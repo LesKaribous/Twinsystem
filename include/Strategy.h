@@ -5,10 +5,6 @@ namespace Strategy{
     int score = 0;
     bool matchEnCours = false;
 
-    //----- INITIALISATION ROBOT -----
-
-    void waitLaunch();
-
     //----- STRATEGIES -----
     void homologationPrimaire();
     void homologationSecondaire();
@@ -16,7 +12,8 @@ namespace Strategy{
     void matchSecondaire();
     void testLancerGobelet();
 
-
+    void sequenceRecalage();
+    void waitLaunch();
 
     //----- AUTRES -----
 

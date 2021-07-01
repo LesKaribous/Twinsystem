@@ -2,7 +2,8 @@
 #include "Settings.h"
 
 #include <Arduino.h>
-#include <FastCRC8.h>
+#include <FastCRC.h>
+#include <SPI.h>
 #include <Wire.h>
 
 using namespace Intercom;
@@ -26,8 +27,6 @@ byte _crcNavRelatif = 0;                  // CRC de controle pour les ordres de 
 
 byte _bufNavAbsolu[6] = {0, 0, 0, 0, 0, 0}; // Buffer d'envoi des ordres de navigation absolus
 byte _crcNavAbsolu = 0;                     // CRC de controle pour les ordres de navigation absolus
-
-
 
 
 void Intercom::init(){

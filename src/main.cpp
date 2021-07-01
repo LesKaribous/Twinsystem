@@ -13,18 +13,18 @@
 // Last update : 01 / 07 / 2021
                                     
 #include "Intercom.h"
+#include "Actuators.h"
+#include "IMH.h"
 
 void setup(){
     Intercom::init();
-    //RemoteControl::init();
-    //Pin::init();
+    delay(500);               //Pause de demarrage avant lancement
+    IHM.init();
+    Actuators::init();
 
     //Motion::init();
-    //Actuators::init();
 
-    //Match::init();
-    //Strategy::init();
-
+    //Match::waitLaunch();
 }
 
 void loop(){
