@@ -1,126 +1,51 @@
 #include "Actuators.h"
+#include "Pin.h"
+#include "Match.h"
+#include "Settings.h"
 
-void Actuators::prepare(){
+using namespace Actuators;
 
-}
+Bras Actuators::brasDroit ;
+Bras Actuators::brasGauche ;
 
-void Actuators::init(){
+Servo Actuators::servoDrapeau ;
+Servo Actuators::servoBrasDroit ;
+Servo Actuators::servoBrasGauche ;
 
-}
+void init(){
+    brasDroit.setPosition(0,0,LOW,LOW,0);
+    brasGauche.setPosition(0,0,LOW,LOW,2000);
 
+    brasDroit.setPosition(100,100,HIGH,LOW,0);
+    brasGauche.setPosition(100,100,HIGH,LOW,2000);
 
-void brasVentouse(BrasVentouse stateBras)
-{
-  switch (stateBras)
-  {
-    case PRISE_DROITE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasDroit.setPosition(0,0,HIGH,LOW,0);
-      attente(200);
-    break;
-    case PRISE_GAUCHE:
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasGauche.setPosition(0,0,HIGH,LOW,0);
-      attente(200);
-    break;
-    case DEPOSE_DROITE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasDroit.setPosition(100,100,LOW,HIGH,0);
-      attente(200);
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      attente(200);
-    break;
-    case DEPOSE_GAUCHE:
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasGauche.setPosition(100,100,LOW,HIGH,0);
-      attente(200);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-      attente(200);
-    break;
-    case PRISE_ENSEMBLE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasDroit.setPosition(0,0,HIGH,LOW,0);
-      brasGauche.setPosition(0,0,HIGH,LOW,0);
-      attente(200);
-    break;
-    case DEPOSE_ENSEMBLE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      attente(200);
-      brasDroit.setPosition(100,100,LOW,HIGH,0);
-      brasGauche.setPosition(100,100,LOW,HIGH,0);
-      attente(200);
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-      attente(200);
-    break;
-    case REPOS:
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-    break;
-  }
-}
+    brasDroit.setPosition(0,0,LOW,LOW,0);
+    brasGauche.setPosition(0,0,LOW,LOW,2000);
 
-void initBrasMancheAir(){
-  servoBrasDroit.attach(pinServoBrasDroit);
-  servoBrasGauche.attach(pinServoBrasGauche);
+    servoBrasDroit.attach(Pin::ServoBrasDroit);
+    servoBrasGauche.attach(Pin::ServoBrasGauche);
 
-  servoBrasDroit.write(POS_BRAS_D_BAS);
-  servoBrasGauche.write(POS_BRAS_G_BAS);
- 
-  delay(800);
+    initBrasMancheAir();
 
-  servoBrasDroit.write(POS_BRAS_D_HAUT);
-  servoBrasGauche.write(POS_BRAS_G_HAUT);
-
-  delay(800);
-  servoBrasDroit.detach();
-  servoBrasGauche.detach();
-}
-
-void brasMancheAir(bool state)
-{
-  if(equipe==EQUIPE_BLEU) servoBrasDroit.attach(pinServoBrasDroit);
-  else servoBrasGauche.attach(pinServoBrasGauche);
-
-  if(state)
-  {
-    if(equipe==EQUIPE_BLEU) servoBrasDroit.write(POS_BRAS_D_BAS);
-    else servoBrasGauche.write(POS_BRAS_G_BAS);
-  }
-  else
-  {
-    if(equipe==EQUIPE_BLEU) servoBrasDroit.write(POS_BRAS_D_HAUT);
-    else servoBrasGauche.write(POS_BRAS_G_HAUT);
-  }
-  delay(800);
-  if(equipe==EQUIPE_BLEU) servoBrasDroit.detach();
-  if(equipe==EQUIPE_BLEU) servoBrasGauche.detach();
+    servoBrasDroit.detach();
+    servoBrasGauche.detach();
 }
 
 
-//----------------INIT ACTIONNEUR-------------
-
-void setupActionneur(){
+void prepare(){
   // Init des bras
   initBrasMancheAir();
 
     // Init du drapeau
-  servoDrapeau.attach(pinServoDrapeau);
+  servoDrapeau.attach(Pin::ServoDrapeau);
   servoDrapeau.write(0);
 
   // Initialisation des bras
-  brasDroit.setPin(pinServoDroit,pinServoVentouseDroit,pinPompeDroit,pinEVDroit);
-  brasGauche.setPin(pinServoGauche,pinServoVentouseGauche,pinPompeGauche,pinEVGauche);
+  brasDroit.setPin(Pin::ServoDroit,Pin::ServoVentouseDroit,Pin::PompeDroit,Pin::EVDroit);
+  brasGauche.setPin(Pin::ServoGauche,Pin::ServoVentouseGauche,Pin::PompeGauche,Pin::EVGauche);
   // Initialisation de la pin pinBalise
-  pinMode(pinBeacon,OUTPUT);
-  digitalWrite(pinBeacon,LOW);
+  pinMode(Pin::Beacon,OUTPUT);
+  digitalWrite(Pin::Beacon,LOW);
 
   brasDroit.setLimit(35,140,10,90);
   brasGauche.setLimit(110,10,180,70);
@@ -132,28 +57,103 @@ void setupActionneur(){
   servoBrasGauche.detach();
 }
 
-void initActionneur(){
+void brasVentouse(BrasVentouse stateBras)
+{
+  switch (stateBras)
+  {
+    case BrasVentouse::PRISE_DROITE:
+      brasDroit.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasDroit.setPosition(0,0,HIGH,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::PRISE_GAUCHE:
+      brasGauche.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasGauche.setPosition(0,0,HIGH,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::DEPOSE_DROITE:
+      brasDroit.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasDroit.setPosition(100,100,LOW,HIGH,0);
+      Match::attente(200);
+      brasDroit.setPosition(0,0,LOW,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::DEPOSE_GAUCHE:
+      brasGauche.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasGauche.setPosition(100,100,LOW,HIGH,0);
+      Match::attente(200);
+      brasGauche.setPosition(0,0,LOW,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::PRISE_ENSEMBLE:
+      brasDroit.setPosition(100,100,HIGH,LOW,0);
+      brasGauche.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasDroit.setPosition(0,0,HIGH,LOW,0);
+      brasGauche.setPosition(0,0,HIGH,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::DEPOSE_ENSEMBLE:
+      brasDroit.setPosition(100,100,HIGH,LOW,0);
+      brasGauche.setPosition(100,100,HIGH,LOW,0);
+      Match::attente(200);
+      brasDroit.setPosition(100,100,LOW,HIGH,0);
+      brasGauche.setPosition(100,100,LOW,HIGH,0);
+      Match::attente(200);
+      brasDroit.setPosition(0,0,LOW,LOW,0);
+      brasGauche.setPosition(0,0,LOW,LOW,0);
+      Match::attente(200);
+    break;
+    case BrasVentouse::REPOS:
+      brasDroit.setPosition(0,0,LOW,LOW,0);
+      brasGauche.setPosition(0,0,LOW,LOW,0);
+    break;
+  }
+}
 
-    brasDroit.setPosition(0,0,LOW,LOW,0);
-    brasGauche.setPosition(0,0,LOW,LOW,2000);
+void initBrasMancheAir(){
+  servoBrasDroit.attach(Pin::ServoBrasDroit);
+  servoBrasGauche.attach(Pin::ServoBrasGauche);
 
-    brasDroit.setPosition(100,100,HIGH,LOW,0);
-    brasGauche.setPosition(100,100,HIGH,LOW,2000);
+  servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
+  servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
+ 
+  delay(800);
 
-    brasDroit.setPosition(0,0,LOW,LOW,0);
-    brasGauche.setPosition(0,0,LOW,LOW,2000);
+  servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
+  servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
 
-    servoBrasDroit.attach(pinServoBrasDroit);
-    servoBrasGauche.attach(pinServoBrasGauche);
+  delay(800);
+  servoBrasDroit.detach();
+  servoBrasGauche.detach();
+}
 
-    initBrasMancheAir();
+void brasMancheAir(bool state)
+{
+  if(TEAM_BLUE) servoBrasDroit.attach(Pin::ServoBrasDroit);
+  else servoBrasGauche.attach(Pin::ServoBrasGauche);
 
-    servoBrasDroit.detach();
-    servoBrasGauche.detach();
-
+  if(state)
+  {
+    if(TEAM_BLUE) servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
+    else servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
+  }
+  else
+  {
+    if(TEAM_BLUE) servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
+    else servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
+  }
+  Match::attente(800);
+  if(TEAM_BLUE) servoBrasDroit.detach();
+  if(TEAM_YELLOW) servoBrasGauche.detach();
 }
 
 
+//----------------INIT ACTIONNEUR-------------
 
 void Bras::setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv)
 {

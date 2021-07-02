@@ -14,12 +14,12 @@
                                     
 #include "Intercom.h"
 #include "Actuators.h"
-#include "IMH.h"
+#include "IHM.h"
 
 void setup(){
     Intercom::init();
     delay(500);               //Pause de demarrage avant lancement
-    IHM.init();
+    IHM::init();
     Actuators::init();
 
     //Motion::init();

@@ -15,8 +15,5 @@ namespace Strategy{
     void sequenceRecalage();
     void waitLaunch();
 
-    //----- AUTRES -----
-
-    void attente(int temps);
 
 }
