@@ -10,6 +10,8 @@ namespace IHM{
     void updateButtonIHM  ();
     void readButtonState  ();
 
+    void freezeSettings   ();
+
     //------ Gestion des E/S ------
     bool getTirette       ();
     bool getDetection     ();

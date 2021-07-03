@@ -2,8 +2,8 @@
 
 namespace Strategy{
 
-    int score = 0;
-    bool matchEnCours = false;
+    extern int score;
+    extern bool matchEnCours;
 
     //----- STRATEGIES -----
     void homologationPrimaire();

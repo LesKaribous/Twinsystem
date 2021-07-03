@@ -15,26 +15,22 @@
 #include "Intercom.h"
 #include "Actuators.h"
 #include "IHM.h"
+#include "Motion.h"
+#include "Match.h"
+#include "Strategy.h"
 
 void setup(){
     Intercom::init();
     delay(500);               //Pause de demarrage avant lancement
     IHM::init();
     Actuators::init();
-
-    //Motion::init();
-
-    //Match::waitLaunch();
+    delay(1000);
+    Strategy::waitLaunch();    
 }
 
 void loop(){
-    //Match::wait();
-
-    //Strategy::homologationPrimaire();
-    //homologationSecondaire();
-    //matchPrimaire();
-    //matchSecondaire();
-
-    //Match::waitFinMatch();
-    //Match::finMatch();
+    Strategy::homologationPrimaire();
+    //Strategy::homologationSecondaire();
+    //Strategy::matchPrimaire();
+    //Strategy::matchSecondaire();
 }

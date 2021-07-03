@@ -5,6 +5,18 @@
 
 namespace Match{
 
+    double tempsRestant = Setting::TEMPS_MATCH;
+    double timeInit = 0;
+    int score = 0;
+    bool matchEnCours = false;
+
+	void start()
+	{
+		timeInit = millis();
+		matchEnCours = true;
+	}
+
+
 	void majScore(int points, int multiplicateur)
 	{
 		score = score + (points * multiplicateur);
@@ -41,7 +53,7 @@ namespace Match{
 			if (matchEnCours)
 			{
 				majTemps();
-				IHM::LCD::matchScreen(score, tempsRestant, In);
+				IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 			}
 		}
 	}
@@ -49,8 +61,10 @@ namespace Match{
 	//----------------PROCEDURE DE FIN DE MATCH----------------
 	void waitFinMatch()
 	{
+		digitalWrite(Pin::Beacon, LOW);
 		while (!majTemps())
 		{
+			//digitalWrite(Pin::Beacon,LOW);
 			IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 		}
 	}
@@ -67,7 +81,7 @@ namespace Match{
 			// Stopper les moteurs
 			Intercom::sendNavigation(255, 0, 0);
 			// Stoppe la Balise
-			//digitalWrite(pinBalise,LOW);
+			digitalWrite(Pin::Beacon,LOW);
 		}
 	}
 }

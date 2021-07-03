@@ -3,311 +3,327 @@
 #include "Match.h"
 #include "Settings.h"
 
-using namespace Actuators;
-
-Bras Actuators::brasDroit ;
-Bras Actuators::brasGauche ;
-
-Servo Actuators::servoDrapeau ;
-Servo Actuators::servoBrasDroit ;
-Servo Actuators::servoBrasGauche ;
-
-void init(){
-    brasDroit.setPosition(0,0,LOW,LOW,0);
-    brasGauche.setPosition(0,0,LOW,LOW,2000);
-
-    brasDroit.setPosition(100,100,HIGH,LOW,0);
-    brasGauche.setPosition(100,100,HIGH,LOW,2000);
-
-    brasDroit.setPosition(0,0,LOW,LOW,0);
-    brasGauche.setPosition(0,0,LOW,LOW,2000);
-
-    servoBrasDroit.attach(Pin::ServoBrasDroit);
-    servoBrasGauche.attach(Pin::ServoBrasGauche);
-
-    initBrasMancheAir();
-
-    servoBrasDroit.detach();
-    servoBrasGauche.detach();
-}
-
-
-void prepare(){
-  // Init des bras
-  initBrasMancheAir();
-
-    // Init du drapeau
-  servoDrapeau.attach(Pin::ServoDrapeau);
-  servoDrapeau.write(0);
-
-  // Initialisation des bras
-  brasDroit.setPin(Pin::ServoDroit,Pin::ServoVentouseDroit,Pin::PompeDroit,Pin::EVDroit);
-  brasGauche.setPin(Pin::ServoGauche,Pin::ServoVentouseGauche,Pin::PompeGauche,Pin::EVGauche);
-  // Initialisation de la pin pinBalise
-  pinMode(Pin::Beacon,OUTPUT);
-  digitalWrite(Pin::Beacon,LOW);
-
-  brasDroit.setLimit(35,140,10,90);
-  brasGauche.setLimit(110,10,180,70);
-  brasDroit.setPosition(0,0,LOW,LOW,0);
-  brasGauche.setPosition(0,0,LOW,LOW,2000);
-
-  servoDrapeau.detach();
-  servoBrasDroit.detach();
-  servoBrasGauche.detach();
-}
-
-void brasVentouse(BrasVentouse stateBras)
+namespace Actuators
 {
-  switch (stateBras)
-  {
-    case BrasVentouse::PRISE_DROITE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasDroit.setPosition(0,0,HIGH,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::PRISE_GAUCHE:
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasGauche.setPosition(0,0,HIGH,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::DEPOSE_DROITE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasDroit.setPosition(100,100,LOW,HIGH,0);
-      Match::attente(200);
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::DEPOSE_GAUCHE:
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasGauche.setPosition(100,100,LOW,HIGH,0);
-      Match::attente(200);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::PRISE_ENSEMBLE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasDroit.setPosition(0,0,HIGH,LOW,0);
-      brasGauche.setPosition(0,0,HIGH,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::DEPOSE_ENSEMBLE:
-      brasDroit.setPosition(100,100,HIGH,LOW,0);
-      brasGauche.setPosition(100,100,HIGH,LOW,0);
-      Match::attente(200);
-      brasDroit.setPosition(100,100,LOW,HIGH,0);
-      brasGauche.setPosition(100,100,LOW,HIGH,0);
-      Match::attente(200);
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-      Match::attente(200);
-    break;
-    case BrasVentouse::REPOS:
-      brasDroit.setPosition(0,0,LOW,LOW,0);
-      brasGauche.setPosition(0,0,LOW,LOW,0);
-    break;
-  }
-}
 
-void initBrasMancheAir(){
-  servoBrasDroit.attach(Pin::ServoBrasDroit);
-  servoBrasGauche.attach(Pin::ServoBrasGauche);
+	Bras brasDroit;
+	Bras brasGauche;
 
-  servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
-  servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
- 
-  delay(800);
+	Servo servoDrapeau;
+	Servo servoBrasDroit;
+	Servo servoBrasGauche;
 
-  servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
-  servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
+	void init()
+	{
+		prepare();
+		/*
+		brasDroit.setPosition(0, 0, LOW, LOW, 0);
+		brasGauche.setPosition(0, 0, LOW, LOW, 2000);
 
-  delay(800);
-  servoBrasDroit.detach();
-  servoBrasGauche.detach();
-}
+		brasDroit.setPosition(100, 100, HIGH, LOW, 0);
+		brasGauche.setPosition(100, 100, HIGH, LOW, 2000);
 
-void brasMancheAir(bool state)
-{
-  if(TEAM_BLUE) servoBrasDroit.attach(Pin::ServoBrasDroit);
-  else servoBrasGauche.attach(Pin::ServoBrasGauche);
+		brasDroit.setPosition(0, 0, LOW, LOW, 0);
+		brasGauche.setPosition(0, 0, LOW, LOW, 2000);
 
-  if(state)
-  {
-    if(TEAM_BLUE) servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
-    else servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
-  }
-  else
-  {
-    if(TEAM_BLUE) servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
-    else servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
-  }
-  Match::attente(800);
-  if(TEAM_BLUE) servoBrasDroit.detach();
-  if(TEAM_YELLOW) servoBrasGauche.detach();
-}
+		servoBrasDroit.attach(Pin::ServoBrasDroit);
+		servoBrasGauche.attach(Pin::ServoBrasGauche);
 
+		initBrasMancheAir();
 
-//----------------INIT ACTIONNEUR-------------
+		servoBrasDroit.detach();
+		servoBrasGauche.detach();
+		*/
+	}
 
-void Bras::setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv)
-{
-  _pinServoBras = pinServoBras ;
-  _pinServoVentouse = pinServoVentouse ;
-  _pinPompe = pinPompe ;
-  _pinEv = pinEv ;
+	void prepare()
+	{
+		// Init des bras
+		initBrasMancheAir();
 
-  _servoBras.detach();
-  _servoVentouse.detach();
+		// Init du drapeau
+		servoDrapeau.attach(Pin::ServoDrapeau);
+		servoDrapeau.write(0);
 
-  _servoBras.attach(_pinServoBras);
-  _servoVentouse.attach(_pinServoVentouse);
+		// Initialisation des bras
+		brasDroit.setPin(Pin::ServoDroit, Pin::ServoVentouseDroit, Pin::PompeDroit, Pin::EVDroit);
+		brasGauche.setPin(Pin::ServoGauche, Pin::ServoVentouseGauche, Pin::PompeGauche, Pin::EVGauche);
+		// Initialisation de la pin pinBalise
+		pinMode(Pin::Beacon, OUTPUT);
+		digitalWrite(Pin::Beacon, LOW);
 
-  pinMode(_pinPompe,OUTPUT);
-  pinMode(_pinEv,OUTPUT);
-}
+		brasDroit.setLimit(35, 140, 10, 90);
+		brasGauche.setLimit(110, 10, 180, 70);
+		brasDroit.setPosition(0, 0, LOW, LOW, 0);
+		brasGauche.setPosition(0, 0, LOW, LOW, 2000);
 
-void Bras::setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv, int pinAscenseur, int pinPotard)
-{
-  setPin(pinServoBras, pinServoVentouse, pinPompe, pinEv) ;
+		servoDrapeau.detach();
+		servoBrasDroit.detach();
+		servoBrasGauche.detach();
+	}
 
-  _pinAscenseur = pinAscenseur ;
-  _pinPotard = pinPotard ;
+	void brasVentouse(BrasVentouse stateBras)
+	{
+		switch (stateBras)
+		{
+		case BrasVentouse::PRISE_DROITE:
+			brasDroit.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasDroit.setPosition(0, 0, HIGH, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::PRISE_GAUCHE:
+			brasGauche.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasGauche.setPosition(0, 0, HIGH, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::DEPOSE_DROITE:
+			brasDroit.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasDroit.setPosition(100, 100, LOW, HIGH, 0);
+			Match::attente(200);
+			brasDroit.setPosition(0, 0, LOW, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::DEPOSE_GAUCHE:
+			brasGauche.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasGauche.setPosition(100, 100, LOW, HIGH, 0);
+			Match::attente(200);
+			brasGauche.setPosition(0, 0, LOW, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::PRISE_ENSEMBLE:
+			brasDroit.setPosition(100, 100, HIGH, LOW, 0);
+			brasGauche.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasDroit.setPosition(0, 0, HIGH, LOW, 0);
+			brasGauche.setPosition(0, 0, HIGH, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::DEPOSE_ENSEMBLE:
+			brasDroit.setPosition(100, 100, HIGH, LOW, 0);
+			brasGauche.setPosition(100, 100, HIGH, LOW, 0);
+			Match::attente(200);
+			brasDroit.setPosition(100, 100, LOW, HIGH, 0);
+			brasGauche.setPosition(100, 100, LOW, HIGH, 0);
+			Match::attente(200);
+			brasDroit.setPosition(0, 0, LOW, LOW, 0);
+			brasGauche.setPosition(0, 0, LOW, LOW, 0);
+			Match::attente(200);
+			break;
+		case BrasVentouse::REPOS:
+			brasDroit.setPosition(0, 0, LOW, LOW, 0);
+			brasGauche.setPosition(0, 0, LOW, LOW, 0);
+			break;
+		}
+	}
 
-}
+	void initBrasMancheAir()
+	{
+		servoBrasDroit.attach(Pin::ServoBrasDroit);
+		servoBrasGauche.attach(Pin::ServoBrasGauche);
 
-void Bras::setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse)
-{
-  _minServoBras = minServoBras ;
-  _maxServoBras = maxServoBras ;
-  _minServoVentouse = minServoVentouse ;
-  _maxServoVentouse = maxServoVentouse ;
-}
+		servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
+		servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
 
-void Bras::setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse, int stopAscenseur,int minAscenseur , int maxAscenseur)
-{
-  setLimit(minServoBras, maxServoBras, minServoVentouse, maxServoVentouse);
-  _stopAscenseur = stopAscenseur ;
-  _minAscenseur = minAscenseur ;
-  _maxAscenseur = maxAscenseur ;
-}
+		delay(800);
 
-int Bras::calcPositionBras(byte posServoBras)
-{
-  // limiter la commande entre 0 et 100%
-  int newPosBras = constrain(posServoBras,0,100);
-  // Calculer la position servo en fonction des limites min max
-  newPosBras = map(newPosBras,0,100,_minServoBras,_maxServoBras);
-  return newPosBras;
-}
+		servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
+		servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
 
-int Bras::calcPositionVentouse(byte posServoVentouse)
-{
-  // limiter la commande entre 0 et 100%
-  int newPosVentouse = constrain(posServoVentouse,0,100);
-  // Calculer la position servo en fonction des limites min max
-  newPosVentouse = map(newPosVentouse,0,100,_minServoVentouse,_maxServoVentouse);
-  return newPosVentouse;
-}
+		delay(800);
+		servoBrasDroit.detach();
+		servoBrasGauche.detach();
+	}
 
-int Bras::calcPositionAscenseur(byte posAscenseur)
-{
-  // limiter la commande entre 0 et 100%
-  int newPosAscenseur = constrain(posAscenseur,0,100);
-  // Calculer la position servo en fonction des limites min max
-  newPosAscenseur = map(newPosAscenseur,0,100,_minAscenseur,_maxAscenseur);
-  return newPosAscenseur;
-}
+	void brasMancheAir(bool state)
+	{
+		if (TEAM_BLUE)
+			servoBrasDroit.attach(Pin::ServoBrasDroit);
+		else
+			servoBrasGauche.attach(Pin::ServoBrasGauche);
 
-void Bras::setPosition(byte posServoBras, byte posServoVentouse, bool pompe, bool ev, int wait)
-{
-  // Appliquer la position
-  _servoBras.write(calcPositionBras(posServoBras));
-  _servoVentouse.write(calcPositionVentouse(posServoVentouse));
+		if (state)
+		{
+			if (TEAM_BLUE)
+				servoBrasDroit.write(Setting::POS_BRAS_D_BAS);
+			else
+				servoBrasGauche.write(Setting::POS_BRAS_G_BAS);
+		}
+		else
+		{
+			if (TEAM_BLUE)
+				servoBrasDroit.write(Setting::POS_BRAS_D_HAUT);
+			else
+				servoBrasGauche.write(Setting::POS_BRAS_G_HAUT);
+		}
+		Match::attente(800);
+		if (TEAM_BLUE)
+			servoBrasDroit.detach();
+		if (TEAM_YELLOW)
+			servoBrasGauche.detach();
+	}
 
-  // Appliquer la commande de pompe/EV
-  digitalWrite(_pinPompe,pompe);
-  digitalWrite(_pinEv,ev);
+	//----------------INIT ACTIONNEUR-------------
 
-  delay(wait);
-}
+	void Bras::setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv)
+	{
+		_pinServoBras = pinServoBras;
+		_pinServoVentouse = pinServoVentouse;
+		_pinPompe = pinPompe;
+		_pinEv = pinEv;
 
-void Bras::setBras(byte posServoBras)
-{
-  _servoBras.write(calcPositionBras(posServoBras));
-}
+		_servoBras.detach();
+		_servoVentouse.detach();
 
-void Bras::setBras(byte posServoBras, int wait)
-{
-  _servoBras.write(calcPositionBras(posServoBras));
-  delay(wait);
-}
+		_servoBras.attach(_pinServoBras);
+		_servoVentouse.attach(_pinServoVentouse);
 
-void Bras::setAscenseur(int posAscenseur)
-{
-  int Input = analogRead(_pinPotard);
+		pinMode(_pinPompe, OUTPUT);
+		pinMode(_pinEv, OUTPUT);
+	}
 
-  posAscenseur = calcPositionAscenseur(posAscenseur);
+	void Bras::setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv, int pinAscenseur, int pinPotard)
+	{
+		setPin(pinServoBras, pinServoVentouse, pinPompe, pinEv);
 
-  _servoAscenseur.detach();
-  _servoAscenseur.attach(_pinAscenseur);
+		_pinAscenseur = pinAscenseur;
+		_pinPotard = pinPotard;
+	}
 
-  while(Input > (posAscenseur + 2) || Input < (posAscenseur - 2))
-  {
-    Input = analogRead(_pinPotard);
-    if (Input > posAscenseur) _servoAscenseur.write(_stopAscenseur-12);
-    else _servoAscenseur.write(_stopAscenseur+12);
-  }
-  _servoAscenseur.write(_stopAscenseur);
-  delay(200);
-  _servoAscenseur.detach();
-}
+	void Bras::setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse)
+	{
+		_minServoBras = minServoBras;
+		_maxServoBras = maxServoBras;
+		_minServoVentouse = minServoVentouse;
+		_maxServoVentouse = maxServoVentouse;
+	}
 
-void Bras::setAscenseur(int posAscenseur, int wait)
-{
-  setAscenseur(posAscenseur);
-  delay(wait);
-}
+	void Bras::setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse, int stopAscenseur, int minAscenseur, int maxAscenseur)
+	{
+		setLimit(minServoBras, maxServoBras, minServoVentouse, maxServoVentouse);
+		_stopAscenseur = stopAscenseur;
+		_minAscenseur = minAscenseur;
+		_maxAscenseur = maxAscenseur;
+	}
 
-int Bras::getPotardValue()
-{
-  return analogRead(_pinPotard);
-}
+	int Bras::calcPositionBras(byte posServoBras)
+	{
+		// limiter la commande entre 0 et 100%
+		int newPosBras = constrain(posServoBras, 0, 100);
+		// Calculer la position servo en fonction des limites min max
+		newPosBras = map(newPosBras, 0, 100, _minServoBras, _maxServoBras);
+		return newPosBras;
+	}
 
-void Bras::setVentouse(byte posServoVentouse)
-{
-  _servoVentouse.write(calcPositionVentouse(posServoVentouse));
-}
+	int Bras::calcPositionVentouse(byte posServoVentouse)
+	{
+		// limiter la commande entre 0 et 100%
+		int newPosVentouse = constrain(posServoVentouse, 0, 100);
+		// Calculer la position servo en fonction des limites min max
+		newPosVentouse = map(newPosVentouse, 0, 100, _minServoVentouse, _maxServoVentouse);
+		return newPosVentouse;
+	}
 
-void Bras::setVentouse(byte posServoVentouse, int wait)
-{
-  _servoVentouse.write(calcPositionVentouse(posServoVentouse));
-  delay(wait);
-}
+	int Bras::calcPositionAscenseur(byte posAscenseur)
+	{
+		// limiter la commande entre 0 et 100%
+		int newPosAscenseur = constrain(posAscenseur, 0, 100);
+		// Calculer la position servo en fonction des limites min max
+		newPosAscenseur = map(newPosAscenseur, 0, 100, _minAscenseur, _maxAscenseur);
+		return newPosAscenseur;
+	}
 
-void Bras::setPompe(bool state)
-{
-  digitalWrite(_pinPompe,state);
-}
+	void Bras::setPosition(byte posServoBras, byte posServoVentouse, bool pompe, bool ev, int wait)
+	{
+		// Appliquer la position
+		_servoBras.write(calcPositionBras(posServoBras));
+		_servoVentouse.write(calcPositionVentouse(posServoVentouse));
 
-void Bras::setPompe(bool state, int wait)
-{
-  digitalWrite(_pinPompe,state);
-  delay(wait);
-}
+		// Appliquer la commande de pompe/EV
+		digitalWrite(_pinPompe, pompe);
+		digitalWrite(_pinEv, ev);
 
-void Bras::setEV(bool state)
-{
-  digitalWrite(_pinEv,state);
-}
+		delay(wait);
+	}
 
-void Bras::setEV(bool state, int wait)
-{
-  digitalWrite(_pinEv,state);
-  delay(wait);
+	void Bras::setBras(byte posServoBras)
+	{
+		_servoBras.write(calcPositionBras(posServoBras));
+	}
+
+	void Bras::setBras(byte posServoBras, int wait)
+	{
+		_servoBras.write(calcPositionBras(posServoBras));
+		delay(wait);
+	}
+
+	void Bras::setAscenseur(int posAscenseur)
+	{
+		int Input = analogRead(_pinPotard);
+
+		posAscenseur = calcPositionAscenseur(posAscenseur);
+
+		_servoAscenseur.detach();
+		_servoAscenseur.attach(_pinAscenseur);
+
+		while (Input > (posAscenseur + 2) || Input < (posAscenseur - 2))
+		{
+			Input = analogRead(_pinPotard);
+			if (Input > posAscenseur)
+				_servoAscenseur.write(_stopAscenseur - 12);
+			else
+				_servoAscenseur.write(_stopAscenseur + 12);
+		}
+		_servoAscenseur.write(_stopAscenseur);
+		delay(200);
+		_servoAscenseur.detach();
+	}
+
+	void Bras::setAscenseur(int posAscenseur, int wait)
+	{
+		setAscenseur(posAscenseur);
+		delay(wait);
+	}
+
+	int Bras::getPotardValue()
+	{
+		return analogRead(_pinPotard);
+	}
+
+	void Bras::setVentouse(byte posServoVentouse)
+	{
+		_servoVentouse.write(calcPositionVentouse(posServoVentouse));
+	}
+
+	void Bras::setVentouse(byte posServoVentouse, int wait)
+	{
+		_servoVentouse.write(calcPositionVentouse(posServoVentouse));
+		delay(wait);
+	}
+
+	void Bras::setPompe(bool state)
+	{
+		digitalWrite(_pinPompe, state);
+	}
+
+	void Bras::setPompe(bool state, int wait)
+	{
+		digitalWrite(_pinPompe, state);
+		delay(wait);
+	}
+
+	void Bras::setEV(bool state)
+	{
+		digitalWrite(_pinEv, state);
+	}
+
+	void Bras::setEV(bool state, int wait)
+	{
+		digitalWrite(_pinEv, state);
+		delay(wait);
+	}
+
 }

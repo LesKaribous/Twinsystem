@@ -18,13 +18,15 @@ namespace Actuators{
     void init();
     void prepare();
 
+    void initBrasMancheAir();
+
     void brasMancheAir(bool state);
     void brasVentouse(BrasVentouse stateBras);
 
     class Bras{
     public:
 
-        Bras::Bras(){}
+        Bras(){}
 
         void setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv);
         void setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv, int pinAscenseur, int pinPotard);

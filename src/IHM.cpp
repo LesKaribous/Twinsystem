@@ -68,7 +68,8 @@ namespace IHM
 		_check = false,
 		_recalage = false,
 		_typeRobot = Setting::ROBOT_PRIMAIRE,
-		_equipe = Setting::EQUIPE_BLEU;
+		_equipe = Setting::EQUIPE_BLEU,
+		freezed = false;
 
 	// Liste d'action de la check list:
 	char *_titreList[6] = {
@@ -88,11 +89,10 @@ namespace IHM
 		"Poser la balise adversaire    ",
 		"Bon match !                   "};
 
-}
 
-void IHM::init()
+
+void init()
 {
-
 	pinMode(Pin::Tirette, INPUT_PULLUP);
 
 	pinMode(Pin::latchMux, OUTPUT);
@@ -108,10 +108,12 @@ void IHM::init()
 	_u8g2.setDrawColor(1);
 	_u8g2.setFontPosTop();
 	_u8g2.setFontDirection(0);
+
+	LCD::splashScreen();
 }
 
 //----------------GESTION DES BOUTTONS DE L'IHM----------------
-void IHM::updateButtonIHM()
+void updateButtonIHM()
 {
 	readButtonState();
 	getDetection();
@@ -120,7 +122,7 @@ void IHM::updateButtonIHM()
 	getEquipe();
 }
 
-void IHM::readButtonState()
+void readButtonState()
 {
 	digitalWrite(Pin::latchMux, LOW);
 	digitalWrite(Pin::latchMux, HIGH);
@@ -133,44 +135,51 @@ void IHM::readButtonState()
 		digitalWrite(Pin::clockMux, LOW);
 	}
 }
-bool IHM::getTirette()
-{
-	if (analogRead(Pin::Tirette) < 10)
-		_tirette = false;
-	else
-		_tirette = true;
-	return _tirette;
+
+void freezeSettings(){
+	freezed = true;
 }
-bool IHM::getDetection()
+
+bool getTirette(){
+	if(!freezed){
+		if (analogRead(Pin::Tirette) < 10)
+			_tirette = false;
+		else
+			_tirette = true;
+		return _tirette;
+	}else return _tirette;
+}
+
+bool getDetection()
 {
-	_detection = _buttonState[0];
+	if(!freezed) 
+		_detection = _buttonState[0];
 	return _detection;
 }
-bool IHM::getStrategie()
-{
-	_strategie = _buttonState[2];
+bool getStrategie(){
+	if(!freezed)
+		_strategie = _buttonState[2];
 	return _strategie;
 }
-bool IHM::getCheck()
-{
-	_check = _buttonState[5];
+bool getCheck(){
+	if(!freezed)
+		_check = _buttonState[5];
 	return _check;
 }
-bool IHM::getEquipe()
-{
-	_equipe = _buttonState[1];
+bool getEquipe(){
+	if(!freezed)
+		_equipe = _buttonState[1];
 	return _equipe;
 }
-void IHM::setRecalage(bool state)
-{
-	_recalage = state;
+void setRecalage(bool state){
+	//if(!freezed) ??
+		_recalage = state;
 }
-bool IHM::getRecalage()
-{
+bool getRecalage(){
 	return _recalage;
 }
 
-namespace IHM{
+
 	namespace LCD{
 		//----------------GESTION DES PAGES LCD-------------------
 		void splashScreen()
@@ -188,6 +197,7 @@ namespace IHM{
 
 			_u8g2.sendBuffer();
 		}
+
 		void menuScreen()
 		{
 			const int ligneEtat = 0;

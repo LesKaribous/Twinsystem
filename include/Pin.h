@@ -1,8 +1,6 @@
 #pragma once
 
 //TODO RESERVE
-
-
 namespace Pin{
     // Declaration des pins E/S
     const int 
@@ -15,7 +13,7 @@ namespace Pin{
         ServoDroit           =   8, //OUTPUT
         ServoVentouseDroit   =   9, //OUTPUT
         ServoGauche          =  24, //OUTPUT
-        ServoVentouseGauche =  10, //OUTPUT
+        ServoVentouseGauche  =  10, //OUTPUT
 
         //Drapeau
         ServoDrapeau         =  15, //OUTPUT

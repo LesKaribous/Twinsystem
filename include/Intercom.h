@@ -13,6 +13,7 @@ namespace Intercom{
   void slowMode(bool speed);
 
   int getNbrBadCRC();
+  void badCRC();
 
   //DEMANDE L'ETAT DU DEPLACEMENT
   int askNavigation();
