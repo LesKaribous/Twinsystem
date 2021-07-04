@@ -5,87 +5,62 @@
 
 namespace Actuators{
 
-    enum class BrasVentouse {
-        PRISE_DROITE,
-        PRISE_GAUCHE,
-        DEPOSE_DROITE,
-        DEPOSE_GAUCHE,
-        PRISE_ENSEMBLE,
-        DEPOSE_ENSEMBLE,
-        REPOS
+    enum class Side {
+        RIGHT,
+        LEFT,
+        BOTH
     };
 
     void init();
-    void prepare();
-
-    void initBrasMancheAir();
+    void initBras();
 
     void brasMancheAir(bool state);
-    void brasVentouse(BrasVentouse stateBras);
+    void brasVentouse(Side stateBras);
 
-    class Bras{
+    class Pincer{
     public:
 
-        Bras(){}
+        Pincer(
+            int pinServoPincer, 
+            int pinServoVentouse, 
+            int pinPompe, 
+            int pinEv
+        );
 
-        void setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv);
-        void setPin(int pinServoBras, int pinServoVentouse, int pinPompe, int pinEv, int pinAscenseur, int pinPotard);
+        void fold();
+        void unfold();
 
-        void setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse);
-        void setLimit(int minServoBras, int maxServoBras, int minServoVentouse, int maxServoVentouse, int stopAscenseur , int minAscenseur , int maxAscenseur);
+        void suck();
+        void unsuck();
 
-        int calcPositionBras(byte posServoBras);
-        int calcPositionVentouse(byte posServoVentouse);
-        int calcPositionAscenseur(byte posAscenseur);
+        void close();
+        void open();
 
-        void setPosition(byte posServoBras, byte posServoVentouse, bool pompe, bool ev, int wait);
+        void sleep();
+        void wake();
 
-        void setBras(byte posServoBras);
-        void setBras(byte posServoBras, int wait);
+    private:
 
-        void setAscenseur(int posAscenseur);
-        void setAscenseur(int posAscenseur, int wait);
-
-        void setVentouse(byte posServoVentouse);
-        void setVentouse(byte posServoVentouse, int wait);
-
-        int getPotardValue();
-
-        void setPompe(bool state);
-        void setPompe(bool state, int wait);
-        void setEV(bool state);
-        void setEV(bool state, int wait);
-
-        private:
-
-        Servo _servoBras ;
+        Servo _servoPincer ;
         Servo _servoVentouse ;
-        Servo _servoAscenseur ;
 
-        int _pinServoBras;
+        int _pinServoPincer;
         int _pinServoVentouse;
 
-        int _pinPompe ;
-        int _pinEv ;
+        int _pinPompe;
+        int _pinEv;
 
-        int _pinAscenseur;
-        int _pinPotard;
-
-        int _minServoBras ;
-        int _maxServoBras ;
-        int _minServoVentouse ;
-        int _maxServoVentouse ;
-        int _minAscenseur ;
-        int _maxAscenseur ;
-
-        int _stopAscenseur ;
+        int _foldPos;
+        int _unfoldPos;
+        int _closePos;
+        int _openPos;
 
     };
 
 
 
-    extern Bras brasDroit ;
-    extern Bras brasGauche ;
+    extern Pincer brasDroit ;
+    extern Pincer brasGauche ;
 
     extern Servo servoDrapeau ;
     extern Servo servoBrasDroit ;
