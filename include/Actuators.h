@@ -3,19 +3,35 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-namespace Actuators{
 
+
+
+namespace Actuators{
     enum class Side {
         RIGHT,
         LEFT,
         BOTH
     };
 
-    void init();
-    void initBras();
+    void init       ();
+    void initBras   ();
 
-    void brasMancheAir(bool state);
-    void brasVentouse(Side stateBras);
+    void deployArm  (bool side);
+
+    void fold   (Side side = Side::BOTH);
+    void unfold (Side side = Side::BOTH);
+
+    void suck   (Side side = Side::BOTH);
+    void unsuck (Side side = Side::BOTH);
+
+    void close  (Side side = Side::BOTH);
+    void open   (Side side = Side::BOTH);
+
+    void grab   (Side side = Side::BOTH);
+    void release(Side side = Side::BOTH);
+
+    void sleep  (Side side = Side::BOTH);
+    void wake   (Side side = Side::BOTH);
 
     class Pincer{
     public:
@@ -24,7 +40,11 @@ namespace Actuators{
             int pinServoPincer, 
             int pinServoVentouse, 
             int pinPompe, 
-            int pinEv
+            int pinEv,
+            int foldedPos,
+            int unfolded,
+            int closed,
+            int opened
         );
 
         void fold();
@@ -55,16 +75,18 @@ namespace Actuators{
         int _closePos;
         int _openPos;
 
+        bool asleep = true;
+
     };
 
 
 
-    extern Pincer brasDroit ;
-    extern Pincer brasGauche ;
+    extern Pincer rightPincer ;
+    extern Pincer leftPincer ;
 
     extern Servo servoDrapeau ;
-    extern Servo servoBrasDroit ;
-    extern Servo servoBrasGauche ;
+    extern Servo servoRightArm ;
+    extern Servo servoLeftArm ;
 
 }
 

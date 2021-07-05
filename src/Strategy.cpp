@@ -6,12 +6,25 @@
 #include "Pin.h"
 
 using namespace Motion;
-using namespace Actuators;
 using namespace Match;
 
 //----------------STRATEGIES----------------
 namespace Strategy
 {
+	void grab()
+	{
+		turnGo(0,-80);
+		Actuators::unfold();
+		Actuators::open();
+		WAIT(500);
+		turnGo(0,40);
+		Actuators::close();
+		Actuators::suck();
+		WAIT(500);
+		Actuators::fold();
+		WAIT(500);
+	}
+
 	void sequenceRecalage()
 	{
 		//Recalage
@@ -33,25 +46,26 @@ namespace Strategy
 
 	void homologationPrimaire()
 	{
-		Intercom::setDetection(false); //Toward +Y ( 130 ; 970 )
+		Intercom::setDetection(false); 	//Toward +Y ( 130 ; 970 )
 		Intercom::setRecalibration(false);
 		Intercom::slowMode(false);
-		turnGo(0, 1000);	 //Toward +Y ( 130 ; 1970 )
-		turnGo(0, -70);		 //Toward +Y ( 130 ; 1900 )
-		brasMancheAir(true); //Ouverture bras
+		turnGo(0, 1000);				//Toward +Y ( 130 ; 1970 )
+		turnGo(0, -70);					//Toward +Y ( 130 ; 1900 )
+		Actuators::deployArm(true); 				//Ouverture bras
 		Intercom::slowMode(true);
-		turnGo(90, 500); //Toward +X ( 630 ; 970 ) //old 90 700
+		turnGo(90, 500); 				//Toward +X ( 630 ; 970 ) //old 90 700
 		//turn ?
-		brasMancheAir(false); //Remonte bras
+		Actuators::deployArm(false);	//Remonte bras
 		Intercom::slowMode(false);
-		turnGo(90, -50);							// Recalage   //Toward -Y ( 130 ; 1020 )
-		turnGo(0, 150);								// Face distributeur
-		turnGo(90, 600);							// Go distributeur //old 800
-		brasVentouse(BrasVentouse::PRISE_ENSEMBLE); // Prendre deux gobelets
+		turnGo(90, -50);				// Recalage   //Toward -Y ( 130 ; 1020 )
+		turnGo(0, 150);					// Face distributeur
+		turnGo(90, 600);				// Go distributeur //old 800
+		turnGo(0, -40);					//step backward before grab
+		grab();							// Prendre deux gobelets
 		turnGo(0, -100);
 		turnGo(-90, 0);
 		turnGo(0, 800);
-		brasVentouse(BrasVentouse::DEPOSE_ENSEMBLE); // Dépose deux gobelets
+		Actuators::release(Actuators::Side::BOTH); // Dépose deux gobelets
 		attente(100000);
 
 		waitFinMatch();

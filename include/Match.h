@@ -5,6 +5,8 @@
 #define TEAM_BLUE IHM::getEquipe() == Setting::EQUIPE_BLEU
 #define TEAM_YELLOW IHM::getEquipe() == Setting::EQUIPE_JAUNE
 
+ #define WAIT(x) Match::attente(x)
+
 namespace Match{
 
     //----- FIN DE MATCH -----

@@ -10,7 +10,8 @@ namespace Strategy{
     void homologationSecondaire();
     void matchPrimaire();
     void matchSecondaire();
-    void testLancerGobelet();
+
+    void testPincer();
 
     void sequenceRecalage();
     void waitLaunch();

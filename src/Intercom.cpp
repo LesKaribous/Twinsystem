@@ -145,7 +145,7 @@ namespace Intercom
 
 	void turnGo(bool detection, bool recalibration, bool speed, int turn, int go)
 	{
-		bool optionDetection = _globalDetection || detection;
+		bool optionDetection = _globalDetection ? detection : false;
 		byte optionNavigation = 0;
 
 		bitWrite(optionNavigation, 0, optionDetection);
@@ -166,7 +166,7 @@ namespace Intercom
 
 	void goTo(bool detection, bool recalibration, bool speed, int X, int Y, int rot)
 	{
-		bool optionDetection = _globalDetection || detection;
+		bool optionDetection = _globalDetection ? detection : false;
 		byte optionNavigation = 0;
 
 		bitWrite(optionNavigation, 0, optionDetection);

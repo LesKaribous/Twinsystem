@@ -24,27 +24,36 @@ namespace Setting{
     // Autres
     const int TEMPS_MATCH = 101000 ;
 
-    // Pos Bras
-    const int POS_BRAS_G_BAS = 38;
-    const int POS_BRAS_G_HAUT = 120;
-
-    const int POS_BRAS_D_BAS = 160;
-    const int POS_BRAS_D_HAUT = 70;
 
 
-    //Pos Pincer
+
+    //********** Actuators ***********
+    //********** Pos Bras ************
+    const int POS_BRAS_G_BAS    =  38;
+    const int POS_BRAS_G_HAUT   = 119;
+
+    const int POS_BRAS_D_BAS    = 160;
+    const int POS_BRAS_D_HAUT   =  70;
+
+
+    //********* Pos Pincer **********
+
+    //brasDroit.setLimit(35, 140, 10, 90);
+    //brasGauche.setLimit(110, 10, 180, 70);
 
     //Right
-    const int PINCER_R_FOLDED   = 70;
-    const int PINCER_R_UNFOLDED = 70;
-    const int PINCER_R_CLOSED   = 70;
-    const int PINCER_R_OPEN     = 70;
+    const int PINCER_R_FOLDED   = 40;
+    const int PINCER_R_UNFOLDED = 150;
+    const int PINCER_R_CLOSED   = 10;
+    const int PINCER_R_OPEN     = 130;
 
-    const int PINCER_L_FOLDED   = 70;
-    const int PINCER_L_UNFOLDED = 70;
-    const int PINCER_L_CLOSED   = 70;
-    const int PINCER_L_OPEN     = 70;
+    //LEFT
+    const int PINCER_L_FOLDED   = 140;
+    const int PINCER_L_UNFOLDED = 30;
+    const int PINCER_L_CLOSED   = 180;
+    const int PINCER_L_OPEN     = 30;
 
+    //Vacuum
     const bool PINCER_SUCk      = true;
     const bool PINCER_EV_ON     = true;
 }
