@@ -11,6 +11,7 @@ namespace Actuators{
 		Pin::EVDroit,
 		Setting::PINCER_R_FOLDED,
 		Setting::PINCER_R_UNFOLDED,
+		Setting::PINCER_R_ARMED,
 		Setting::PINCER_R_CLOSED,
 		Setting::PINCER_R_OPEN
 	);
@@ -22,6 +23,7 @@ namespace Actuators{
 		Pin::EVGauche,
 		Setting::PINCER_L_FOLDED,
 		Setting::PINCER_L_UNFOLDED,
+		Setting::PINCER_L_ARMED,
 		Setting::PINCER_L_CLOSED,
 		Setting::PINCER_L_OPEN
 	);
@@ -29,6 +31,8 @@ namespace Actuators{
 	Servo servoDrapeau;
 	Servo servoRightArm;
 	Servo servoLeftArm;
+
+	bool BrasState = false;
 
 	void init(){
 		// Init des bras
@@ -51,42 +55,30 @@ namespace Actuators{
 		servoLeftArm.detach();
 
 		pinMode(Pin::Beacon, OUTPUT);
+		digitalWrite(Pin::Beacon, HIGH);
+		WAIT(1000);
 		digitalWrite(Pin::Beacon, LOW);
 		
 
 	}
 
-	void deployArm(bool state)
+	void deployArm(bool state, bool push, Side side)
 	{
-		if (TEAM_BLUE){
+		if ((TEAM_BLUE && side == Side::BOTH) || side == Side::RIGHT){
 			servoRightArm.attach(Pin::ServoBrasDroit);
 			servoRightArm.write( state ? Setting::POS_BRAS_D_BAS : Setting::POS_BRAS_D_HAUT );
+			if(push) servoRightArm.write( Setting::POS_BRAS_D_PUSH);
+			WAIT(800);
 			servoRightArm.detach();
 		}else{
 			servoLeftArm.attach(Pin::ServoBrasGauche);
 			servoLeftArm.write(state ? Setting::POS_BRAS_G_BAS : Setting::POS_BRAS_G_HAUT);
+			if(push) servoLeftArm.write( Setting::POS_BRAS_G_PUSH);
+			WAIT(800);
 			servoLeftArm.detach();
 		}
-		WAIT(800);
 	}
 		
-	void grab(Side side){
-		unfold(side);
-		WAIT(1000);
-		suck(side);
-		close(side);
-		WAIT(1000);
-		fold(side);
-	}
-
-	void release(Side side){
-		unfold(side);
-		WAIT(1000);
-		unsuck(side);
-		open(side);
-		WAIT(1000);
-		fold(side);
-	}
 
 	void fold(Side s){
 		if(s == Side::RIGHT || s == Side::BOTH) rightPincer.fold();
@@ -96,6 +88,12 @@ namespace Actuators{
 		if(s == Side::RIGHT || s == Side::BOTH) rightPincer.unfold();
 		if(s == Side::LEFT  || s == Side::BOTH) leftPincer.unfold();
 	}
+	void arming(Side s){
+		if(s == Side::RIGHT || s == Side::BOTH) rightPincer.arming();
+		if(s == Side::LEFT  || s == Side::BOTH) leftPincer.arming();
+		open(s);
+	}
+
 
     void suck(Side s){
 		if(s == Side::RIGHT || s == Side::BOTH) rightPincer.suck();
@@ -127,7 +125,7 @@ namespace Actuators{
 
 	Pincer::Pincer(
 		int pinServoPincer, int pinServoVentouse, int pinPompe, int pinEv,
-		int foldedPos, int unfolded, int closed, int opened )
+		int foldedPos, int unfolded, int arming,  int closed, int opened )
 	{
 		_pinServoPincer 	= pinServoPincer;
 		_pinServoVentouse 	= pinServoVentouse;
@@ -135,6 +133,7 @@ namespace Actuators{
 		_pinEv				= pinEv;
 
 		_foldPos 	= foldedPos;
+		_armingPos 	= arming;
 		_unfoldPos 	= unfolded; 
 		_closePos 	= closed;
 		_openPos 	= opened;
@@ -148,6 +147,12 @@ namespace Actuators{
 		if(asleep) wake();
 		_servoPincer.write(_unfoldPos);
 	}
+
+	void Pincer::arming(){
+		if(asleep) wake();
+		_servoPincer.write(_armingPos);
+	}
+
 
 	void Pincer::fold(){
 		if(asleep) wake();
@@ -172,7 +177,7 @@ namespace Actuators{
 	void Pincer::unsuck(){
 		digitalWrite(_pinPompe, !Setting::PINCER_SUCk);
 		digitalWrite(_pinEv, Setting::PINCER_EV_ON);
-		Match::attente(400);
+		Match::attente(700);
 		digitalWrite(_pinEv, !Setting::PINCER_EV_ON);
 	}
 

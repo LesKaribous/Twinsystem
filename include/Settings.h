@@ -1,6 +1,10 @@
 #pragma once
 
+//#define TESTARM
+
 namespace Setting{
+
+    const float SPEED = 100; //%
 
     //Adresse I2C pour les cartes esclaves
     const int PILOT_ADRESS = 0x3C;
@@ -25,32 +29,31 @@ namespace Setting{
     const int TEMPS_MATCH = 101000 ;
 
 
-
-
     //********** Actuators ***********
     //********** Pos Bras ************
-    const int POS_BRAS_G_BAS    =  38;
+    const int POS_BRAS_G_PUSH   =  20;
+    const int POS_BRAS_G_BAS    =  38; //38
     const int POS_BRAS_G_HAUT   = 119;
 
-    const int POS_BRAS_D_BAS    = 160;
-    const int POS_BRAS_D_HAUT   =  70;
+    const int POS_BRAS_D_PUSH   = 179;
+    const int POS_BRAS_D_BAS    = 165; //160
+    const int POS_BRAS_D_HAUT   =  75; 
 
 
     //********* Pos Pincer **********
 
-    //brasDroit.setLimit(35, 140, 10, 90);
-    //brasGauche.setLimit(110, 10, 180, 70);
-
     //Right
     const int PINCER_R_FOLDED   = 40;
-    const int PINCER_R_UNFOLDED = 150;
+    const int PINCER_R_ARMED    = 145;
+    const int PINCER_R_UNFOLDED = 155;
     const int PINCER_R_CLOSED   = 10;
     const int PINCER_R_OPEN     = 130;
 
     //LEFT
     const int PINCER_L_FOLDED   = 140;
-    const int PINCER_L_UNFOLDED = 30;
-    const int PINCER_L_CLOSED   = 180;
+    const int PINCER_L_ARMED    = 35;
+    const int PINCER_L_UNFOLDED = 20;
+    const int PINCER_L_CLOSED   = 155;
     const int PINCER_L_OPEN     = 30;
 
     //Vacuum

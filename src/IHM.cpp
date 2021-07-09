@@ -69,6 +69,9 @@ namespace IHM
 		_recalage = false,
 		_typeRobot = Setting::ROBOT_PRIMAIRE,
 		_equipe = Setting::EQUIPE_BLEU,
+		_testBras = false,
+		_oppenentFront = false,
+		_oppenentBack  = true,
 		freezed = false;
 
 	// Liste d'action de la check list:
@@ -120,6 +123,7 @@ void updateButtonIHM()
 	getStrategie();
 	getCheck();
 	getEquipe();
+	getTestBras();
 }
 
 void readButtonState()
@@ -178,6 +182,20 @@ void setRecalage(bool state){
 bool getRecalage(){
 	return _recalage;
 }
+bool getTestBras(){
+	if(!freezed)
+		_testBras = _buttonState[6];
+	return _testBras;
+}
+
+void setOpponent(int op){
+	_oppenentFront = (op == 1) ? true : false;
+	_oppenentBack= (op == -1) ? true : false;
+}
+
+bool getOpponent(){
+	return _oppenentFront;
+}
 
 
 	namespace LCD{
@@ -198,8 +216,7 @@ bool getRecalage(){
 			_u8g2.sendBuffer();
 		}
 
-		void menuScreen()
-		{
+		void menuScreen(){
 			const int ligneEtat = 0;
 			const int ligneStrategie = 64;
 			const int colonne1 = 2;
@@ -338,9 +355,16 @@ bool getRecalage(){
 			// Partie inférieure
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(3, 77, "Temps:      sec");
-			_u8g2.drawStr(3, 87, "    X:         ");
-			_u8g2.drawStr(3, 97, "    Y:         ");
-			_u8g2.drawStr(3, 107, "alpha:      deg");
+			_u8g2.drawStr(3, 84, "    X:         ");
+			_u8g2.drawStr(3, 91, "    Y:         ");
+			_u8g2.drawStr(3, 98, "alpha:      deg");
+
+			if (_oppenentFront)
+			_u8g2.drawStr(3, 105, "Opp: Front");
+			else if(_oppenentBack)
+			_u8g2.drawStr(3, 105, "Opp: Behind");
+			else
+			_u8g2.drawStr(3, 105, "Opp: No");
 
 			_u8g2.setCursor(36, 77);
 			_u8g2.print(tempsRestant);
@@ -350,6 +374,9 @@ bool getRecalage(){
 			_u8g2.drawStr(0, 120, "erreurs :");
 			_u8g2.setCursor(40, 120);
 			_u8g2.print(nbrBadCRC);
+
+
+			
 
 			_u8g2.sendBuffer();
 		}

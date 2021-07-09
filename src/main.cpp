@@ -20,6 +20,7 @@
 #include "Strategy.h"
 
 void setup(){
+
     Actuators::init();
     Intercom::init();
     delay(500); //Pause de demarrage avant lancement
@@ -29,9 +30,6 @@ void setup(){
 }
 
 void loop(){
-    Strategy::testPincer();
-    //Strategy::homologationPrimaire();
-    //Strategy::homologationSecondaire();
-    //Strategy::matchPrimaire();
-    //Strategy::matchSecondaire();
+    if(!IHM::getStrategie()) Strategy::matchPrimaire();
+    else Strategy::homologationPrimaire();
 }

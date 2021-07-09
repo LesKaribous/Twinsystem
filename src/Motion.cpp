@@ -40,7 +40,7 @@ namespace Motion
 		}
 	}
 
-	void goTo(int X, int Y, int rot)
+	void goTo(int X, int Y, int rot) //undefined behavior
 	{
 		Intercom::goTo(X, Y, rot);
 		int reponseNavigation = Intercom::askNavigation();

@@ -8,14 +8,14 @@ namespace Match{
     double tempsRestant = Setting::TEMPS_MATCH;
     double timeInit = 0;
     int score = 0;
-    bool matchEnCours = false;
+   	State state = State::INIT;
+	bool pavillonDeployed = false;
 
 	void start()
 	{
 		timeInit = millis();
-		matchEnCours = true;
+		state = State::RUNNING;
 	}
-
 
 	void majScore(int points, int multiplicateur)
 	{
@@ -32,10 +32,15 @@ namespace Match{
 			finMatch();
 			return true;
 		}
-		else if (tempsRestant <= 5)
+		else if (tempsRestant <= 4)
 		{
-			Actuators::servoDrapeau.attach(Pin::ServoDrapeau);
-			Actuators::servoDrapeau.write(90);
+			if(!pavillonDeployed){
+				Actuators::servoDrapeau.attach(Pin::ServoDrapeau);
+				Actuators::servoDrapeau.write(90);
+				majScore(10,1);
+				pavillonDeployed = true;
+			}
+			IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 			return false;
 		}
 		else
@@ -50,7 +55,7 @@ namespace Match{
 
 		while ((millis() - initTemps) <= temps)
 		{
-			if (matchEnCours)
+			if (state == State::RUNNING)
 			{
 				majTemps();
 				IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
@@ -71,10 +76,13 @@ namespace Match{
 
 	void finMatch()
 	{
+		IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 		// Stopper les moteurs
 		Intercom::sendNavigation(255, 0, 0);
 		// Stopper la Balise
 		digitalWrite(Pin::Beacon, LOW);
+		Actuators::unsuck();
+		Actuators::sleep();
 		// Boucle infinie
 		while (1)
 		{

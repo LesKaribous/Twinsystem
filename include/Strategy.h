@@ -1,4 +1,5 @@
 #pragma once
+#include "Actuators.h"
 
 namespace Strategy{
 
@@ -16,5 +17,7 @@ namespace Strategy{
     void sequenceRecalage();
     void waitLaunch();
 
+    void grab(Actuators::Side side = Actuators::Side::BOTH);
+    void release(Actuators::Side side = Actuators::Side::BOTH);
 
 }

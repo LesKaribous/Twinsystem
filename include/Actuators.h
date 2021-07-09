@@ -8,6 +8,7 @@
 
 namespace Actuators{
     enum class Side {
+        TEST,
         RIGHT,
         LEFT,
         BOTH
@@ -15,9 +16,9 @@ namespace Actuators{
 
     void init       ();
     void initBras   ();
+    void deployArm  (bool state, bool push = false, Side side = Side::BOTH);
 
-    void deployArm  (bool side);
-
+    void arming (Side side = Side::BOTH);
     void fold   (Side side = Side::BOTH);
     void unfold (Side side = Side::BOTH);
 
@@ -26,9 +27,6 @@ namespace Actuators{
 
     void close  (Side side = Side::BOTH);
     void open   (Side side = Side::BOTH);
-
-    void grab   (Side side = Side::BOTH);
-    void release(Side side = Side::BOTH);
 
     void sleep  (Side side = Side::BOTH);
     void wake   (Side side = Side::BOTH);
@@ -43,11 +41,13 @@ namespace Actuators{
             int pinEv,
             int foldedPos,
             int unfolded,
+            int arming,
             int closed,
             int opened
         );
 
         void fold();
+        void arming();
         void unfold();
 
         void suck();
@@ -72,11 +72,11 @@ namespace Actuators{
 
         int _foldPos;
         int _unfoldPos;
+        int _armingPos;
         int _closePos;
         int _openPos;
 
         bool asleep = true;
-
     };
 
 

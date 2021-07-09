@@ -5,18 +5,36 @@
 #define TEAM_BLUE IHM::getEquipe() == Setting::EQUIPE_BLEU
 #define TEAM_YELLOW IHM::getEquipe() == Setting::EQUIPE_JAUNE
 
- #define WAIT(x) Match::attente(x)
+ #define WAIT(x) \
+    if(Match::hasStarted()) \
+        Match::attente(x); \ 
+    else \
+        delay(x);               
+//END WAIT
+
+    //Match::attente(x*int(Setting::SPEED / 100.0));
 
 namespace Match{
 
-    //----- FIN DE MATCH -----
-    
+    enum State{
+        INIT,
+        READY,
+        ARMED,
+        RUNNING, 
+        STOPPED,
+        FINISHED
+    };
+
+    extern State state;
+
     void start();
     void waitFinMatch();
     void finMatch();
 
     bool majTemps();
-    void majScore();
+    void majScore(int points, int multiplicateur);
+
+    inline bool hasStarted(){return state >= State::RUNNING;}
 
     //----- AUTRES -----
     void attente(int temps);

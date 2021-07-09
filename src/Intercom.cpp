@@ -6,6 +6,8 @@
 #include <SPI.h>
 #include <Wire.h>
 
+#include "IHM.h"
+
 namespace Intercom
 {
 
@@ -76,13 +78,21 @@ namespace Intercom
 		}
 		// Serial.print("repNav:");
 		// Serial.println(reponseNavigation);
-		if (reponseNavigation == 'N')
+		if (reponseNavigation == 'N'){
 			etatNavigation = _RECU;
+			IHM::setOpponent(0);
+		}
 		else if (reponseNavigation == 'O')
 			etatNavigation = _TERMINEE;
 		else if (reponseNavigation == 'E')
 			etatNavigation = _ERRONEE;
-		else
+		else if (reponseNavigation == 'F'){ //Oppennent Front ?
+			IHM::setOpponent(1);
+			etatNavigation = _RECU;
+		}else if (reponseNavigation == 'B'){//Opponent Bakc ?
+			IHM::setOpponent(-1);
+			etatNavigation = _RECU;
+		}else
 			reponseNavigation = _BIZARRE;
 		return etatNavigation;
 	}
