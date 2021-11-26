@@ -30,5 +30,17 @@ namespace Pin{
         latchMux             =  37, //OUTPUT
         clockMux             =  38, //OUTPUT
         clockInhMux          = A21, //OUTPUT
-        dataMux              =  39; //INPUT
+        dataMux              =  39, //INPUT
+
+        stepSleep = 4,       //OUTPUT
+        stepDirRight = 3,    //OUTPUT
+        stepDirLeft = 6,     //OUTPUT
+        stepStepRight = 2,   //OUTPUT
+        stepStepLeft = 5,    //OUTPUT
+        stepM0 = 7,          //OUTPUT
+        stepM1 = 0,          //OUTPUT
+        stepM2 = 2;          //OUTPUT
+
+
 }   
+

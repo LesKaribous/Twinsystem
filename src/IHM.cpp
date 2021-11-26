@@ -380,5 +380,16 @@ bool getOpponent(){
 
 			_u8g2.sendBuffer();
 		}
+
+		#ifdef DANSE
+		void danseScreen(){
+			_u8g2.clearBuffer();
+			// Titre
+			_u8g2.setFont(u8g2_font_logisoso16_tr);
+			_u8g2.drawStr(8, 1, "Danse !");
+
+			_u8g2.sendBuffer();
+		}
+		#endif
 	}
 }

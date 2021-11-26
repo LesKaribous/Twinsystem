@@ -1,6 +1,7 @@
 #pragma once
 
 //#define TESTARM
+//#define DANSE
 
 namespace Setting{
 

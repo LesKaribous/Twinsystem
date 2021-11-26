@@ -10,7 +10,6 @@
 
 namespace Intercom
 {
-
 	FastCRC8 _CRC8;
 
 	int navError = 0; // Nombre d'erreur de com avec la navigation

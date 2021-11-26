@@ -5,6 +5,7 @@
 #include <SPI.h>
 
 #include "Match.h"
+#include "Settings.h"
 
 /***********
  *      --Button--
@@ -52,6 +53,10 @@ namespace IHM{
         void checkListScreen  ();
         void goScreen         ();
         void matchScreen      ( int score,int tempsRestant,int nbrBadCRC );
+
+        #ifdef DANSE
+        void danseScreen();
+        #endif
     }
 }
 

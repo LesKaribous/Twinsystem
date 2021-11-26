@@ -3,9 +3,6 @@
 #include <Arduino.h>
 #include <Servo.h>
 
-
-
-
 namespace Actuators{
     enum class Side {
         TEST,
@@ -78,8 +75,6 @@ namespace Actuators{
 
         bool asleep = true;
     };
-
-
 
     extern Pincer rightPincer ;
     extern Pincer leftPincer ;

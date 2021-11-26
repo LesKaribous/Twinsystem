@@ -3,6 +3,11 @@
 
 namespace Strategy{
 
+	#ifdef DANSE
+	extern bool danseMode;
+    void danse();
+	#endif
+
     extern int score;
     extern bool matchEnCours;
 
