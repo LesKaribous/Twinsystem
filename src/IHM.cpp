@@ -66,6 +66,7 @@ namespace IHM
 		_detection = false,
 		_strategie = false,
 		_check = false,
+		_robot = false,
 		_recalage = false,
 		_typeRobot = Setting::ROBOT_PRIMAIRE,
 		_equipe = Setting::EQUIPE_BLEU,
@@ -100,7 +101,6 @@ void init()
 
 	pinMode(Pin::latchMux, OUTPUT);
 	pinMode(Pin::clockMux, OUTPUT);
-	pinMode(Pin::clockInhMux, OUTPUT);
 	pinMode(Pin::dataMux, INPUT);
 
 	digitalWrite(Pin::latchMux, HIGH);
@@ -120,6 +120,7 @@ void updateButtonIHM()
 {
 	readButtonState();
 	getDetection();
+	getRobot();
 	getStrategie();
 	getCheck();
 	getEquipe();
@@ -154,6 +155,12 @@ bool getTirette(){
 	}else return _tirette;
 }
 
+bool getRobot()
+{
+	if(!freezed) 
+		_robot = _buttonState[3];
+	return _robot;
+}
 bool getDetection()
 {
 	if(!freezed) 
@@ -257,6 +264,12 @@ bool getOpponent(){
 				_u8g2.print("Homologation");
 			else
 				_u8g2.print("Match");
+			
+			_u8g2.setCursor(colonne1, ligneStrategie + 30);
+			if (_robot)
+				_u8g2.print("Primaire");
+			else
+				_u8g2.print("Secondaire");
 
 			// Symboles :
 			_u8g2.setFont(u8g2_font_m2icon_9_tf);

@@ -9,10 +9,9 @@
 //                            |___/                                                                
 //
 //     Author  : Nadarbreicq, JulesTopart
-//     Version : 1.0.0
-// Last update : 01 / 07 / 2021
+//     Version : 2.3.0
+// Last update : 05 / 03 / 2022
                                     
-#include "Intercom.h"
 #include "Actuators.h"
 #include "IHM.h"
 #include "Motion.h"
@@ -22,7 +21,6 @@
 void setup(){
 
     Actuators::init();
-    Intercom::init();
     delay(500); //Pause de demarrage avant lancement
     IHM::init();
     delay(1000);

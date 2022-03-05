@@ -1,0 +1,55 @@
+#pragma once
+
+#include <TeensyStep.h>
+#include <stdint.h>
+
+#include "Pin.h"
+
+namespace Controller{
+    extern StepControl 
+        robot,
+        motorA,
+        motorB,
+        motorC;
+
+    extern Stepper 
+        sA, sB, sC;
+
+    extern bool engaged;
+
+    void init();
+
+    void go     (long steps, bool abs = false, bool async = false);
+    void turn   (long steps, bool abs = false, bool async = false);
+    void stop   (bool async = false);
+
+    void reset();
+
+    void emergencyStop();
+
+    void setSpeed(int speed);
+    void setAccel(int accel);
+    void setCalibration(bool state);
+
+    u_int32_t getAccel();
+    u_int32_t getSpeed();
+
+    bool isRunning();
+    bool isSleeping();
+
+    // Engaging motors make them ready to move.
+    // Note : Motors may be engaged but sleeping !
+    void engage(bool state = true);
+
+    // Disengaging motors turn them off. They cannot move at all, not powered at all.
+    void disengage();
+
+    //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
+    //Note : A move request will exit sleep mode and turn them on.
+    void sleep(bool state = true);
+}
+
+
+
+
+

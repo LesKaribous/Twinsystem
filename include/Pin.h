@@ -1,46 +1,45 @@
 #pragma once
 
-//TODO RESERVE
 namespace Pin{
     // Declaration des pins E/S
     const int 
-        PompeGauche          =  23, //OUTPUT
-        EVGauche             =  17, //OUTPUT
-        PompeDroit           =  27, //OUTPUT
-        EVDroit              =  26, //OUTPUT
-
-        //Bras ventouse
-        ServoDroit           =   8, //OUTPUT
-        ServoVentouseDroit   =   9, //OUTPUT
-        ServoGauche          =  24, //OUTPUT
-        ServoVentouseGauche  =  10, //OUTPUT
-
-        //Drapeau
-        ServoDrapeau         =  15, //OUTPUT
-
-        //Bras manche à air
-        ServoBrasDroit       =  16, //OUTPUT
-        ServoBrasGauche      =  25, //OUTPUT
-
         //Balise
         Beacon               =  28, //OUTPUT
 
         //IHM       
         Tirette              = A22, //INPUT_PULLUP
+
         latchMux             =  37, //OUTPUT
         clockMux             =  38, //OUTPUT
-        clockInhMux          = A21, //OUTPUT
-        dataMux              =  39, //INPUT
+        dataMux              =  39; //INPUT
 
-        stepSleep = 4,       //OUTPUT
-        stepDirRight = 3,    //OUTPUT
-        stepDirLeft = 6,     //OUTPUT
-        stepStepRight = 2,   //OUTPUT
-        stepStepLeft = 5,    //OUTPUT
-        stepM0 = 7,          //OUTPUT
-        stepM1 = 0,          //OUTPUT
-        stepM2 = 2;          //OUTPUT
+    namespace Servo{
+        const int 
+            pinPump01   = 0,
+            pinServo02  = 1,
+            pinServo03  = 2,
+            pinServo04  = 3,
 
+            pinPump02   = 4,
+            pinServo06  = 5,
+            pinServo07  = 6,
+            pinServo08  = 7,
 
+            pinPump03   = 25,
+            pinServo10  = 28,
+            pinServo11  = 29,
+            pinServo12  = 30;
+    }
+
+    namespace Stepper{
+        const int 
+            enable = 23,       //OUTPUT
+            dirA = 16,        //OUTPUT
+            dirB = 17,        //OUTPUT
+            dirC = 15,        //OUTPUT
+            stepA = 22,       //OUTPUT
+            stepB = 21,       //OUTPUT
+            stepC = 20;       //OUTPUT
+    }
 }   
 

@@ -3,6 +3,7 @@
 #include "Motion.h"
 #include "Actuators.h"
 #include "Match.h"
+#include "Controller.h"
 #include "Pin.h"
 
 using namespace Motion;
@@ -176,88 +177,6 @@ namespace Strategy
 		waitFinMatch();
 	}
 
-	#ifdef DANSE
-	void danse(){
-		Intercom::setDetection(true); 	//Toward +Y ( 130 ; 970 )
-		Intercom::setRecalibration(false);
-		Intercom::slowMode(false);
-
-		attente(5000);
-
-		for (size_t i = 0; i < 5; i++)
-		{
-			turnGo(-20,0);
-			turnGo(40,0);
-			turnGo(-20,0);
-
-			turnGo(0,40);
-			turnGo(0,-40);
-
-			turnGo(0, 40);
-			turnGo(0, -40);
-		}
-
-		Actuators::deployArm(true, false, Actuators::Side::LEFT);
-		Actuators::deployArm(true, false, Actuators::Side::RIGHT);
-
-		Actuators::deployArm(true, true, Side::LEFT);
-		Actuators::deployArm(true, true, Side::RIGHT);
-
-		Actuators::deployArm(false, false, Actuators::Side::LEFT);
-		Actuators::deployArm(false, false, Actuators::Side::RIGHT);
-
-		for (size_t i = 0; i < 5; i++)
-		{
-			turnGo(0, 50);
-			Actuators::deployArm(true, false, Actuators::Side::RIGHT);
-			attente(100);
-			unfold(Side::RIGHT);
-			attente(100);
-			unfold(Side::LEFT);
-			attente(100);
-			Actuators::deployArm(true, false, Actuators::Side::LEFT);
-			turnGo(0, -50);
-
-			attente(200);
-
-			turnGo(-90, 0);
-			Actuators::deployArm(false, false, Actuators::Side::LEFT);
-			fold(Side::LEFT);
-			attente(100);
-			fold(Side::RIGHT);
-			attente(100);
-			Actuators::deployArm(false, false, Actuators::Side::RIGHT);
-			turnGo(45, 0);
-
-			turnGo(0, 50);
-			Actuators::deployArm(true, false, Actuators::Side::RIGHT);
-			attente(100);
-			unfold(Side::RIGHT);
-			attente(100);
-			unfold(Side::LEFT);
-			attente(100);
-			Actuators::deployArm(true, false, Actuators::Side::LEFT);
-			turnGo(0, -50);
-
-			turnGo(-90, 0);
-			Actuators::deployArm(false, false, Actuators::Side::LEFT);
-			fold(Side::LEFT);
-			attente(100);
-			fold(Side::RIGHT);
-			attente(100);
-			Actuators::deployArm(false, false, Actuators::Side::RIGHT);
-			turnGo(45, 0);
-
-			turnGo(360,0);
-			turnGo(-360,0);
-
-			
-		}
-
-		attente(300);
-	}
-	#endif
-
 	void waitLaunch()
 	{
 		Match::state = Match::State::READY;
@@ -284,12 +203,6 @@ namespace Strategy
 					TestBrasDeployed = false;
 				}
 			#endif
-			#ifdef DANSE
-				if(!IHM::getTestBras() && !danseMode){
-					danseMode = true;
-				}
-				if(danseMode) IHM::LCD::danseScreen();
-			#endif
 
 			//interfaceLink();
 			if (!IHM::getCheck())
@@ -313,6 +226,7 @@ namespace Strategy
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
 		// Envois des paramètres à la ComNavigation
+		Controller::setCalibration(IHM::getRobot());
 		Intercom::setGlobalDetection(IHM::getDetection());
 		Intercom::setTeam(IHM::getEquipe());
 		// Démarrage de la balise

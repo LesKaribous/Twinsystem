@@ -18,9 +18,8 @@
  * Switch 1 : Index 1 : Equipe 
  * Switch 2 : Index 2 : Strategy
  * Switch 3 : Index 0 : Balise
- * Switch 4 : Index 3 : Void
+ * Switch 4 : Index 3 : Robot
  **********/
-
 
 
 namespace IHM{
@@ -28,11 +27,11 @@ namespace IHM{
 
     void updateButtonIHM  ();
     void readButtonState  ();
-
     void freezeSettings   ();
 
     //------ Gestion des E/S ------
     bool getTirette       ();
+    bool getRobot         ();
     bool getDetection     ();
     bool getStrategie     ();
     bool getCheck         ();
