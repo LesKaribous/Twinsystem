@@ -1,54 +1,55 @@
 #pragma once
 
-//#define TESTARM
-//#define DANSE
+#include "Geometry.h"
 
-namespace Setting{
+struct  CalibrationData;
 
-    const float SPEED = 100; //%
+namespace Settings{
 
-    //Adresse I2C pour les cartes esclaves
-    const int PILOT_ADRESS = 0x3C;
+    const bool 
+        ADVERSAIRE_NON = 1,
+        ADVERSAIRE_OUI = 0,
 
-    // Adversaire
-    const bool ADVERSAIRE_NON = 1 ;
-    const bool ADVERSAIRE_OUI = 0 ;
+        EQUIPE_JAUNE = 1,
+        EQUIPE_BLEU  = 0,
 
-    // Couleur Equipe
-    const bool EQUIPE_JAUNE = 1 ;
-    const bool EQUIPE_BLEU  = 0 ;
+        STRATEGIE_HOMOLOGATION = 1,
+        STRATEGIE_MATCH        = 0 ;
 
-    // Strategie
-    const bool STRATEGIE_HOMOLOGATION = 1 ;
-    const bool STRATEGIE_MATCH        = 0 ;
+    const int 
+        TEMPS_MATCH = 101000 ;
 
-    // type de Robot
-    const bool ROBOT_PRIMAIRE = 1 ;
-    const bool ROBOT_SECONDAIRE = 0 ;
-
-    // Autres
-    const int TEMPS_MATCH = 101000 ;
-
-
-    namespace Robot{  
-        const uint32_t ACCEL = 2500; // Old : 5000
-        const uint32_t SPEED = 5000; // Old : 5000
-    }
-
-    namespace Stepper{
+    namespace Robot{
         const float 
-            FACTOR_A  = 8.71f,//17.42f
-            FACTOR_B  = 8.71f,
-            FACTOR_C  = 8.71f,
-            FACTOR_R  = 18.545f,//37.09f
-            FACTOR_X  = 0.85f,
-            FACTOR_Y  = 1.50f;
-    }
+            FEEDRATE = 100, //%
+            RADIUS = 150; //??
+
+        const uint32_t 
+            ACCEL = 2500, // Old : 5000              
+            SPEED = 5000; // Old : 5000
     
-    namespace Util{
-        const float 
-            sqrt3o2 = 1.0f * sqrt(3.0f) / 2.0f,
-            rad120 = 120.0f * (PI / 180.0f),
-            rad240 = 2.0f * rad120 ;
+        const bool 
+            PRIMARY   = 1,
+            SECONDARY = 0 ;
+    }
+
+    namespace Calibration{
+        const CalibrationProfile Primary = {
+            { 8.71f, 8.71f, 8.71f }, //ABC
+            { 18.545f, 0.85f, 1.50f } //ROTXY
+        };
+
+        const CalibrationProfile Secondary = {
+            { 8.71f, 8.71f, 8.71f }, //ABC
+            { 18.545f, 0.85f, 1.50f } //ROTXY
+        };
     }
 }
+
+
+
+// Struct definition
+struct  CalibrationProfile{
+    Vec3 Holonomic,
+         Cartesian;
+};

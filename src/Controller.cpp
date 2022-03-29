@@ -1,5 +1,5 @@
 #include "Controller.h"
-#include "Config.h"
+#include "Settings.h"
 
 namespace Controller{
 
@@ -11,31 +11,26 @@ namespace Controller{
     bool engaged = false,
          sleeping = false;
 
-    struct CalibrationProfile{
-        float linearFactor;
-        float rotationalFactor;
-        float leftStepperFactor;
-        float rightStepperFactor;
-    } calibration;
+    CalibrationProfile calibration;
 
     u_int32_t speed, accel;
 
     void init(){
          sA
-        .setAcceleration(Config::Speed::defaultAccel)
-        .setMaxSpeed(Config::Speed::defaultSpeed)
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
         .setInverseRotation(true);
         //.setStepPinPolarity(LOW);
 
         sB
-        .setAcceleration(Config::Speed::defaultAccel)
-        .setMaxSpeed(Config::Speed::defaultSpeed)
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
         .setInverseRotation(false);
         //.setStepPinPolarity(LOW);
 
         sC
-        .setAcceleration(Config::Speed::defaultAccel)
-        .setMaxSpeed(Config::Speed::defaultSpeed)
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
         .setInverseRotation(false);
         //.setStepPinPolarity(LOW);
 
@@ -44,31 +39,19 @@ namespace Controller{
 
         engage();
         sleep(); 
-    
     }
 
     void setCalibration(bool state){
-        if (state){
-            calibration = {
-                Config::Calibration::Primary::linearFactor,   
-                Config::Calibration::Primary::rotationalFactor,
-                Config::Calibration::Primary::leftStepperFactor,
-                Config::Calibration::Primary::rightStepperFactor
-            };
+        if (state == Settings::Robot::PRIMARY){
+            calibration = Settings::Calibration::Primary;
         }else {
-            calibration = {
-                Config::Calibration::Secondary::linearFactor,   
-                Config::Calibration::Secondary::rotationalFactor,
-                Config::Calibration::Secondary::leftStepperFactor,
-                Config::Calibration::Secondary::rightStepperFactor
-            };
+            calibration = Settings::Calibration::Secondary;
         }
-        
     }
 
     void engage(bool state){
         if(engaged != state){
-            digitalWrite(Pin::Stepper::sleep, state);
+            digitalWrite(Pin::Stepper::enable, state);
             engaged = state;
         }
     }
@@ -76,57 +59,41 @@ namespace Controller{
     void disengage(){
         if(engaged){
             engaged = false;
-            digitalWrite(Pin::Stepper::sleep, LOW);
+            digitalWrite(Pin::Stepper::enable, LOW);
         }
     }
 
     void sleep(bool state){
         if(engaged && sleeping != state){
-            digitalWrite(Pin::Stepper::sleep, state);
+            digitalWrite(Pin::Stepper::enable, state);
             sleeping = state;
         }
     }
 
 
-    void move(u_int32_t stepsRight, u_int32_t stepsLeft, bool abs, bool async){
-            if(abs){
-                sRight.setTargetAbs(stepsRight);
-                sLeft.setTargetAbs(stepsLeft);
-            }else{
-                sRight.setTargetRel(stepsRight);
-                sLeft.setTargetRel(stepsLeft);
-            }
+    void move(Vec3 target, bool async){
 
-            if(sleeping) sleep(false);
-            
-            if(async)controller.moveAsync(sRight,sLeft);
-            else controller.move(sRight,sLeft);
+        target.mult(calibration.Holonomic.toMatrix());
+
+        sA.setTargetRel(target.a);
+        sB.setTargetRel(target.b);
+        sC.setTargetRel(target.c);
+
+        if(sleeping) sleep(false);
+        
+        if(async)controller.moveAsync(sA,sB,sC);
+        else controller.move(sA,sB,sC);
     }
-
-
-    void turn(long steps, bool abs, bool async){
-        if(engaged){
-            move(steps * calibration.rotationalFactor * calibration.rightStepperFactor,
-                -steps * calibration.rotationalFactor * calibration.leftStepperFactor,
-                 abs, async);
-        }
-    }
-
-    void go(long steps, bool abs, bool async){
-        if(engaged){
-            if(sleeping) sleep(false);
-            move(steps * calibration.linearFactor * calibration.rightStepperFactor,
-                 steps * calibration.linearFactor * calibration.leftStepperFactor,
-                 abs, async);
-        }
-    }
-
 
     void reset(){
-        sRight.setPosition(0);
-        sRight.setTargetRel(0);
-        sLeft.setPosition(0);
-        sLeft.setTargetRel(0);
+        sA.setPosition(0);
+        sA.setTargetRel(0);
+
+        sB.setPosition(0);
+        sB.setTargetRel(0);
+
+        sC.setPosition(0);
+        sC.setTargetRel(0);
     }
 
     void stop(bool async){
@@ -137,21 +104,19 @@ namespace Controller{
     void emergencyStop(){
         controller.emergencyStop();
         //TODO : Disengage after an emergencystop ?
-    }
+    } 
 
 
     void setSpeed(u_int32_t speed){
-        sLeft
-        .setMaxSpeed(speed);
-        sRight
-        .setMaxSpeed(speed);
+        sA.setMaxSpeed(speed);
+        sB.setMaxSpeed(speed);
+        sC.setMaxSpeed(speed);
     }
 
     void setAccel(u_int32_t accel){
-        sLeft
-        .setAcceleration(accel);
-        sRight
-        .setAcceleration(accel);
+        sA.setAcceleration(accel);
+        sB.setAcceleration(accel);
+        sC.setAcceleration(accel);
     }
 
     u_int32_t getAccel(){

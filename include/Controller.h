@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "Pin.h"
+#include "Geometry.h"
 
 namespace Controller{
     extern StepControl 
@@ -19,8 +20,8 @@ namespace Controller{
 
     void init();
 
-    void go     (long steps, bool abs = false, bool async = false);
-    void turn   (long steps, bool abs = false, bool async = false);
+    void move(Vec3 target, bool async = false);
+
     void stop   (bool async = false);
 
     void reset();

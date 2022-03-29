@@ -9,6 +9,5 @@ namespace Motion{
     void sequenceRecalage();
 
     //----- COMMANDES DE DEPLACEMENT -----
-    void turnGo(int turn, int go);
     void goTo(int X, int Y, int rot);
 }

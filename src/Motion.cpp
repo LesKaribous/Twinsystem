@@ -2,34 +2,32 @@
 #include "Controller.h"
 #include "Match.h"
 
+#include "Geometry.h"
+
 namespace Motion
 {
+
 	Vec2 position = {0,0};
 
 	//----------------ENVOI UNE COMMANDE TURN GO----------------
-	void go(Vec2 target){
-		Vec2 move = target.sub(position);
-		Controller::go(go);
+	void goTo(int X, int Y, int rot){
+		Vec3 target = fk({X, Y, rot});
+		Controller::move(target);
 	}
 
-	void goTo(int X, int Y, int rot) //undefined behavior
-	{
-		Intercom::goTo(X, Y, rot);
-	}
+	Vec3 fk(Vec3 pos){
+		float θ = pos.c,
+			  a = PI/3,
+			  b = a - θ,
+			  c = a + θ,
+			  L = Settings::Robot::RADIUS;
 
-	void turnGo(bool adversaire, bool recalage, bool ralentit, int X, int Y, int rot)
-	{
-		Intercom::goTo(adversaire, recalage, ralentit, X, Y, rot);
-		int reponseNavigation = Intercom::askNavigation();
-		while (reponseNavigation != TERMINEE)
-		{
-			if (reponseNavigation == ERRONEE)
-			{
-				Intercom::goTo(adversaire, recalage, ralentit, X, Y, rot);
-				Intercom::badCRC();
-			}
-			Match::attente(200);
-			reponseNavigation = Intercom::askNavigation();
-		}
+		Matrix3x3 P = {
+			-cosf(θ), -sinf(θ), L,
+			 cosf(b) , sinf(b), L,
+			 cosf(c) , sinf(c), L
+		};
+
+		return pos.mult(P);
 	}
 }
