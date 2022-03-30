@@ -2,8 +2,14 @@
 
 #include "Geometry.h"
 
-struct  CalibrationData;
+// Struct definition
+struct  CalibrationProfile{
+    Vec3 Holonomic,
+         Cartesian;
+};
 
+
+// Namespace
 namespace Settings{
 
     const bool 
@@ -48,8 +54,3 @@ namespace Settings{
 
 
 
-// Struct definition
-struct  CalibrationProfile{
-    Vec3 Holonomic,
-         Cartesian;
-};

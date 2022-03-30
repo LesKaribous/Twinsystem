@@ -7,15 +7,6 @@
 #include "Geometry.h"
 
 namespace Controller{
-    extern StepControl 
-        robot,
-        motorA,
-        motorB,
-        motorC;
-
-    extern Stepper 
-        sA, sB, sC;
-
     extern bool engaged;
 
     void init();

@@ -4,16 +4,10 @@
 #include <Servo.h>
 
 namespace Actuators{
-    enum class Side {
-        TEST,
-        RIGHT,
-        LEFT,
-        BOTH
-    };
 
+/*
     void init       ();
     void initBras   ();
-    void deployArm  (bool state, bool push = false, Side side = Side::BOTH);
 
     void arming (Side side = Side::BOTH);
     void fold   (Side side = Side::BOTH);
@@ -82,7 +76,7 @@ namespace Actuators{
     extern Servo servoDrapeau ;
     extern Servo servoRightArm ;
     extern Servo servoLeftArm ;
-
+*/
 }
 
 

@@ -1,15 +1,14 @@
 #include "Match.h"
 #include "Actuators.h"
 #include "Pin.h"
-#include "Intercom.h"
+#include "Controller.h"
 
 namespace Match{
 
-    double tempsRestant = Setting::TEMPS_MATCH;
+    double tempsRestant = Settings::TEMPS_MATCH;
     double timeInit = 0;
     int score = 0;
    	State state = State::INIT;
-	bool pavillonDeployed = false;
 
 	void start()
 	{
@@ -17,30 +16,24 @@ namespace Match{
 		state = State::RUNNING;
 	}
 
-	void majScore(int points, int multiplicateur)
+	void updateScore(int points, int multiplicateur)
 	{
 		score = score + (points * multiplicateur);
 	}
 
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
-	bool majTemps()
+	bool updateTime()
 	{
-		tempsRestant = (Setting::TEMPS_MATCH - (millis() - timeInit)) / 1000;
+		tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
 		if (tempsRestant <= 0)
 		{
-			finMatch();
+			Match::end();
 			return true;
 		}
 		else if (tempsRestant <= 4)
 		{
-			if(!pavillonDeployed){
-				Actuators::servoDrapeau.attach(Pin::ServoDrapeau);
-				Actuators::servoDrapeau.write(90);
-				majScore(10,1);
-				pavillonDeployed = true;
-			}
-			IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+			//Last action ?
 			return false;
 		}
 		else
@@ -48,7 +41,7 @@ namespace Match{
 	}
 
 	//----------------PROCEDURE D'ATTENTE----------------
-	void attente(int temps)
+	void wait(int temps)
 	{
 
 		int initTemps = millis();
@@ -57,39 +50,41 @@ namespace Match{
 		{
 			if (state == State::RUNNING)
 			{
-				majTemps();
-				IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+				updateTime();
+				//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 			}
 		}
 	}
 
 	//----------------PROCEDURE DE FIN DE MATCH----------------
-	void waitFinMatch()
+	void waitEnd()
 	{
-		digitalWrite(Pin::Beacon, LOW);
-		while (!majTemps())
+		//Stopper la balise
+
+		while (!updateTime())
 		{
 			//digitalWrite(Pin::Beacon,LOW);
-			IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+			//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 		}
 	}
 
-	void finMatch()
+	void end()
 	{
-		IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+		//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
 		// Stopper les moteurs
-		Intercom::sendNavigation(255, 0, 0);
+		Controller::stop();
+		Controller::disengage();
+		//Intercom::sendNavigation(255, 0, 0);
+
 		// Stopper la Balise
-		digitalWrite(Pin::Beacon, LOW);
-		Actuators::unsuck();
-		Actuators::sleep();
+
+		//Actuators::unsuck();
+		//Actuators::sleep();
+
 		// Boucle infinie
 		while (1)
 		{
-			// Stopper les moteurs
-			Intercom::sendNavigation(255, 0, 0);
-			// Stoppe la Balise
-			digitalWrite(Pin::Beacon,LOW);
+
 		}
 	}
 }

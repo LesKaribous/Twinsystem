@@ -23,6 +23,8 @@
 
 
 namespace IHM{
+
+    /*
     void init();
 
     void updateButtonIHM  ();
@@ -53,9 +55,6 @@ namespace IHM{
         void goScreen         ();
         void matchScreen      ( int score,int tempsRestant,int nbrBadCRC );
 
-        #ifdef DANSE
-        void danseScreen();
-        #endif
-    }
+    */
 }
 

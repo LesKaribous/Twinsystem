@@ -4,16 +4,18 @@
 #include "Settings.h"
 
 namespace Actuators{
+
+	/*
 	Pincer rightPincer(
 		Pin::ServoDroit, 
 		Pin::ServoVentouseDroit, 
 		Pin::PompeDroit,
 		Pin::EVDroit,
-		Setting::PINCER_R_FOLDED,
-		Setting::PINCER_R_UNFOLDED,
-		Setting::PINCER_R_ARMED,
-		Setting::PINCER_R_CLOSED,
-		Setting::PINCER_R_OPEN
+		Settings::PINCER_R_FOLDED,
+		Settings::PINCER_R_UNFOLDED,
+		Settings::PINCER_R_ARMED,
+		Settings::PINCER_R_CLOSED,
+		Settings::PINCER_R_OPEN
 	);
 
 	Pincer leftPincer(
@@ -21,11 +23,11 @@ namespace Actuators{
 		Pin::ServoVentouseGauche, 
 		Pin::PompeGauche,
 		Pin::EVGauche,
-		Setting::PINCER_L_FOLDED,
-		Setting::PINCER_L_UNFOLDED,
-		Setting::PINCER_L_ARMED,
-		Setting::PINCER_L_CLOSED,
-		Setting::PINCER_L_OPEN
+		Settings::PINCER_L_FOLDED,
+		Settings::PINCER_L_UNFOLDED,
+		Settings::PINCER_L_ARMED,
+		Settings::PINCER_L_CLOSED,
+		Settings::PINCER_L_OPEN
 	);
 
 	Servo servoDrapeau;
@@ -42,8 +44,8 @@ namespace Actuators{
 		servoRightArm.attach(Pin::ServoBrasDroit);
 		servoLeftArm.attach(Pin::ServoBrasGauche);
 
-		servoRightArm.write(Setting::POS_BRAS_D_HAUT);
-		servoLeftArm.write(Setting::POS_BRAS_G_HAUT);
+		servoRightArm.write(Settings::POS_BRAS_D_HAUT);
+		servoLeftArm.write(Settings::POS_BRAS_G_HAUT);
 
 		fold();
 		open();
@@ -66,14 +68,14 @@ namespace Actuators{
 	{
 		if ((TEAM_BLUE && side == Side::BOTH) || side == Side::RIGHT){
 			servoRightArm.attach(Pin::ServoBrasDroit);
-			servoRightArm.write( state ? Setting::POS_BRAS_D_BAS : Setting::POS_BRAS_D_HAUT );
-			if(push) servoRightArm.write( Setting::POS_BRAS_D_PUSH);
+			servoRightArm.write( state ? Settings::POS_BRAS_D_BAS : Settings::POS_BRAS_D_HAUT );
+			if(push) servoRightArm.write( Settings::POS_BRAS_D_PUSH);
 			WAIT(800);
 			servoRightArm.detach();
 		}else{
 			servoLeftArm.attach(Pin::ServoBrasGauche);
-			servoLeftArm.write(state ? Setting::POS_BRAS_G_BAS : Setting::POS_BRAS_G_HAUT);
-			if(push) servoLeftArm.write( Setting::POS_BRAS_G_PUSH);
+			servoLeftArm.write(state ? Settings::POS_BRAS_G_BAS : Settings::POS_BRAS_G_HAUT);
+			if(push) servoLeftArm.write( Settings::POS_BRAS_G_PUSH);
 			WAIT(800);
 			servoLeftArm.detach();
 		}
@@ -170,15 +172,15 @@ namespace Actuators{
 	}
 
 	void Pincer::suck(){
-		digitalWrite(_pinPompe, Setting::PINCER_SUCk);
-		digitalWrite(_pinEv, !Setting::PINCER_EV_ON);
+		digitalWrite(_pinPompe, Settings::PINCER_SUCk);
+		digitalWrite(_pinEv, !Settings::PINCER_EV_ON);
 	}
 
 	void Pincer::unsuck(){
-		digitalWrite(_pinPompe, !Setting::PINCER_SUCk);
-		digitalWrite(_pinEv, Setting::PINCER_EV_ON);
+		digitalWrite(_pinPompe, !Settings::PINCER_SUCk);
+		digitalWrite(_pinEv, Settings::PINCER_EV_ON);
 		Match::attente(700);
-		digitalWrite(_pinEv, !Setting::PINCER_EV_ON);
+		digitalWrite(_pinEv, !Settings::PINCER_EV_ON);
 	}
 
 	
@@ -189,11 +191,11 @@ namespace Actuators{
 	}
 
 	void Pincer::sleep(){
-		digitalWrite(_pinPompe, !Setting::PINCER_SUCk);
-		digitalWrite(_pinEv, !Setting::PINCER_EV_ON);
+		digitalWrite(_pinPompe, !Settings::PINCER_SUCk);
+		digitalWrite(_pinEv, !Settings::PINCER_EV_ON);
 		_servoPincer.detach();
 		_servoVentouse.detach();
 		asleep = true;
 	}
-
+*/
 }

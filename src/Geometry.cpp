@@ -37,17 +37,20 @@ Matrix2x2 Vec2::toMatrix(){
 Vec2& Vec2::mult(float v){
     a*=v; 
     b*=v;
+    return *this;
 }
 
 Vec2& Vec2::mult(Matrix2x2 m){
     a = m.a * a + m.b * b;
     b = m.c * a + m.d * b;
+    return *this;
 }
 
 
 Vec2& Vec2::rotate(float a){
     this->mult( { cosf(a), sinf(a), 
                  -sinf(a), cosf(a)} );
+    return *this;
 }
 
 //Static Methods
@@ -68,6 +71,7 @@ float Vec2::dot(Vec2& a, Vec2& b){
 
 Vec2 Vec2::dist(Vec2& a, Vec2& b){
     a.sub(b);
+    return a;
 }
 
 float Vec2::angleBetween(Vec2& a, Vec2& b){
@@ -83,6 +87,7 @@ Matrix2x2& Matrix2x2::transpose(){
     b = b + c;
     c = b - c;
     b = b - c;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::invert(){
@@ -97,6 +102,7 @@ Matrix2x2& Matrix2x2::mult(float v){
     b *= v;
     c *= v;
     d *= v;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::div(float v){
@@ -104,6 +110,7 @@ Matrix2x2& Matrix2x2::div(float v){
     b /= v;
     c /= v;
     d /= v;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::mult(Matrix2x2& mb){
@@ -112,6 +119,7 @@ Matrix2x2& Matrix2x2::mult(Matrix2x2& mb){
     b = ma.a * mb.b + ma.b * mb.d;
     c = ma.c * mb.a + ma.d * mb.c;
     d = ma.c * mb.b + ma.d * mb.d;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::add(float v){
@@ -119,6 +127,7 @@ Matrix2x2& Matrix2x2::add(float v){
     b += v;
     c += v;
     d += v;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::add(Matrix2x2& m){
@@ -126,6 +135,7 @@ Matrix2x2& Matrix2x2::add(Matrix2x2& m){
     b += m.b;
     c += m.c;
     d += m.d;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::sub(float v){
@@ -133,6 +143,7 @@ Matrix2x2& Matrix2x2::sub(float v){
     b -= v;
     c -= v;
     d -= v;
+    return *this;
 }
 
 Matrix2x2& Matrix2x2::sub(Matrix2x2& m){
@@ -140,6 +151,7 @@ Matrix2x2& Matrix2x2::sub(Matrix2x2& m){
     b -= m.b;
     c -= m.c;
     d -= m.d;
+    return *this;
 }
 
 float Matrix2x2::trace(){
@@ -193,12 +205,14 @@ Vec3& Vec3::mult(float v){
     a *= v; 
     b *= v;
     c *= v;
+    return *this;
 }
 
 Vec3& Vec3::mult(Matrix3x3 m){
     a = m.a * a + m.b * b + m.c * c;
     b = m.d * a + m.e * b + m.f * c;
     c = m.g * a + m.h * b + m.i * c;
+    return *this;
 }
 
 Matrix3x3 Vec3::toMatrix(){
@@ -212,6 +226,8 @@ Vec3& Vec3::rotateZ(float a){
     this->mult({ cosf(a), -sinf(a), 0, 
                  sinf(a),  cosf(a), 0,
                     0   ,     0   , 1 } );
+
+    return *this;
 }
 
 //Static Methods
@@ -231,6 +247,7 @@ float Vec3::dot(Vec3& a, Vec3& b){
 
 Vec3 Vec3::dist(Vec3& a, Vec3& b){
     a.sub(b);
+    return a;
 }
 
 float Vec3::angleBetween(Vec3& a, Vec3& b){
@@ -252,7 +269,7 @@ Matrix3x3& Matrix3x3::transpose(){
     f = cpy.h;
     g = cpy.c;
     h = cpy.f;
-
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::mult(float v){
@@ -265,6 +282,7 @@ Matrix3x3& Matrix3x3::mult(float v){
     g *= v;
     h *= v;
     i *= v;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::div(float v){
@@ -277,6 +295,7 @@ Matrix3x3& Matrix3x3::div(float v){
     g /= v;
     h /= v;
     i /= v;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::mult(Matrix3x3& mb){
@@ -290,6 +309,7 @@ Matrix3x3& Matrix3x3::mult(Matrix3x3& mb){
     g = ma.g * mb.a + ma.h * mb.d + ma.i * mb.g;
     h = ma.g * mb.b + ma.h * mb.e + ma.i * mb.h;
     i = ma.g * mb.c + ma.h * mb.f + ma.i * mb.i;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::add(float v){
@@ -302,6 +322,7 @@ Matrix3x3& Matrix3x3::add(float v){
     g += v;
     h += v;
     i += v;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::add(Matrix3x3& m){
@@ -314,6 +335,7 @@ Matrix3x3& Matrix3x3::add(Matrix3x3& m){
     g += m.g;
     h += m.h;
     i += m.i;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::sub(float v){
@@ -326,6 +348,7 @@ Matrix3x3& Matrix3x3::sub(float v){
     g -= v;
     h -= v;
     i -= v;
+    return *this;
 }
 
 Matrix3x3& Matrix3x3::sub(Matrix3x3& m){
@@ -338,6 +361,7 @@ Matrix3x3& Matrix3x3::sub(Matrix3x3& m){
     g -= m.g;
     h -= m.h;
     i -= m.i;
+    return *this;
 }
 
 float Matrix3x3::trace(){

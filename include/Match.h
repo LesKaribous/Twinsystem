@@ -7,7 +7,7 @@
 
  #define WAIT(x) \
     if(Match::hasStarted()) \
-        Match::attente(x); \ 
+        Match::attente(x); \
     else \
         delay(x);               
 //END WAIT
@@ -28,15 +28,15 @@ namespace Match{
     extern State state;
 
     void start();
-    void waitFinMatch();
-    void finMatch();
+    void waitEnd();
+    void end();
 
-    bool majTemps();
-    void majScore(int points, int multiplicateur);
+    bool updateTime();
+    void updateScore(int points, int multiplicateur);
 
     inline bool hasStarted(){return state >= State::RUNNING;}
 
     //----- AUTRES -----
-    void attente(int temps);
+    void wait(int temps);
 }
 

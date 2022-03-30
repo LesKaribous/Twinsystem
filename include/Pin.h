@@ -3,16 +3,14 @@
 namespace Pin{
     // Declaration des pins E/S
     const int 
-        //Balise
-        Beacon               =  28, //OUTPUT
-
         //IHM       
-        Tirette              = A22, //INPUT_PULLUP
-
-        latchMux             =  37, //OUTPUT
+        Tirette              =  37, //INPUT_PULLUP
         clockMux             =  38, //OUTPUT
-        dataMux              =  39; //INPUT
-
+        dataMux              =  38, //INPUT
+        initButton           =  36,
+        neoPixel             =  35,
+        robotSelect          =  14;
+/*
     namespace Servo{
         const int 
             pinPump01   = 0,
@@ -29,13 +27,13 @@ namespace Pin{
             pinServo10  = 28,
             pinServo11  = 29,
             pinServo12  = 30;
-    }
+    }*/
 
     namespace Stepper{
         const int 
-            enable = 23,       //OUTPUT
-            dirA = 16,        //OUTPUT
-            dirB = 17,        //OUTPUT
+            enable = 23,      //OUTPUT
+            dirA = 17,        //OUTPUT
+            dirB = 16,        //OUTPUT
             dirC = 15,        //OUTPUT
             stepA = 22,       //OUTPUT
             stepB = 21,       //OUTPUT

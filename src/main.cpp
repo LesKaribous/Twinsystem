@@ -9,25 +9,28 @@
 //                            |___/                                                                
 //
 //     Author  : Nadarbreicq, JulesTopart
-//     Version : 2.3.0
-// Last update : 05 / 03 / 2022
+//     Version : 2.4.2
+//     Last update : 30 / 03 / 2022
                                     
-#include "Actuators.h"
-#include "IHM.h"
-#include "Motion.h"
-#include "Match.h"
-#include "Strategy.h"
+
+#include "Twinsystem.h"
 
 void setup(){
+    
+    Controller::init();
+    //Actuators::init();
 
-    Actuators::init();
-    delay(500); //Pause de demarrage avant lancement
-    IHM::init();
-    delay(1000);
-    Strategy::waitLaunch();    
+    //Debugger::init();
+    //delay(500); //Pause de demarrage avant lancement
+    //IHM::init();
+    //delay(1000);
+
+    //Strategy::waitLaunch();
+    delay(2000);
 }
 
 void loop(){
-    if(!IHM::getStrategie()) Strategy::matchPrimaire();
-    else Strategy::homologationPrimaire();
+    Strategy::match();
+
+    Match::end();
 }

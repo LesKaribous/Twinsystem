@@ -1,5 +1,6 @@
 #include "Controller.h"
 #include "Settings.h"
+#include "Debugger.h"
 
 namespace Controller{
 
@@ -37,8 +38,11 @@ namespace Controller{
             //------Déclaration des I/O------
         pinMode(Pin::Stepper::enable, OUTPUT);
 
+        setCalibration(true); //Primary WARNING
+        reset();        
         engage();
-        sleep(); 
+        sleep();
+
     }
 
     void setCalibration(bool state){
@@ -75,12 +79,22 @@ namespace Controller{
 
         target.mult(calibration.Holonomic.toMatrix());
 
+        Debugger::log("Calibration:");
+		Debugger::log(target.a);
+		Debugger::log(target.b);
+		Debugger::log(target.c);
+        
         sA.setTargetRel(target.a);
         sB.setTargetRel(target.b);
         sC.setTargetRel(target.c);
 
         if(sleeping) sleep(false);
         
+        Debugger::log("Move :");
+        Debugger::log(int(target.a));
+        Debugger::log(int(target.b));
+        Debugger::log(int(target.c));
+
         if(async)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);
     }
