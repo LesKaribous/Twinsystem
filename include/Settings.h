@@ -28,7 +28,8 @@ namespace Settings{
     namespace Robot{
         const float 
             FEEDRATE = 100, //%
-            RADIUS = 90;
+            RADIUS = 90,
+            WHEEL_RADIUS = 60;
 
         const uint32_t 
             ACCEL = 2500, // Old : 5000              
@@ -56,7 +57,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 8.71f, 8.71f, 8.71f }, //Holonomic : ABC
-            { 0.85f, 1.50f, 0.9f } //Cartesian : XYROT
+            { 1.0f, 1.0f, 1.0f } //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {

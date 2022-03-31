@@ -35,7 +35,7 @@ void setup(){
 }
 
 void loop(){
-    //Motion::go({0,0,PI/2.0f});
-    Motion::go({100,0,0});
+    Motion::go({0,100,100});
+    //Motion::go({100,0,0});
     delay(5000);
 }

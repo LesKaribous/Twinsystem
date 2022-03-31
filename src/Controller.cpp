@@ -70,13 +70,15 @@ namespace Controller{
 
     void move(Vec3 target, bool async){
 
+        /*
         target.mult(calibration.Holonomic.toMatrix());
 
         Debugger::log("Calibration:");
 		Debugger::log(target.a);
 		Debugger::log(target.b);
 		Debugger::log(target.c);
-        
+        */
+
         sA.setTargetRel(target.a);
         sB.setTargetRel(target.b);
         sC.setTargetRel(target.c);
