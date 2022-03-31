@@ -17,31 +17,24 @@ namespace Controller{
     u_int32_t speed, accel;
 
     void init(){
-         sA
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
-        .setInverseRotation(true);
-        //.setStepPinPolarity(LOW);
-
-        sB
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
-        .setInverseRotation(false);
-        //.setStepPinPolarity(LOW);
-
-        sC
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
-        .setInverseRotation(false);
-        //.setStepPinPolarity(LOW);
 
             //------Déclaration des I/O------
         pinMode(Pin::Stepper::enable, OUTPUT);
-
-        setCalibration(true); //Primary WARNING
-        reset();        
         engage();
         sleep();
+
+            //------Déclaration des I/O------
+        pinMode(Pin::Stepper::stepA, OUTPUT);
+        pinMode(Pin::Stepper::stepB, OUTPUT);
+        pinMode(Pin::Stepper::stepC, OUTPUT);
+
+        pinMode(Pin::Stepper::dirA, OUTPUT);
+        pinMode(Pin::Stepper::dirB, OUTPUT);
+        pinMode(Pin::Stepper::dirC, OUTPUT);
+
+        reset();    
+
+        setCalibration(true); //Primary WARNING
 
     }
 
@@ -55,7 +48,7 @@ namespace Controller{
 
     void engage(bool state){
         if(engaged != state){
-            digitalWrite(Pin::Stepper::enable, state);
+            digitalWrite(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             engaged = state;
         }
     }
@@ -63,13 +56,13 @@ namespace Controller{
     void disengage(){
         if(engaged){
             engaged = false;
-            digitalWrite(Pin::Stepper::enable, LOW);
+            digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
         }
     }
 
     void sleep(bool state){
         if(engaged && sleeping != state){
-            digitalWrite(Pin::Stepper::enable, state);
+            digitalWrite(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             sleeping = state;
         }
     }
@@ -90,11 +83,6 @@ namespace Controller{
 
         if(sleeping) sleep(false);
         
-        Debugger::log("Move :");
-        Debugger::log(int(target.a));
-        Debugger::log(int(target.b));
-        Debugger::log(int(target.c));
-
         if(async)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);
     }
@@ -108,6 +96,25 @@ namespace Controller{
 
         sC.setPosition(0);
         sC.setTargetRel(0);
+
+        sA
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
+        .setInverseRotation(Settings::Stepper::DIR_A_POLARITY)
+        .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
+
+        sB
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
+        .setInverseRotation(false)
+        .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
+
+        sC
+        .setAcceleration(Settings::Robot::ACCEL)
+        .setMaxSpeed(Settings::Robot::SPEED)
+        .setInverseRotation(false)
+        .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
+
     }
 
     void stop(bool async){

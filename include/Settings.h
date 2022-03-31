@@ -28,7 +28,7 @@ namespace Settings{
     namespace Robot{
         const float 
             FEEDRATE = 100, //%
-            RADIUS = 150; //??
+            RADIUS = 90;
 
         const uint32_t 
             ACCEL = 2500, // Old : 5000              
@@ -39,15 +39,29 @@ namespace Settings{
             SECONDARY = 0 ;
     }
 
+    namespace Stepper{
+        const bool 
+            ENABLE_POLARITY = false,
+            
+            STEP_A_POLARITY = true,
+            STEP_B_POLARITY = true,
+            STEP_C_POLARITY = true,
+
+            DIR_A_POLARITY = false,
+            DIR_B_POLARITY = false,
+            DIR_C_POLARITY = false;
+            
+    } // namespace Stepper 
+
     namespace Calibration{
         const CalibrationProfile Primary = {
-            { 8.71f, 8.71f, 8.71f }, //ABC
-            { 18.545f, 0.85f, 1.50f } //ROTXY
+            { 8.71f, 8.71f, 8.71f }, //Holonomic : ABC
+            { 0.85f, 1.50f, 0.9f } //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
-            { 8.71f, 8.71f, 8.71f }, //ABC
-            { 18.545f, 0.85f, 1.50f } //ROTXY
+            { 8.71f, 8.71f, 8.71f }, //Holonomic : ABC
+            { 0.85f, 1.50f, 0.9f } //Cartesian : XYROT
         };
     }
 }

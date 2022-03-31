@@ -82,9 +82,6 @@ namespace Match{
 		//Actuators::sleep();
 
 		// Boucle infinie
-		while (1)
-		{
-
-		}
+		while(true){}
 	}
 }

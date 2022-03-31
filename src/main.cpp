@@ -16,21 +16,26 @@
 #include "Twinsystem.h"
 
 void setup(){
-    
     Controller::init();
-    //Actuators::init();
+    //delay(2000);
 
-    //Debugger::init();
+    Debugger::init();
     //delay(500); //Pause de demarrage avant lancement
     //IHM::init();
     //delay(1000);
 
     //Strategy::waitLaunch();
     delay(2000);
+    
+
+    pinMode(Pin::initButton, INPUT_PULLUP);
+    while(digitalRead(Pin::initButton)){}
+    while(!digitalRead(Pin::initButton)){}
+    while(digitalRead(Pin::initButton)){}
 }
 
 void loop(){
-    Strategy::match();
-
-    Match::end();
+    //Motion::go({0,0,PI/2.0f});
+    Motion::go({100,0,0});
+    delay(5000);
 }

@@ -9,7 +9,7 @@ namespace Motion{
     void sequenceRecalage();
 
     //----- COMMANDES DE DEPLACEMENT -----
-    void goTo(int X, int Y);
+    void go(Vec3);
 
     //Inverse Kinematics
     Vec3 ik(Vec3);

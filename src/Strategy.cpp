@@ -15,7 +15,7 @@ namespace Strategy{
 
 
 	void match(){
-		Motion::goTo(100,0);
+
 	}
 
 	void Homologation(){

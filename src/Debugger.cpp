@@ -3,8 +3,7 @@
 namespace Debugger{
     void init(){
         Serial.begin(115200);
-        delay(500);
-
+    
         Serial.print("Twinsystem... compiled  ");
         Serial.print(__DATE__);
         Serial.print(" at ");
