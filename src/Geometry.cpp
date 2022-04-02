@@ -41,8 +41,11 @@ Vec2& Vec2::mult(float v){
 }
 
 Vec2& Vec2::mult(Matrix2x2 m){
-    a = m.a * a + m.b * b;
-    b = m.c * a + m.d * b;
+    float 
+    na = m.a * a + m.b * b,
+    nb = m.c * a + m.d * b;
+    a = na;
+    b = nb;
     return *this;
 }
 
@@ -115,10 +118,14 @@ Matrix2x2& Matrix2x2::div(float v){
 
 Matrix2x2& Matrix2x2::mult(Matrix2x2& mb){
     Matrix2x2 ma = *this;
-    a = ma.a * mb.a + ma.b * mb.c;
-    b = ma.a * mb.b + ma.b * mb.d;
-    c = ma.c * mb.a + ma.d * mb.c;
-    d = ma.c * mb.b + ma.d * mb.d;
+    float
+    na = ma.a * mb.a + ma.b * mb.c,
+    nb = ma.a * mb.b + ma.b * mb.d,
+    nc = ma.c * mb.a + ma.d * mb.c,
+    nd = ma.c * mb.b + ma.d * mb.d;
+
+    a = na; b = nb; c = nc; d = nd;
+    
     return *this;
 }
 
@@ -209,9 +216,12 @@ Vec3& Vec3::mult(float v){
 }
 
 Vec3& Vec3::mult(Matrix3x3 m){
-    a = m.a * a + m.b * b + m.c * c;
-    b = m.d * a + m.e * b + m.f * c;
-    c = m.g * a + m.h * b + m.i * c;
+    float na = m.a * a + m.b * b + m.c * c;
+    float nb = m.d * a + m.e * b + m.f * c;
+    float nc = m.g * a + m.h * b + m.i * c;
+    a = na;
+    b = nb;
+    c = nc;
     return *this;
 }
 
@@ -300,15 +310,21 @@ Matrix3x3& Matrix3x3::div(float v){
 
 Matrix3x3& Matrix3x3::mult(Matrix3x3& mb){
     Matrix3x3 ma = *this;
-    a = ma.a * mb.a + ma.b * mb.d + ma.c * mb.g;
-    b = ma.a * mb.b + ma.b * mb.e + ma.c * mb.h;
-    c = ma.a * mb.c + ma.b * mb.f + ma.c * mb.i;
-    d = ma.d * mb.a + ma.e * mb.d + ma.f * mb.g;
-    e = ma.d * mb.b + ma.e * mb.e + ma.f * mb.h;
-    f = ma.d * mb.c + ma.e * mb.f + ma.f * mb.i;
-    g = ma.g * mb.a + ma.h * mb.d + ma.i * mb.g;
-    h = ma.g * mb.b + ma.h * mb.e + ma.i * mb.h;
-    i = ma.g * mb.c + ma.h * mb.f + ma.i * mb.i;
+    float 
+    na = ma.a * mb.a + ma.b * mb.d + ma.c * mb.g,
+    nb = ma.a * mb.b + ma.b * mb.e + ma.c * mb.h,
+    nc = ma.a * mb.c + ma.b * mb.f + ma.c * mb.i,
+    nd = ma.d * mb.a + ma.e * mb.d + ma.f * mb.g,
+    ne = ma.d * mb.b + ma.e * mb.e + ma.f * mb.h,
+    nf = ma.d * mb.c + ma.e * mb.f + ma.f * mb.i,
+    ng = ma.g * mb.a + ma.h * mb.d + ma.i * mb.g,
+    nh = ma.g * mb.b + ma.h * mb.e + ma.i * mb.h,
+    ni = ma.g * mb.c + ma.h * mb.f + ma.i * mb.i;
+
+    a = na; b = nb; c = nc; 
+    d = nd; e = ne; f = nf; 
+    g = ng; h = nh; i = ni;
+
     return *this;
 }
 

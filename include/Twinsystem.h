@@ -7,3 +7,4 @@
 #include "Controller.h"
 #include "Strategy.h"
 #include "Debugger.h"
+#include "Pin.h"

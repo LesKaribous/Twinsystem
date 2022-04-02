@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 namespace Pin{
     // Declaration des pins E/S
@@ -32,8 +33,8 @@ namespace Pin{
     namespace Stepper{
         const int 
             enable = 23,      //OUTPUT
-            dirA = 17,        //OUTPUT
-            dirB = 16,        //OUTPUT
+            dirA = 16,        //OUTPUT
+            dirB = 17,        //OUTPUT
             dirC = 15,        //OUTPUT
             stepA = 22,       //OUTPUT
             stepB = 21,       //OUTPUT

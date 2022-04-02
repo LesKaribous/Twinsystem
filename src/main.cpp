@@ -15,18 +15,21 @@
 
 #include "Twinsystem.h"
 
+#include "Test.h"
+
+
 void setup(){
     Controller::init();
-    //delay(2000);
+    delay(1000);
 
+    Settings::init();
     Debugger::init();
     //delay(500); //Pause de demarrage avant lancement
     //IHM::init();
     //delay(1000);
 
     //Strategy::waitLaunch();
-    delay(2000);
-    
+
 
     pinMode(Pin::initButton, INPUT_PULLUP);
     while(digitalRead(Pin::initButton)){}
@@ -35,7 +38,7 @@ void setup(){
 }
 
 void loop(){
-    Motion::go({0,100,100});
-    //Motion::go({100,0,0});
-    delay(5000);
+    //Test::calibrationRotation();
+    //Test::calibrationX();
+    Test::calibrationY();
 }

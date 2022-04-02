@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geometry.h"
+#include "Pin.h"
 
 // Struct definition
 struct  CalibrationProfile{
@@ -20,29 +21,30 @@ namespace Settings{
         EQUIPE_BLEU  = 0,
 
         STRATEGIE_HOMOLOGATION = 1,
-        STRATEGIE_MATCH        = 0 ;
+        STRATEGIE_MATCH        = 0,
+
+        PRIMARY   = 1,
+        SECONDARY = 0 ;
 
     const int 
         TEMPS_MATCH = 101000 ;
 
-    namespace Robot{
-        const float 
-            FEEDRATE = 100, //%
-            RADIUS = 90,
-            WHEEL_RADIUS = 60;
+    const float 
+        FEEDRATE = 100, //%
+        RADIUS = 90,
+        WHEEL_RADIUS = 30;
 
-        const uint32_t 
-            ACCEL = 2500, // Old : 5000              
-            SPEED = 5000; // Old : 5000
-    
-        const bool 
-            PRIMARY   = 1,
-            SECONDARY = 0 ;
-    }
+    const uint32_t 
+        ACCEL = 1000, // Old : 5000              
+        SPEED = 3000; // Old : 5000
+
+
+    extern bool ROBOT;
+    void init();
 
     namespace Stepper{
         const bool 
-            ENABLE_POLARITY = false,
+            ENABLE_POLARITY = true,
             
             STEP_A_POLARITY = true,
             STEP_B_POLARITY = true,
@@ -51,6 +53,9 @@ namespace Settings{
             DIR_A_POLARITY = false,
             DIR_B_POLARITY = false,
             DIR_C_POLARITY = false;
+
+        const u_int8_t 
+            STEP_MODE = 8;
             
     } // namespace Stepper 
 
@@ -62,7 +67,7 @@ namespace Settings{
 
         const CalibrationProfile Secondary = {
             { 8.71f, 8.71f, 8.71f }, //Holonomic : ABC
-            { 0.85f, 1.50f, 0.9f } //Cartesian : XYROT
+            { 1.17f, 1.17f, 1.045f } //Cartesian : XYROT
         };
     }
 }

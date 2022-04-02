@@ -9,67 +9,33 @@ namespace Motion
 {
 
 	Vec3 position = {0,0,0};
+	
 
 	void go(Vec3 target){
 
-		Debugger::log("----------------");
-		Debugger::log("Target :");
-		Debugger::log(target.a);
-		Debugger::log(target.b);
-		Debugger::log(target.c);
+		Vec3 calibration = Settings::ROBOT == Settings::PRIMARY ?  Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
+		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
 
-		//Vec3 calibration = Settings::Calibration::Primary.Cartesian;
-		//target.mult(calibration.toMatrix());
+		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
+		target.mult(Settings::Stepper::STEP_MODE*RAD_TO_DEG);
 
-		Vec3 targetHolo = ik(target);
-
-		Debugger::log("Holonomic :");
-		Debugger::log(targetHolo.a);
-		Debugger::log(targetHolo.b);
-		Debugger::log(targetHolo.c);
-
-		Controller::move(targetHolo, true);
+		Controller::move(target, false);
 	}
 
 	Vec3 ik(Vec3 target){
-		float w = target.c,
-			  a = PI/3.0f,
-			  b = a - w,
-			  c = a + w,
-			  L = Settings::Robot::RADIUS,
-			  R = Settings::Robot::WHEEL_RADIUS;
+		float c60 = cosf(PI/3.0f),
+			  s60 = sinf(PI/3.0f),
+			  L = Settings::RADIUS,
+			  R = Settings::WHEEL_RADIUS;
 
-		Debugger::log("Calculus :");
-		Debugger::log(a);
-		Debugger::log(b);
-		Debugger::log(c);
+		target.c *= DEG_TO_RAD;
 
-		/*
-		//rot x y
 		Matrix3x3 P = {
-			-L, 	1, 		 0,
-			-L, -1/2 , -sin(a),
-			-L, -1/2 , sinf(a),
+			   0,   1 , L,
+			-s60, -c60, L,
+			 s60, -c60, L
 		};
-		P.mult(1/R);
-		*/
-
-		
-		Matrix3x3 P = {
-			-cosf(w), -sinf(w), L,
-			 cosf(b) , sinf(b), L,
-			 cosf(c) , sinf(c), L
-		};
-		
-
-		/*
-		Matrix3x3 P = {
-			-0.58, -0.33, 0.33,
-			-0.58,  0.33, 0.33,
-			    0,  0.67, 0.33
-		};
-		*/
-
-		return target.mult(P);
+				
+		return target.mult(P).mult(1/R);
 	}
 }

@@ -39,7 +39,7 @@ namespace Controller{
     }
 
     void setCalibration(bool state){
-        if (state == Settings::Robot::PRIMARY){
+        if (state == Settings::PRIMARY){
             calibration = Settings::Calibration::Primary;
         }else {
             calibration = Settings::Calibration::Secondary;
@@ -79,9 +79,9 @@ namespace Controller{
 		Debugger::log(target.c);
         */
 
-        sA.setTargetRel(target.a);
-        sB.setTargetRel(target.b);
-        sC.setTargetRel(target.c);
+        sA.setTargetRel(int32_t(target.a));
+        sB.setTargetRel(int32_t(target.b));
+        sC.setTargetRel(int32_t(target.c));
 
         if(sleeping) sleep(false);
         
@@ -100,22 +100,22 @@ namespace Controller{
         sC.setTargetRel(0);
 
         sA
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
+        .setAcceleration(Settings::ACCEL)
+        .setMaxSpeed(Settings::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_A_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
 
         sB
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
-        .setInverseRotation(false)
-        .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
+        .setAcceleration(Settings::ACCEL)
+        .setMaxSpeed(Settings::SPEED)
+        .setInverseRotation(Settings::Stepper::DIR_B_POLARITY)
+        .setStepPinPolarity(Settings::Stepper::STEP_B_POLARITY);
 
         sC
-        .setAcceleration(Settings::Robot::ACCEL)
-        .setMaxSpeed(Settings::Robot::SPEED)
-        .setInverseRotation(false)
-        .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
+        .setAcceleration(Settings::ACCEL)
+        .setMaxSpeed(Settings::SPEED)
+        .setInverseRotation(Settings::Stepper::DIR_C_POLARITY)
+        .setStepPinPolarity(Settings::Stepper::STEP_C_POLARITY);
 
     }
 

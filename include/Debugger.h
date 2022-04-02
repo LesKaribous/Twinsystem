@@ -4,6 +4,7 @@
 namespace Debugger{
     void init();
 
+    void printHeader();
     void checkSerial();
     void execCommand();
 

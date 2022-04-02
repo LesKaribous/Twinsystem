@@ -58,7 +58,9 @@ struct Matrix3x3;
 // | b |
 // | c |
 struct Vec3 { 
-    float a, b, c;
+    float a, 
+          b, 
+          c;
 
     Vec3& add(Vec3&);
     Vec3& sub(Vec3&);
