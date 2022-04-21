@@ -22,6 +22,7 @@ struct Vec2 {
     float mag();
     float magSq();
 
+    Vec2 copy();
 
     static Vec2 add(Vec2&, Vec2&);
     static Vec2 sub(Vec2&, Vec2&);
@@ -38,6 +39,9 @@ struct Matrix2x2 {
           c, d;
 
     static Matrix2x2 GetIdentity();
+
+    Matrix2x2 copy();
+
     Matrix2x2& transpose();
     Matrix2x2& invert();
     Matrix2x2& mult(float);
@@ -62,6 +66,7 @@ struct Vec3 {
           b, 
           c;
 
+
     Vec3& add(Vec3&);
     Vec3& sub(Vec3&);
     Vec3& dist(Vec3&);
@@ -75,6 +80,8 @@ struct Vec3 {
     float dot(Vec3& a);
     float mag();
     float magSq();
+
+    Vec3 copy();
 
     static Vec3 add(Vec3&, Vec3&);
     static Vec3 sub(Vec3&, Vec3&);
@@ -93,6 +100,8 @@ struct Matrix3x3 {
     float a, b, c, 
           d, e, f,
           g, h, i;
+
+    Matrix3x3 copy();
 
     static Matrix3x3 GetIdentity();
     Matrix3x3& transpose();

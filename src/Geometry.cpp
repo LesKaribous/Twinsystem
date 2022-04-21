@@ -5,6 +5,11 @@
 
 //---------- Vector2 ------------
 //Methods
+
+Vec2 Vec2::copy(){
+    return *this;
+}
+
 Vec2& Vec2::add(Vec2& v){
     a += v.a;
     b += v.b;
@@ -85,6 +90,11 @@ float Vec2::angleBetween(Vec2& a, Vec2& b){
 
 //---------- Matrix2x2 ------------
 // Methods
+
+Matrix2x2 Matrix2x2::copy(){
+    return *this;
+}
+
 
 Matrix2x2& Matrix2x2::transpose(){
     b = b + c;
@@ -182,6 +192,11 @@ Matrix2x2 Matrix2x2::GetIdentity(){
 
 //---------- Vector3 ------------
 //Methods
+
+Vec3 Vec3::copy(){
+    return *this;
+}
+
 Vec3& Vec3::add(Vec3& v){
     a += v.a; 
     b += v.b;  
@@ -268,6 +283,10 @@ float Vec3::angleBetween(Vec3& a, Vec3& b){
 
 //---------- Matrix3x3 ------------
 // Methods
+
+Matrix3x3 Matrix3x3::copy(){
+    return *this;
+}
 
 Matrix3x3& Matrix3x3::transpose(){
 
