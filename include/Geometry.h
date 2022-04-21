@@ -115,3 +115,17 @@ struct Matrix3x3 {
     float trace();
 
 };
+
+
+//Operators overload
+bool operator== (const Vec2&, const Vec2&);
+bool operator!= (const Vec2&, const Vec2&);
+
+bool operator== (const Vec3&, const Vec3&);
+bool operator!= (const Vec3&, const Vec3&);
+
+bool operator== (const Matrix2x2&, const Matrix2x2&);
+bool operator!= (const Matrix2x2&, const Matrix2x2&);
+
+bool operator== (const Matrix3x3&, const Matrix3x3&);
+bool operator!= (const Matrix3x3&, const Matrix3x3&);

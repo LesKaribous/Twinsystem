@@ -410,3 +410,62 @@ Matrix3x3 Matrix3x3::GetIdentity(){
             0,1,0,
             0,0,1};
 }
+
+
+// Operators overload
+
+bool operator== (const Vec2& a, const Vec2& b){ 
+    return (a.a == b.a &&
+                a.b == b.b);
+}
+bool operator!= (const Vec2& a, const Vec2& b){ 
+    return (a.a != b.a ||
+                a.b != b.b);
+}
+
+bool operator== (const Vec3& a, const Vec3& b){ 
+    return (a.a == b.a &&
+            a.b == b.b && 
+            a.c == b.c  );
+}
+bool operator!= (const Vec3& a, const Vec3& b){ 
+    return (a.a != b.a ||
+            a.b != b.b || 
+            a.c != b.c  );
+}
+
+bool operator== (const Matrix2x2& a, const Matrix2x2& b){ 
+    return (a.a == b.a &&
+            a.b == b.b && 
+            a.c == b.c &&
+            a.d == b.d );
+}
+bool operator!= (const Matrix2x2& a, const Matrix2x2& b){ 
+    return (a.a != b.a ||
+            a.b != b.b || 
+            a.c != b.c ||
+            a.d != b.d  );
+}
+
+bool operator== (const Matrix3x3& a, const Matrix3x3& b){ 
+    return (a.a == b.a &&
+            a.b == b.b && 
+            a.c == b.c &&
+            a.d == b.d &&
+            a.e == b.e &&
+            a.f == b.f &&
+            a.g == b.g &&
+            a.h == b.h &&
+            a.i == b.i );
+}
+bool operator!= (const Matrix3x3& a, const Matrix3x3& b){ 
+    return (a.a != b.a ||
+            a.b != b.b || 
+            a.c != b.c ||
+            a.d != b.d ||
+            a.e != b.e ||
+            a.f != b.f ||
+            a.g != b.g ||
+            a.h != b.h ||
+            a.i != b.i );
+}
