@@ -49,7 +49,7 @@ namespace Motion
 	}
 
 	bool running(){
-		if(cPosition != cTarget);
+		//if(cPosition != cTarget);
 	}
 	
 	Vec3 ik(Vec3 target){
