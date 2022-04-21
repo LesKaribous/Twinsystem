@@ -12,6 +12,10 @@ namespace Motion{
     void go(Vec3);
     void goTo(Vec3);
 
+    bool running();
+
+    //Setters
+    void SetPosition(Vec3);
 
     //Getters
     Vec3 GetPosition();
