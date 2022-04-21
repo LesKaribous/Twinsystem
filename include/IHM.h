@@ -1,14 +1,5 @@
 #pragma once 
 
-#include <Arduino.h>
-#include <U8g2lib.h>
-#include <SPI.h>
-#include <SoftwareSerial.h>
-#include <DFRobotDFPlayerMini.h>
-
-#include "Match.h"
-#include "Settings.h"
-#include "Debugger.h"
 
 /***********
  *      --Button--
@@ -71,7 +62,7 @@ namespace IHM{
         void initScreen       ();
         void checkListScreen  ();
         void goScreen         ();
-        void matchScreen      ( int score,int tempsRestant,int nbrBadCRC );
+        void matchScreen      ();
     }
 
     namespace Sound{

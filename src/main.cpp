@@ -17,24 +17,18 @@
 #include "Test.h"
 
 void setup(){
-    Controller::init();
-    //delay(1000);
-
-    Settings::init();
-    Debugger::init();
-    IHM::init();
-
-    //Strategy::waitLaunch();
-    IHM::menu();
-    while(!IHM::getTirette())   {IHM::menu();}
-    while( IHM::getTirette())   {IHM::menu();}
-
-    IHM::LCD::goScreen();
+    //--- INIT ---
+    Controller  ::init();
+    Settings    ::init();
+    Debugger    ::init();
+    IHM         ::init();
+    //--- WAIT LAUNCH---
+    Strategy::waitLaunch();
 
 }
 
 void loop(){
-    IHM::LCD::matchScreen(0,0,0);
+    IHM::LCD::matchScreen();
     //Test::calibrationRotation();
     //Test::calibrationX();
     //Test::calibrationY();

@@ -18,7 +18,11 @@ namespace Strategy{
 
 	}
 
-	void Homologation(){
+	void homologation(){
+
+	}
+
+	void recalage(){
 
 	}
 
@@ -27,8 +31,9 @@ namespace Strategy{
 	{
 		IHM::menu();
 
-    	while(!IHM::getTirette())   {IHM::menu();}
-    	while( IHM::getTirette())   {IHM::menu();}
+    	while(!IHM::getTirette())IHM::menu();
+    	while( IHM::getTirette())IHM::menu();
+
 		// Lancement du Match
 		Match::start();
     	IHM::LCD::goScreen();

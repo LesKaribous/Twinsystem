@@ -1,6 +1,12 @@
 #include "IHM.h"
-#include "Settings.h"
-#include "Pin.h"
+#include <Arduino.h>
+#include <U8g2lib.h>
+#include <SPI.h>
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
+
+#include "Twinsystem.h"
+
 
 namespace IHM
 {
@@ -145,7 +151,12 @@ void init()
 void menu(){
 	updateButtonIHM();
 	LCD::startMenu();
-	//LCD::menuScreen();
+	if(getCheck()){
+		while(getCheck()) delay(10) ;// Attente du front descendant
+		LCD::initScreen();
+		Strategy::recalage();
+		setRecalage(true);
+	}
 }
 
 //----------------GESTION DES BOUTTONS DE L'IHM----------------
@@ -203,7 +214,7 @@ bool getRobot(){
 }
 bool getCheck(){
 	if(!freezed)
-		_check = digitalRead(Pin::checkButton);
+		_check = !digitalRead(Pin::checkButton);
 	return _check;
 }
 //---Gestion Boutons Multiplexeur
@@ -354,7 +365,6 @@ bool getArrowDown()
 		void page01(){
 			// Alignements
 			const int marginLeft = 2;
-			int wChaine;
 			const int yTirette 		= 20;
 			const int yLidar 		= 32;
 			const int yRecalage 	= 44;
@@ -393,8 +403,19 @@ bool getArrowDown()
 			_u8g2.drawStr(0, yInferieur, "---------------");
 			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
 			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
-			_u8g2.drawStr(marginLeft, yInferieur + 30, "alpha:      deg");
+			_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
 			_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+			// - X position
+			_u8g2.setCursor(30, yInferieur + 10);
+			_u8g2.print(Motion::GetPosition().a,0);
+			// - Y position
+			_u8g2.setCursor(30, yInferieur + 20);
+			_u8g2.print(Motion::GetPosition().b,0);
+			// - Rot position
+			_u8g2.setCursor(30, yInferieur + 30);
+			_u8g2.print(Motion::GetPosition().c,0);
+
 
 		}
 
@@ -514,7 +535,7 @@ bool getArrowDown()
 			delay(1000);
 		}
 
-		void matchScreen(int score, int tempsRestant, int nbrBadCRC)
+		void matchScreen()
 		{
 			_u8g2.clearBuffer();
 			// Titre
@@ -530,25 +551,32 @@ bool getArrowDown()
 			// Score Chiffre
 			_u8g2.setFont(u8g2_font_logisoso32_tr);
 			_u8g2.setCursor(2, 31);
-			_u8g2.print(score);
+			_u8g2.print(Match::GetScore());
 
 			_u8g2.drawHLine(0, 75, 64);
 
-			// Partie inférieure
+			//---Partie inférieure---
+			// Affichage Statique
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(3, 77, "Temps:      sec");
 			_u8g2.drawStr(3, 84, "    X:         ");
 			_u8g2.drawStr(3, 91, "    Y:         ");
-			_u8g2.drawStr(3, 98, "alpha:      deg");
+			_u8g2.drawStr(3, 98, "  rot:      deg");
 
-			_u8g2.setCursor(36, 77);
-			_u8g2.print(tempsRestant);
+			// Affichage Variable
+			// - Temps
+			_u8g2.setCursor(30, 77);
+			_u8g2.print(Match::GetTempsRestant()/1000,0);
+			// - X position
+			_u8g2.setCursor(30, 84);
+			_u8g2.print(Motion::GetPosition().a,0);
+			// - Y position
+			_u8g2.setCursor(30, 91);
+			_u8g2.print(Motion::GetPosition().b,0);
+			// - Rot position
+			_u8g2.setCursor(30, 98);
+			_u8g2.print(Motion::GetPosition().c,0);
 
-			// Erreurs
-			_u8g2.drawHLine(0, 119, 64);
-			_u8g2.drawStr(0, 120, "erreurs :");
-			_u8g2.setCursor(40, 120);
-			_u8g2.print(nbrBadCRC);
 
 			_u8g2.sendBuffer();
 		}

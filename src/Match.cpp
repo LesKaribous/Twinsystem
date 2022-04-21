@@ -21,6 +21,13 @@ namespace Match{
 		score = score + (points * multiplicateur);
 	}
 
+	int GetScore(){
+		return score;
+	}
+    double GetTempsRestant(){
+		return tempsRestant;
+	}
+
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
 	bool updateTime()
 	{
