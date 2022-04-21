@@ -54,6 +54,9 @@ namespace IHM
 	U8G2_SSD1309_128X64_NONAME2_F_4W_HW_SPI 
 	_u8g2(U8G2_R3, Pin::Lcd::Cs, Pin::Lcd::Dc, Pin::Lcd::Rs);  
 
+	// Declaration DFPlayerMini
+	SoftwareSerial DFPlayerSerial(27, 26); // RX, TX
+	DFRobotDFPlayerMini mp3;
 
 	// Logo Karibous
 	const byte
@@ -85,9 +88,7 @@ namespace IHM
 		_optionStrat01	= false,
 		_optionStrat02	= false,
 		_optionStrat03	= false,
-		_oppenentFront 	= false,	// @jules -> c'est quoi ?
-		_oppenentBack  	= true,		// @jules -> c'est quoi ?
-		freezed 		= false;	// @jules -> c'est quoi ?
+		freezed 		= false;
 
 	// TODO -> Change list
 	// Liste d'action de la check list:
@@ -109,12 +110,10 @@ namespace IHM
 		"Poser la balise adversaire    ",
 		"Bon match !                   "};
 
-
-
 void init()
 {
-	pinMode(Pin::tirette	, INPUT_PULLUP);
-	pinMode(Pin::initButton	, INPUT_PULLUP);
+	pinMode(Pin::tirette		, INPUT_PULLUP);
+	pinMode(Pin::checkButton	, INPUT_PULLUP);
 
 	pinMode(Pin::latchMux	, OUTPUT);
 	pinMode(Pin::clockMux	, OUTPUT);
@@ -123,12 +122,23 @@ void init()
 	digitalWrite(Pin::latchMux, LOW);
 	digitalWrite(Pin::clockMux, LOW);
 
-	_u8g2.begin(); //Init du LCD
+	// Init and configuration of the MP3 module DFPlayer Mini
+	DFPlayerSerial.begin(9600);
+	mp3.begin(DFPlayerSerial);
+	Debugger::log("DFPlayer launched");
+
+	mp3.setTimeOut(500);
+	mp3.volume(29);
+	mp3.EQ(DFPLAYER_EQ_NORMAL);
+
+	// Init and configuration for the LCD
+	_u8g2.begin(); 
 	_u8g2.setFontRefHeightExtendedText();
 	_u8g2.setDrawColor(1);
 	_u8g2.setFontPosTop();
 	_u8g2.setFontDirection(0);
 
+	// Splashscreen with the K logo
 	LCD::splashScreen();
 }
 
@@ -153,8 +163,8 @@ void updateButtonIHM()
 	getOption03();
 	getCheck();
 	getEquipe();
-	getTestBras();
 }
+
 void readButtonState()
 {
 	digitalWrite(Pin::latchMux, LOW	);
@@ -168,23 +178,47 @@ void readButtonState()
 		digitalWrite(Pin::clockMux, LOW);
 	}
 }
+
+//---Gestion Etat Robot---
+void setRecalage(bool state){
+	//if(!freezed) ??
+		_recalage = state;
+}
+bool getRecalage(){
+	return _recalage;
+}
 void freezeSettings(){
 	freezed = true;
 }
-bool getTirette()
-{
+//---Gestion Boutons physiques---
+bool getTirette(){
 	if(!freezed)
 		_tirette = !digitalRead(Pin::tirette);
 	return _tirette;
 }
-bool getRobot()
-{
+bool getRobot(){
 	if(!freezed) 
 		_robot = digitalRead(Pin::robotSelect);
 	return _robot;
 }
-bool getDetection()
+bool getCheck(){
+	if(!freezed)
+		_check = digitalRead(Pin::checkButton);
+	return _check;
+}
+//---Gestion Boutons Multiplexeur
+bool getArrowUp()
 {
+	if(!freezed) 
+		_arrowUp 	= !_buttonState[4];
+	return _arrowUp;
+}
+bool getEquipe(){
+	if(!freezed)
+		_equipe = _buttonState[5];
+	return _equipe;
+}
+bool getDetection(){
 	if(!freezed) 
 		_detection = _buttonState[6];
 	return _detection;
@@ -194,40 +228,23 @@ bool getStrategie(){
 		_strategie = _buttonState[7];
 	return _strategie;
 }
-bool getCheck(){
-	if(!freezed)
-		_check = _buttonState[5];
-	return _check;
-}
-bool getEquipe(){
-	if(!freezed)
-		_equipe = _buttonState[5];
-	return _equipe;
-}
-void setRecalage(bool state){
-	//if(!freezed) ??
-		_recalage = state;
-}
-bool getRecalage(){
-	return _recalage;
-}
-bool getTestBras(){
-	if(!freezed)
-		_testBras = _buttonState[6];
-	return _testBras;
-}
-void setOpponent(int op){
-	_oppenentFront = (op == 1) ? true : false;
-	_oppenentBack = (op == -1) ? true : false;
-}
-bool getOpponent(){
-	return _oppenentFront;
-}
-bool getArrowUp()
+bool getOption01()
 {
 	if(!freezed) 
-		_arrowUp 	= !_buttonState[4];
-	return _arrowUp;
+		_optionStrat01 = _buttonState[0];
+	return _optionStrat01;
+}
+bool getOption02()
+{
+	if(!freezed) 
+		_optionStrat02 = _buttonState[1];
+	return _optionStrat02;
+}
+bool getOption03()
+{
+	if(!freezed) 
+		_optionStrat03 = _buttonState[2];
+	return _optionStrat03;
 }
 bool getArrowDown()
 {
@@ -235,29 +252,14 @@ bool getArrowDown()
 		_arrowDown 	= !_buttonState[3];
 	return _arrowDown;
 }
-bool getOption01()
-{
-	if(!freezed) 
-		_optionStrat01 	= _buttonState[0];
-	return _optionStrat01;
-}
-bool getOption02()
-{
-	if(!freezed) 
-		_optionStrat02 	= _buttonState[1];
-	return _optionStrat02;
-}
-bool getOption03()
-{
-	if(!freezed) 
-		_optionStrat03 	= _buttonState[2];
-	return _optionStrat03;
-}
 
 	namespace LCD{
 		//----------------GESTION DES PAGES LCD-------------------
 		void splashScreen()
 		{
+			// Lecture de son
+			Sound::playSound(LOADING_SOUND);
+			//Demarrage affichage
 			_u8g2.clearBuffer();
 			// Affichage du menu de base
 			baseMenu();
@@ -268,6 +270,8 @@ bool getOption03()
 			_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
 
 			_u8g2.sendBuffer();
+
+			delay(2000);
 		}
 
 		void baseMenu(){
@@ -284,6 +288,7 @@ bool getOption03()
 				if (_prevUpState) {
 					_prevUpState = false ;
 					_page++;
+					Sound::playSound(UP_SOUND);
 					if (_page == _nbrPage) _page = 0;
 				}
 			}
@@ -297,6 +302,7 @@ bool getOption03()
 				if (_prevDownState) {
 					_prevDownState = false ;
 					_page--;
+					Sound::playSound(DOWN_SOUND);
 					if (_page < 0) _page = _nbrPage-1;
 				}
 			}
@@ -355,7 +361,7 @@ bool getOption03()
 			const int yInferieur	= 60;
 			const int xBox	= 50;
 
-			//Gestion Option 01 Stratégie
+			// Affichage etat Tirette
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(marginLeft, yTirette, "Tirette ");
 			_u8g2.setFont(u8g2_font_m2icon_9_tf);
@@ -364,7 +370,7 @@ bool getOption03()
 			else
 				_u8g2.drawGlyph(xBox, yTirette, 0x0045);
 
-			//Gestion Option 02 Stratégie
+			// Affichage etat Lidar
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(marginLeft, yLidar, "Lidar ");
 			_u8g2.setFont(u8g2_font_m2icon_9_tf);
@@ -373,7 +379,7 @@ bool getOption03()
 			else
 				_u8g2.drawGlyph(xBox, yLidar, 0x0045);
 
-			//Gestion Option 03 Stratégie
+			// Affichage etat recalage départ
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(marginLeft, yRecalage, "Recalage ");
 			_u8g2.setFont(u8g2_font_m2icon_9_tf);
@@ -391,6 +397,7 @@ bool getOption03()
 			_u8g2.drawStr(0, yInferieur + 40, "---------------");
 
 		}
+
 		void page02(){
 			// Alignements
 			const int marginLeft = 2;
@@ -453,8 +460,6 @@ bool getOption03()
 			else
 				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
 
-			
-
 		}
 		
 		void initScreen()
@@ -465,6 +470,7 @@ bool getOption03()
 			_u8g2.sendBuffer();
 			delay(1500);
 		}
+
 		void checkListScreen()
 		{
 			for (int i = 0; i < 6; i++)
@@ -498,13 +504,16 @@ bool getOption03()
 				delay(1000);
 			}
 		}
+
 		void goScreen()
 		{
 			_u8g2.clearBuffer();
 			_u8g2.setFont(u8g2_font_logisoso32_tr);
 			_u8g2.drawStr(5, 48, "GO!");
 			_u8g2.sendBuffer();
+			delay(1000);
 		}
+
 		void matchScreen(int score, int tempsRestant, int nbrBadCRC)
 		{
 			_u8g2.clearBuffer();
@@ -532,13 +541,6 @@ bool getOption03()
 			_u8g2.drawStr(3, 91, "    Y:         ");
 			_u8g2.drawStr(3, 98, "alpha:      deg");
 
-			if (_oppenentFront)
-			_u8g2.drawStr(3, 105, "Opp: Front");
-			else if(_oppenentBack)
-			_u8g2.drawStr(3, 105, "Opp: Behind");
-			else
-			_u8g2.drawStr(3, 105, "Opp: No");
-
 			_u8g2.setCursor(36, 77);
 			_u8g2.print(tempsRestant);
 
@@ -547,9 +549,6 @@ bool getOption03()
 			_u8g2.drawStr(0, 120, "erreurs :");
 			_u8g2.setCursor(40, 120);
 			_u8g2.print(nbrBadCRC);
-
-
-			
 
 			_u8g2.sendBuffer();
 		}
@@ -565,4 +564,18 @@ bool getOption03()
 		}
 		#endif
 	}
+
+	namespace Sound{
+
+		void playSound (int soundfile){
+			mp3.playMp3Folder(soundfile);
+		}
+
+		void switchSound (bool state){
+			if(state) Sound::playSound(SWITCH_RIGHT_SOUND);
+			else Sound::playSound(SWITCH_LEFT_SOUND);
+		}
+	}
+
 }
+

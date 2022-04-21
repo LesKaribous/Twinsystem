@@ -17,7 +17,7 @@ namespace Pin{
         latchMux             =  38,
         clockMux             =  39, //OUTPUT
         dataMux              =  24, //INPUT
-        initButton           =  36,
+        checkButton          =  36,
         neoPixel             =  35,
         robotSelect          =  14;
 /*

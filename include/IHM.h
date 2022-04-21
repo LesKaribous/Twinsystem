@@ -3,9 +3,12 @@
 #include <Arduino.h>
 #include <U8g2lib.h>
 #include <SPI.h>
+#include <SoftwareSerial.h>
+#include <DFRobotDFPlayerMini.h>
 
 #include "Match.h"
 #include "Settings.h"
+#include "Debugger.h"
 
 /***********
  *      --Button--
@@ -21,6 +24,14 @@
  * Switch 4 : Index 3 : Robot
  **********/
 
+#define LOADING_SOUND 0001
+#define UP_SOUND 0002
+#define DOWN_SOUND 0003
+#define SWITCH_RIGHT_SOUND 0004
+#define SWITCH_LEFT_SOUND 0005
+#define START_SOUND 0006
+#define MUSEUM_SOUND 0007
+#define DROOP_SOUND 0008
 
 namespace IHM{
 
@@ -38,9 +49,6 @@ namespace IHM{
     bool getStrategie     ();
     bool getCheck         ();
     bool getEquipe        ();
-    bool getTestBras      ();
-    bool getOpponent      ();
-    void setOpponent      (int);
     bool getArrowUp       ();
     bool getArrowDown     ();
     bool getOption01      ();
@@ -64,5 +72,11 @@ namespace IHM{
         void checkListScreen  ();
         void goScreen         ();
         void matchScreen      ( int score,int tempsRestant,int nbrBadCRC );
+    }
+
+    namespace Sound{
+        //------ Gestion des sons -------
+        void playSound      (int soundfile);
+        void switchSound    (bool state);
     }
 }

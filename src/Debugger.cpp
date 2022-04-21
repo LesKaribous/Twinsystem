@@ -5,13 +5,14 @@ namespace Debugger{
     void init(){
         Serial.begin(115200);
     
-        while (!Serial && millis() < 5000) {
+        while (!Serial && millis() < 500) {
             //Waiting for serial
+            //21-04-2022 - @Nadar - Diminution de 5000ms à 500ms
         }
         printHeader();
         Serial.print("Preparing system...");
         
-        delay(1000);
+        delay(200);
         Serial.println("done.");
 
         Serial.print("Robot select : ");

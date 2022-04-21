@@ -25,45 +25,17 @@ namespace Strategy{
 
 	void waitLaunch()
 	{
-		//Tirette and Screen routine
-		/*Match::state = Match::State::READY;
-		while(Match::state != Match::State::RUNNING){
-			
-			IHM::updateButtonIHM();
-			Intercom::setTeam(IHM::getEquipe());
-		
-			if(!IHM::getTirette()){
-				Match::state = Match::State::ARMED;
-			}
-			if (Match::state == Match::State::ARMED){
-				if(IHM::getTirette()){
-					Match::state = Match::State::RUNNING;
-				}
-			}
+		IHM::menu();
 
-			//interfaceLink();
-			if (!IHM::getCheck())
-			{
-				IHM::LCD::initScreen();
-				Match::state = Match::State::READY;
-				sequenceRecalage();
-				IHM::setRecalage(true);
-			}
-
-			IHM::LCD::menuScreen();
-		}
-		*/
-
-
-
+    	while(!IHM::getTirette())   {IHM::menu();}
+    	while( IHM::getTirette())   {IHM::menu();}
 		// Lancement du Match
 		Match::start();
-		//IHM::LCD::goScreen();
+    	IHM::LCD::goScreen();
 		// Enregistrement des paramètres de match
-		//IHM::freezeInputs();
-		// Démarrage de la balise
-
-		// Delai pour affichage
+		IHM::freezeSettings();
+		// Delais d'affichage
 		delay(100);
+
 	}
 }

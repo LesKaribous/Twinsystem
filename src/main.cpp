@@ -18,21 +18,19 @@
 
 void setup(){
     Controller::init();
-    delay(1000);
+    //delay(1000);
 
     Settings::init();
     Debugger::init();
-
-    delay(500); //Pause de demarrage avant lancement
     IHM::init();
-    delay(1000);
 
     //Strategy::waitLaunch();
+    IHM::menu();
+    while(!IHM::getTirette())   {IHM::menu();}
+    while( IHM::getTirette())   {IHM::menu();}
 
-    while(digitalRead(Pin::initButton)) {IHM::menu();}
-    while(!digitalRead(Pin::initButton)){IHM::menu();}
-    while(digitalRead(Pin::initButton)) {IHM::menu();}
     IHM::LCD::goScreen();
+
 }
 
 void loop(){
