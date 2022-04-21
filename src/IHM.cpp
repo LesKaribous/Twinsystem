@@ -4,7 +4,7 @@
 
 namespace IHM
 {
-	/*
+	
 	const byte _LOGO_KARIBOUS_bits[] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -51,8 +51,9 @@ namespace IHM
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 	// Declaration de l'ecran
-	U8G2_ST7920_128X64_F_SW_SPI
-	_u8g2(U8G2_R3, 13, 11, 12, U8X8_PIN_NONE);
+	U8G2_SSD1309_128X64_NONAME2_F_4W_HW_SPI 
+	_u8g2(U8G2_R3, Pin::Lcd::Cs, Pin::Lcd::Dc, Pin::Lcd::Rs);  
+
 
 	// Logo Karibous
 	const byte
@@ -62,20 +63,33 @@ namespace IHM
 	// Declaration des variables IHM
 	int _buttonState[8];
 
-	bool
-		_tirette = false,
-		_detection = false,
-		_strategie = false,
-		_check = false,
-		_robot = false,
-		_recalage = false,
-		_typeRobot = Setting::ROBOT_PRIMAIRE,
-		_equipe = Setting::EQUIPE_BLEU,
-		_testBras = false,
-		_oppenentFront = false,
-		_oppenentBack  = true,
-		freezed = false;
+	int _page = 0;
+	int _tabPage[4];
+	const int _nbrPage = 4;
 
+	bool
+		_tirette 		= false,
+		_detection 		= false,
+		_strategie 		= false,
+		_check 			= false,
+		_robot 			= false,
+		_lidar 			= false,	
+		_recalage 		= false,
+		_arrowUp		= false,
+		_arrowDown		= false,
+		_prevUpState 	= false,
+		_prevDownState 	= false,	
+		_typeRobot 		= Settings::PRIMARY,
+		_equipe 		= Settings::EQUIPE_JAUNE,
+		_testBras 		= false,	
+		_optionStrat01	= false,
+		_optionStrat02	= false,
+		_optionStrat03	= false,
+		_oppenentFront 	= false,	// @jules -> c'est quoi ?
+		_oppenentBack  	= true,		// @jules -> c'est quoi ?
+		freezed 		= false;	// @jules -> c'est quoi ?
+
+	// TODO -> Change list
 	// Liste d'action de la check list:
 	char *_titreList[6] = {
 		"Robot",
@@ -85,6 +99,7 @@ namespace IHM
 		"Balise",
 		"GO !"};
 
+	// TODO -> Change list
 	// Liste d'action de la check list:
 	char *_list[6] = {
 		"Installer le robot secondaire ",
@@ -98,13 +113,14 @@ namespace IHM
 
 void init()
 {
-	pinMode(Pin::Tirette, INPUT_PULLUP);
+	pinMode(Pin::tirette	, INPUT_PULLUP);
+	pinMode(Pin::initButton	, INPUT_PULLUP);
 
-	pinMode(Pin::latchMux, OUTPUT);
-	pinMode(Pin::clockMux, OUTPUT);
-	pinMode(Pin::dataMux, INPUT);
+	pinMode(Pin::latchMux	, OUTPUT);
+	pinMode(Pin::clockMux	, OUTPUT);
+	pinMode(Pin::dataMux	, INPUT);
 
-	digitalWrite(Pin::latchMux, HIGH);
+	digitalWrite(Pin::latchMux, LOW);
 	digitalWrite(Pin::clockMux, LOW);
 
 	_u8g2.begin(); //Init du LCD
@@ -116,61 +132,66 @@ void init()
 	LCD::splashScreen();
 }
 
+void menu(){
+	updateButtonIHM();
+	LCD::startMenu();
+	//LCD::menuScreen();
+}
+
 //----------------GESTION DES BOUTTONS DE L'IHM----------------
 void updateButtonIHM()
 {
 	readButtonState();
+	getArrowUp();
+	getArrowDown();
+	getTirette();
 	getDetection();
 	getRobot();
 	getStrategie();
+	getOption01();
+	getOption02();
+	getOption03();
 	getCheck();
 	getEquipe();
 	getTestBras();
 }
-
 void readButtonState()
 {
-	digitalWrite(Pin::latchMux, LOW);
+	digitalWrite(Pin::latchMux, LOW	);
 	digitalWrite(Pin::latchMux, HIGH);
 	for (int i = 0; i <= 7; i++)
 	{
-		// on note l'état de la sortie (pin 9) du HC165
+		// on note l'état de la sortie du HC165
 		_buttonState[7 - i] = digitalRead(Pin::dataMux);
 		// et on envoi un front montant sur la pin 2 pour décaler les valeurs
 		digitalWrite(Pin::clockMux, HIGH);
 		digitalWrite(Pin::clockMux, LOW);
 	}
 }
-
 void freezeSettings(){
 	freezed = true;
 }
-
-bool getTirette(){
-	if(!freezed){
-		if (analogRead(Pin::Tirette) < 10)
-			_tirette = false;
-		else
-			_tirette = true;
-		return _tirette;
-	}else return _tirette;
+bool getTirette()
+{
+	if(!freezed)
+		_tirette = !digitalRead(Pin::tirette);
+	return _tirette;
 }
-
 bool getRobot()
 {
 	if(!freezed) 
-		_robot = _buttonState[3];
+		_robot = digitalRead(Pin::robotSelect);
 	return _robot;
 }
 bool getDetection()
 {
 	if(!freezed) 
-		_detection = _buttonState[0];
+		_detection = _buttonState[6];
 	return _detection;
 }
 bool getStrategie(){
 	if(!freezed)
-		_strategie = _buttonState[2];
+		_strategie = _buttonState[7];
 	return _strategie;
 }
 bool getCheck(){
@@ -180,7 +201,7 @@ bool getCheck(){
 }
 bool getEquipe(){
 	if(!freezed)
-		_equipe = _buttonState[1];
+		_equipe = _buttonState[5];
 	return _equipe;
 }
 void setRecalage(bool state){
@@ -195,109 +216,247 @@ bool getTestBras(){
 		_testBras = _buttonState[6];
 	return _testBras;
 }
-
 void setOpponent(int op){
 	_oppenentFront = (op == 1) ? true : false;
-	_oppenentBack= (op == -1) ? true : false;
+	_oppenentBack = (op == -1) ? true : false;
 }
-
 bool getOpponent(){
 	return _oppenentFront;
 }
-
+bool getArrowUp()
+{
+	if(!freezed) 
+		_arrowUp 	= !_buttonState[4];
+	return _arrowUp;
+}
+bool getArrowDown()
+{
+	if(!freezed) 
+		_arrowDown 	= !_buttonState[3];
+	return _arrowDown;
+}
+bool getOption01()
+{
+	if(!freezed) 
+		_optionStrat01 	= _buttonState[0];
+	return _optionStrat01;
+}
+bool getOption02()
+{
+	if(!freezed) 
+		_optionStrat02 	= _buttonState[1];
+	return _optionStrat02;
+}
+bool getOption03()
+{
+	if(!freezed) 
+		_optionStrat03 	= _buttonState[2];
+	return _optionStrat03;
+}
 
 	namespace LCD{
 		//----------------GESTION DES PAGES LCD-------------------
 		void splashScreen()
 		{
 			_u8g2.clearBuffer();
+			// Affichage du menu de base
+			baseMenu();
+
 			// Affichage de l'image K
 			_u8g2.setDrawColor(1);
 			_u8g2.setBitmapMode(0);
 			_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
 
+			_u8g2.sendBuffer();
+		}
+
+		void baseMenu(){
+
+			_u8g2.setFont(u8g2_font_unifont_t_75);
+			_u8g2.setFontPosCenter();
+			// Fleche de menu
+			if (_arrowUp) {
+				_u8g2.drawGlyph(57, 2, 0x25b2);
+				_prevUpState = true ;
+			}
+			else {
+				_u8g2.drawGlyph(57, 2, 0x25b3);
+				if (_prevUpState) {
+					_prevUpState = false ;
+					_page++;
+					if (_page == _nbrPage) _page = 0;
+				}
+			}
+
+			if (_arrowDown) {
+				_u8g2.drawGlyph(57, 123, 0x25bc);
+				_prevDownState = true ;
+			}
+			else {
+				_u8g2.drawGlyph(57, 123, 0x25bd);
+				if (_prevDownState) {
+					_prevDownState = false ;
+					_page--;
+					if (_page < 0) _page = _nbrPage-1;
+				}
+			}
+
+			// Indicateur de Page
+			// Raz marqueur page
+			for(int i=0;i<_nbrPage;i++) _tabPage[i] = 0x25ab ;
+			// Selection page 
+			_tabPage[_page] = 0x25ae ;
+			// Affichage des breadCrum
+			for(int i=0;i<_nbrPage;i++){
+				_u8g2.drawGlyph(15+i*5, 2, _tabPage[i]);
+			}
+
+			// Afficher info version
+			// TODO
 			// Affichages de la date de compilation
 			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(5, 110, __DATE__);
-			_u8g2.drawStr(5, 118, __TIME__);
-
-			_u8g2.sendBuffer();
+			_u8g2.setFontPosTop();
+			_u8g2.drawStr(1, 111, __DATE__);
+			_u8g2.drawStr(1, 119, __TIME__);
 		}
 
-		void menuScreen(){
-			const int ligneEtat = 0;
-			const int ligneStrategie = 64;
-			const int colonne1 = 2;
-
+		void startMenu(){
 			_u8g2.clearBuffer();
-
-			// Affichages des titres :
-			_u8g2.setFont(u8g2_font_5x7_mr);
-
-			_u8g2.drawStr(colonne1, ligneEtat, " -- ETAT --");
-			_u8g2.drawStr(colonne1 + 3, ligneStrategie, "-- STRAT --");
-
-			// Affichages des sous-titres :
-			_u8g2.setFont(u8g2_font_micro_mr);
-
-			_u8g2.drawStr(colonne1 + 15, ligneEtat + 10, "robot ");
-			_u8g2.drawStr(colonne1 + 10, ligneEtat + 20, "Tirette");
-			_u8g2.drawStr(colonne1 + 10, ligneEtat + 30, "Balise");
-			_u8g2.drawStr(colonne1 + 10, ligneEtat + 40, "Recalage");
-
-			_u8g2.drawStr(colonne1, ligneStrategie + 10, "Equipe");
-
-			// Etat type de robot :
-			_u8g2.setCursor(colonne1, ligneEtat + 10);
-			if (_typeRobot == Setting::ROBOT_PRIMAIRE)
-				_u8g2.print("1st");
-			else
-				_u8g2.print("2nd");
-			// Etat equipe :
-			_u8g2.setCursor(colonne1 + 28, ligneStrategie + 10);
-			if (_equipe == Setting::EQUIPE_JAUNE)
-				_u8g2.print("jaune");
-			else
-				_u8g2.print("bleu");
-			// Etat strategie :
-			_u8g2.setCursor(colonne1, ligneStrategie + 20);
-			if (_strategie)
-				_u8g2.print("Homologation");
-			else
-				_u8g2.print("Match");
-			
-			_u8g2.setCursor(colonne1, ligneStrategie + 30);
-			if (_robot)
-				_u8g2.print("Primaire");
-			else
-				_u8g2.print("Secondaire");
-
-			// Symboles :
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			// Etat tirette :
-			if (_tirette)
-				_u8g2.drawGlyph(colonne1, ligneEtat + 20 - 1, 0x0045);
-			else
-				_u8g2.drawGlyph(colonne1, ligneEtat + 20 - 1, 0x0046);
-			// Etat balise :
-			if (!_detection)
-				_u8g2.drawGlyph(colonne1, ligneEtat + 30 - 1, 0x0045);
-			else
-				_u8g2.drawGlyph(colonne1, ligneEtat + 30 - 1, 0x0046);
-			// Etat recalage :
-			if (!_recalage)
-				_u8g2.drawGlyph(colonne1, ligneEtat + 40 - 1, 0x0045);
-			else
-				_u8g2.drawGlyph(colonne1, ligneEtat + 40 - 1, 0x0046);
-			// Validation de départ :
-			_u8g2.setFont(u8g2_font_open_iconic_check_2x_t);
-			if (!_tirette && _detection && _recalage)
-				_u8g2.drawGlyph(44, 10, 0x41);
-			else
-				_u8g2.drawGlyph(44, 10, 0x42);
+			// Affichage du menu de base
+			baseMenu();
+			// Affichage de la page
+			affichePage();
 
 			_u8g2.sendBuffer();
 		}
+
+		void affichePage(){
+			switch (_page) {
+				case 0:
+					page01();
+					break;
+				case 1:
+					page02();
+					break;
+				default:
+					_u8g2.setFont(u8g2_font_5x7_mr);
+					_u8g2.drawStr(2, 60, "error 404");
+					break;
+			}
+		}
+
+		void page01(){
+			// Alignements
+			const int marginLeft = 2;
+			int wChaine;
+			const int yTirette 		= 20;
+			const int yLidar 		= 32;
+			const int yRecalage 	= 44;
+			const int yInferieur	= 60;
+			const int xBox	= 50;
+
+			//Gestion Option 01 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(marginLeft, yTirette, "Tirette ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_tirette)
+				_u8g2.drawGlyph(xBox, yTirette, 0x0046);
+			else
+				_u8g2.drawGlyph(xBox, yTirette, 0x0045);
+
+			//Gestion Option 02 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(marginLeft, yLidar, "Lidar ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_lidar)
+				_u8g2.drawGlyph(xBox, yLidar, 0x0046);
+			else
+				_u8g2.drawGlyph(xBox, yLidar, 0x0045);
+
+			//Gestion Option 03 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(marginLeft, yRecalage, "Recalage ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_recalage)
+				_u8g2.drawGlyph(xBox, yRecalage, 0x0046);
+			else
+				_u8g2.drawGlyph(xBox, yRecalage, 0x0045);
+
+			// Partie inférieure
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(0, yInferieur, "---------------");
+			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 30, "alpha:      deg");
+			_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+		}
+		void page02(){
+			// Alignements
+			const int marginLeft = 2;
+			int wChaine;
+			const int yTeam = 21;
+			const int yAvoid = 37;
+			const int yStrat = 53;
+			const int yOption01 = 69;
+			const int yOption02 = 85;
+			const int yOption03 = 101;
+
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.setFontPosCenter();
+
+			//Gestion equipe
+			wChaine = _u8g2.drawStr(marginLeft, yTeam, "Equipe");
+			if (_equipe == Settings::EQUIPE_JAUNE)
+				_u8g2.drawStr(marginLeft + wChaine, yTeam, " jaune");
+			else
+				_u8g2.drawStr(marginLeft + wChaine, yTeam, " violet");
+			
+			//Gestion evitement
+			wChaine = _u8g2.drawStr(marginLeft, yAvoid, "Evit.");
+			if (_detection)
+				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " simple");
+			else
+				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " complexe");
+
+			//Gestion Stratégie
+			wChaine = _u8g2.drawStr(marginLeft, yStrat, "Strat.");
+			if (_strategie)
+				_u8g2.drawStr(marginLeft + wChaine, yStrat, " homologation");
+			else
+				_u8g2.drawStr(marginLeft + wChaine, yStrat, " match");
+
+			//Gestion Option 01 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			wChaine = _u8g2.drawStr(marginLeft, yOption01, " - Option 01 ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_optionStrat01)
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0045);
+			else
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0046);
+
+			//Gestion Option 02 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			wChaine = _u8g2.drawStr(marginLeft, yOption02, " - Option 02 ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_optionStrat02)
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0045);
+			else
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0046);
+
+			//Gestion Option 03 Stratégie
+			_u8g2.setFont(u8g2_font_micro_mr);
+			wChaine = _u8g2.drawStr(marginLeft, yOption03, " - Option 03 ");
+			_u8g2.setFont(u8g2_font_m2icon_9_tf);
+			if (_optionStrat03)
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0045);
+			else
+				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
+
+			
+
+		}
+		
 		void initScreen()
 		{
 			_u8g2.clearBuffer();
@@ -406,5 +565,4 @@ bool getOpponent(){
 		}
 		#endif
 	}
-	*/
 }

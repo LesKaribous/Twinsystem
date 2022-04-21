@@ -24,8 +24,8 @@
 
 namespace IHM{
 
-    /*
     void init();
+    void menu();
 
     void updateButtonIHM  ();
     void readButtonState  ();
@@ -41,6 +41,11 @@ namespace IHM{
     bool getTestBras      ();
     bool getOpponent      ();
     void setOpponent      (int);
+    bool getArrowUp       ();
+    bool getArrowDown     ();
+    bool getOption01      ();
+    bool getOption02      ();
+    bool getOption03      ();
 
     //----- Gestion des etats -----
     void setRecalage      ( bool state );
@@ -49,12 +54,15 @@ namespace IHM{
     namespace LCD{
         //------ Pages LCD ------
         void splashScreen     ();
+        void baseMenu         ();
+        void affichePage      ();
+        void page01           ();
+        void page02           ();
+        void startMenu        ();
         void menuScreen       ();
         void initScreen       ();
         void checkListScreen  ();
         void goScreen         ();
         void matchScreen      ( int score,int tempsRestant,int nbrBadCRC );
-
-    */
+    }
 }
-

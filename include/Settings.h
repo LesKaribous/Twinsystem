@@ -17,8 +17,8 @@ namespace Settings{
         ADVERSAIRE_NON = 1,
         ADVERSAIRE_OUI = 0,
 
-        EQUIPE_JAUNE = 1,
-        EQUIPE_BLEU  = 0,
+        EQUIPE_JAUNE    = 1,
+        EQUIPE_VIOLET   = 0,
 
         STRATEGIE_HOMOLOGATION = 1,
         STRATEGIE_MATCH        = 0,

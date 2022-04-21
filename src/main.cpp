@@ -12,11 +12,9 @@
 //     Version : 2.4.2
 //     Last update : 30 / 03 / 2022
                                     
-
 #include "Twinsystem.h"
 
 #include "Test.h"
-
 
 void setup(){
     Controller::init();
@@ -24,21 +22,22 @@ void setup(){
 
     Settings::init();
     Debugger::init();
-    //delay(500); //Pause de demarrage avant lancement
-    //IHM::init();
-    //delay(1000);
+
+    delay(500); //Pause de demarrage avant lancement
+    IHM::init();
+    delay(1000);
 
     //Strategy::waitLaunch();
 
-
-    pinMode(Pin::initButton, INPUT_PULLUP);
-    while(digitalRead(Pin::initButton)){}
-    while(!digitalRead(Pin::initButton)){}
-    while(digitalRead(Pin::initButton)){}
+    while(digitalRead(Pin::initButton)) {IHM::menu();}
+    while(!digitalRead(Pin::initButton)){IHM::menu();}
+    while(digitalRead(Pin::initButton)) {IHM::menu();}
+    IHM::LCD::goScreen();
 }
 
 void loop(){
+    IHM::LCD::matchScreen(0,0,0);
     //Test::calibrationRotation();
     //Test::calibrationX();
-    Test::calibrationY();
+    //Test::calibrationY();
 }

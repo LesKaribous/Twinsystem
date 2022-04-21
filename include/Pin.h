@@ -3,11 +3,20 @@
 
 namespace Pin{
     // Declaration des pins E/S
-    const int 
-        //IHM       
-        Tirette              =  37, //INPUT_PULLUP
-        clockMux             =  38, //OUTPUT
-        dataMux              =  38, //INPUT
+     
+        //IHM    
+        namespace Lcd{
+            const int
+                Cs = 10,
+                Dc = 9 ,
+                Rs = 8 ;
+        }   
+
+    const int
+        tirette              =  37, //INPUT_PULLUP
+        latchMux             =  38,
+        clockMux             =  39, //OUTPUT
+        dataMux              =  24, //INPUT
         initButton           =  36,
         neoPixel             =  35,
         robotSelect          =  14;
