@@ -31,6 +31,9 @@ namespace Match{
     void waitEnd();
     void end();
 
+    int GetScore();
+    double GetTempsRestant();
+
     bool updateTime();
     void updateScore(int points, int multiplicateur);
 

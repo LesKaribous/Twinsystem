@@ -9,6 +9,7 @@ namespace Strategy{
     //----- STRATEGIES -----
     void homologation();
     void match();
+    void recalage();
 
     void waitLaunch();
 
