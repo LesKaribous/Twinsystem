@@ -12,7 +12,7 @@ namespace Controller{
     bool engaged = false,
          sleeping = false;
 
-    CalibrationProfile calibration;
+    Vec3 calibration;
 
     u_int32_t speed, accel;
 
@@ -34,16 +34,12 @@ namespace Controller{
 
         reset();    
 
-        setCalibration(true); //Primary WARNING
+        setCalibration(Settings::ROBOT); //Primary WARNING
 
     }
 
     void setCalibration(bool state){
-        if (state == Settings::PRIMARY){
-            calibration = Settings::Calibration::Primary;
-        }else {
-            calibration = Settings::Calibration::Secondary;
-        }
+        calibration = state == Settings::PRIMARY ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
     }
 
     void engage(bool state){
@@ -70,14 +66,7 @@ namespace Controller{
 
     void move(Vec3 target, bool async){
 
-        /*
-        target.mult(calibration.Holonomic.toMatrix());
-
-        Debugger::log("Calibration:");
-		Debugger::log(target.a);
-		Debugger::log(target.b);
-		Debugger::log(target.c);
-        */
+        target.mult(calibration.toMatrix());
 
         sA.setTargetRel(int32_t(target.a));
         sB.setTargetRel(int32_t(target.b));

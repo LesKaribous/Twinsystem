@@ -66,7 +66,7 @@ namespace Settings{
         };
 
         const CalibrationProfile Secondary = {
-            { 8.71f, 8.71f, 8.71f }, //Holonomic : ABC
+            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
             { 1.17f, 1.17f, 1.045f } //Cartesian : XYROT
         };
     }

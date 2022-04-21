@@ -10,6 +10,12 @@ namespace Motion{
 
     //----- COMMANDES DE DEPLACEMENT -----
     void go(Vec3);
+    void goTo(Vec3);
+
+
+    //Getters
+    Vec3 GetPosition();
+	Vec3 GetTarget();
 
     //Inverse Kinematics
     Vec3 ik(Vec3);
