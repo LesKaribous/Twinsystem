@@ -28,23 +28,31 @@ namespace Match{
 		return tempsRestant;
 	}
 
+	
+	void update(){
+		updateTime();
+		IHM::LCD::matchScreen();
+	}
+
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
 	bool updateTime()
 	{
-		tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
+		if(Match::hasStarted){ //Do not update time before match has started
+			tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
-		if (tempsRestant <= 0)
-		{
-			Match::end();
-			return true;
+			if (tempsRestant <= 0)
+			{
+				Match::end();
+				return true;
+			}
+			else if (tempsRestant <= 4)
+			{
+				//Last action ?
+				return false;
+			}
+			else
+				return false;
 		}
-		else if (tempsRestant <= 4)
-		{
-			//Last action ?
-			return false;
-		}
-		else
-			return false;
 	}
 
 	//----------------PROCEDURE D'ATTENTE----------------

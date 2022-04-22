@@ -15,7 +15,8 @@ namespace Strategy{
 
 
 	void match(){
-
+		go({100,0,0});
+		goTo({0,0,0});
 	}
 
 	void homologation(){
@@ -41,6 +42,7 @@ namespace Strategy{
 		IHM::freezeSettings();
 		// Delais d'affichage
 		delay(100);
+		//Match::update();
 
 	}
 }

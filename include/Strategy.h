@@ -12,5 +12,4 @@ namespace Strategy{
     void recalage();
 
     void waitLaunch();
-
 }

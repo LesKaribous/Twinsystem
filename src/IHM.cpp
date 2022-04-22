@@ -535,50 +535,51 @@ bool getArrowDown()
 			delay(1000);
 		}
 
-		void matchScreen()
-		{
-			_u8g2.clearBuffer();
-			// Titre
-			_u8g2.setFont(u8g2_font_logisoso16_tr);
-			_u8g2.drawStr(8, 1, "Match");
-			_u8g2.drawHLine(0, 20, 64);
+		void matchScreen(){
+			if(Match::hasStarted){
+				_u8g2.clearBuffer();
+				// Titre
+				_u8g2.setFont(u8g2_font_logisoso16_tr);
+				_u8g2.drawStr(8, 1, "Match");
+				_u8g2.drawHLine(0, 20, 64);
 
-			// Affichage partie Score
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(4, 23, "Score:");
-			_u8g2.drawStr(38, 66, "points");
+				// Affichage partie Score
+				_u8g2.setFont(u8g2_font_micro_mr);
+				_u8g2.drawStr(4, 23, "Score:");
+				_u8g2.drawStr(38, 66, "points");
 
-			// Score Chiffre
-			_u8g2.setFont(u8g2_font_logisoso32_tr);
-			_u8g2.setCursor(2, 31);
-			_u8g2.print(Match::GetScore());
+				// Score Chiffre
+				_u8g2.setFont(u8g2_font_logisoso32_tr);
+				_u8g2.setCursor(2, 31);
+				_u8g2.print(Match::GetScore());
 
-			_u8g2.drawHLine(0, 75, 64);
+				_u8g2.drawHLine(0, 75, 64);
 
-			//---Partie inférieure---
-			// Affichage Statique
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(3, 77, "Temps:      sec");
-			_u8g2.drawStr(3, 84, "    X:         ");
-			_u8g2.drawStr(3, 91, "    Y:         ");
-			_u8g2.drawStr(3, 98, "  rot:      deg");
+				//---Partie inférieure---
+				// Affichage Statique
+				_u8g2.setFont(u8g2_font_micro_mr);
+				_u8g2.drawStr(3, 77, "Temps:      sec");
+				_u8g2.drawStr(3, 84, "    X:         ");
+				_u8g2.drawStr(3, 91, "    Y:         ");
+				_u8g2.drawStr(3, 98, "  rot:      deg");
 
-			// Affichage Variable
-			// - Temps
-			_u8g2.setCursor(30, 77);
-			_u8g2.print(Match::GetTempsRestant()/1000,0);
-			// - X position
-			_u8g2.setCursor(30, 84);
-			_u8g2.print(Motion::GetPosition().a,0);
-			// - Y position
-			_u8g2.setCursor(30, 91);
-			_u8g2.print(Motion::GetPosition().b,0);
-			// - Rot position
-			_u8g2.setCursor(30, 98);
-			_u8g2.print(Motion::GetPosition().c,0);
+				// Affichage Variable
+				// - Temps
+				_u8g2.setCursor(30, 77);
+				_u8g2.print(Match::GetTempsRestant()/1000,0);
+				// - X position
+				_u8g2.setCursor(30, 84);
+				_u8g2.print(Motion::GetPosition().a,0);
+				// - Y position
+				_u8g2.setCursor(30, 91);
+				_u8g2.print(Motion::GetPosition().b,0);
+				// - Rot position
+				_u8g2.setCursor(30, 98);
+				_u8g2.print(Motion::GetPosition().c,0);
 
 
-			_u8g2.sendBuffer();
+				_u8g2.sendBuffer();
+			}
 		}
 
 		#ifdef DANSE

@@ -18,18 +18,20 @@
 
 void setup(){
     //--- INIT ---
-    Controller  ::init();
-    Settings    ::init();
-    Debugger    ::init();
-    IHM         ::init();
+    Controller::init();
+    Settings::init();
+    Debugger::init();
+    IHM::init();
     //--- WAIT LAUNCH---
     Strategy::waitLaunch();
 
 }
 
 void loop(){
-    IHM::LCD::matchScreen();
-    //Test::calibrationRotation();
-    //Test::calibrationX();
-    //Test::calibrationY();
+    if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 
+        Strategy::match();
+    else if(IHM::getStrategie() == Settings::STRATEGIE_HOMOLOGATION) 
+        Strategy::homologation();
+
+    Match::end();
 }

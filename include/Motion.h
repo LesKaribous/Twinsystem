@@ -9,6 +9,7 @@ namespace Motion{
     void sequenceRecalage();
 
     //----- COMMANDES DE DEPLACEMENT -----
+    void move(Vec3 target, bool absolute = true);
     void go(Vec3);
     void goTo(Vec3);
 

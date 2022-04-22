@@ -17,44 +17,28 @@ namespace Motion
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 	}
 
-	Vec3 GetPosition(){
-		return cPosition;
-	}
-
-	Vec3 GetTarget(){
-		return cTarget;
-	}
-
-
-	void SetPosition(Vec3 pos){
-		cPosition = pos;
-		cTarget = pos;
-	}
-
 	//Relative move request
 	void go(Vec3 target){
-		cTarget = cPosition.copy().add(target);
-		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
-		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
-		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
-
-		Controller::move(target, false);
-		while(running());
-		cPosition.add(target);
+		move(target, false);
 	}
 
 	//Absolute move request
 	void goTo(Vec3 target){
-		target.sub(cPosition);
-		cTarget = target;
+		move(target, true);
+	}
 
+	//Absolute move request
+	void move(Vec3 target, bool absolute){
+		if(absolute) target.sub(cPosition);
+		cTarget = target;
+		
 		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
 		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
 
-		Controller::move(target, false);
-		while(running());
-		cPosition.add(target);
+		Controller::move(target, true);
+		while(running()) Match::update();
+		cPosition.add(cTarget);
 	}
 
 	bool running(){
@@ -78,6 +62,20 @@ namespace Motion
 		return target.mult(P).mult(1/R);
 	}
 
+
+
+
+	Vec3 GetPosition(){
+		return cPosition;
+	}
+
+	Vec3 GetTarget(){
+		return cTarget;
+	}
+	void SetPosition(Vec3 pos){
+		cPosition = pos;
+		cTarget = pos;
+	}
 
 
 
