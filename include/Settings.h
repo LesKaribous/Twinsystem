@@ -57,7 +57,7 @@ namespace Settings{
         const u_int8_t 
             STEP_MODE = 8;
             
-    } // namespace Stepper 
+    }
 
     namespace Calibration{
         const CalibrationProfile Primary = {
@@ -70,6 +70,7 @@ namespace Settings{
             { 1.17f, 1.17f, 1.045f } //Cartesian : XYROT
         };
     }
+
 }
 
 

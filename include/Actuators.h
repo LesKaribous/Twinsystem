@@ -3,80 +3,85 @@
 #include <Arduino.h>
 #include <Servo.h>
 
+#define FLOOR 0
+#define DISPENSER 1
+#define WORK_SHED 2
+#define GALLERY 3
+#define PEDESTAL 4
+
 namespace Actuators{
+       
+    void init();
+    
+    class Bras
+    {
+        public:
 
-/*
-    void init       ();
-    void initBras   ();
+        Bras();
+        ~Bras();
 
-    void arming (Side side = Side::BOTH);
-    void fold   (Side side = Side::BOTH);
-    void unfold (Side side = Side::BOTH);
+        void setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump);
+        void setLimit(  int minServoElevator, 
+                        int maxServoElevator, 
+                        int minServoArm, 
+                        int maxServoArm, 
+                        int minServoTool, 
+                        int maxServoTool );
+    
+        int calcPositionElevator(byte posServoElevator);
+        int calcPositionArm     (byte posServoArm);
+        int calcPositionTool    (byte posServoTool);
 
-    void suck   (Side side = Side::BOTH);
-    void unsuck (Side side = Side::BOTH);
+        void detachBras();
+        void attachBras();
 
-    void close  (Side side = Side::BOTH);
-    void open   (Side side = Side::BOTH);
+        void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool);
+        void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait);
 
-    void sleep  (Side side = Side::BOTH);
-    void wake   (Side side = Side::BOTH);
+        void setElevator    (byte posServoElevator);
+        void setElevator    (byte posServoElevator, int wait);
 
-    class Pincer{
-    public:
+        void setArm (byte posServoArm);    
+        void setArm (byte posServoArm, int wait);
 
-        Pincer(
-            int pinServoPincer, 
-            int pinServoVentouse, 
-            int pinPompe, 
-            int pinEv,
-            int foldedPos,
-            int unfolded,
-            int arming,
-            int closed,
-            int opened
-        );
+        void setTool (byte posServoTool);
+        void setTool (byte posServoTool, int wait);
 
-        void fold();
-        void arming();
-        void unfold();
+        void grab();
+        void grab(int wait);
 
-        void suck();
-        void unsuck();
+        void ungrab();
+        void ungrab(int wait);
 
-        void close();
-        void open();
 
-        void sleep();
-        void wake();
+        private:
 
-    private:
+        Servo _servoElevator ;
+        Servo _servoArm ;
+        Servo _servoTool ;
 
-        Servo _servoPincer ;
-        Servo _servoVentouse ;
+        int _pinServoElevator;
+        int _pinServoArm;
+        int _pinServoTool;
 
-        int _pinServoPincer;
-        int _pinServoVentouse;
+        int _pinPump ;
 
-        int _pinPompe;
-        int _pinEv;
+        int _minServoElevator ;
+        int _maxServoElevator ;
+        int _minServoArm ;
+        int _maxServoArm ;
+        int _minServoTool ;
+        int _maxServoTool ;
 
-        int _foldPos;
-        int _unfoldPos;
-        int _armingPos;
-        int _closePos;
-        int _openPos;
-
-        bool asleep = true;
     };
 
-    extern Pincer rightPincer ;
-    extern Pincer leftPincer ;
-
-    extern Servo servoDrapeau ;
-    extern Servo servoRightArm ;
-    extern Servo servoLeftArm ;
-*/
+    //Bras
+    void takeElement(Bras robotArm,int location);
+    
+    extern Bras BrasAU;
+    extern Bras BrasInit;
+    extern Bras BrasTirette;
+    
 }
 
 

@@ -20,6 +20,10 @@ namespace Strategy{
 	}
 
 	void homologation(){
+		Actuators::takeElement(Actuators::BrasAU,WORK_SHED);
+		go({100,0,0});
+		go({0,0,-60});
+		Actuators::takeElement(Actuators::BrasTirette,WORK_SHED);
 
 	}
 

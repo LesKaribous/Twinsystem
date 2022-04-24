@@ -20,7 +20,7 @@ namespace Pin{
         checkButton          =  36,
         neoPixel             =  35,
         robotSelect          =  14;
-/*
+
     namespace Servo{
         const int 
             pinPump01   = 0,
@@ -37,7 +37,8 @@ namespace Pin{
             pinServo10  = 28,
             pinServo11  = 29,
             pinServo12  = 30;
-    }*/
+    }
+    
 
     namespace Stepper{
         const int 

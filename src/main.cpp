@@ -22,6 +22,7 @@ void setup(){
     Settings::init();
     Debugger::init();
     IHM::init();
+    Actuators::init();
     //--- WAIT LAUNCH---
     Strategy::waitLaunch();
 

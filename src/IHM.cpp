@@ -144,6 +144,9 @@ void init()
 	_u8g2.setFontPosTop();
 	_u8g2.setFontDirection(0);
 
+	// Initi the IO of the IHM
+	updateButtonIHM();
+
 	// Splashscreen with the K logo
 	LCD::splashScreen();
 }
