@@ -24,6 +24,7 @@ void setup(){
     IHM::init();
     Actuators::init();
     //--- WAIT LAUNCH---
+    //Strategy::testingActuators();
     Strategy::waitLaunch();
 
 }

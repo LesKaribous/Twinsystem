@@ -20,17 +20,58 @@ namespace Strategy{
 	}
 
 	void homologation(){
-		Actuators::takeElement(Actuators::BrasAU,WORK_SHED);
-		go({100,0,0});
-		go({0,0,-60});
-		Actuators::takeElement(Actuators::BrasTirette,WORK_SHED);
-
+		Actuators::takeElement(Actuators::BrasInit,FLOOR);
+		Actuators::takeElement(Actuators::BrasTirette,FLOOR);
+		Actuators::takeElement(Actuators::BrasAU,FLOOR);
+		delay(2000);
+		Actuators::BrasInit.ungrab();
+		Actuators::BrasTirette.ungrab();
+		Actuators::BrasAU.ungrab();
+		delay(2000);
 	}
 
 	void recalage(){
 
 	}
 
+	void testingActuators(){
+		Actuators::BrasInit.setPosition(0,100,50);
+		Actuators::BrasAU.setPosition(0,100,50);
+		Actuators::BrasTirette.setPosition(0,100,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,50,100);
+		Actuators::BrasAU.setPosition(0,50,100);
+		Actuators::BrasTirette.setPosition(0,50,100);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,50,0);
+		Actuators::BrasAU.setPosition(0,50,0);
+		Actuators::BrasTirette.setPosition(0,50,0);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,50,50);
+		Actuators::BrasAU.setPosition(0,50,50);
+		Actuators::BrasTirette.setPosition(0,50,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,100,50);
+		Actuators::BrasAU.setPosition(0,100,50);
+		Actuators::BrasTirette.setPosition(0,100,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(100,100,50);
+		Actuators::BrasAU.setPosition(100,100,50);
+		Actuators::BrasTirette.setPosition(100,100,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,100,50);
+		Actuators::BrasAU.setPosition(0,100,50);
+		Actuators::BrasTirette.setPosition(0,100,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.setPosition(0,0,50);
+		Actuators::BrasAU.setPosition(0,0,50);
+		Actuators::BrasTirette.setPosition(0,0,50);
+		IHM::waitCheck();
+		Actuators::BrasInit.detachBras();
+		Actuators::BrasAU.detachBras();
+		Actuators::BrasTirette.detachBras();
+		IHM::waitCheck();
+	}
 
 	void waitLaunch()
 	{

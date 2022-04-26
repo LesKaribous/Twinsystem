@@ -39,6 +39,7 @@ namespace IHM{
     bool getDetection     ();
     bool getStrategie     ();
     bool getCheck         ();
+    bool waitCheck        ();
     bool getEquipe        ();
     bool getArrowUp       ();
     bool getArrowDown     ();
@@ -57,6 +58,8 @@ namespace IHM{
         void affichePage      ();
         void page01           ();
         void page02           ();
+        void page03           ();
+        void adjustActuators  ();
         void startMenu        ();
         void menuScreen       ();
         void initScreen       ();

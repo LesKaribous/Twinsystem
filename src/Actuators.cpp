@@ -31,21 +31,20 @@ namespace Actuators{
 			BrasAU			.setLimit(	180,95,			// Elevator
 										180,60,			// Arm
 										0,180); 		// Tool
-			BrasInit		.setLimit(	180,102,		// Elevator
-										180,70,			// Arm
+			BrasInit		.setLimit(	180,100,		// Elevator
+										180,55,			// Arm
 										0,180);			// Tool
-			BrasTirette		.setLimit(	180,100,		// Elevator
-										180,70,			// Arm
+			BrasTirette		.setLimit(	180,105,		// Elevator
+										180,50,			// Arm
 										0,180); 		// Tool
 			// Set zero position
 			BrasAU			.setPosition(0,0,50);
 			BrasInit		.setPosition(0,0,50);
-			BrasTirette		.setPosition(0,0,50,2000);
+			BrasTirette		.setPosition(0,0,50,1000);
 			// Wait for match launch
 			BrasAU			.detachBras();
 			BrasInit		.detachBras();
 			BrasTirette		.detachBras();
-
 		}
 	}
 
@@ -96,16 +95,19 @@ namespace Actuators{
 		_pinServoTool     = pinServoTool ;
 		_pinPump          = pinPump ;
 
-		_servoElevator.detach();
-		_servoArm.detach();
-		_servoTool.detach();
-
 		_servoElevator.attach(_pinServoElevator);
 		_servoArm.attach(_pinServoArm);
 		_servoTool.attach(_pinServoTool);
 
 		pinMode(_pinPump,OUTPUT);
 		ungrab();
+	}
+
+	void Bras::setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump, int pinEv)
+	{
+		setPin(pinServoElevator, pinServoArm, pinServoTool, pinPump);
+		_pinEv = pinEv ;
+		_pinEvAvailable = true ;
 	}
 
 	void Bras::setLimit( int minServoElevator, int maxServoElevator, int minServoArm, int maxServoArm, int minServoTool, int maxServoTool )
@@ -118,6 +120,62 @@ namespace Actuators{
 
 		_minServoTool = minServoTool;
 		_maxServoTool = maxServoTool;
+	}
+
+	void Bras::setLimitMin(int servoToLimit, int valueToLimit){
+		switch(servoToLimit){
+			case SERVO_ELEVATOR :
+				_minServoElevator = valueToLimit;
+			break;
+			case SERVO_ARM :
+				_minServoArm = valueToLimit;
+			break;
+			case SERVO_TOOL :
+				_minServoTool = valueToLimit;
+			break;
+		}
+	}
+
+	void Bras::setLimitMax(int servoToLimit, int valueToLimit){
+		switch(servoToLimit){
+			case SERVO_ELEVATOR :
+				_maxServoElevator = valueToLimit;
+			break;
+			case SERVO_ARM :
+				_maxServoArm = valueToLimit;
+			break;
+			case SERVO_TOOL :
+				_maxServoTool = valueToLimit;
+			break;
+		}
+	}
+
+	int Bras::getMin(int servo){
+		switch(servo){
+			case SERVO_ELEVATOR :
+				return _minServoElevator;
+			break;
+			case SERVO_ARM :
+				return _minServoArm;
+			break;
+			case SERVO_TOOL :
+				return _minServoTool;
+			break;
+		}
+	}
+
+	int Bras::getMax(int servo){
+		switch(servo){
+			case SERVO_ELEVATOR :
+				return _maxServoElevator;
+			break;
+			case SERVO_ARM :
+				return _maxServoArm;
+			break;
+			case SERVO_TOOL :
+				return _maxServoTool;
+			break;
+		}
 	}
 
 	void Bras::detachBras()
@@ -177,7 +235,7 @@ namespace Actuators{
 
 	void Bras::setElevator    (byte posServoElevator)
 	{
-		_servoElevator.attach(_pinServoElevator);
+		if(!_servoElevator.attached()) _servoElevator.attach(_pinServoElevator);
 		_servoElevator.write(calcPositionElevator(posServoElevator));
 	}
 
@@ -189,7 +247,7 @@ namespace Actuators{
 
 	void Bras::setArm (byte posServoArm)
 	{
-		_servoArm.attach(_pinServoArm);
+		if(!_servoArm.attached()) _servoArm.attach(_pinServoArm);
 		_servoArm.write(calcPositionArm(posServoArm));
 	}
 
@@ -201,7 +259,7 @@ namespace Actuators{
 
 	void Bras::setTool (byte posServoTool)
 	{
-		_servoTool.attach(_pinServoTool);
+		if(!_servoTool.attached()) _servoTool.attach(_pinServoTool);
 		_servoTool.write(calcPositionTool(posServoTool));
 	}
 
@@ -234,5 +292,7 @@ namespace Actuators{
 		ungrab();
 		delay(wait);
 	}
+
+
 
 }

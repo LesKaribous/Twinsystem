@@ -9,6 +9,10 @@
 #define GALLERY 3
 #define PEDESTAL 4
 
+#define SERVO_ELEVATOR 0
+#define SERVO_ARM 1
+#define SERVO_TOOL 2
+
 namespace Actuators{
        
     void init();
@@ -21,6 +25,7 @@ namespace Actuators{
         ~Bras();
 
         void setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump);
+        void setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump, int pinEv);
         void setLimit(  int minServoElevator, 
                         int maxServoElevator, 
                         int minServoArm, 
@@ -28,6 +33,12 @@ namespace Actuators{
                         int minServoTool, 
                         int maxServoTool );
     
+        void setLimitMin(int servoToLimit, int valueToLimit);
+	    void setLimitMax(int servoToLimit, int valueToLimit);
+
+        int getMin(int servo);
+        int getMax(int servo);
+
         int calcPositionElevator(byte posServoElevator);
         int calcPositionArm     (byte posServoArm);
         int calcPositionTool    (byte posServoTool);
@@ -65,6 +76,8 @@ namespace Actuators{
         int _pinServoTool;
 
         int _pinPump ;
+        int _pinEv ;
+        bool _pinEvAvailable = false;
 
         int _minServoElevator ;
         int _maxServoElevator ;

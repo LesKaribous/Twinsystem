@@ -156,9 +156,12 @@ void menu(){
 	LCD::startMenu();
 	if(getCheck()){
 		while(getCheck()) delay(10) ;// Attente du front descendant
-		LCD::initScreen();
-		Strategy::recalage();
-		setRecalage(true);
+		if(_page == 2) Strategy::testingActuators();
+		else{
+			LCD::initScreen();
+			Strategy::recalage();
+			setRecalage(true);
+		}
 	}
 }
 
@@ -219,6 +222,11 @@ bool getCheck(){
 	if(!freezed)
 		_check = !digitalRead(Pin::checkButton);
 	return _check;
+}
+bool waitCheck(){
+	while(!getCheck()) delay(200);
+	while(getCheck()) delay(200);
+	return true;
 }
 //---Gestion Boutons Multiplexeur
 bool getArrowUp()
@@ -358,6 +366,9 @@ bool getArrowDown()
 				case 1:
 					page02();
 					break;
+				case 2:
+					page03();
+					break;
 				default:
 					_u8g2.setFont(u8g2_font_5x7_mr);
 					_u8g2.drawStr(2, 60, "error 404");
@@ -484,6 +495,23 @@ bool getArrowDown()
 			else
 				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
 
+		}
+
+		void page03(){
+
+			_u8g2.setFont(u8g2_font_logisoso18_tr);
+			_u8g2.drawStr(2, 22, "Adj.");
+			_u8g2.drawStr(2, 48, "Servo");
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(10, 80, "Press Check");
+			_u8g2.drawStr(20, 90, "Button");
+
+		}
+
+		void adjustActuators(){
+			// Change Value
+			// TODO
+		
 		}
 		
 		void initScreen()
