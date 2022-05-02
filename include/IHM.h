@@ -33,6 +33,9 @@ namespace IHM{
     void readButtonState  ();
     void freezeSettings   ();
 
+    //------ Gestion du ring Neopixel ------
+    void setColor();
+
     //------ Gestion des E/S ------
     bool getTirette       ();
     bool getRobot         ();

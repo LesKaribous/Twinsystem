@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
+#include <Adafruit_NeoPixel.h>
 
 #include "Twinsystem.h"
 
@@ -59,6 +60,9 @@ namespace IHM
 	// Declaration de l'ecran
 	U8G2_SSD1309_128X64_NONAME2_F_4W_HW_SPI 
 	_u8g2(U8G2_R3, Pin::Lcd::Cs, Pin::Lcd::Dc, Pin::Lcd::Rs);  
+
+	// Declacation du bloc LED NeoPixels
+	Adafruit_NeoPixel ringLed = Adafruit_NeoPixel(7, Pin::neoPixel, NEO_GRB + NEO_KHZ800);
 
 	// Declaration DFPlayerMini
 	SoftwareSerial DFPlayerSerial(27, 26); // RX, TX
@@ -144,11 +148,23 @@ void init()
 	_u8g2.setFontPosTop();
 	_u8g2.setFontDirection(0);
 
+	// Init and configuraiton of the NeoPixels
+	ringLed.begin();
+  	ringLed.setBrightness(50);
+	setColor();
+  	ringLed.show();
+
 	// Initi the IO of the IHM
 	updateButtonIHM();
 
 	// Splashscreen with the K logo
 	LCD::splashScreen();
+}
+
+void setColor(){
+	for(int i=0;i<=ringLed.numPixels();i++){
+		ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
+	}
 }
 
 void menu(){
