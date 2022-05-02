@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 #include <Servo.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
 
 #define FLOOR 0
 #define DISPENSER 1
@@ -24,7 +26,7 @@ namespace Actuators{
         Bras();
         ~Bras();
 
-        void setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump);
+        void setPin(int pinServoElevator, int pinServoArm, int pinServoTool);
         void setPin(int pinServoElevator, int pinServoArm, int pinServoTool, int pinPump, int pinEv);
         void setLimit(  int minServoElevator, 
                         int maxServoElevator, 
@@ -49,20 +51,15 @@ namespace Actuators{
         void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool);
         void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait);
 
-        void setElevator    (byte posServoElevator);
-        void setElevator    (byte posServoElevator, int wait);
+        void setElevator    (byte posServoElevator  , int wait = 0);
+        void setArm         (byte posServoArm       , int wait = 0);
+        void setTool        (byte posServoTool      , int wait = 0);
 
-        void setArm (byte posServoArm);    
-        void setArm (byte posServoArm, int wait);
+        void enablePump (bool state = true);
+        void openEv     (bool state = true);
 
-        void setTool (byte posServoTool);
-        void setTool (byte posServoTool, int wait);
-
-        void grab();
-        void grab(int wait);
-
-        void ungrab();
-        void ungrab(int wait);
+        void grab(int wait = 0);
+        void ungrab(int wait = 0);
 
 
         private:
@@ -90,6 +87,9 @@ namespace Actuators{
 
     //Bras
     void takeElement(Bras robotArm,int location);
+    void releaseElement(Bras robotArm,int location);
+    void flipElement(Bras robotArm);
+    void flipChallenge(Bras robotArm);
     
     extern Bras BrasAU;
     extern Bras BrasInit;
