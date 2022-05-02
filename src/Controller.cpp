@@ -52,7 +52,7 @@ namespace Controller{
     void disengage(){
         if(engaged){
             engaged = false;
-            digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
+            digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
         }
     }
 
