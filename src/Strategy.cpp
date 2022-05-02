@@ -20,18 +20,28 @@ namespace Strategy{
 	}
 
 	void homologation(){
-		Actuators::takeElement(Actuators::BrasInit,FLOOR);
-		Actuators::takeElement(Actuators::BrasTirette,FLOOR);
-		Actuators::takeElement(Actuators::BrasAU,FLOOR);
-		delay(2000);
-		Actuators::BrasInit.ungrab();
-		Actuators::BrasTirette.ungrab();
-		Actuators::BrasAU.ungrab();
-		delay(2000);
+		SetPosition({350,1600,0});
+		//Actuators::takeElement(Actuators::BrasInit,PEDESTAL);
+		//go({0,0,120});
+		goTo({250,300,0});
+		delay(5000);
+		//Actuators::releaseElement(Actuators::BrasInit,PEDESTAL);
 	}
 
 	void recalage(){
+		while(1){
+			flipChallenge(Actuators::BrasAU);
+			delay(1000);
+		}
+		
+	}
 
+	void testingFlip(){
+		Actuators::takeElement(Actuators::BrasAU,FLOOR);
+		delay(1000);
+		Actuators::flipElement(Actuators::BrasAU);
+		delay(1000);
+		Actuators::releaseElement(Actuators::BrasAU,FLOOR);
 	}
 
 	void testingActuators(){
@@ -75,8 +85,6 @@ namespace Strategy{
 
 	void waitLaunch()
 	{
-		IHM::menu();
-
     	while(!IHM::getTirette())IHM::menu();
     	while( IHM::getTirette())IHM::menu();
 
