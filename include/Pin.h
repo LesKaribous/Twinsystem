@@ -38,17 +38,29 @@ namespace Pin{
             pinServo11  = 29,
             pinServo12  = 30;
     }
+
+    namespace Pump{
+        const int 
+            pinPump01   = 0,
+            pinEv01     = 1,
+
+            pinPump02   = 2,
+            pinEv02     = 3,
+
+            pinPump03   = 4,
+            pinEv03     = 5;
+    }
     
 
     namespace Stepper{
         const int 
-            enable = 23,      //OUTPUT
-            dirA = 16,        //OUTPUT
-            dirB = 17,        //OUTPUT
-            dirC = 15,        //OUTPUT
-            stepA = 22,       //OUTPUT
-            stepB = 21,       //OUTPUT
-            stepC = 20;       //OUTPUT
+            enable  = 23,      //OUTPUT
+            dirA    = 16,        //OUTPUT
+            dirB    = 17,        //OUTPUT
+            dirC    = 15,        //OUTPUT
+            stepA   = 22,       //OUTPUT
+            stepB   = 21,       //OUTPUT
+            stepC   = 20;       //OUTPUT
     }
 }   
 
