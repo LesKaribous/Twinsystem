@@ -13,20 +13,17 @@
 //     Last update : 30 / 03 / 2022
                                     
 #include "Twinsystem.h"
-
 #include "Test.h"
 
 void setup(){
     //--- INIT ---
-    Controller::init();
     Settings::init();
+    Actuators::init();
+    Controller::init();
     Debugger::init();
     IHM::init();
-    Actuators::init();
     //--- WAIT LAUNCH---
-    //Strategy::testingActuators();
     Strategy::waitLaunch();
-
 }
 
 void loop(){
