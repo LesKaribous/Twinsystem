@@ -90,11 +90,12 @@ namespace Actuators{
     void releaseElement(Bras robotArm,int location);
     void flipElement(Bras robotArm);
     void flipChallenge(Bras robotArm);
-    
+    void sleep();
+    void unsuck();
+
     extern Bras BrasAU;
     extern Bras BrasInit;
     extern Bras BrasTirette;
-    
 }
 
 

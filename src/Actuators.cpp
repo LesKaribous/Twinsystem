@@ -162,6 +162,18 @@ namespace Actuators{
 		robotArm.setPosition(0,0,50);
 	}
 
+	void sleep(){
+		BrasAU			.ungrab();
+		BrasInit		.ungrab();
+		BrasTirette		.ungrab();
+	}
+
+	void unsuck(){
+		BrasAU			.detachBras();
+		BrasInit		.detachBras();
+		BrasTirette		.detachBras();
+	}
+
 	Bras::Bras()
 	{
 
