@@ -20,19 +20,14 @@ namespace Strategy{
 	}
 
 	void homologation(){
-		SetPosition({350,1600,0});
-		//Actuators::takeElement(Actuators::BrasInit,PEDESTAL);
-		//go({0,0,120});
-		goTo({250,300,0});
-		delay(5000);
-		//Actuators::releaseElement(Actuators::BrasInit,PEDESTAL);
+		SetPosition({125,850});
+		goTo({500,1500});
+		goTo({500,1500,90});
+		goTo({125,850,90});
 	}
 
 	void recalage(){
-		while(1){
-			flipChallenge(Actuators::BrasAU);
-			delay(1000);
-		}
+		goTo({300,0});
 		
 	}
 
