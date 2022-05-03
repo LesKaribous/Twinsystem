@@ -28,7 +28,6 @@ namespace Match{
 		return tempsRestant;
 	}
 
-	
 	void update(){
 		updateTime();
 		IHM::LCD::matchScreen();
@@ -58,15 +57,13 @@ namespace Match{
 	//----------------PROCEDURE D'ATTENTE----------------
 	void wait(int temps)
 	{
-
 		int initTemps = millis();
-
 		while ((millis() - initTemps) <= temps)
 		{
 			if (state == State::RUNNING)
 			{
 				updateTime();
-				//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+				IHM::LCD::matchScreen();
 			}
 		}
 	}
@@ -75,27 +72,24 @@ namespace Match{
 	void waitEnd()
 	{
 		//Stopper la balise
-
 		while (!updateTime())
 		{
 			//digitalWrite(Pin::Beacon,LOW);
-			//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+			IHM::LCD::matchScreen();
 		}
 	}
 
+	
+
 	void end()
 	{
-		//IHM::LCD::matchScreen(score, tempsRestant, Intercom::getNbrBadCRC());
+		IHM::LCD::matchScreen();
 		// Stopper les moteurs
 		Controller::stop();
 		Controller::disengage();
-		//Intercom::sendNavigation(255, 0, 0);
-
-		// Stopper la Balise
-
-		//Actuators::unsuck();
-		//Actuators::sleep();
-
+		// Stopper les actionneurs
+		Actuators::unsuck();
+		Actuators::sleep();
 		// Boucle infinie
 		while(true){}
 	}

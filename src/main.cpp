@@ -20,6 +20,7 @@ void setup(){
     Settings::init();
     Actuators::init();
     Controller::init();
+    Motion::init();
     Debugger::init();
     IHM::init();
     //--- WAIT LAUNCH---
@@ -27,10 +28,13 @@ void setup(){
 }
 
 void loop(){
+    
+    //--- START MATCH---
+    Match::start();
     if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 
         Strategy::match();
     else if(IHM::getStrategie() == Settings::STRATEGIE_HOMOLOGATION) 
         Strategy::homologation();
-
+    //--- END MATCH---
     Match::end();
 }

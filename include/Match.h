@@ -36,7 +36,7 @@ namespace Match{
 
     void update();
     bool updateTime();
-    void updateScore(int points, int multiplicateur);
+    void updateScore(int points, int multiplicateur = 1);
 
     inline bool hasStarted(){return state >= State::RUNNING;}
 
