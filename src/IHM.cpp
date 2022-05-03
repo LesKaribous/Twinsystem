@@ -151,7 +151,8 @@ void init()
 	// Init and configuraiton of the NeoPixels
 	ringLed.begin();
   	ringLed.setBrightness(50);
-	setColor();
+	setColor(2);
+
   	ringLed.show();
 
 	// Initi the IO of the IHM
@@ -161,9 +162,14 @@ void init()
 	LCD::splashScreen();
 }
 
-void setColor(){
+void setColor(bool colorChoosed){
 	for(int i=0;i<=ringLed.numPixels();i++){
-		ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
+		if(colorChoosed == Settings::EQUIPE_JAUNE) 
+			ringLed.setPixelColor(i, ringLed.Color(254, 254, 0));
+		else if(colorChoosed == Settings::EQUIPE_VIOLET) 
+			ringLed.setPixelColor(i, ringLed.Color(102, 0, 204));
+		else 
+			ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
 	}
 }
 
@@ -208,6 +214,7 @@ void readButtonState()
 		_buttonState[7 - i] = digitalRead(Pin::dataMux);
 		// et on envoi un front montant sur la pin 2 pour décaler les valeurs
 		digitalWrite(Pin::clockMux, HIGH);
+		delay(10);
 		digitalWrite(Pin::clockMux, LOW);
 	}
 }
@@ -370,6 +377,8 @@ bool getArrowDown()
 			baseMenu();
 			// Affichage de la page
 			affichePage();
+			// MAJ du neopixel
+			setColor(_equipe);
 
 			_u8g2.sendBuffer();
 		}
@@ -613,7 +622,7 @@ bool getArrowDown()
 				// Affichage Variable
 				// - Temps
 				_u8g2.setCursor(30, 77);
-				_u8g2.print(Match::GetTempsRestant()/1000,0);
+				_u8g2.print(Match::GetTempsRestant());
 				// - X position
 				_u8g2.setCursor(30, 84);
 				_u8g2.print(Motion::GetPosition().a,0);
@@ -623,7 +632,6 @@ bool getArrowDown()
 				// - Rot position
 				_u8g2.setCursor(30, 98);
 				_u8g2.print(Motion::GetPosition().c,0);
-
 
 				_u8g2.sendBuffer();
 			}

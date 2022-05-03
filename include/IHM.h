@@ -34,7 +34,7 @@ namespace IHM{
     void freezeSettings   ();
 
     //------ Gestion du ring Neopixel ------
-    void setColor();
+    void setColor(bool colorChoosed);
 
     //------ Gestion des E/S ------
     bool getTirette       ();
