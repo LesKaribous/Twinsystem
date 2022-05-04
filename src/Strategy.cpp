@@ -15,19 +15,14 @@ namespace Strategy{
 
 
 	void match(){
-		go({100,0,0});
-		goTo({0,0,0});
+		
 	}
 
 	void homologation(){
-		SetPosition({125,850});
-		goTo({500,1500});
-		goTo({500,1500,90});
-		goTo({125,850,90});
+		Motion::
 	}
 
 	void recalage(){
-		goTo({300,0});
 		
 	}
 

@@ -6,21 +6,34 @@ namespace Motion{
     extern Vec3 position;
 
     void init();
-    void sequenceRecalage();
 
     //----- COMMANDES DE DEPLACEMENT -----
-    void move(Vec3 target, bool absolute = true);
+
+    //Moves
+    //void trajectory(Trajectory traj);
+
+    void go(PolarVec);
+    void go(Vec2);
     void go(Vec3);
-    void goTo(Vec3);
+    
+    void turn(float);
+
+    //Raw Move
+    void move(Vec3 target);
 
     bool running();
 
     //Setters
     void SetPosition(Vec3);
 
+    void SetAbsolute(bool = true);
+    void SetRelative(bool = true);
+
     //Getters
     Vec3 GetPosition();
 	Vec3 GetTarget();
+    bool isAbsolute();
+    bool isRelative();
 
     //Inverse Kinematics
     Vec3 ik(Vec3);

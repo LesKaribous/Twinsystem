@@ -11,24 +11,54 @@ namespace Motion
 	Vec3 cPosition 		= {0,0,0};
 	Vec3 cTarget 		= {0,0,0};
 	Vec3 calibration 	= {1,1,1};
+	bool absolute 		= false;
 
 	void init(){
 		calibration = Settings::ROBOT == Settings::PRIMARY ?  
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 	}
 
-	//Relative move request
+	Vec3 GetPosition(){
+		return cPosition;
+	}
+
+	Vec3 GetTarget(){
+		return cTarget;
+	}
+
+	void SetPosition(Vec3 newPos){
+		cPosition = newPos;
+	}
+
+    void SetAbsolute(bool state){
+		absolute = state;
+	}
+
+    void SetRelative(bool state){
+		SetAbsolute(!state);
+	}
+
+    void go(PolarVec target){
+		go(target.toVec2());
+	}
+
+	void go(Vec2 target){
+		if (absolute) move({target.a, target.b, cPosition.c});
+		else move({target.a, target.b, 0});
+	}
+
 	void go(Vec3 target){
-		move(target, false);
+		move({target.a, target.b, target.c});
 	}
 
-	//Absolute move request
-	void goTo(Vec3 target){
-		move(target, true);
+    void turn(float angle){
+		if (absolute) move({cPosition.a, cPosition.b, angle});
+		else move({0, 0, angle});
 	}
 
-	//Absolute move request
-	void move(Vec3 target, bool absolute){
+
+	//Raw move request
+	void move(Vec3 target){
 		if(absolute) target.sub(cPosition);
 		cTarget = target;
 		
@@ -40,6 +70,8 @@ namespace Motion
 		while(running()) Match::update();
 		cPosition.add(cTarget);
 	}
+
+
 
 	bool running(){
 		return Controller::isRunning();
@@ -61,22 +93,5 @@ namespace Motion
 				
 		return target.mult(P).mult(1/R);
 	}
-
-
-
-
-	Vec3 GetPosition(){
-		return cPosition;
-	}
-
-	Vec3 GetTarget(){
-		return cTarget;
-	}
-	void SetPosition(Vec3 pos){
-		cPosition = pos;
-		cTarget = pos;
-	}
-
-
 
 }
