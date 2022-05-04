@@ -171,6 +171,7 @@ void setColor(bool colorChoosed){
 		else 
 			ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
 	}
+	ringLed.show();
 }
 
 void menu(){
