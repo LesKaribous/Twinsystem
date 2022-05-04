@@ -222,8 +222,7 @@ void readButtonState()
 
 //---Gestion Etat Robot---
 void setRecalage(bool state){
-	//if(!freezed) ??
-		_recalage = state;
+	_recalage = state;
 }
 bool getRecalage(){
 	return _recalage;
@@ -260,35 +259,35 @@ bool getArrowUp()
 	return _arrowUp;
 }
 bool getEquipe(){
-	if(!freezed)
+	if(!freezed && !_recalage)
 		_equipe = _buttonState[5];
 	return _equipe;
 }
 bool getDetection(){
-	if(!freezed) 
+	if(!freezed && !_recalage) 
 		_detection = _buttonState[6];
 	return _detection;
 }
 bool getStrategie(){
-	if(!freezed)
+	if(!freezed && !_recalage)
 		_strategie = _buttonState[7];
 	return _strategie;
 }
 bool getOption01()
 {
-	if(!freezed) 
+	if(!freezed && !_recalage) 
 		_optionStrat01 = _buttonState[0];
 	return _optionStrat01;
 }
 bool getOption02()
 {
-	if(!freezed) 
+	if(!freezed && !_recalage) 
 		_optionStrat02 = _buttonState[1];
 	return _optionStrat02;
 }
 bool getOption03()
 {
-	if(!freezed) 
+	if(!freezed && !_recalage) 
 		_optionStrat03 = _buttonState[2];
 	return _optionStrat03;
 }
@@ -494,6 +493,7 @@ bool getArrowDown()
 			else
 				_u8g2.drawStr(marginLeft + wChaine, yStrat, " match");
 
+
 			//Gestion Option 01 Stratégie
 			_u8g2.setFont(u8g2_font_micro_mr);
 			wChaine = _u8g2.drawStr(marginLeft, yOption01, " - Option 01 ");
@@ -638,16 +638,6 @@ bool getArrowDown()
 			}
 		}
 
-		#ifdef DANSE
-		void danseScreen(){
-			_u8g2.clearBuffer();
-			// Titre
-			_u8g2.setFont(u8g2_font_logisoso16_tr);
-			_u8g2.drawStr(8, 1, "Danse !");
-
-			_u8g2.sendBuffer();
-		}
-		#endif
 	}
 
 	namespace Sound{
