@@ -30,9 +30,10 @@ namespace Motion{
 
     //Setters
     void SetPosition(Vec3);
-
     void SetAbsolute(bool = true);
     void SetRelative(bool = true);
+
+    void SetControlPoint(Vec2 point);
 
     //Getters
     Vec3 GetPosition();

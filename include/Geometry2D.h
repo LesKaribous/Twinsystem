@@ -10,8 +10,6 @@ struct Vec3;
 struct Vec2 { 
     float a, b;
 
-    Vec2();
-
     Vec2& add(Vec2&);
     Vec2& sub(Vec2&);
     Vec2& dist(Vec2&);

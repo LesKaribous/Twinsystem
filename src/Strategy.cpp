@@ -19,23 +19,18 @@ namespace Strategy{
 	}
 
 	void homologation(){
+		
 		SetRelative();
 		go(100,0);
 		go(-100,0);
 		go(0,100);
 		go(0,-100);
+		
+		Vec2 point = {200,0};
+		SetControlPoint(point);
+		turn(90);
+		turn(-90);
 
-		SetAbsolute();
-		go(100,0);
-		go(0,0);
-		go(0,100);
-		go(0,0);
-
-		SetAbsolute();
-		go(100,0,60);
-		go(0,0,0);
-		go(0,100,-60);
-		go(0,0);
 	}
 
 	void recalage(){

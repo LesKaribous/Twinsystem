@@ -11,6 +11,9 @@ namespace Motion
 	Vec3 cPosition 		= {0,0,0};
 	Vec3 cTarget 		= {0,0,0};
 	Vec3 calibration 	= {1,1,1};
+
+	Vec2 controlPoint   = {0,0};
+
 	bool absolute 		= true;
 
 	void init(){
@@ -53,7 +56,8 @@ namespace Motion
 	}
 
 	void go(float x, float y){
-		go({x, y});
+		Vec2 target = {x, y};
+		go(target);
 	}
 
 	void go(Vec2 target){
@@ -89,11 +93,22 @@ namespace Motion
 		return Controller::isRunning();
 	}
 	
+
+	void SetControlPoint(Vec2 point){
+		//What is going on when robot is moving ??
+		controlPoint = point;
+		cPosition.a += point.a;
+		cPosition.b += point.b;
+	}
+
 	Vec3 ik(Vec3 target){
 		float c60 = cosf(PI/3.0f),
 			  s60 = sinf(PI/3.0f),
 			  L = Settings::RADIUS,
 			  R = Settings::WHEEL_RADIUS;
+
+		target.a += controlPoint.a;
+		target.b += controlPoint.b;
 
 		target.c *= DEG_TO_RAD;
 
