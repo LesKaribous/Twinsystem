@@ -11,11 +11,13 @@ namespace Motion
 	Vec3 cPosition 		= {0,0,0};
 	Vec3 cTarget 		= {0,0,0};
 	Vec3 calibration 	= {1,1,1};
-	bool absolute 		= false;
+	bool absolute 		= true;
 
 	void init(){
 		calibration = Settings::ROBOT == Settings::PRIMARY ?  
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
+		
+		absolute = Settings::ABSOLUTE;
 	}
 
 	Vec3 GetPosition(){
@@ -38,8 +40,20 @@ namespace Motion
 		SetAbsolute(!state);
 	}
 
-    void go(PolarVec target){
+
+
+    void turn(float angle){
+		if (absolute) move({cPosition.a, cPosition.b, angle});
+		else move({0, 0, angle});
+	}
+
+    void goPolar(float heading, float length){
+		PolarVec target = {heading, length};
 		go(target.toVec2());
+	}
+
+	void go(float x, float y){
+		go({x, y});
 	}
 
 	void go(Vec2 target){
@@ -47,13 +61,11 @@ namespace Motion
 		else move({target.a, target.b, 0});
 	}
 
+	void go(float x, float y, float heading){
+		go({x, y, heading});
+	}
 	void go(Vec3 target){
 		move({target.a, target.b, target.c});
-	}
-
-    void turn(float angle){
-		if (absolute) move({cPosition.a, cPosition.b, angle});
-		else move({0, 0, angle});
 	}
 
 

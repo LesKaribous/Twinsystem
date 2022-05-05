@@ -19,7 +19,23 @@ namespace Strategy{
 	}
 
 	void homologation(){
-		Motion::
+		SetRelative();
+		go(100,0);
+		go(-100,0);
+		go(0,100);
+		go(0,-100);
+
+		SetAbsolute();
+		go(100,0);
+		go(0,0);
+		go(0,100);
+		go(0,0);
+
+		SetAbsolute();
+		go(100,0,60);
+		go(0,0,0);
+		go(0,100,-60);
+		go(0,0);
 	}
 
 	void recalage(){

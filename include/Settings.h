@@ -24,7 +24,9 @@ namespace Settings{
         STRATEGIE_MATCH        = 0,
 
         PRIMARY   = 1,
-        SECONDARY = 0 ;
+        SECONDARY = 0,
+
+        ABSOLUTE = true;
 
     const int 
         TEMPS_MATCH = 101000 ;
