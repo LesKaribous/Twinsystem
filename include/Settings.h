@@ -37,8 +37,8 @@ namespace Settings{
         WHEEL_RADIUS = 30;
 
     const uint32_t 
-        ACCEL = 2500, // Old : 5000              
-        SPEED = 6000; // Old : 5000
+        ACCEL = 5000, // Old : 2000              
+        SPEED = 10000; // Old : 5000
 
 
     extern bool ROBOT;
@@ -69,7 +69,7 @@ namespace Settings{
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.17f, -1.17f, 1.045f } //Cartesian : XYROT
+            { 1.17f, -1.17f, -1.045f } //Cartesian : XYROT
         };
     }
 

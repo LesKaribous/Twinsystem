@@ -21,6 +21,7 @@ namespace Motion
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 		
 		absolute = Settings::ABSOLUTE;
+		Controller::setFeedrate(100);
 	}
 
 	Vec3 GetPosition(){
@@ -31,6 +32,17 @@ namespace Motion
 		return cTarget;
 	}
 
+	bool isAbsolute(){
+		return absolute;
+	}
+
+	bool isRelative(){
+		return !absolute;
+	}
+
+	void SetPosition(Vec2 newPos){
+		cPosition = Vec3(newPos, cPosition.c);
+	}
 	void SetPosition(Vec3 newPos){
 		cPosition = newPos;
 	}
@@ -42,7 +54,6 @@ namespace Motion
     void SetRelative(bool state){
 		SetAbsolute(!state);
 	}
-
 
 
     void turn(float angle){
@@ -65,19 +76,49 @@ namespace Motion
 		else move({target.a, target.b, 0});
 	}
 
-	void go(float x, float y, float heading){
-		go({x, y, heading});
+	void goTurn(float x, float y, float heading){
+		goTurn({x, y, heading});
 	}
-	void go(Vec3 target){
-		move({target.a, target.b, target.c});
+	void goTurn(Vec3 target){
+		go(Vec2(target.a, target.b));
+		turn(target.c);
 	}
 
+	void probeBorder(Vec2 borderPos){
+		boolean tAbsolute = isAbsolute();
+		
+		align(borderPos);
+
+		SetRelative();
+
+		Controller::setFeedrate(FAST);
+		go(-borderPos.mag() + 20,.0);
+		Controller::setFeedrate(SLOW);
+		go(-borderPos.mag() - 10,.0);
+
+		Vec2 offset = Vec2(.0,112.61);
+		SetPosition(borderPos.add(offset));
+
+		Controller::setFeedrate(FAST);
+		SetAbsolute(tAbsolute);
+	}
+
+	void align(Vec2 coord){
+		boolean tAbsolute = isAbsolute();
+
+		SetAbsolute(tAbsolute);
+		turn(coord.heading());
+
+
+
+		SetAbsolute(tAbsolute);
+	}
 
 	//Raw move request
 	void move(Vec3 target){
 		if(absolute) target.sub(cPosition);
 		cTarget = target;
-		
+
 		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
 		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
@@ -88,27 +129,24 @@ namespace Motion
 	}
 
 
-
 	bool running(){
 		return Controller::isRunning();
 	}
-	
 
+	/*
 	void SetControlPoint(Vec2 point){
 		//What is going on when robot is moving ??
 		controlPoint = point;
 		cPosition.a += point.a;
 		cPosition.b += point.b;
 	}
+	*/
 
 	Vec3 ik(Vec3 target){
 		float c60 = cosf(PI/3.0f),
 			  s60 = sinf(PI/3.0f),
 			  L = Settings::RADIUS,
 			  R = Settings::WHEEL_RADIUS;
-
-		target.a += controlPoint.a;
-		target.b += controlPoint.b;
 
 		target.c *= DEG_TO_RAD;
 

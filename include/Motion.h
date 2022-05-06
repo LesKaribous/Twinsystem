@@ -5,23 +5,55 @@
 namespace Motion{
     extern Vec3 position;
 
+    /**
+     * @brief Init kinematics
+     */
     void init();
-
-    //----- COMMANDES DE DEPLACEMENT -----
 
     //Moves
     //void trajectory(Trajectory traj);
 
-    
+    /**
+     * @brief Turn robot arround its center by desired angle
+     * @param angle angle in degrees
+     */
     void turn(float);
+
+    /**
+     * @brief Move the robot using polar coordinates
+     * @param heading move direction
+     * @param length distance to go
+     */
     void goPolar(float heading, float length);
     
+    /**
+     * @brief Move the robot using cartesian coordinates
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
     void go(float x, float y);
     void go(Vec2);
 
-    void go(float x, float y, float heading);
-    void go(Vec3);
+    /**
+     * @brief Move the robot using cartesian coordinates & turn by desired angle
+     * @param x X coordinate
+     * @param y Y coordinate
+     * @param w Y coordinate
+     */
+    void goTurn(float x, float y, float w);
+    void goTurn(Vec3);
 
+    /**
+     * @brief Set the robot position using position of the bumped border
+     * @param border position relative to the robot current position
+     */
+    void probeBorder(Vec2);
+
+    /**
+     * @brief Align (turn) the robot toward the desired vector
+     * @param coordinateSystem position relative to the robot current position
+     */
+    void align(Vec2);
 
     //Raw Move
     void move(Vec3 target);
@@ -29,11 +61,12 @@ namespace Motion{
     bool running();
 
     //Setters
+    void SetPosition(Vec2);
     void SetPosition(Vec3);
     void SetAbsolute(bool = true);
     void SetRelative(bool = true);
 
-    void SetControlPoint(Vec2 point);
+    //void SetControlPoint(Vec2 point);
 
     //Getters
     Vec3 GetPosition();
