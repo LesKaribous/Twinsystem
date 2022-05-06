@@ -3,7 +3,6 @@
 #include "Match.h"
 #include "Settings.h"
 #include "Debugger.h"
-
 namespace Actuators{
 
 	//Bras
@@ -221,62 +220,6 @@ namespace Actuators{
 		_maxServoTool = maxServoTool;
 	}
 
-	void Bras::setLimitMin(int servoToLimit, int valueToLimit){
-		switch(servoToLimit){
-			case SERVO_ELEVATOR :
-				_minServoElevator = valueToLimit;
-			break;
-			case SERVO_ARM :
-				_minServoArm = valueToLimit;
-			break;
-			case SERVO_TOOL :
-				_minServoTool = valueToLimit;
-			break;
-		}
-	}
-
-	void Bras::setLimitMax(int servoToLimit, int valueToLimit){
-		switch(servoToLimit){
-			case SERVO_ELEVATOR :
-				_maxServoElevator = valueToLimit;
-			break;
-			case SERVO_ARM :
-				_maxServoArm = valueToLimit;
-			break;
-			case SERVO_TOOL :
-				_maxServoTool = valueToLimit;
-			break;
-		}
-	}
-
-	int Bras::getMin(int servo){
-		switch(servo){
-			case SERVO_ELEVATOR :
-				return _minServoElevator;
-			break;
-			case SERVO_ARM :
-				return _minServoArm;
-			break;
-			case SERVO_TOOL :
-				return _minServoTool;
-			break;
-		}
-	}
-
-	int Bras::getMax(int servo){
-		switch(servo){
-			case SERVO_ELEVATOR :
-				return _maxServoElevator;
-			break;
-			case SERVO_ARM :
-				return _maxServoArm;
-			break;
-			case SERVO_TOOL :
-				return _maxServoTool;
-			break;
-		}
-	}
-
 	void Bras::detachBras()
 	{
 		_servoElevator.detach();
@@ -318,18 +261,13 @@ namespace Actuators{
 		return newPosTool;
 	}
 
-	void Bras::setPosition(byte posServoElevator, byte posServoArm, byte posServoTool)
+	void Bras::setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait)
 	{
 		// Appliquer la position
 		setElevator(posServoElevator);
 		setArm(posServoArm);
 		setTool(posServoTool);
-	}
-
-	void Bras::setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait)
-	{
-		setPosition(posServoElevator, posServoArm, posServoTool);
-		delay(wait);
+		Match::wait(wait);
 	}
 
 	void Bras::setElevator    (byte posServoElevator, int wait)
@@ -337,7 +275,7 @@ namespace Actuators{
 		if(!_servoElevator.attached()) 
 			_servoElevator.attach(_pinServoElevator);
 		_servoElevator.write(calcPositionElevator(posServoElevator));
-		delay(wait);
+		Match::wait(wait);
 	}
 
 	void Bras::setArm (byte posServoArm, int wait)
@@ -345,7 +283,7 @@ namespace Actuators{
 		if(!_servoArm.attached()) 
 			_servoArm.attach(_pinServoArm);
 		_servoArm.write(calcPositionArm(posServoArm));
-		delay(wait);
+		Match::wait(wait);
 	}
 
 	void Bras::setTool (byte posServoTool, int wait)
@@ -353,7 +291,7 @@ namespace Actuators{
 		if(!_servoTool.attached()) 
 			_servoTool.attach(_pinServoTool);
 		_servoTool.write(calcPositionTool(posServoTool));
-		delay(wait);
+		Match::wait(wait);
 	}
 
 	void Bras::enablePump (bool state){
@@ -371,17 +309,17 @@ namespace Actuators{
 		enablePump();
 		openEv(false);
 
-		delay(wait);
+		Match::wait(wait);
 	}
 
 	void Bras::ungrab(int wait)
 	{
 		enablePump(false);
 		openEv();
-		delay(500);
+		Match::wait(500);
 		openEv(false);
 
-		delay(wait);
+		Match::wait(wait);
 	}
 
 }

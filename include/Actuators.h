@@ -18,7 +18,6 @@
 namespace Actuators{
        
     void init();
-    
     class Bras
     {
         public:
@@ -35,12 +34,6 @@ namespace Actuators{
                         int minServoTool, 
                         int maxServoTool );
     
-        void setLimitMin(int servoToLimit, int valueToLimit);
-	    void setLimitMax(int servoToLimit, int valueToLimit);
-
-        int getMin(int servo);
-        int getMax(int servo);
-
         int calcPositionElevator(byte posServoElevator);
         int calcPositionArm     (byte posServoArm);
         int calcPositionTool    (byte posServoTool);
@@ -48,8 +41,7 @@ namespace Actuators{
         void detachBras();
         void attachBras();
 
-        void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool);
-        void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait);
+        void setPosition(byte posServoElevator, byte posServoArm, byte posServoTool, int wait = 0);
 
         void setElevator    (byte posServoElevator  , int wait = 0);
         void setArm         (byte posServoArm       , int wait = 0);
@@ -86,10 +78,6 @@ namespace Actuators{
     };
 
     //Bras
-    void takeElement(Bras robotArm,int location);
-    void releaseElement(Bras robotArm,int location);
-    void flipElement(Bras robotArm);
-    void flipChallenge(Bras robotArm);
     void sleep();
     void unsuck();
 
