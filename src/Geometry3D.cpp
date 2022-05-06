@@ -4,6 +4,22 @@
 //---------- Vector3 ------------
 //Methods
 
+Vec3::Vec3(){
+    a = b = c = 0.0f;
+}
+
+Vec3::Vec3(Vec2 v, float f){
+    a = v.a; b = v.b; c = f; 
+}
+
+Vec3::Vec3(float v){
+    a = b = c = v;
+}
+
+Vec3::Vec3(float x,float y,float z){
+    a = x; b = y; c = z;
+}
+
 Vec3 Vec3::copy(){
     return *this;
 }

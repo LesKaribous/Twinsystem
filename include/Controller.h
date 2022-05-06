@@ -6,6 +6,9 @@
 #include "Pin.h"
 #include "Geometry.h"
 
+#define SLOW 30
+#define FAST 100
+
 namespace Controller{
     extern bool engaged;
 
@@ -22,6 +25,7 @@ namespace Controller{
     void setSpeed(int speed);
     void setAccel(int accel);
     void setCalibration(bool state);
+    void setFeedrate(float feed);
 
     u_int32_t getAccel();
     u_int32_t getSpeed();

@@ -20,6 +20,19 @@ Vec2 PolarVec::toVec2(){
 //---------- Vector2 ------------
 //Methods
 
+Vec2::Vec2(){
+    a = b = 0.0f;
+}
+
+
+Vec2::Vec2(float v){
+    a = b = v;
+}
+
+Vec2::Vec2(float x, float y){
+    a = x; b = y;
+}
+
 Vec2 Vec2::copy(){
     return *this;
 }
@@ -42,6 +55,10 @@ Vec2& Vec2::dist(Vec2& v){
 
 float Vec2::mag(){
     return sqrt(magSq());
+}
+
+float Vec2::heading(){
+    return atan2f(a,b);
 }
 
 float Vec2::magSq(){

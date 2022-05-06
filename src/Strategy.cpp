@@ -15,26 +15,15 @@ namespace Strategy{
 
 
 	void match(){
-		
 	}
 
 	void homologation(){
-		
-		SetRelative();
-		go(100,0);
-		go(-100,0);
-		go(0,100);
-		go(0,-100);
-		
-		Vec2 point = {200,0};
-		SetControlPoint(point);
-		turn(90);
-		turn(-90);
-
 	}
 
 	void recalage(){
-		
+		turn(30);
+		Vec2 borderPos(0,-100);
+		probeBorder(borderPos);
 	}
 
 	void testingFlip(){

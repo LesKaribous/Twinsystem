@@ -13,6 +13,10 @@ struct Vec3 {
           b, 
           c;
 
+    Vec3();
+    Vec3(Vec2, float);
+    Vec3(float);
+    Vec3(float,float,float);
 
     Vec3& add(Vec3&);
     Vec3& sub(Vec3&);

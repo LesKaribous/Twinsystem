@@ -16,6 +16,8 @@ namespace Controller{
 
     u_int32_t speed, accel;
 
+    float feedrate = 100;
+
     void init(){
 
             //------Déclaration des I/O------
@@ -41,6 +43,27 @@ namespace Controller{
     void setCalibration(bool state){
         calibration = state == Settings::PRIMARY ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
     }
+
+    void setFeedrate(float value){
+        feedrate = value;
+        setSpeed(Settings::SPEED * value / 100.0);
+    }
+
+
+    void setSpeed(int speed){
+        sA.setMaxSpeed(speed);
+        sB.setMaxSpeed(speed);
+        sC.setMaxSpeed(speed);
+    }
+
+    void setAccel(int accel){
+        sA.setAcceleration(accel);
+        sB.setAcceleration(accel);
+        sC.setAcceleration(accel);
+    }
+
+
+
 
     void engage(bool state){
         if(engaged != state){
@@ -117,19 +140,6 @@ namespace Controller{
         controller.emergencyStop();
         //TODO : Disengage after an emergencystop ?
     } 
-
-
-    void setSpeed(u_int32_t speed){
-        sA.setMaxSpeed(speed);
-        sB.setMaxSpeed(speed);
-        sC.setMaxSpeed(speed);
-    }
-
-    void setAccel(u_int32_t accel){
-        sA.setAcceleration(accel);
-        sB.setAcceleration(accel);
-        sC.setAcceleration(accel);
-    }
 
     u_int32_t getAccel(){
         return accel;
