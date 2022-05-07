@@ -18,9 +18,10 @@ namespace Strategy{
 		*/
 
 		go(100,0);
-		turn(90);
-		go(0);
-		turn(0);
+		go(100,100);
+		turn(30);
+		go(0,100);
+		go(0,0);
 		
 	}
 
@@ -33,8 +34,13 @@ namespace Strategy{
 	}
 
 	void recalage(){
-		//turn(30);
-		//probeBorder(Vec2(0,100));
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-100);
+		Vec2 borderXmax( 100, 0	 );
+		Vec2 borderYmax(   0, 100);
+
+		Debugger::log(borderYmin.heading()*RAD_TO_DEG+90);
+		probeBorder(borderYmin);
 	}
 
 	

@@ -41,10 +41,10 @@ namespace Motion
 	}
 
 	void SetPosition(Vec2 newPos){
-		cPosition = Vec3(newPos, cPosition.c);
+		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
 	}
 	void SetPosition(Vec3 newPos){
-		cPosition = newPos;
+		cPosition = newPos.mult(Vec3(1.0,1.0,RAD_TO_DEG).toMatrix());
 	}
 
     void SetAbsolute(bool state){
@@ -74,7 +74,7 @@ namespace Motion
 	}
 
 	void go(Vec2 target){
-		if (absolute) moveAbs({target.a, target.b, cPosition.c});
+		if (absolute) moveAbs({target.a, target.b, cPosition.c*RAD_TO_DEG});
 		else move({target.a, target.b, 0});
 	}
 
@@ -121,11 +121,8 @@ namespace Motion
 
 	void align(Vec2 coord){
 		boolean tAbsolute = isAbsolute();
-
 		SetAbsolute(tAbsolute);
-		Debugger::log(coord.heading()*RAD_TO_DEG + 90);
-		turn(coord.heading()+90);
-
+		turn(coord.heading()*RAD_TO_DEG+90);
 		SetAbsolute(tAbsolute);
 	}
 
@@ -147,13 +144,14 @@ namespace Motion
 	}
 
 	void moveAbs(Vec3 target){
+
 		target.c *= DEG_TO_RAD;
 		target.sub(cPosition);
-		cTarget = target;
-		//target.rotateZ(cPosition.c);
 
-		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
-		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc) : steps
+		cTarget = target;
+		target.rotateZ(cPosition.c);
+		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
+		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
 
 		Controller::move(target, true);
@@ -161,7 +159,7 @@ namespace Motion
 
 		cPosition.add(cTarget);
 		if(cPosition.c >= 2*PI) cPosition.c -= 2*PI;
-		if(cPosition.c <= -2*PI) cPosition.c += 2*PI; 
+		if(cPosition.c <= -2*PI) cPosition.c += 2*PI;
 	}
 
 
