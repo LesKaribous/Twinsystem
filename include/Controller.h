@@ -32,6 +32,7 @@ namespace Controller{
 
     bool isRunning();
     bool isSleeping();
+    void update();
 
     // Engaging motors make them ready to move.
     // Note : Motors may be engaged but sleeping !

@@ -30,8 +30,8 @@ namespace Test{
 
 
 	void testMotion(){
-		calibrationRotation();
-		IHM::waitCheck();
+		//calibrationRotation();
+		//IHM::waitCheck();
 		calibrationX();
 		IHM::waitCheck();
 		calibrationY();

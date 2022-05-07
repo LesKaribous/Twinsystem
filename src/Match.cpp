@@ -32,24 +32,25 @@ namespace Match{
 	}
 
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
-	bool updateTime()
-	{
+	bool updateTime(){
+		Controller::update();
 		if(Match::hasStarted()){ //Do not update time before match has started
 			tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
-			if (tempsRestant <= 0)
-			{
+			if (tempsRestant <= 0){
 				Match::end();
 				return true;
 			}
-			else if (tempsRestant <= 4)
-			{
+			else if (tempsRestant <= 4){
 				//Last action ?
 				return false;
 			}
 			else
 				return false;
+		}else{
+			if(Motion::isProbing()) IHM::LCD::initScreen();
 		}
+		return false;
 	}
 
 	//----------------PROCEDURE D'ATTENTE----------------

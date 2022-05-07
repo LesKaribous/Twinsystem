@@ -35,23 +35,26 @@ namespace Strategy{
 
 	void recalage(){
 		Vec2 borderXmin(-100, 0	 );
-		Vec2 borderYmin(   0,-100);
+		Vec2 borderYmin(   0,-700);
 		Vec2 borderXmax( 100, 0	 );
 		Vec2 borderYmax(   0, 100);
-
-		Debugger::log(borderYmin.heading()*RAD_TO_DEG+90);
+		probeBorder(borderXmin);
 		probeBorder(borderYmin);
+		SetAbsolute();
+		//go(-500,500);
 	}
 
 	
 	void waitLaunch()
 	{
     	while(!IHM::getTirette()){
+			Controller::update();
 			IHM::menu();
 			Debugger::checkSerial();
 			if(Debugger::lastCommand() == "start") break;
 		}
     	while(IHM::getTirette()){
+			Controller::update();
 			Debugger::checkSerial();
 			IHM::menu();
 		}

@@ -452,13 +452,14 @@ bool getArrowDown()
 			// - X position
 			_u8g2.setCursor(30, yInferieur + 10);
 			_u8g2.print(Motion::GetPosition().a,0);
+
 			// - Y position
 			_u8g2.setCursor(30, yInferieur + 20);
 			_u8g2.print(Motion::GetPosition().b,0);
+
 			// - Rot position
 			_u8g2.setCursor(30, yInferieur + 30);
 			_u8g2.print(Motion::GetPosition().c,0);
-
 
 		}
 
@@ -555,13 +556,43 @@ bool getArrowDown()
 		
 		}
 		
-		void initScreen()
-		{
+		void initScreen(){
+			// Alignements
+			const int marginLeft = 2;
+			const int yInferieur	= 60;
+			
 			_u8g2.clearBuffer();
 			_u8g2.setFont(u8g2_font_logisoso32_tr);
-			_u8g2.drawStr(3, 2, "Init");
+			_u8g2.drawStr(3, 2, "Probing...");
+
+			// Partie inférieure
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(0, yInferieur, "---------------");
+			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
+			_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+			// - X position
+			_u8g2.setCursor(30, yInferieur + 10);
+			if(Motion::isXProbed())
+				_u8g2.print(Motion::GetPosition().a,0);
+			else 
+				_u8g2.print('?',0);
+
+			// - Y position
+			_u8g2.setCursor(30, yInferieur + 20);
+			if(Motion::isYProbed())
+				_u8g2.print(Motion::GetPosition().b,0);
+			else 
+				_u8g2.print('?',0);
+			// - Rot position
+			_u8g2.setCursor(30, yInferieur + 30);
+			if(Motion::isProbed())
+				_u8g2.print(Motion::GetPosition().c,0);
+			else 
+				_u8g2.print('?',0);
 			_u8g2.sendBuffer();
-			delay(1500);
 		}
 
 		void checkListScreen()

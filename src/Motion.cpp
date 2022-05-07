@@ -14,7 +14,9 @@ namespace Motion
 
 	Vec2 controlPoint   = {0,0};
 
+ 	bool probedX = false, probedY = false;
 	bool absolute 		= true;
+	bool probing = false;
 
 	void init(){
 		calibration = Settings::ROBOT == Settings::PRIMARY ?  
@@ -39,6 +41,18 @@ namespace Motion
 	bool isRelative(){
 		return !absolute;
 	}
+
+	bool isProbed(){
+		return probedX && probedY;
+	}
+	bool isXProbed(){
+		return probedX;
+	}
+	bool isYProbed(){
+		return probedY;
+	}
+
+
 
 	void SetPosition(Vec2 newPos){
 		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
@@ -88,35 +102,48 @@ namespace Motion
 
 	void probeBorder(Vec2 borderPos){
 		boolean tAbsolute = isAbsolute();
+		probing = true;
 		
 		align(borderPos);
 
 		SetRelative();
 
 		Controller::setFeedrate(FAST);
-		go(-borderPos.mag() + 20,.0);
+		go(-borderPos.mag() - 80,.0);
 		Controller::setFeedrate(SLOW);
-		go(-borderPos.mag() - 10,.0);
+		go(-50,.0);
 
 		
 		float offset = 112.61f;
 
-		if(cPosition.a < 0.0 + offset)
+		if(cPosition.a < 0.0 + offset){
 			cPosition.a = 0.0 + offset;
+			probedX = true;
+		}
+
 		
 		if(cPosition.a > 3000.0 - offset)
 			cPosition.a = 3000.0 - offset; 
 
-		if(cPosition.b < 0.0)
-			cPosition.a = 0.0 + offset;
-		
+		if(cPosition.b < 0.0){
+			cPosition.b = 0.0 + offset;
+			probedY = true;
+		}
+
 		if(cPosition.b > 2000.0)
-			cPosition.a = 2000.0 - offset;
+			cPosition.b = 2000.0 - offset;
 		
 		go(100,.0);
 
 		Controller::setFeedrate(FAST);
 		SetAbsolute(tAbsolute);
+		probing = false;
+		probedX = probedY = true;
+
+	}
+
+	bool isProbing(){
+		return probing;
 	}
 
 	void align(Vec2 coord){
@@ -128,8 +155,13 @@ namespace Motion
 
 	//Raw relative move request
 	void move(Vec3 target){
+		Debugger::log("Relative target :");
+		Debugger::log(target);
 		target.c *= DEG_TO_RAD;
 		cTarget = target;
+		
+		while(target.c > PI) target.c -= 2.0f*PI;
+		while(target.c < -PI) target.c += 2.0f*PI;
 
 		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
 		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
@@ -137,19 +169,19 @@ namespace Motion
 
 		Controller::move(target, true);
 		while(running()) Match::update();
-
-		cPosition.add(cTarget.rotateZ(cPosition.c));
-		if(cPosition.c >= 2*PI) cPosition.c -= 2*PI;
-		if(cPosition.c <= -2*PI) cPosition.c += 2*PI; 
+		cPosition.add(cTarget.rotateZ(-cPosition.c));
 	}
 
 	void moveAbs(Vec3 target){
 
 		target.c *= DEG_TO_RAD;
 		target.sub(cPosition);
-
 		cTarget = target;
+		
 		target.rotateZ(cPosition.c);
+		while(target.c > PI) target.c -= 2.0f*PI;
+		while(target.c < -PI) target.c += 2.0f*PI;
+
 		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
 		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
@@ -158,8 +190,6 @@ namespace Motion
 		while(running()) Match::update();
 
 		cPosition.add(cTarget);
-		if(cPosition.c >= 2*PI) cPosition.c -= 2*PI;
-		if(cPosition.c <= -2*PI) cPosition.c += 2*PI;
 	}
 
 
@@ -181,7 +211,7 @@ namespace Motion
 			  s60 = sinf(PI/3.0f),
 			  L = Settings::RADIUS,
 			  R = Settings::WHEEL_RADIUS;
-
+			  
 		Matrix3x3 P = {
 			   0,   1 , L,
 			-s60, -c60, L,

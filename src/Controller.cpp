@@ -1,6 +1,7 @@
 #include "Controller.h"
 #include "Settings.h"
 #include "Debugger.h"
+#include "Match.h"
 
 namespace Controller{
 
@@ -62,12 +63,9 @@ namespace Controller{
         sC.setAcceleration(accel);
     }
 
-
-
-
     void engage(bool state){
         if(engaged != state){
-            digitalWrite(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
+            digitalWriteFast(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             engaged = state;
         }
     }
@@ -75,30 +73,36 @@ namespace Controller{
     void disengage(){
         if(engaged){
             engaged = false;
-            digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
+            digitalWriteFast(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
         }
     }
 
     void sleep(bool state){
         if(engaged && sleeping != state){
-            digitalWrite(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
+            digitalWriteFast(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             sleeping = state;
         }
     }
 
+    void update(){
+
+    }
 
     void move(Vec3 target, bool async){
-
         target.mult(calibration.toMatrix());
 
         sA.setTargetRel(int32_t(target.a));
         sB.setTargetRel(int32_t(target.b));
         sC.setTargetRel(int32_t(target.c));
 
-        if(sleeping) sleep(false);
+        if(sleeping){
+            sleep(false);
+            Match::wait(200);
+        }
         
         if(async)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);
+        
     }
 
     void reset(){

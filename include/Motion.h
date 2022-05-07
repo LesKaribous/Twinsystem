@@ -4,7 +4,7 @@
 
 namespace Motion{
     extern Vec3 position;
-
+    extern bool probedX, probedY;
     /**
      * @brief Init kinematics
      */
@@ -49,6 +49,9 @@ namespace Motion{
      */
     void probeBorder(Vec2);
 
+    //Return true while probing
+    bool isProbing();
+
     /**
      * @brief Align (turn) the robot toward the desired vector
      * @param coordinateSystem position relative to the robot current position
@@ -74,6 +77,9 @@ namespace Motion{
 	Vec3 GetTarget();
     bool isAbsolute();
     bool isRelative();
+    bool isProbed();
+    bool isXProbed();
+    bool isYProbed();
 
     //Inverse Kinematics
     Vec3 ik(Vec3);
