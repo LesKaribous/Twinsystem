@@ -7,4 +7,34 @@
 #include "Controller.h"
 #include "Strategy.h"
 #include "Debugger.h"
+#include "Settings.h"
 #include "Pin.h"
+
+using namespace Debugger;
+
+namespace System{
+    inline void reboot(){
+        log("Rebooting robot in 3s...");
+        delay(1000);
+        log("Rebooting robot in 2s...");
+        delay(1000);
+        log("Rebooting robot in 1s...");
+        delay(1000);
+        _reboot_Teensyduino_();
+    }
+
+
+    inline void init(){
+        //--- INIT ---
+        Settings::init();
+        Actuators::init();
+        Controller::init();
+        Motion::init();
+        Debugger::init();
+        IHM::init();
+        //--- WAIT LAUNCH---
+        Strategy::waitLaunch();
+    }
+
+} // namespace System
+

@@ -6,10 +6,10 @@ namespace Debugger{
 
     void printHeader();
     void checkSerial();
-    void execCommand();
+    void parseCommand(String);
+    String lastCommand();
 
     void log(String);
-    void log(int);
     void log(float);
 
 

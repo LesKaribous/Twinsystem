@@ -1,7 +1,10 @@
 #include "Debugger.h"
-#include "Settings.h"
+#include "Twinsystem.h"
 
 namespace Debugger{
+
+    String lastCmd = "";
+
     void init(){
         Serial.begin(115200);
     
@@ -9,6 +12,7 @@ namespace Debugger{
             //Waiting for serial
             //21-04-2022 - @Nadar - Diminution de 5000ms à 500ms
         }
+
         printHeader();
         Serial.print("Preparing system...");
         
@@ -41,22 +45,45 @@ namespace Debugger{
 
     void checkSerial(){
         if(Serial.available()){
-            String command = Serial.readStringUntil('(');
+            String command = Serial.readStringUntil('\n');
             Serial.println("Received :" + command);
+            parseCommand(command);
         }
     }
     
-
-    void execCommand(String command){
-
+    void parseCommand(String command){
+        if(command == "start"){
+            lastCmd = "start";
+            log("Starting program...");
+        }else if(command == "restart"){
+            //lastCmd = command;
+            log("Not supported yet.");
+        }else if(command == "reboot"){
+            System::reboot();
+        }else if(command == "probe"){
+            lastCmd = command;
+            log("Zeroing robot...");
+            Strategy::recalage();
+        }else if(command == "help" || command == "?"){
+            log("-------- Commands list ---------");
+            log("help : Arm the robot before start");
+            log("arm : Arm the robot before start");
+            log("start : Arm the robot before start");
+        }else{
+            log("Unknown command : " + command);
+            log("Please run <help> to see available commands");
+        }
     }
+
+    String lastCommand(){
+        String buf = lastCmd;
+        lastCmd = "";
+        return buf;
+    }
+
 
     void log(String message){
         Serial.println(message);
-    }
-
-    void log(int data){
-        Serial.println(data);
     }
 
     void log(float data){
