@@ -119,18 +119,12 @@ namespace Motion
 		if(cPosition.a < 0.0 + offset){
 			cPosition.a = 0.0 + offset;
 			probedX = true;
-		}
-
-		
-		if(cPosition.a > 3000.0 - offset)
+		}else if(cPosition.a > 3000.0 - offset)
 			cPosition.a = 3000.0 - offset; 
-
-		if(cPosition.b < 0.0){
+		else if(cPosition.b < 0.0){
 			cPosition.b = 0.0 + offset;
 			probedY = true;
-		}
-
-		if(cPosition.b > 2000.0)
+		}else if(cPosition.b > 2000.0)
 			cPosition.b = 2000.0 - offset;
 		
 		go(100,.0);
@@ -138,8 +132,6 @@ namespace Motion
 		Controller::setFeedrate(FAST);
 		SetAbsolute(tAbsolute);
 		probing = false;
-		probedX = probedY = true;
-
 	}
 
 	bool isProbing(){

@@ -41,7 +41,9 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		SetAbsolute();
-		//go(-500,500);
+		go(500,500);
+
+		Controller::sleep();
 	}
 
 	

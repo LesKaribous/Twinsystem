@@ -49,8 +49,6 @@ namespace Motion{
      */
     void probeBorder(Vec2);
 
-    //Return true while probing
-    bool isProbing();
 
     /**
      * @brief Align (turn) the robot toward the desired vector
@@ -80,6 +78,8 @@ namespace Motion{
     bool isProbed();
     bool isXProbed();
     bool isYProbed();
+    //Return true while probing
+    bool isProbing();
 
     //Inverse Kinematics
     Vec3 ik(Vec3);
