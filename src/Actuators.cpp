@@ -20,23 +20,24 @@ namespace Actuators{
 
 		Settings::init(); // To solve the "type robot issue"
 
-		if(Settings::ROBOT == Settings::PRIMARY ){
-
-			BrasInit	.setPin(Pin::Servo::pinServo02,
+		
+		BrasInit	.setPin(Pin::Servo::pinServo02,
 								Pin::Servo::pinServo03,
 								Pin::Servo::pinServo04,
 								Pin::Pump::pinPump01,
 								Pin::Pump::pinEv01);
-			BrasTirette	.setPin(Pin::Servo::pinServo06,
+		BrasTirette	.setPin(Pin::Servo::pinServo06,
 								Pin::Servo::pinServo07,
 								Pin::Servo::pinServo08,
 								Pin::Pump::pinPump02,
 								Pin::Pump::pinEv02);
-			BrasAU		.setPin(Pin::Servo::pinServo10,
+		BrasAU		.setPin(Pin::Servo::pinServo10,
 								Pin::Servo::pinServo11,
 								Pin::Servo::pinServo12,
 								Pin::Pump::pinPump03,
 								Pin::Pump::pinEv03);
+
+		if(Settings::ROBOT == Settings::PRIMARY ){			
 			//Set Limit
 			BrasAU			.setLimit(	180,95,			// Elevator
 										180,60,			// Arm
@@ -47,6 +48,20 @@ namespace Actuators{
 			BrasTirette		.setLimit(	180,105,		// Elevator
 										180,50,			// Arm
 										0,180); 		// Tool
+		}
+		else{
+			//Set Limit
+			BrasAU			.setLimit(	150,67,			// Elevator
+										160,30,			// Arm
+										0,180); 		// Tool
+			BrasInit		.setLimit(	180,105,		// Elevator
+										135,15,			// Arm
+										0,180);			// Tool
+			//Set limit for "statuette" actuators							
+			BrasTirette		.setLimit(	0,180,			// Testor
+										10,100,			// Arm with succer
+										180,50); 		// Pad
+		}
 			//Set Geometry
 			BrasAU		.setGeometry(60,0);
 			BrasInit	.setGeometry(180,0);
@@ -55,12 +70,15 @@ namespace Actuators{
 			// Set zero position
 			BrasAU			.setPosition(0,0,50);
 			BrasInit		.setPosition(0,0,50);
-			BrasTirette		.setPosition(0,0,50,1000);
+			if(Settings::ROBOT == Settings::PRIMARY )
+				BrasTirette		.setPosition(0,0,50,1000);
+			else
+				BrasTirette		.setPosition(0,0,10,1000);
 			// Wait for match launch
 			BrasAU			.detachBras();
 			BrasInit		.detachBras();
 			BrasTirette		.detachBras();
-		}
+		
 	}
 
 	void sleep(){
