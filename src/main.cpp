@@ -16,19 +16,10 @@
 #include "Test.h"
 
 void setup(){
-    //--- INIT ---
-    Settings::init();
-    Actuators::init();
-    Controller::init();
-    Motion::init();
-    Debugger::init();
-    IHM::init();
-    //--- WAIT LAUNCH---
-    Strategy::waitLaunch();
+    System::init();
 }
 
 void loop(){
-    
     //--- START MATCH---
     Match::start();
     if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 

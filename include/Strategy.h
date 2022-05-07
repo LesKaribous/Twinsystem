@@ -10,8 +10,6 @@ namespace Strategy{
     void homologation();
     void match();
     void recalage();
-    void testingFlip();
-    void testingActuators();
 
     void waitLaunch();
     //----- ACTUATORS STRATEGIES -----

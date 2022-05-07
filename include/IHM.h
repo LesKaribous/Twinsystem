@@ -62,6 +62,7 @@ namespace IHM{
         void page01           ();
         void page02           ();
         void page03           ();
+        void page04           ();
         void adjustActuators  ();
         void startMenu        ();
         void menuScreen       ();

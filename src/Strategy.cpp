@@ -1,10 +1,5 @@
 #include "Strategy.h"
-#include "Intercom.h"
-#include "Motion.h"
-#include "Actuators.h"
-#include "Match.h"
-#include "Controller.h"
-#include "Pin.h"
+#include "Twinsystem.h"
 
 using namespace Motion;
 using namespace Match;
@@ -14,70 +9,57 @@ using namespace Actuators;
 namespace Strategy{
 
 	void match(){
+		SetAbsolute();
+		/*
+		go(0,100);
+		goTurn(100,100,50);
+		goTurn(100,0,20);
+		go(0,0);
+		*/
+
+		go(100,0);
+		go(100,100);
+		turn(30);
+		go(0,100);
+		go(0,0);
 		
 	}
 
 	void homologation(){
-		
+		SetRelative();
+		goTurn(100,0,90);
+		goTurn(100,0,90);
+		goTurn(100,0,90);
+		goTurn(100,0,90);
 	}
 
 	void recalage(){
-		turn(30);
-		Vec2 borderPos(0,-100);
-		probeBorder(borderPos);
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-700);
+		Vec2 borderXmax( 100, 0	 );
+		Vec2 borderYmax(   0, 100);
+		probeBorder(borderXmin);
+		probeBorder(borderYmin);
+		SetAbsolute();
+		go(500,500);
+
+		Controller::sleep();
 	}
 
-	void testingFlip(){
-		takeElement(BrasAU,FLOOR);
-		delay(1000);
-		flipElement(BrasAU);
-		delay(1000);
-		releaseElement(BrasAU,FLOOR);
-	}
-
-	void testingActuators(){
-		BrasInit.setPosition(0,100,50);
-		BrasAU.setPosition(0,100,50);
-		BrasTirette.setPosition(0,100,50);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,50,100);
-		BrasAU.setPosition(0,50,100);
-		BrasTirette.setPosition(0,50,100);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,50,0);
-		BrasAU.setPosition(0,50,0);
-		BrasTirette.setPosition(0,50,0);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,50,50);
-		BrasAU.setPosition(0,50,50);
-		BrasTirette.setPosition(0,50,50);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,100,50);
-		BrasAU.setPosition(0,100,50);
-		BrasTirette.setPosition(0,100,50);
-		IHM::waitCheck();
-		BrasInit.setPosition(100,100,50);
-		BrasAU.setPosition(100,100,50);
-		BrasTirette.setPosition(100,100,50);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,100,50);
-		BrasAU.setPosition(0,100,50);
-		BrasTirette.setPosition(0,100,50);
-		IHM::waitCheck();
-		BrasInit.setPosition(0,0,50);
-		BrasAU.setPosition(0,0,50);
-		BrasTirette.setPosition(0,0,50);
-		IHM::waitCheck();
-		BrasInit.detachBras();
-		BrasAU.detachBras();
-		BrasTirette.detachBras();
-		IHM::waitCheck();
-	}
-
+	
 	void waitLaunch()
 	{
-    	while(!IHM::getTirette())IHM::menu();
-    	while( IHM::getTirette())IHM::menu();
+    	while(!IHM::getTirette()){
+			Controller::update();
+			IHM::menu();
+			Debugger::checkSerial();
+			if(Debugger::lastCommand() == "start") break;
+		}
+    	while(IHM::getTirette()){
+			Controller::update();
+			Debugger::checkSerial();
+			IHM::menu();
+		}
 
 		// Lancement du Match
 		Match::start();

@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #include "Twinsystem.h"
-
+#include "Test.h"
 
 namespace IHM
 {
@@ -177,9 +177,10 @@ void setColor(bool colorChoosed){
 void menu(){
 	updateButtonIHM();
 	LCD::startMenu();
-	if(getCheck()){
+	if(getCheck() || Debugger::lastCommand() == "probe"){
 		while(getCheck()) delay(10) ;// Attente du front descendant
-		if(_page == 2) Strategy::testingActuators();
+		if(_page == 2) Test::testingActuators();
+		else if(_page == 3) Test::testMotion();
 		else{
 			LCD::initScreen();
 			Strategy::recalage();
@@ -394,6 +395,9 @@ bool getArrowDown()
 				case 2:
 					page03();
 					break;
+				case 3:
+					page04();
+					break;
 				default:
 					_u8g2.setFont(u8g2_font_5x7_mr);
 					_u8g2.drawStr(2, 60, "error 404");
@@ -448,13 +452,14 @@ bool getArrowDown()
 			// - X position
 			_u8g2.setCursor(30, yInferieur + 10);
 			_u8g2.print(Motion::GetPosition().a,0);
+
 			// - Y position
 			_u8g2.setCursor(30, yInferieur + 20);
 			_u8g2.print(Motion::GetPosition().b,0);
+
 			// - Rot position
 			_u8g2.setCursor(30, yInferieur + 30);
 			_u8g2.print(Motion::GetPosition().c,0);
-
 
 		}
 
@@ -534,19 +539,60 @@ bool getArrowDown()
 
 		}
 
+		void page04(){
+
+			_u8g2.setFont(u8g2_font_logisoso18_tr);
+			_u8g2.drawStr(2, 22, "Adj.");
+			_u8g2.drawStr(2, 48, "Motion");
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(10, 80, "Press Check");
+			_u8g2.drawStr(20, 90, "Button");
+
+		}
+
 		void adjustActuators(){
 			// Change Value
 			// TODO
 		
 		}
 		
-		void initScreen()
-		{
+		void initScreen(){
+			// Alignements
+			const int marginLeft = 2;
+			const int yInferieur	= 60;
+			
 			_u8g2.clearBuffer();
 			_u8g2.setFont(u8g2_font_logisoso32_tr);
-			_u8g2.drawStr(3, 2, "Init");
+			_u8g2.drawStr(3, 2, "Probing...");
+
+			// Partie inférieure
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(0, yInferieur, "---------------");
+			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
+			_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
+			_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+			// - X position
+			_u8g2.setCursor(30, yInferieur + 10);
+			if(Motion::isXProbed())
+				_u8g2.print(Motion::GetPosition().a,0);
+			else 
+				_u8g2.print('?',0);
+
+			// - Y position
+			_u8g2.setCursor(30, yInferieur + 20);
+			if(Motion::isYProbed())
+				_u8g2.print(Motion::GetPosition().b,0);
+			else 
+				_u8g2.print('?',0);
+			// - Rot position
+			_u8g2.setCursor(30, yInferieur + 30);
+			if(Motion::isProbed())
+				_u8g2.print(Motion::GetPosition().c,0);
+			else 
+				_u8g2.print('?',0);
 			_u8g2.sendBuffer();
-			delay(1500);
 		}
 
 		void checkListScreen()
@@ -593,7 +639,7 @@ bool getArrowDown()
 		}
 
 		void matchScreen(){
-			if(Match::hasStarted){
+			if(Match::hasStarted()){
 				_u8g2.clearBuffer();
 				// Titre
 				_u8g2.setFont(u8g2_font_logisoso16_tr);
