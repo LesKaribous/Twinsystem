@@ -96,8 +96,22 @@ namespace Motion
 		Controller::setFeedrate(SLOW);
 		go(-borderPos.mag() - 10,.0);
 
-		Vec2 offset = Vec2(.0,112.61);
-		SetPosition(borderPos.add(offset));
+		
+		float offset = 112.61f;
+
+		if(cPosition.a < 0.0 + offset)
+			cPosition.a = 0.0 + offset;
+		
+		if(cPosition.a > 3000.0 - offset)
+			cPosition.a = 3000.0 - offset; 
+
+		if(cPosition.b < 0.0)
+			cPosition.a = 0.0 + offset;
+		
+		if(cPosition.b > 2000.0)
+			cPosition.a = 2000.0 - offset;
+		
+		go(100,.0);
 
 		Controller::setFeedrate(FAST);
 		SetAbsolute(tAbsolute);
@@ -107,18 +121,17 @@ namespace Motion
 		boolean tAbsolute = isAbsolute();
 
 		SetAbsolute(tAbsolute);
-		turn(coord.heading());
-
-
+		turn(coord.heading()-180.0);
 
 		SetAbsolute(tAbsolute);
 	}
 
 	//Raw move request
 	void move(Vec3 target){
-		if(absolute) target.sub(cPosition);
+		if(absolute){
+			target.sub(cPosition);
+		}
 		cTarget = target;
-
 		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
 		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
@@ -148,14 +161,16 @@ namespace Motion
 			  L = Settings::RADIUS,
 			  R = Settings::WHEEL_RADIUS;
 
+		
 		target.c *= DEG_TO_RAD;
+		target.rotateZ(-cPosition.c * DEG_TO_RAD);
 
 		Matrix3x3 P = {
 			   0,   1 , L,
 			-s60, -c60, L,
 			 s60, -c60, L
 		};
-				
+
 		return target.mult(P).mult(1/R);
 	}
 
