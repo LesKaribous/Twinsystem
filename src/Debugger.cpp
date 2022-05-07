@@ -90,4 +90,14 @@ namespace Debugger{
         Serial.println(data);
     }
 
+    void log(Vec3 v){
+        Serial.print("Vec3: {x:");
+        Serial.print(v.a);
+        Serial.print(", y:");
+        Serial.print(v.b);
+        Serial.print(", w:");
+        Serial.print(v.c);
+        Serial.println("}");
+    }
+
 } // namespace Debugger

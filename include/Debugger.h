@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "Geometry.h"
 
 namespace Debugger{
     void init();
@@ -11,7 +12,7 @@ namespace Debugger{
 
     void log(String);
     void log(float);
-
+    void log(Vec3);
 
 } // namespace Debugger
 
