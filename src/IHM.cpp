@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 
 #include "Twinsystem.h"
-
+#include "Test.h"
 
 namespace IHM
 {
@@ -177,9 +177,10 @@ void setColor(bool colorChoosed){
 void menu(){
 	updateButtonIHM();
 	LCD::startMenu();
-	if(getCheck()){
+	if(getCheck() || Debugger::lastCommand() == "probe"){
 		while(getCheck()) delay(10) ;// Attente du front descendant
-		if(_page == 2) Strategy::testingActuators();
+		if(_page == 2) Test::testingActuators();
+		else if(_page == 3) Test::testMotion();
 		else{
 			LCD::initScreen();
 			Strategy::recalage();
@@ -394,6 +395,9 @@ bool getArrowDown()
 				case 2:
 					page03();
 					break;
+				case 3:
+					page04();
+					break;
 				default:
 					_u8g2.setFont(u8g2_font_5x7_mr);
 					_u8g2.drawStr(2, 60, "error 404");
@@ -528,6 +532,17 @@ bool getArrowDown()
 			_u8g2.setFont(u8g2_font_logisoso18_tr);
 			_u8g2.drawStr(2, 22, "Adj.");
 			_u8g2.drawStr(2, 48, "Servo");
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(10, 80, "Press Check");
+			_u8g2.drawStr(20, 90, "Button");
+
+		}
+
+		void page04(){
+
+			_u8g2.setFont(u8g2_font_logisoso18_tr);
+			_u8g2.drawStr(2, 22, "Adj.");
+			_u8g2.drawStr(2, 48, "Motion");
 			_u8g2.setFont(u8g2_font_micro_mr);
 			_u8g2.drawStr(10, 80, "Press Check");
 			_u8g2.drawStr(20, 90, "Button");

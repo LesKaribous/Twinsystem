@@ -57,6 +57,7 @@ namespace Motion{
 
     //Raw Move
     void move(Vec3 target);
+    void moveAbs(Vec3 target);
 
     bool running();
 

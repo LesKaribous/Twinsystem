@@ -1,7 +1,5 @@
 #include "Match.h"
-#include "Actuators.h"
-#include "Pin.h"
-#include "Controller.h"
+#include "Twinsystem.h"
 
 namespace Match{
 
@@ -91,6 +89,8 @@ namespace Match{
 		Actuators::unsuck();
 		Actuators::sleep();
 		// Boucle infinie
-		while(true){}
+		while(true){
+			Debugger::checkSerial();
+		}
 	}
 }

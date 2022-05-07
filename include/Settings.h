@@ -37,7 +37,7 @@ namespace Settings{
         WHEEL_RADIUS = 30;
 
     const uint32_t 
-        ACCEL = 5000, // Old : 2000              
+        ACCEL = 2000, // Old : 2000              
         SPEED = 10000; // Old : 5000
 
 
@@ -64,12 +64,12 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.16f, -1.16f, -1.045f } //Cartesian : XYROT
+            { 1.16f, -1.16f, -1.0525f } //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.17f, -1.17f, -1.045f } //Cartesian : XYROT
+            { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
         };
     }
 

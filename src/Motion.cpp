@@ -25,7 +25,7 @@ namespace Motion
 	}
 
 	Vec3 GetPosition(){
-		return cPosition;
+		return Vec3(cPosition.a, cPosition.b, cPosition.c * RAD_TO_DEG);
 	}
 
 	Vec3 GetTarget(){
@@ -57,8 +57,10 @@ namespace Motion
 
 
     void turn(float angle){
-		if (absolute) move({cPosition.a, cPosition.b, angle});
+		Controller::setFeedrate(30);
+		if (absolute) moveAbs({cPosition.a, cPosition.b, angle});
 		else move({0, 0, angle});
+		Controller::setFeedrate(100);
 	}
 
     void goPolar(float heading, float length){
@@ -72,7 +74,7 @@ namespace Motion
 	}
 
 	void go(Vec2 target){
-		if (absolute) move({target.a, target.b, cPosition.c});
+		if (absolute) moveAbs({target.a, target.b, cPosition.c});
 		else move({target.a, target.b, 0});
 	}
 
@@ -121,24 +123,45 @@ namespace Motion
 		boolean tAbsolute = isAbsolute();
 
 		SetAbsolute(tAbsolute);
-		turn(coord.heading()-180.0);
+		Debugger::log(coord.heading()*RAD_TO_DEG + 90);
+		turn(coord.heading()+90);
 
 		SetAbsolute(tAbsolute);
 	}
 
-	//Raw move request
+	//Raw relative move request
 	void move(Vec3 target){
-		if(absolute){
-			target.sub(cPosition);
-		}
+		target.c *= DEG_TO_RAD;
 		cTarget = target;
-		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
-		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc)
+
+		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
+		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
 
 		Controller::move(target, true);
 		while(running()) Match::update();
+
+		cPosition.add(cTarget.rotateZ(cPosition.c));
+		if(cPosition.c >= 2*PI) cPosition.c -= 2*PI;
+		if(cPosition.c <= -2*PI) cPosition.c += 2*PI; 
+	}
+
+	void moveAbs(Vec3 target){
+		target.c *= DEG_TO_RAD;
+		target.sub(cPosition);
+		cTarget = target;
+		//target.rotateZ(cPosition.c);
+
+		target.mult(calibration.toMatrix()); //Apply calibration (X,Y,ROT)
+		target = ik(target); //Apply inverse kinematics (X,Y,ROT) -> (Va, Vb, Vc) : steps
+		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
+
+		Controller::move(target, true);
+		while(running()) Match::update();
+
 		cPosition.add(cTarget);
+		if(cPosition.c >= 2*PI) cPosition.c -= 2*PI;
+		if(cPosition.c <= -2*PI) cPosition.c += 2*PI; 
 	}
 
 
@@ -160,10 +183,6 @@ namespace Motion
 			  s60 = sinf(PI/3.0f),
 			  L = Settings::RADIUS,
 			  R = Settings::WHEEL_RADIUS;
-
-		
-		target.c *= DEG_TO_RAD;
-		target.rotateZ(-cPosition.c * DEG_TO_RAD);
 
 		Matrix3x3 P = {
 			   0,   1 , L,

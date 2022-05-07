@@ -46,7 +46,7 @@ namespace Controller{
 
     void setFeedrate(float value){
         feedrate = value;
-        setSpeed(Settings::SPEED * value / 100.0);
+        setSpeed(float(Settings::SPEED) * value / 100.0);
     }
 
 
