@@ -608,7 +608,7 @@ bool getArrowDown()
 		}
 
 		void matchScreen(){
-			if(Match::hasStarted){
+			if(Match::hasStarted()){
 				_u8g2.clearBuffer();
 				// Titre
 				_u8g2.setFont(u8g2_font_logisoso16_tr);

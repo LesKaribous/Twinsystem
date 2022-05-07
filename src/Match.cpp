@@ -34,7 +34,7 @@ namespace Match{
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
 	bool updateTime()
 	{
-		if(Match::hasStarted){ //Do not update time before match has started
+		if(Match::hasStarted()){ //Do not update time before match has started
 			tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
 			if (tempsRestant <= 0)
