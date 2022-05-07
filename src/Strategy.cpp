@@ -16,12 +16,15 @@ namespace Strategy{
 		goTurn(100,0,20);
 		go(0,0);
 		*/
-
+		/*
 		go(100,0);
 		go(100,100);
 		turn(30);
 		go(0,100);
 		go(0,0);
+		*/
+		turn(90);
+
 		
 	}
 
@@ -34,6 +37,7 @@ namespace Strategy{
 	}
 
 	void recalage(){
+		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-100, 0	 );
 		Vec2 borderYmin(   0,-700);
 		Vec2 borderXmax( 100, 0	 );
