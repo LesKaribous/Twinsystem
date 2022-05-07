@@ -34,6 +34,8 @@ namespace Actuators{
                         int minServoTool, 
                         int maxServoTool );
     
+        void setGeometry(int angle, int decalage);
+
         int calcPositionElevator(byte posServoElevator);
         int calcPositionArm     (byte posServoArm);
         int calcPositionTool    (byte posServoTool);
@@ -67,6 +69,9 @@ namespace Actuators{
         int _pinPump ;
         int _pinEv ;
         bool _pinEvAvailable = false;
+
+        int _angle ;
+        int _centerDistance ;
 
         int _minServoElevator ;
         int _maxServoElevator ;

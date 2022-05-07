@@ -13,11 +13,12 @@ using namespace Actuators;
 //----------------STRATEGIES----------------
 namespace Strategy{
 
-
 	void match(){
+		
 	}
 
 	void homologation(){
+		
 	}
 
 	void recalage(){
@@ -90,12 +91,13 @@ namespace Strategy{
 	}
 
 	
+//----- ACTUATORS STRATEGIES -----
+
 	void takeElement(Bras robotArm,int location)
 	{
 		// Arming the arm	
 		switch(location){
 			case FLOOR :
-				
 				// Arming the arm
 				robotArm.grab();
 				robotArm.setPosition(100,100,80,1000);
@@ -105,8 +107,9 @@ namespace Strategy{
 			case DISPENSER :
 				// Arming the arm
 				robotArm.grab();
-				robotArm.setPosition(100,100,80,1000);
+				robotArm.setPosition(0,60,70,1000);
 				// Take an element lay on a 60° dispenser
+				robotArm.setPosition(0,20,80,1000);
 			break;
 			case WORK_SHED :
 				// Arming the arm
