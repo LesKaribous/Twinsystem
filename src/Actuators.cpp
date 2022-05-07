@@ -48,9 +48,9 @@ namespace Actuators{
 										180,50,			// Arm
 										0,180); 		// Tool
 			//Set Geometry
-			BrasAU		.setGeometry();
-			BrasInit		.setGeometry();
-			BrasTirette	.setGeometry();
+			BrasAU		.setGeometry(60,0);
+			BrasInit	.setGeometry(180,0);
+			BrasTirette	.setGeometry(300,0);
 
 			// Set zero position
 			BrasAU			.setPosition(0,0,50);
