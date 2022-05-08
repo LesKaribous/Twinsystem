@@ -17,4 +17,5 @@ namespace Strategy{
     void releaseElement(Actuators::Bras robotArm,int location);
     void flipElement(Actuators::Bras robotArm);
     void flipChallenge(Actuators::Bras robotArm);
+    void probeElement();
 }

@@ -178,4 +178,17 @@ namespace Strategy{
 		robotArm.setPosition(0,0,50);
 	}
 
+	void probeElement(){
+		BrasTirette.setTool(100);
+		BrasTirette.setTool2(100,500);
+		int square = Actuators::getProbingValue();
+		Debugger::log(square);
+		BrasTirette.setTool(0);
+		BrasTirette.setTool2(0,500);
+		if(square == IHM::getEquipe()) {
+			BrasTirette.setElevator(100,500);
+			updateScore(5);
+			BrasTirette.setElevator(0,500);
+		}
+	}
 }
