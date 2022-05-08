@@ -20,20 +20,23 @@ namespace Pin{
         checkButton          =  36,
         neoPixel             =  35,
         robotSelect          =  14;
+    
+    const int probeResistor  = A26;
+    
 
     namespace Servo{
         const int 
-            pinPump01   = 0,
+            pinServo01  = 0,
             pinServo02  = 1,
             pinServo03  = 2,
             pinServo04  = 3,
 
-            pinPump02   = 4,
+            pinServo05  = 4,
             pinServo06  = 5,
             pinServo07  = 6,
             pinServo08  = 7,
 
-            pinPump03   = 25,
+            pinServo09  = 25,
             pinServo10  = 28,
             pinServo11  = 29,
             pinServo12  = 30;
