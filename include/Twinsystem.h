@@ -9,6 +9,7 @@
 #include "Debugger.h"
 #include "Settings.h"
 #include "Pin.h"
+#include "Test.h"
 
 using namespace Debugger;
 
