@@ -562,7 +562,7 @@ bool getArrowDown()
 			const int yInferieur	= 60;
 			
 			_u8g2.clearBuffer();
-			_u8g2.setFont(u8g2_font_logisoso32_tr);
+			_u8g2.setFont(u8g2_font_logisoso16_tr);
 			_u8g2.drawStr(3, 2, "Probing...");
 
 			// Partie inférieure
