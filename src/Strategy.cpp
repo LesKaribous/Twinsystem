@@ -8,24 +8,34 @@ using namespace Actuators;
 //----------------STRATEGIES----------------
 namespace Strategy{
 
+	void recalage(){
+		SetPosition(Vec3(0,0,0));
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-550);
+		Vec2 borderXmax( 100, 0	 );
+		Vec2 borderYmax(   0, 100);
+		probeBorder(borderXmin);
+		probeBorder(borderYmin);
+		SetAbsolute();
+		goTurn(250,550,0);
+		Controller::sleep();
+	}
+
 	void match(){
 		SetAbsolute();
-		/*
-		go(0,100);
-		goTurn(100,100,50);
-		goTurn(100,0,20);
-		go(0,0);
-		*/
-		/*
-		go(100,0);
-		go(100,100);
-		turn(30);
-		go(0,100);
-		go(0,0);
-		*/
-		turn(90);
+		go(673,685);
+		takeElement(BrasInit,FLOOR);
+		turn(120);
+		go(743,560);
+		takeElement(BrasAU,FLOOR);
+		turn(180);
+		go(814,668);
+		takeElement(BrasTirette,FLOOR);
+		go(630,400);
+		flipElement(BrasAU);
+		flipElement(BrasInit);
+		flipElement(BrasTirette);
 
-		
 	}
 
 	void homologation(){
@@ -34,20 +44,6 @@ namespace Strategy{
 		goTurn(100,0,90);
 		goTurn(100,0,90);
 		goTurn(100,0,90);
-	}
-
-	void recalage(){
-		SetPosition(Vec3(0,0,0));
-		Vec2 borderXmin(-100, 0	 );
-		Vec2 borderYmin(   0,-700);
-		Vec2 borderXmax( 100, 0	 );
-		Vec2 borderYmax(   0, 100);
-		probeBorder(borderXmin);
-		probeBorder(borderYmin);
-		SetAbsolute();
-		go(500,500);
-
-		Controller::sleep();
 	}
 
 	
