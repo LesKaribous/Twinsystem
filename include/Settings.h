@@ -9,7 +9,6 @@ struct  CalibrationProfile{
          Cartesian;
 };
 
-
 // Namespace
 namespace Settings{
 
@@ -44,6 +43,10 @@ namespace Settings{
     extern bool ROBOT;
     void init();
 
+    namespace Geometry{
+        
+        const float offset = 125.98f;
+    }
     namespace Stepper{
         const bool 
             ENABLE_POLARITY = true,

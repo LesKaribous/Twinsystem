@@ -4,6 +4,7 @@
 
 #include "Debugger.h"
 #include "Geometry.h"
+#include "Settings.h"
 
 namespace Motion
 {
@@ -113,19 +114,18 @@ namespace Motion
 		Controller::setFeedrate(SLOW);
 		go(-50,.0);
 
-		
-		float offset = 112.61f;
+		float _offset = Settings::Geometry::offset ;
 
-		if(cPosition.a < 0.0 + offset){
-			cPosition.a = 0.0 + offset;
+		if(cPosition.a < 0.0 + _offset){
+			cPosition.a = 0.0 + _offset;
 			probedX = true;
-		}else if(cPosition.a > 3000.0 - offset)
-			cPosition.a = 3000.0 - offset; 
+		}else if(cPosition.a > 3000.0 - _offset)
+			cPosition.a = 3000.0 - _offset; 
 		else if(cPosition.b < 0.0){
-			cPosition.b = 0.0 + offset;
+			cPosition.b = 0.0 + _offset;
 			probedY = true;
 		}else if(cPosition.b > 2000.0)
-			cPosition.b = 2000.0 - offset;
+			cPosition.b = 2000.0 - _offset;
 		
 		go(100,.0);
 
