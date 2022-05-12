@@ -44,7 +44,7 @@ namespace Settings{
     void init();
 
     namespace Geometry{
-        
+
         const float offset = 125.98f;
     }
     namespace Stepper{
@@ -67,7 +67,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.16f, -1.16f, -1.0525f } //Cartesian : XYROT
+            { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
