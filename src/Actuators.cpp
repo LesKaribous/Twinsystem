@@ -41,7 +41,7 @@ namespace Actuators{
 								Pin::Pump::pinEv02);		
 			//Set Limit
 			BrasAU			.setLimit(	180,95,			// Elevator
-										180,60,			// Arm
+										180,55,			// Arm
 										0,180); 		// Tool
 			BrasInit		.setLimit(	180,100,		// Elevator
 										180,55,			// Arm
@@ -72,9 +72,9 @@ namespace Actuators{
 										180,100); 		// Testor 2
 		}
 			//Set Geometry
-			BrasAU		.setGeometry(60,0);
-			BrasInit	.setGeometry(180,0);
-			BrasTirette	.setGeometry(300,0);
+			BrasAU		.setGeometry(240,0);
+			BrasInit	.setGeometry(0,0);
+			BrasTirette	.setGeometry(120,0);
 
 			// Set zero position
 			BrasAU			.setPosition(0,0,50);
@@ -174,6 +174,22 @@ namespace Actuators{
 	void Bras::setGeometry(int angle, int centerDistance){
 		_angle = angle;
 		_centerDistance = centerDistance;
+	}
+
+	int Bras::GetAngle() const{
+		return _angle;
+	}
+
+    int Bras::GetDecalage() const{
+		return _centerDistance;
+	}
+
+	void Bras::updateElement(int elementColor){
+		_elementColor = elementColor;
+	}
+
+	int Bras::GetElement() const{
+		return _elementColor;
 	}
 
 	void Bras::detachBras()

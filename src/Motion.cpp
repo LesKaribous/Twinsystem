@@ -79,7 +79,7 @@ namespace Motion
 	}
 
     void goPolar(float heading, float length){
-		PolarVec target = {heading, length};
+		PolarVec target(-heading*DEG_TO_RAD, length); // Switch to left hand coord system
 		go(target.toVec2());
 	}
 
@@ -112,7 +112,7 @@ namespace Motion
 		Controller::setFeedrate(FAST);
 		go(-borderPos.mag() - 80,.0);
 		Controller::setFeedrate(SLOW);
-		go(-50,.0);
+		go(-120,.0);
 
 		float _offset = Settings::Geometry::offset ;
 

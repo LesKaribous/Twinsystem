@@ -1,6 +1,7 @@
 #include "Geometry2D.h"
 #include "Geometry3D.h"
 #include <Math.h>
+#include <Arduino.h>
 
 //---------- Polar Vec --------
 
@@ -10,9 +11,10 @@ PolarVec::PolarVec(float _heading , float _mag){
 }
 
 Vec2 PolarVec::toVec2(){
-    Vec2 result;
-    result.setMagnitude(mag);
-    result.setHeading(mag);
+    Vec2 result(mag*cosf(heading),mag*sinf(heading));
+    //Vec2 result(1,0);
+    //result.setHeading(heading);
+    //result.setMagnitude(mag);
     return result;
 }
 
@@ -81,17 +83,16 @@ Vec2& Vec2::setMagnitude(float newMag){
 }
 
 Vec2& Vec2::setHeading(float head){
-    a = mag();
-    b = 0;
-    rotate(head);
+    Vec2 xAxis(1,0);
+    rotate(angleBetween( xAxis, *this));
     return *this;
 }
 
 Vec2& Vec2::normalize(){
     if(mag() != 0){
         float cMag = mag();
-        a /= cMag;
-        b /= cMag;
+        a /= cMag * a > 0 ? 1 : -1;
+        b /= cMag * b > 0 ? 1 : -1;
     }
     return *this;
 }
@@ -113,9 +114,13 @@ Vec2& Vec2::mult(Matrix2x2 m){
 }
 
 
-Vec2& Vec2::rotate(float a){
-    this->mult( { cosf(a), sinf(a), 
-                 -sinf(a), cosf(a)} );
+Vec2& Vec2::rotate(float x){
+
+    while(x > PI) x -= 2.0f*PI;
+    while(x < -PI) x += 2.0f*PI;
+
+    this->mult( { cosf(x), -sinf(x), 
+                  sinf(x), cosf(x)} );
     return *this;
 }
 

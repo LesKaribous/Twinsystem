@@ -39,11 +39,11 @@ namespace Test{
 
 
     void testingFlip(){
-		takeElement(BrasAU,FLOOR);
+		takeElement(BrasAU,GROUND);
 		delay(1000);
 		flipElement(BrasAU);
 		delay(1000);
-		releaseElement(BrasAU,FLOOR);
+		releaseElement(BrasAU,GROUND);
 	}
 
 	void testingActuators(){

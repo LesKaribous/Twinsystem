@@ -5,11 +5,16 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 
-#define FLOOR 0
+#define GROUND 0
 #define DISPENSER 1
 #define WORK_SHED 2
 #define GALLERY 3
 #define PEDESTAL 4
+
+#define NO_ELEMENT 0
+#define BLUE_ELEMENT 1
+#define GREEN_ELEMENT 2
+#define RED_ELEMENT 3
 
 #define SQUARE_PURPLE 0
 #define SQUARE_YELLOW 1
@@ -54,6 +59,12 @@ namespace Actuators{
     
         void setGeometry(int angle, int decalage);
 
+        int GetAngle() const;
+        int GetDecalage() const;
+
+        void updateElement(int elementColor);
+        int GetElement() const;
+
         int calcPositionElevator(byte posServoElevator);
         int calcPositionArm     (byte posServoArm);
         int calcPositionTool    (byte posServoTool);
@@ -94,6 +105,7 @@ namespace Actuators{
 
         int _angle ;
         int _centerDistance ;
+        int _elementColor = NO_ELEMENT ;
 
         int _minServoElevator ;
         int _maxServoElevator ;

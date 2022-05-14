@@ -73,10 +73,10 @@ Matrix3x3 Vec3::toMatrix(){
             0,0,c};
 }
 
-Vec3& Vec3::rotateZ(float a){
+Vec3& Vec3::rotateZ(float x){
 
-    this->mult({ cosf(a), -sinf(a), 0, 
-                 sinf(a),  cosf(a), 0,
+    this->mult({ cosf(x), -sinf(x), 0, 
+                 sinf(x),  cosf(x), 0,
                     0   ,     0   , 1 } );
 
     return *this;

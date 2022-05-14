@@ -7,11 +7,23 @@ namespace Strategy{
     extern bool matchEnCours;
 
     //----- STRATEGIES -----
+    void recalage();
     void homologation();
     void match();
-    void recalage();
+
+    void recalagePrimary();
+    void homologationPrimary();
+    void matchPrimary();
+
+    void recalageSecondary();
+    void homologationSecondary();
+	void matchSecondary();
 
     void waitLaunch();
+    //-------- SOUS-STRATEGIES --------
+    void takeGroundTrio();
+    void takeHorizontalDispenser(Actuators::Bras robotArm);
+    void layOnGallery(Actuators::Bras robotArm, int Color);
     //----- ACTUATORS STRATEGIES -----
     void takeElement(Actuators::Bras robotArm,int location);
     void releaseElement(Actuators::Bras robotArm,int location);

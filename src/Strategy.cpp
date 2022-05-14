@@ -9,42 +9,81 @@ using namespace Actuators;
 namespace Strategy{
 
 	void recalage(){
+		if(Settings::ROBOT == Settings::PRIMARY) recalagePrimary();
+		else if(Settings::ROBOT == Settings::SECONDARY) recalageSecondary();
+	}
+
+	void homologation(){
+		if(Settings::ROBOT == Settings::PRIMARY) homologationPrimary();
+		else if(Settings::ROBOT == Settings::SECONDARY) homologationSecondary();
+	}
+
+	void match(){
+		if(Settings::ROBOT == Settings::PRIMARY) matchPrimary();
+		else if(Settings::ROBOT == Settings::SECONDARY) matchSecondary();
+	}
+
+	void recalagePrimary(){
+		// Laisser passer le robot secondaire
+		SetRelative();
+		go(500,0);
+		wait(12000);
+		go(-500,0);
 		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-100, 0	 );
-		Vec2 borderYmin(   0,-550);
+		Vec2 borderYmin(   0,-100);
 		Vec2 borderXmax( 100, 0	 );
 		Vec2 borderYmax(   0, 100);
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		SetAbsolute();
 		goTurn(250,550,0);
+		probeBorder(borderXmin);
+		goTurn(250,550,0);
 		Controller::sleep();
 	}
 
-	void match(){
+    void recalageSecondary(){
+		SetPosition(Vec3(0,0,0));
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-400);
+		Vec2 borderXmax( 100, 0	 );
+		Vec2 borderYmax(   0, 100);
+		probeBorder(borderXmin);
+		probeBorder(borderYmin);
 		SetAbsolute();
-		go(673,685);
-		takeElement(BrasInit,FLOOR);
-		turn(120);
-		go(743,560);
-		takeElement(BrasAU,FLOOR);
-		turn(180);
-		go(814,668);
-		takeElement(BrasTirette,FLOOR);
-		go(630,400);
+		goTurn(250,850,0);
+		probeBorder(borderXmin);
+		goTurn(250,850,0);
+		Controller::sleep();
+	}
+
+	void homologationPrimary(){
+
+	}
+    void homologationSecondary(){
+		
+	}
+
+	void matchPrimary(){
+		takeGroundTrio();
+		/*
 		flipElement(BrasAU);
 		flipElement(BrasInit);
 		flipElement(BrasTirette);
+		*/
+		layOnGallery(BrasAU,BLUE_ELEMENT);
+		layOnGallery(BrasInit,GREEN_ELEMENT);
+		layOnGallery(BrasTirette,RED_ELEMENT);
+
+		takeHorizontalDispenser(BrasAU);
+
+	}
+	void matchSecondary(){
 
 	}
 
-	void homologation(){
-		SetRelative();
-		goTurn(100,0,90);
-		goTurn(100,0,90);
-		goTurn(100,0,90);
-		goTurn(100,0,90);
-	}
+	
 
 	
 	void waitLaunch()
@@ -72,19 +111,66 @@ namespace Strategy{
 
 	}
 
-	
+//-------- SOUS-STRATEGIES --------
+
+	void takeGroundTrio(){
+		SetAbsolute();
+		go(673,675);
+		takeElement(BrasInit,GROUND);
+		BrasInit.updateElement(GREEN_ELEMENT);
+		go(650,550);
+		turn(120);
+		go(743,550);
+		takeElement(BrasAU,GROUND);
+		BrasInit.updateElement(BLUE_ELEMENT);
+		turn(180);
+		go(820,668);
+		takeElement(BrasTirette,GROUND);
+		BrasInit.updateElement(RED_ELEMENT);
+		go(500,400);
+	}
+
+	void takeHorizontalDispenser(Bras robotArm){
+		SetAbsolute();
+		go(200,300);
+		turn(robotArm.GetAngle());
+		go(120,300);
+		takeElement(robotArm,WORK_SHED);
+		robotArm.updateElement(GREEN_ELEMENT);
+		go(200,300);
+	}
+
+	void layOnGallery(Bras robotArm, int colorElement){
+		float xPos = 0 ;
+		if(colorElement == BLUE_ELEMENT) xPos = 570 ; 
+		else if(colorElement == GREEN_ELEMENT) xPos = 810 ; 
+		else if(colorElement == RED_ELEMENT) xPos = 1050 ; 
+		SetAbsolute();
+		go(xPos,300);
+		turn(360-robotArm.GetAngle()+90); // +90 car Gallerie positionnée à 90° de l'origine
+		go(xPos,220);
+		releaseElement(robotArm,GALLERY);
+		go(xPos,300);
+	}
+
 //----- ACTUATORS STRATEGIES -----
 
 	void takeElement(Bras robotArm,int location)
 	{
-		// Arming the arm	
+		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 		switch(location){
-			case FLOOR :
+			case GROUND :
 				// Arming the arm
 				robotArm.grab();
-				robotArm.setPosition(100,100,80,1000);
+				robotArm.setPosition(100,100,80,500);
+				// Go To the element
+				SetRelative();
+				goPolar(robotArm.GetAngle(),20);
 				// Take an element lay on the floor
-				robotArm.setPosition(35,100,80,1000);
+				robotArm.setPosition(40,100,80,1000);
+				robotArm.setPosition(80,100,80,500);
+				goPolar(robotArm.GetAngle(),-30);
+				robotArm.setPosition(80,50,80,500);
 			break;
 			case DISPENSER :
 				// Arming the arm
@@ -120,14 +206,18 @@ namespace Strategy{
 			break;
 		}
 		robotArm .setPosition(0,0,80,500);
+
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
 
 	void releaseElement(Bras robotArm,int location){
-			
+
+		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
+
 		switch(location){
-			case FLOOR :
+			case GROUND :
 				// Release an element on the floor
-				robotArm.setPosition(35,100,80,400);
+				robotArm.setPosition(40,100,80,400);
 				robotArm.ungrab(500);
 				robotArm.setPosition(60,100,80,400);
 			break;
@@ -152,9 +242,14 @@ namespace Strategy{
 			break;
 		}
 		robotArm .setPosition(0,0,50,500);
+
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
 
 	void flipElement(Bras robotArm){
+
+		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
+
 		robotArm .setPosition(0,100,20,800);
 		robotArm.ungrab(300);
 
@@ -163,7 +258,9 @@ namespace Strategy{
 		robotArm .setPosition(100,100,0,1000);
 		//IHM::waitCheck();// ToDo avancer Relativement en fonction de la position de robotArm
 
-		takeElement(robotArm,FLOOR);
+		takeElement(robotArm,GROUND);
+
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
 
 	void flipChallenge(Bras robotArm){
