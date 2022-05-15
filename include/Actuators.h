@@ -9,7 +9,9 @@
 #define DISPENSER 1
 #define WORK_SHED 2
 #define GALLERY 3
-#define PEDESTAL 4
+#define GALLERY_TOP 4
+#define PEDESTAL 5
+#define MUSEUM 6
 
 #define NO_ELEMENT 0
 #define BLUE_ELEMENT 1

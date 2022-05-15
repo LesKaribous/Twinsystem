@@ -8,6 +8,8 @@ using namespace Actuators;
 //----------------STRATEGIES----------------
 namespace Strategy{
 
+	int nbrElBlue = 0, nbrElGreen = 0, nbrElRed = 0;
+
 	void recalage(){
 		if(Settings::ROBOT == Settings::PRIMARY) recalagePrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) recalageSecondary();
@@ -25,10 +27,13 @@ namespace Strategy{
 
 	void recalagePrimary(){
 		// Laisser passer le robot secondaire
+		/*
 		SetRelative();
 		go(500,0);
 		wait(12000);
 		go(-500,0);
+		*/
+		// ------
 		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-100, 0	 );
 		Vec2 borderYmin(   0,-100);
@@ -67,25 +72,26 @@ namespace Strategy{
 
 	void matchPrimary(){
 		takeGroundTrio();
-		/*
+		
 		flipElement(BrasAU);
 		flipElement(BrasInit);
 		flipElement(BrasTirette);
-		*/
-		layOnGallery(BrasAU,BLUE_ELEMENT);
-		layOnGallery(BrasInit,GREEN_ELEMENT);
+
 		layOnGallery(BrasTirette,RED_ELEMENT);
+		layOnGallery(BrasInit,GREEN_ELEMENT);
+		layOnGallery(BrasAU,BLUE_ELEMENT);
 
 		takeHorizontalDispenser(BrasAU);
+		layOnGallery(BrasAU,GREEN_ELEMENT);
 
+		goHome();
 	}
 	void matchSecondary(){
+		takeStatuette(BrasAU);
 
+		goHome();
 	}
 
-	
-
-	
 	void waitLaunch()
 	{
     	while(!IHM::getTirette()){
@@ -127,30 +133,71 @@ namespace Strategy{
 		go(820,668);
 		takeElement(BrasTirette,GROUND);
 		BrasInit.updateElement(RED_ELEMENT);
-		go(500,400);
 	}
 
-	void takeHorizontalDispenser(Bras robotArm){
+	void takeHorizontalDispenser(Bras &robotArm){
 		SetAbsolute();
 		go(200,300);
-		turn(robotArm.GetAngle());
-		go(120,300);
+		turn(0);
+		// -----Probing-----
+		SetPosition(Vec3(0,0,0));
+		Vec2 borderXmin(-20, 0	 );
+		Vec2 borderYmin(   0,-100);
+		probeBorder(borderXmin);
+		probeBorder(borderYmin);
+		//-------
+		go(200,300);
+		turn(robotArm.GetAngle()+60);
+		go(110,300);
 		takeElement(robotArm,WORK_SHED);
 		robotArm.updateElement(GREEN_ELEMENT);
-		go(200,300);
 	}
 
-	void layOnGallery(Bras robotArm, int colorElement){
+	void layOnGallery(Bras &robotArm, int colorElement){
 		float xPos = 0 ;
-		if(colorElement == BLUE_ELEMENT) xPos = 570 ; 
-		else if(colorElement == GREEN_ELEMENT) xPos = 810 ; 
-		else if(colorElement == RED_ELEMENT) xPos = 1050 ; 
+		bool layOnTop = false;
+		Debugger::log(colorElement);
+		if(colorElement == BLUE_ELEMENT) {
+			xPos = 570 ; 
+			if (nbrElBlue>0) layOnTop = true ;
+			nbrElBlue++;
+		}
+		else if(colorElement == GREEN_ELEMENT) {
+			xPos = 810 ; 
+			if (nbrElGreen>0) layOnTop = true ;
+			nbrElGreen++;
+		}
+		else if(colorElement == RED_ELEMENT) {
+			xPos = 1050 ; 
+			if (nbrElRed>0) layOnTop = true ;
+			nbrElRed++;
+		}
 		SetAbsolute();
-		go(xPos,300);
+		go(xPos,240);
 		turn(360-robotArm.GetAngle()+90); // +90 car Gallerie positionnée à 90° de l'origine
-		go(xPos,220);
-		releaseElement(robotArm,GALLERY);
-		go(xPos,300);
+		go(xPos,160);
+		// ToDo Recalage Bordure
+		if(!layOnTop) releaseElement(robotArm,GALLERY);
+		else releaseElement(robotArm,GALLERY_TOP);
+		go(xPos,240);
+		robotArm.updateElement(NO_ELEMENT);
+	}
+
+	void takeStatuette(Bras &robotArm){
+		SetAbsolute();
+		go(390,1580);
+		turn(-15); //TODO: A modifier avec l'angle de robotArm
+		takeElement(robotArm,PEDESTAL);
+		turn(0);
+		go(200,200);
+		turn(360-robotArm.GetAngle()+90);
+		go(200,200);
+		releaseElement(robotArm,MUSEUM);
+	}
+
+	void goHome(){
+		SetAbsolute();
+		go(200,400);
 	}
 
 //----- ACTUATORS STRATEGIES -----
@@ -162,15 +209,15 @@ namespace Strategy{
 			case GROUND :
 				// Arming the arm
 				robotArm.grab();
-				robotArm.setPosition(100,100,80,500);
+				robotArm.setPosition(100,100,80,400);
 				// Go To the element
 				SetRelative();
 				goPolar(robotArm.GetAngle(),20);
 				// Take an element lay on the floor
-				robotArm.setPosition(40,100,80,1000);
-				robotArm.setPosition(80,100,80,500);
+				robotArm.setPosition(40,100,80,800);
+				robotArm.setPosition(80,100,80,400);
 				goPolar(robotArm.GetAngle(),-30);
-				robotArm.setPosition(80,50,80,500);
+				robotArm.setPosition(80,50,80);
 			break;
 			case DISPENSER :
 				// Arming the arm
@@ -201,8 +248,12 @@ namespace Strategy{
 				robotArm.setPosition(100,50,50,1000);
 				// Take the statuette from the pedestal
 				robotArm.setPosition(100,50,100,1000);
-				robotArm.setPosition(80,70,100,1000);
+				// Go To the element
+				SetRelative();
+				goPolar(robotArm.GetAngle(),80);
+				robotArm.setPosition(100,70,100,1000);
 				robotArm.setPosition(100,50,100,1000);
+				goPolar(robotArm.GetAngle(),-100);
 			break;
 		}
 		robotArm .setPosition(0,0,80,500);
@@ -231,17 +282,31 @@ namespace Strategy{
 			break;
 			case GALLERY :
 				// Relase an element on the Gallery
+				robotArm.setPosition(0,30,100,200);
 				robotArm.ungrab();
+
 			break;
-			case PEDESTAL :
+			case GALLERY_TOP :
+				// Relase an element on the Gallery
+				robotArm.setPosition(0,30,100,400);
+				robotArm.setPosition(100,30,100,400);
+				robotArm.setPosition(100,40,80,200);
+				robotArm.ungrab();
+
+			break;
+			case MUSEUM :
 				// Release the statuette on the museum
 				robotArm .setPosition(0,0,80,200);
 				robotArm .setPosition(100,50,50,1000);
+				SetRelative();
+				goPolar(robotArm.GetAngle(),60);
 				robotArm .setPosition(80,70,50,1000);
 				robotArm.ungrab(500);
+				IHM::Sound::playSound(MUSEUM_SOUND);
+				goPolar(robotArm.GetAngle(),-80);
 			break;
 		}
-		robotArm .setPosition(0,0,50,500);
+		robotArm .setPosition(0,0,50,0);
 
 		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
@@ -250,14 +315,13 @@ namespace Strategy{
 
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 
-		robotArm .setPosition(0,100,20,800);
-		robotArm.ungrab(300);
-
-		//IHM::waitCheck(); // ToDo reculer Relativement en fonction de la position de robotArm
-		robotArm .setPosition(0,100,0,500);
-		robotArm .setPosition(100,100,0,1000);
-		//IHM::waitCheck();// ToDo avancer Relativement en fonction de la position de robotArm
-
+		robotArm .setPosition(0,100,0,800);
+		robotArm.ungrab();
+		SetRelative();
+		goPolar(robotArm.GetAngle(),-70); // reculer relativement en fonction de robotArm
+		//robotArm .setPosition(0,100,0,500);
+		robotArm .setPosition(100,100,0,200);
+		goPolar(robotArm.GetAngle(),100); //avancer relativement en fonction de robotArm
 		takeElement(robotArm,GROUND);
 
 		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
@@ -268,7 +332,7 @@ namespace Strategy{
 		robotArm.grab();
 		robotArm.setPosition(100,100,80,1000);
 		// Take an element lay on the floor
-		robotArm.setPosition(35,100,80,1000);
+		robotArm.setPosition(35,100,80,500);
 		// Let it flip !
 		robotArm.setPosition(35,40,0,200);
 		robotArm.ungrab(300);

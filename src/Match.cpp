@@ -42,7 +42,7 @@ namespace Match{
 				return true;
 			}
 			else if (tempsRestant <= 4){
-				//Last action ?
+				Strategy::goHome();
 				return false;
 			}
 			else
