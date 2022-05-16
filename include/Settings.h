@@ -36,7 +36,7 @@ namespace Settings{
         WHEEL_RADIUS = 30;
 
     const uint32_t 
-        ACCEL = 2000, // Old : 2000              
+        ACCEL = 4000, // Old : 2000              
         SPEED = 10000; // Old : 5000
 
 

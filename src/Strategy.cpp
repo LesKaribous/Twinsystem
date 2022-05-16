@@ -71,6 +71,9 @@ namespace Strategy{
 	}
 
 	void matchPrimary(){
+		updateScore(Score::STATUETTE_DEPOSEE);
+		updateScore(Score::VITRINE_DEPOSEE);
+
 		takeGroundTrio();
 		
 		flipElement(BrasAU);
@@ -163,8 +166,9 @@ namespace Strategy{
 			nbrElBlue++;
 		}
 		else if(colorElement == GREEN_ELEMENT) {
-			xPos = 810 ; 
-			if (nbrElGreen>0) layOnTop = true ;
+			xPos = 725 ; 
+			if (nbrElGreen==1) xPos = 875 ;
+			else if (nbrElGreen>=2){ xPos = 810 ; layOnTop = true ;}
 			nbrElGreen++;
 		}
 		else if(colorElement == RED_ELEMENT) {
@@ -180,6 +184,8 @@ namespace Strategy{
 		if(!layOnTop) releaseElement(robotArm,GALLERY);
 		else releaseElement(robotArm,GALLERY_TOP);
 		go(xPos,240);
+		updateScore(Score::ECHANTILLON_GALERIE);
+		updateScore(Score::ECHANTILLON_GALERIE_TRIE);
 		robotArm.updateElement(NO_ELEMENT);
 	}
 
@@ -188,16 +194,20 @@ namespace Strategy{
 		go(390,1580);
 		turn(-15); //TODO: A modifier avec l'angle de robotArm
 		takeElement(robotArm,PEDESTAL);
+		updateScore(Score::STATUETTE_ENLEVEE);
 		turn(0);
 		go(200,200);
 		turn(360-robotArm.GetAngle()+90);
 		go(200,200);
 		releaseElement(robotArm,MUSEUM);
+		updateScore(Score::STATUETTE_VITRINE);
+		updateScore(Score::VITRINE_ACTIVEE);
 	}
 
 	void goHome(){
 		SetAbsolute();
 		go(200,400);
+		updateScore(Score::ROBOTS_CAMPEMENT/2); // Approximation : les deux robots doivent être au campement à la fin
 	}
 
 //----- ACTUATORS STRATEGIES -----

@@ -41,8 +41,10 @@ namespace Match{
 				Match::end();
 				return true;
 			}
-			else if (tempsRestant <= 4){
+			else if (tempsRestant <= 4 && state != State::HOMING){
+				state = State::HOMING;
 				Strategy::goHome();
+				Match::end();
 				return false;
 			}
 			else
