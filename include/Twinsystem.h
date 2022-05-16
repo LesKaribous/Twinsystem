@@ -10,6 +10,7 @@
 #include "Settings.h"
 #include "Pin.h"
 #include "Test.h"
+#include "Intercom.h"
 
 using namespace Debugger;
 
@@ -33,6 +34,7 @@ namespace System{
         Motion::init();
         Debugger::init();
         IHM::init();
+        Intercom::init();
         //--- WAIT LAUNCH---
         Strategy::waitLaunch();
     }

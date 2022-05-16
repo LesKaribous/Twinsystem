@@ -43,6 +43,7 @@ namespace IHM{
     bool getStrategie     ();
     bool getCheck         ();
     bool waitCheck        ();
+    bool getLidar         ();
     bool getEquipe        ();
     bool getArrowUp       ();
     bool getArrowDown     ();

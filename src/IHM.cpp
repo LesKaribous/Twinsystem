@@ -6,6 +6,7 @@
 #include <DFRobotDFPlayerMini.h>
 #include <Adafruit_NeoPixel.h>
 
+#include "Intercom.h"
 #include "Twinsystem.h"
 #include "Test.h"
 
@@ -190,14 +191,14 @@ void menu(){
 }
 
 //----------------GESTION DES BOUTTONS DE L'IHM----------------
-void updateButtonIHM()
-{
+void updateButtonIHM(){
 	readButtonState();
 	getArrowUp();
 	getArrowDown();
 	getTirette();
 	getDetection();
 	getRobot();
+	getLidar();
 	getStrategie();
 	getOption01();
 	getOption02();
@@ -228,6 +229,13 @@ void setRecalage(bool state){
 bool getRecalage(){
 	return _recalage;
 }
+
+bool getLidar(){
+	if(!freezed)
+		_lidar = Intercom::connected;
+	return _lidar;
+}
+
 void freezeSettings(){
 	freezed = true;
 }

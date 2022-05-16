@@ -101,11 +101,13 @@ namespace Strategy{
 			Controller::update();
 			IHM::menu();
 			Debugger::checkSerial();
+			Intercom::checkSerial();
 			if(Debugger::lastCommand() == "start") break;
 		}
     	while(IHM::getTirette()){
 			Controller::update();
 			Debugger::checkSerial();
+			Intercom::checkSerial();
 			IHM::menu();
 		}
 
