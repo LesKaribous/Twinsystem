@@ -36,8 +36,8 @@ namespace Settings{
         WHEEL_RADIUS = 30;
 
     const uint32_t 
-        ACCEL = 4000, // Old : 2000              
-        SPEED = 10000; // Old : 5000
+        ACCEL = 3000, // Old : 2000              
+        SPEED = 5000; // Old : 5000
 
 
     extern bool ROBOT;
