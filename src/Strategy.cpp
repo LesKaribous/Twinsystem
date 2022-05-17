@@ -16,7 +16,7 @@ namespace Strategy{
 	}
 
 	void homologation(){
-		if(Settings::ROBOT == Settings::PRIMARY) homologationPrimary();
+		if(Settings::ROBOT == Settings::PRIMARY) matchSecondary(); //homologationPrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) homologationSecondary();
 	}
 
@@ -90,7 +90,10 @@ namespace Strategy{
 		goHome();
 	}
 	void matchSecondary(){
+		
+		takeAndPushUnder(BrasAU);
 		takeStatuette(BrasAU);
+		layStatuette(BrasAU);
 
 		goHome();
 	}
@@ -197,18 +200,64 @@ namespace Strategy{
 		turn(-15); //TODO: A modifier avec l'angle de robotArm
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
+	}
+
+	void layStatuette(Bras &robotArm){
+		SetAbsolute();
 		turn(0);
 		go(200,200);
+		//Home 
+		SetPosition(Vec3(0,0,0));
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-100);
+		Vec2 borderXmax( 100, 0	 );
+		Vec2 borderYmax(   0, 100);
+		probeBorder(borderXmin);
+		probeBorder(borderYmin);
+		//
 		turn(360-robotArm.GetAngle()+90);
-		go(200,200);
+		go(230,200);
 		releaseElement(robotArm,MUSEUM);
 		updateScore(Score::STATUETTE_VITRINE);
 		updateScore(Score::VITRINE_ACTIVEE);
 	}
 
+	void takeAndPushUnder(Bras &robotArm){
+		int statePush = 0;
+		while(statePush<2)
+		{
+			// Take an element on the Workshed and push it under
+			SetAbsolute();
+			if(statePush == 0) 		go(230,1550);
+			else if(statePush == 1) go(400,1730);
+			
+			turn(-15); //TODO: A modifier avec l'angle de robotArm
+			takeElement(robotArm,WORK_SHED);
+			updateScore(Score::ECHANTILLON_ENLEVE);
+			// Go To center
+			SetAbsolute();
+			go(390,1580);
+			// Go Back to free the space before releasing
+			SetRelative();
+			goPolar(robotArm.GetAngle(),-100);
+			//	Release
+			releaseElement(robotArm,GROUND);
+			//	Push under
+			goPolar(robotArm.GetAngle(),220);
+			// Go Back
+			goPolar(robotArm.GetAngle(),-100);
+			//	Incremente l'état pour passer au suivant
+			statePush ++;
+		}
+		updateScore(Score::ECHANTILLON_ABRI);
+		SetAbsolute();
+	}
+
 	void goHome(){
 		SetAbsolute();
-		go(200,400);
+		if(Settings::ROBOT == Settings::PRIMARY) go(200,400);
+		else if(Settings::ROBOT == Settings::SECONDARY) go(200,850);
+		
 		updateScore(Score::ROBOTS_CAMPEMENT/2); // Approximation : les deux robots doivent être au campement à la fin
 	}
 
@@ -241,12 +290,14 @@ namespace Strategy{
 			case WORK_SHED :
 				// Arming the arm
 				robotArm.grab();
-				robotArm.setPosition(100,100,80,1000);
+				robotArm.setPosition(100,70,100,1000);
+				// Go To the element
+				SetRelative();
+				goPolar(robotArm.GetAngle(),20);
 				// Take an element on the work shed
-				robotArm.setPosition(100,70,100,500);
 				robotArm.setPosition(60,70,100,1000);
 				robotArm.setPosition(100,70,100,500);
-				robotArm.setPosition(100,70,80,500);
+				goPolar(robotArm.GetAngle(),-80);
 			break;
 			case GALLERY :
 				// Arming the arm
@@ -257,12 +308,11 @@ namespace Strategy{
 			case PEDESTAL :
 				// Arming the arm
 				robotArm.grab();
-				robotArm.setPosition(100,50,50,1000);
-				// Take the statuette from the pedestal
 				robotArm.setPosition(100,50,100,1000);
 				// Go To the element
 				SetRelative();
-				goPolar(robotArm.GetAngle(),80);
+				goPolar(robotArm.GetAngle(),100);
+				// Take the statuette from the pedestal
 				robotArm.setPosition(100,70,100,1000);
 				robotArm.setPosition(100,50,100,1000);
 				goPolar(robotArm.GetAngle(),-100);
@@ -309,10 +359,9 @@ namespace Strategy{
 			case MUSEUM :
 				// Release the statuette on the museum
 				robotArm .setPosition(0,0,80,200);
-				robotArm .setPosition(100,50,50,1000);
+				robotArm .setPosition(90,60,50);
 				SetRelative();
-				goPolar(robotArm.GetAngle(),60);
-				robotArm .setPosition(80,70,50,1000);
+				goPolar(robotArm.GetAngle(),20);
 				robotArm.ungrab(500);
 				IHM::Sound::playSound(MUSEUM_SOUND);
 				goPolar(robotArm.GetAngle(),-80);

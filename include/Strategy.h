@@ -26,6 +26,8 @@ namespace Strategy{
     void takeHorizontalDispenser(Actuators::Bras &robotArm);
     void layOnGallery(Actuators::Bras &robotArm,int colorElement);
     void takeStatuette(Actuators::Bras &robotArm);
+    void layStatuette(Actuators::Bras &robotArm);
+    void takeAndPushUnder(Actuators::Bras &robotArm);
     void goHome();
     //----- ACTUATORS STRATEGIES -----
     void takeElement(Actuators::Bras robotArm,int location);
