@@ -643,7 +643,6 @@ bool getArrowDown()
 			_u8g2.setFont(u8g2_font_logisoso32_tr);
 			_u8g2.drawStr(5, 48, "GO!");
 			_u8g2.sendBuffer();
-			delay(1000);
 		}
 
 		void matchScreen(){
