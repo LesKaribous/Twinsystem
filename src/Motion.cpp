@@ -59,19 +59,6 @@ namespace Motion
 		return probedY;
 	}
 
-	void SetTarget(Vec3 target){
-		target.c *= DEG_TO_RAD;
-		if(absolute){
-			target.sub(cPosition);
-			target.rotateZ(cPosition.c);
-		}
-		
-		while(target.c > PI) target.c -= 2.0f*PI;
-		while(target.c < -PI) target.c += 2.0f*PI;
-		cTarget = target;
-		Intercom::focus();
-	}
-
 	void SetPosition(Vec2 newPos){
 		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
 	}
@@ -157,14 +144,29 @@ namespace Motion
 
 	void align(Vec2 coord){
 		boolean tAbsolute = isAbsolute();
-		SetAbsolute(tAbsolute);
+		SetAbsolute();
 		turn(coord.heading()*RAD_TO_DEG+90);
 		SetAbsolute(tAbsolute);
 	}
 
+	Vec3 SetTarget(Vec3 target){
+		target.c *= DEG_TO_RAD;
+
+		if(absolute){
+			target.sub(cPosition); 		 //Convert Absolute target to relative
+			target.rotateZ(cPosition.c);
+		}
+		
+		while(target.c > PI) target.c -= 2.0f*PI;
+		while(target.c < -PI) target.c += 2.0f*PI;
+		cTarget = target;
+		Intercom::focus();
+		return target;
+	}
+
 	//Raw relative move request
 	void move(Vec3 target){
-		SetTarget(target);
+		target = SetTarget(target);
 
 		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
 		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
@@ -173,8 +175,7 @@ namespace Motion
 		Controller::move(target, true);
 		while(running()) computeSync();
 
-		if(absolute) cPosition.add(cTarget);
-		else cPosition.add(cTarget.rotateZ(-cPosition.c));
+		cPosition.add(cTarget.rotateZ(-cPosition.c)); //Need to take actual rotation when adding relative target
 	}
 
 	bool running(){

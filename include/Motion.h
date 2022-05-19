@@ -66,7 +66,7 @@ namespace Motion{
     bool running();
 
     //Setters
-    void SetTarget(Vec3);
+    Vec3 SetTarget(Vec3);
     void SetPosition(Vec2);
     void SetPosition(Vec3);
     void SetAbsolute(bool = true);

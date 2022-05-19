@@ -64,10 +64,64 @@ namespace Debugger{
             lastCmd = command;
             log("Zeroing robot...");
             Strategy::recalage();
+        }else if(command == "sleep"){
+            lastCmd = command;
+            log("Disable motors...");
+            Controller::sleep();
         }else if(command == "count"){
             lastCmd = command;
             log("Asking for point count..");
             Intercom::askOpponent();
+        }else if(command.startsWith("SetAbsolute")){
+            Motion::SetAbsolute();
+            log("Switched to absolute mode.");
+        }else if(command.startsWith("SetRelative")){
+            Motion::SetRelative();
+            log("Switched to relative mode.");
+        }else if(command.startsWith("goTurn(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String xStr = argString.substring(0, argString.indexOf(','));
+            String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(',')-1);
+            String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
+
+            float x = float(xStr.toInt());
+            float y = float(yStr.toInt());
+            float a = float(rotStr.toInt());
+
+            Motion::goTurn(x, y, a);
+
+        }else if(command.startsWith("SetPosition(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String xStr = argString.substring(0, argString.indexOf(','));
+            String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(','));
+            String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
+
+            float x = float(xStr.toInt());
+            float y = float(yStr.toInt());
+            float a = float(rotStr.toInt());
+            Vec3 pos(x,y,a);
+            Motion::SetPosition(pos);
+
+        }else if(command.startsWith("go(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String xStr = argString.substring(0, argString.indexOf(','));
+            String yStr  = argString.substring(argString.indexOf(',')+1, argString.length());
+
+            float x = float(xStr.toInt());
+            float y = float(yStr.toInt());
+
+            Motion::go(x, y);
+
+        }else if(command.startsWith("turn(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            float a = float(argString.toInt());
+
+            Motion::turn(a);
+
         }else if(command == "help" || command == "?"){
             log("-------- Commands list ---------");
             log("help : Arm the robot before start");

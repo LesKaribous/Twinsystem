@@ -2,12 +2,16 @@
 #include "Debugger.h"
 #include "IHM.h"
 #include "Motion.h"
+#include "Settings.h"
 
 namespace Intercom{
 
     bool connected = false;
     unsigned long timeout = 0;
     unsigned long ping = 0;
+    unsigned long countTimer = 0;
+
+    int count = 0;
 
     void init(){
         Serial4.begin(9600);
@@ -28,6 +32,12 @@ namespace Intercom{
             connected = false;
             Debugger::log("Lidar connection timed out");
         }
+
+        if(millis() - countTimer > 500){
+            askOpponent();
+            countTimer = millis();
+        }
+
     }
     
     void parseRequest(String command){
@@ -40,10 +50,7 @@ namespace Intercom{
             timeout = millis();
         }else if(command.startsWith("count")){
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
-            int count = float(argString.toInt());
-
-            Debugger::log(count);
-            
+            count = float(argString.toInt());         
             //Lidar::setFOV(angle, width);
         }
     }
@@ -61,14 +68,12 @@ namespace Intercom{
     void askOpponent(){
         Serial4.print("getPointCount(");
         Serial4.println(")");
-        
-        setFOV(90, 10, 1000);
     }
 
     void focus(){
         Vec3 t3 = Motion::GetTarget();
         Vec2 t2(t3.a, t3.b);
-        setFOV(t2.heading(), t2.mag());
+        setFOV(t2.heading(), Settings::LIDAR_RANGE,  t2.mag());
     }
 
     bool collision(){

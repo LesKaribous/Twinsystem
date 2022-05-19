@@ -33,7 +33,8 @@ namespace Settings{
     const float 
         FEEDRATE = 100, //%
         RADIUS = 90,
-        WHEEL_RADIUS = 30;
+        WHEEL_RADIUS = 30,
+        LIDAR_RANGE = 20; //°
 
     const uint32_t 
         ACCEL = 3000, // Old : 2000              

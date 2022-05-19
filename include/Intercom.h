@@ -10,13 +10,12 @@ namespace Intercom{
     void focus();
     void checkSerial();
     void parseRequest(String);
-<<<<<<< HEAD
     void setFOV(float angle, float width);
 
     bool collision();
-=======
     void askOpponent();
     void setFOV(float angle, float width, float maxDist);
->>>>>>> 35dc2e9b5c0d19d7c907990ca15c2470d1eb72e7
+
+    extern int count;
     
 } // namespace Intercom
