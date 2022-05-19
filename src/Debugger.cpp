@@ -64,6 +64,10 @@ namespace Debugger{
             lastCmd = command;
             log("Zeroing robot...");
             Strategy::recalage();
+        }else if(command == "count"){
+            lastCmd = command;
+            log("Asking for point count..");
+            Intercom::askOpponent();
         }else if(command == "help" || command == "?"){
             log("-------- Commands list ---------");
             log("help : Arm the robot before start");

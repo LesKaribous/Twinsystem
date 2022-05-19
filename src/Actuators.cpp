@@ -307,7 +307,7 @@ namespace Actuators{
 	{
 		enablePump(false);
 		openEv();
-		Match::wait(500);
+		Match::wait(300);
 		openEv(false);
 
 		Match::wait(wait);

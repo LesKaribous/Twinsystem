@@ -76,7 +76,7 @@ namespace Motion
 		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
 	}
 	void SetPosition(Vec3 newPos){
-		cPosition = newPos.mult(Vec3(1.0,1.0,RAD_TO_DEG).toMatrix());
+		cPosition = newPos.mult(Vec3(1.0,1.0,DEG_TO_RAD).toMatrix());
 	}
 
     void SetAbsolute(bool state){
