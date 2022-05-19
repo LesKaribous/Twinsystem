@@ -33,8 +33,10 @@ namespace Strategy{
     void takeAndPushUnder(Actuators::Bras &robotArm);
     void takeDispenser(Actuators::Bras &robotArm, int dispenser);
     void takeFirstDispenser();
+    void releaseCube(Actuators::Bras &robotArm);
     void goHome();
     //----- ACTUATORS STRATEGIES -----
+    
     void takeElement(Actuators::Bras robotArm,int location);
     void releaseElement(Actuators::Bras robotArm,int location);
     void flipElement(Actuators::Bras robotArm);

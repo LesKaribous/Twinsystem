@@ -60,7 +60,7 @@ namespace Actuators{
 								Pin::Pump::pinEv02);
 			//Set Limit
 			BrasAU			.setLimit(	150,67,			// Elevator
-										160,30,			// Arm
+										160,25,			// Arm
 										0,180); 		// Tool
 			BrasInit		.setLimit(	180,105,		// Elevator
 										135,15,			// Arm
