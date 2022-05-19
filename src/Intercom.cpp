@@ -1,6 +1,7 @@
 #include "Intercom.h"
 #include "Debugger.h"
 #include "IHM.h"
+#include "Motion.h"
 
 namespace Intercom{
 
@@ -40,5 +41,13 @@ namespace Intercom{
         Serial4.println(")");
     }
 
+    void focus(){
+        Vec3 t3 = Motion::GetTarget();
+        Vec2 t2(t3.a, t3.b);
+        setFOV(t2.heading(), t2.mag());
+    }
 
+    bool collision(){
+        return (count > 80);
+    }
 } // namespace Intercom

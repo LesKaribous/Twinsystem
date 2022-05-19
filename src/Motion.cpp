@@ -5,6 +5,7 @@
 #include "Debugger.h"
 #include "Geometry.h"
 #include "Settings.h"
+#include "Intercom.h"
 
 namespace Motion
 {
@@ -25,6 +26,11 @@ namespace Motion
 		
 		absolute = Settings::ABSOLUTE;
 		Controller::setFeedrate(100);
+	}
+
+	void computeSync(){
+		Match::update();
+		Intercom::checkSerial();
 	}
 
 	Vec3 GetPosition(){
@@ -53,7 +59,18 @@ namespace Motion
 		return probedY;
 	}
 
-
+	void SetTarget(Vec3 target){
+		target.c *= DEG_TO_RAD;
+		if(absolute){
+			target.sub(cPosition);
+			target.rotateZ(cPosition.c);
+		}
+		
+		while(target.c > PI) target.c -= 2.0f*PI;
+		while(target.c < -PI) target.c += 2.0f*PI;
+		cTarget = target;
+		Intercom::focus();
+	}
 
 	void SetPosition(Vec2 newPos){
 		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
@@ -73,7 +90,7 @@ namespace Motion
 
     void turn(float angle){
 		Controller::setFeedrate(30);
-		if (absolute) moveAbs({cPosition.a, cPosition.b, angle});
+		if (absolute) move({cPosition.a, cPosition.b, angle});
 		else move({0, 0, angle});
 		Controller::setFeedrate(100);
 	}
@@ -89,7 +106,7 @@ namespace Motion
 	}
 
 	void go(Vec2 target){
-		if (absolute) moveAbs({target.a, target.b, cPosition.c*RAD_TO_DEG});
+		if (absolute) move({target.a, target.b, cPosition.c*RAD_TO_DEG});
 		else move({target.a, target.b, 0});
 	}
 
@@ -147,56 +164,22 @@ namespace Motion
 
 	//Raw relative move request
 	void move(Vec3 target){
-		Debugger::log("Relative target :");
-		Debugger::log(target);
-		target.c *= DEG_TO_RAD;
-		cTarget = target;
-		
-		while(target.c > PI) target.c -= 2.0f*PI;
-		while(target.c < -PI) target.c += 2.0f*PI;
+		SetTarget(target);
 
 		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
 		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
 
 		Controller::move(target, true);
-		while(running()) Match::update();
-		cPosition.add(cTarget.rotateZ(-cPosition.c));
+		while(running()) computeSync();
+
+		if(absolute) cPosition.add(cTarget);
+		else cPosition.add(cTarget.rotateZ(-cPosition.c));
 	}
-
-	void moveAbs(Vec3 target){
-
-		target.c *= DEG_TO_RAD;
-		target.sub(cPosition);
-		cTarget = target;
-		
-		target.rotateZ(cPosition.c);
-		while(target.c > PI) target.c -= 2.0f*PI;
-		while(target.c < -PI) target.c += 2.0f*PI;
-
-		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
-		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
-		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
-
-		Controller::move(target, true);
-		while(running()) Match::update();
-
-		cPosition.add(cTarget);
-	}
-
 
 	bool running(){
 		return Controller::isRunning();
 	}
-
-	/*
-	void SetControlPoint(Vec2 point){
-		//What is going on when robot is moving ??
-		controlPoint = point;
-		cPosition.a += point.a;
-		cPosition.b += point.b;
-	}
-	*/
 
 	Vec3 ik(Vec3 target){
 		float c60 = cosf(PI/3.0f),

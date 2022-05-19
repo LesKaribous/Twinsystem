@@ -10,6 +10,10 @@ namespace Motion{
      */
     void init();
 
+    /**
+     * @brief Execute this routine while moving.
+     */
+    void computeSync();
     //Moves
     //void trajectory(Trajectory traj);
 
@@ -58,11 +62,11 @@ namespace Motion{
 
     //Raw Move
     void move(Vec3 target);
-    void moveAbs(Vec3 target);
 
     bool running();
 
     //Setters
+    void SetTarget(Vec3);
     void SetPosition(Vec2);
     void SetPosition(Vec3);
     void SetAbsolute(bool = true);
