@@ -30,7 +30,7 @@ namespace Intercom{
 
         }else if(connected && millis() - timeout > 5000){
             connected = false;
-            Debugger::log("Lidar connection timed out");
+            Debugger::println("Lidar connection timed out");
         }
 
         if(millis() - countTimer > 500){

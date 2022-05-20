@@ -106,7 +106,7 @@ namespace Actuators{
 
 	int getProbingValue(){
 		int value = analogRead(Pin::probeResistor);
-		//Debugger::log(value);
+		//Debugger::println(value);
 		if(value <= RESISTOR_PURPLE + 60) return SQUARE_PURPLE ;
 		else if(value <= RESISTOR_YELLOW + 60) return SQUARE_YELLOW ;
 		else if(value <= RESISTOR_BAD + 60) return SQUARE_BAD;

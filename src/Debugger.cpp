@@ -5,6 +5,9 @@ namespace Debugger{
 
     String lastCmd = "";
 
+    char buffer[1024];
+    EasyStringStream log(buffer, 1024);
+
     void init(){
         Serial.begin(115200);
     
@@ -13,7 +16,7 @@ namespace Debugger{
             //21-04-2022 - @Nadar - Diminution de 5000ms à 500ms
         }
 
-        printHeader();
+        header();
         Serial.print("Preparing system...");
         
         delay(200);
@@ -24,7 +27,7 @@ namespace Debugger{
         else Serial.println("SECONDARY");
     }
 
-    void printHeader(){
+    void header(){
         Serial.println("  _______       _                     _"                        );
         Serial.println(" |__   __|     (_)                   | |"                       );
         Serial.println("    | |_      ___ _ __  ___ _   _ ___| |_ ___ _ __ ___  "       );
@@ -44,6 +47,7 @@ namespace Debugger{
     }
 
     void checkSerial(){
+        printBuffer();
         if(Serial.available()){
             String command = Serial.readStringUntil('\n');
             Serial.println("Received :" + command);
@@ -54,30 +58,30 @@ namespace Debugger{
     void parseCommand(String command){
         if(command == "start"){
             lastCmd = "start";
-            log("Starting program...");
+            println("Starting program...");
         }else if(command == "restart"){
             //lastCmd = command;
-            log("Not supported yet.");
+            println("Not supported yet.");
         }else if(command == "reboot"){
             System::reboot();
         }else if(command == "probe"){
             lastCmd = command;
-            log("Zeroing robot...");
+            println("Zeroing robot...");
             Strategy::recalage();
         }else if(command == "sleep"){
             lastCmd = command;
-            log("Disable motors...");
+            println("Disable motors...");
             Controller::sleep();
         }else if(command == "count"){
             lastCmd = command;
-            log("Asking for point count..");
+            println("Asking for point count..");
             Intercom::askOpponent();
         }else if(command.startsWith("SetAbsolute")){
             Motion::SetAbsolute();
-            log("Switched to absolute mode.");
+            println("Switched to absolute mode.");
         }else if(command.startsWith("SetRelative")){
             Motion::SetRelative();
-            log("Switched to relative mode.");
+            println("Switched to relative mode.");
         }else if(command.startsWith("goTurn(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
@@ -123,13 +127,13 @@ namespace Debugger{
             Motion::turn(a);
 
         }else if(command == "help" || command == "?"){
-            log("-------- Commands list ---------");
-            log("help : Arm the robot before start");
-            log("arm : Arm the robot before start");
-            log("start : Arm the robot before start");
+            log << "-------- Commands list ---------";
+            log << "help : Arm the robot before start";
+            log << "arm : Arm the robot before start";
+            log << "start : Arm the robot before start";
         }else{
-            log("Unknown command : " + command);
-            log("Please run <help> to see available commands");
+            log << "Unknown command : " << command;
+            log << "Please run <help> to see available commands";
         }
     }
 
@@ -140,22 +144,53 @@ namespace Debugger{
     }
 
 
-    void log(String message){
+    void println(String message){
+        print(message);
+        Serial.println();
+    }
+
+    void println(float message){
+        print(message);
+        Serial.println();
+    }
+
+    void println(int message){
+        print(message);
+        Serial.println();
+    }
+
+    void println(Vec3 message){
+        print(message);
+        Serial.println();
+    }
+    
+
+    void print(String message){
         Serial.println(message);
     }
 
-    void log(float data){
+    void print(float data){
         Serial.println(data);
     }
 
-    void log(Vec3 v){
+    void print(int data){
+        Serial.println(data);
+    }
+
+    void print(Vec3 v){
         Serial.print("Vec3: {x:");
         Serial.print(v.a);
         Serial.print(", y:");
         Serial.print(v.b);
         Serial.print(", w:");
         Serial.print(v.c);
-        Serial.println("}");
+        Serial.print("}");
+    }
+
+    void printBuffer(){
+        if(log.getCursor() != 0)
+            Serial.println(buffer);
+        log.reset();
     }
 
 } // namespace Debugger

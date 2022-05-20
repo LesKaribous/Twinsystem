@@ -136,7 +136,7 @@ void init()
 	// Init and configuration of the MP3 module DFPlayer Mini
 	DFPlayerSerial.begin(9600);
 	mp3.begin(DFPlayerSerial);
-	Debugger::log("DFPlayer launched");
+	Debugger::println("DFPlayer launched");
 
 	mp3.setTimeOut(500);
 	mp3.volume(29);

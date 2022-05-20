@@ -173,7 +173,7 @@ namespace Strategy{
 	void layOnGallery(Bras &robotArm, int colorElement){
 		float xPos = 0 ;
 		bool layOnTop = false;
-		Debugger::log(colorElement);
+		Debugger::println(colorElement);
 		if(colorElement == BLUE_ELEMENT) {
 			xPos = 570 ; 
 			if (nbrElBlue>0) layOnTop = true ;
@@ -445,7 +445,7 @@ namespace Strategy{
 		BrasTirette.setTool(100);
 		BrasTirette.setTool2(100,500);
 		int square = Actuators::getProbingValue();
-		Debugger::log(square);
+		Debugger::println(square);
 		BrasTirette.setTool(0);
 		BrasTirette.setTool2(0,500);
 		if(square == IHM::getEquipe()) {
