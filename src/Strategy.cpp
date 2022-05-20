@@ -97,13 +97,14 @@ namespace Strategy{
 		goHome();
 	}
 	void matchSecondary(){
-		
 		takeAndPushUnder(BrasAU);
 		takeStatuette(BrasAU);
 		releaseCube(BrasTirette);
-		//Basculer les carrés
 		layStatuette(BrasAU);
-		//takeFirstDispenser();
+		go(400,1000);
+
+		for(int square = 0; square <=2; square++) flipSquares(square) ;
+		updateScore(Score::CARRE_NON_BASCULE);
 
 		goHome();
 	}
@@ -209,7 +210,8 @@ namespace Strategy{
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		turn(360-robotArm.GetAngle()-135);
+		alignTurn(robotArm.GetAngle(), -135); // TODO: Vérifier fonctionnement 
+		//turn(360-robotArm.GetAngle()-135);
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
 	}
@@ -227,7 +229,8 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		//
-		turn(360-robotArm.GetAngle()+90);
+		alignTurn(robotArm.GetAngle(), 90); // TODO: Vérifier fonctionnement 
+		//turn(360-robotArm.GetAngle()+90);
 		go(230,200);
 		releaseElement(robotArm,MUSEUM);
 		updateScore(Score::STATUETTE_VITRINE);
@@ -297,7 +300,8 @@ namespace Strategy{
 	void releaseCube(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		turn(360-robotArm.GetAngle()-135);
+		alignTurn(robotArm.GetAngle(), -135); // TODO: Vérifier fonctionnement 
+		//turn(360-robotArm.GetAngle()-135);
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
 		robotArm.setElevator(100,500);
@@ -307,10 +311,33 @@ namespace Strategy{
 		SetAbsolute();
 	}
 
+	void flipSquares(int squareNumber){
+		SetAbsolute();
+		alignTurn(BrasTirette.GetAngle(), -90); // TODO: Vérifier fonctionnement 
+		// turn(360-BrasTirette.GetAngle()-90);
+		go(667+(squareNumber*185) , 1800);
+		if (squareNumber != 1) probeElement();
+		else {
+			SetRelative();
+			goPolar(BrasTirette.GetAngle(),180);
+
+			SetAbsolute();
+			SetPosition(Vec3(GetPosition().a,1887,GetPosition().c)); //Recalage
+			SetRelative();
+
+			BrasTirette.setElevator(100,500);
+			BrasTirette.setElevator(0);
+			goPolar(BrasTirette.GetAngle(),-100);
+			SetAbsolute();
+		}
+		updateScore(Score::CARRE_BASCULE);
+		SetAbsolute();
+	}
+
 	void goHome(){
 		SetAbsolute();
 		if(Settings::ROBOT == Settings::PRIMARY) go(200,400);
-		else if(Settings::ROBOT == Settings::SECONDARY) go(200,850);
+		else if(Settings::ROBOT == Settings::SECONDARY) go(200,950);
 		
 		updateScore(Score::ROBOTS_CAMPEMENT/2); // Approximation : les deux robots doivent être au campement à la fin
 	}
@@ -464,6 +491,15 @@ namespace Strategy{
 	}
 
 	void probeElement(){
+		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
+		// Avancer / recalage
+		SetRelative();
+		goPolar(BrasTirette.GetAngle(),180);
+
+		SetAbsolute();
+		SetPosition(Vec3(GetPosition().a,1887,GetPosition().c)); //Recalage
+		SetRelative();
+
 		BrasTirette.setTool(100);
 		BrasTirette.setTool2(100,500);
 		int square = Actuators::getProbingValue();
@@ -475,5 +511,21 @@ namespace Strategy{
 			updateScore(5);
 			BrasTirette.setElevator(0,500);
 		}
+		goPolar(BrasTirette.GetAngle(),-100);
+
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
+
+//----- ALIGNMENT STRATEGIES -----
+// TODO: add and modify to motion ? @Jules ?
+
+	void alignTurn(float angleFrom, float angleTo){
+		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
+
+			SetAbsolute();
+			turn(360-angleFrom-angleTo);
+
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
+	}
+
 }

@@ -34,6 +34,7 @@ namespace Strategy{
     void takeDispenser(Actuators::Bras &robotArm, int dispenser);
     void takeFirstDispenser();
     void releaseCube(Actuators::Bras &robotArm);
+    void flipSquares(int squareNumber);
     void goHome();
     //----- ACTUATORS STRATEGIES -----
     
@@ -42,4 +43,8 @@ namespace Strategy{
     void flipElement(Actuators::Bras robotArm);
     void flipChallenge(Actuators::Bras robotArm);
     void probeElement();
+
+    //----- ALIGNMENT STRATEGIES -----
+
+	void alignTurn(float angleFrom, float angleTo);
 }
