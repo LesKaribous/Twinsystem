@@ -160,7 +160,7 @@ namespace Motion
 		while(target.c > PI) target.c -= 2.0f*PI;
 		while(target.c < -PI) target.c += 2.0f*PI;
 		cTarget = target;
-		Intercom::focus();
+		//Intercom::focus();
 		return target;
 	}
 

@@ -15,11 +15,11 @@
 
 namespace System{
     inline void reboot(){
-        Debugger::log << "Rebooting robot in 3s...";
+        Debugger::log("Rebooting robot in 3s...");
         delay(1000);
-        Debugger::log << "Rebooting robot in 2s...";
+        Debugger::log( "Rebooting robot in 2s...");
         delay(1000);
-        Debugger::log << "Rebooting robot in 1s...";
+        Debugger::log( "Rebooting robot in 1s...");
         delay(1000);
         _reboot_Teensyduino_();
     }

@@ -7,14 +7,14 @@ namespace Intercom{
     extern bool connected;
 
     void init();
-    void focus();
+    //void focus();
+    void reboot();
     void checkSerial();
     void parseRequest(String);
-    void setFOV(float angle, float width);
 
     bool collision();
-    void askOpponent();
-    void setFOV(float angle, float width, float maxDist);
+    void lookAt(float angle, float dist);
+    void setFOV(float angle, float dist);
 
     extern int count;
     
