@@ -523,7 +523,7 @@ namespace Strategy{
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 
 			SetAbsolute();
-			turn(360-angleFrom-angleTo);
+			turn(360-angleFrom+angleTo);
 
 		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
 	}
