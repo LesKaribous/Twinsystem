@@ -319,7 +319,7 @@ namespace Strategy{
 		if (squareNumber != 1) probeElement();
 		else {
 			SetRelative();
-			goPolar(BrasTirette.GetAngle(),180);
+			goPolar(BrasTirette.GetAngle(),150);
 
 			SetAbsolute();
 			SetPosition(Vec3(GetPosition().a,1887,GetPosition().c)); //Recalage
@@ -494,7 +494,7 @@ namespace Strategy{
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 		// Avancer / recalage
 		SetRelative();
-		goPolar(BrasTirette.GetAngle(),180);
+		goPolar(BrasTirette.GetAngle(),150);
 
 		SetAbsolute();
 		SetPosition(Vec3(GetPosition().a,1887,GetPosition().c)); //Recalage
