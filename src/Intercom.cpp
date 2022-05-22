@@ -17,27 +17,30 @@ namespace Intercom{
         Serial4.begin(9600);
     }
 
+    void reboot(){
+        Serial2.clear();
+        Serial2.begin(9600);
+        Serial4.println("reboot()");
+        connected = false;
+    }
+
     void checkSerial(){
         if(Serial4.available() > 0){
             String command = Serial4.readStringUntil('\n');
             parseRequest(command);
         }
         
-        if(millis() - ping > 1000){
+        if(millis() - ping > 2000){
 
             Serial4.println("ping");
+            Debugger::log("ping at ", int(ping), "ms");
             ping = millis();
 
-        }else if(connected && millis() - timeout > 5000){
-            connected = false;
-            Debugger::println("Lidar connection timed out");
+            if(connected && millis() - timeout > 5000){
+                connected = false;
+                Debugger::println("Lidar connection timed out");
+            }
         }
-
-        if(millis() - countTimer > 500){
-            askOpponent();
-            countTimer = millis();
-        }
-
     }
     
     void parseRequest(String command){
@@ -48,35 +51,37 @@ namespace Intercom{
         }else if(command.startsWith("pong")){
             connected = true;
             timeout = millis();
-        }else if(command.startsWith("count")){
+        }else if(command.startsWith("detection")){
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
             count = float(argString.toInt());         
-            //Lidar::setFOV(angle, width);
+            Debugger::log( "Detected ", count, "points at targeted position");
         }
     }
 
-    void setFOV(float angle, float bandWidth, float maxDist){
+    void setFOV(float angle, float dist){
         Serial4.print("setFov(");
         Serial4.print(int(angle*100));
         Serial4.print(',');
-        Serial4.print(int(bandWidth*100));
+        Serial4.print(int(dist*100));
+        Serial4.println(")");
+    }
+
+    void lookAt(float angle, float dist){
+        Serial4.print("lookAt(");
+        Serial4.print(int(angle*100));
         Serial4.print(',');
-        Serial4.print(int(maxDist*100));
+        Serial4.print(int(dist*100));
         Serial4.println(")");
     }
-
-    void askOpponent(){
-        Serial4.print("getPointCount(");
-        Serial4.println(")");
-    }
-
+    
+    /*
     void focus(){
         Vec3 t3 = Motion::GetTarget();
         Vec2 t2(t3.a, t3.b);
         setFOV(t2.heading(), Settings::LIDAR_RANGE,  t2.mag());
-    }
+    }*/
 
     bool collision(){
         return (count > 80);
     }
-} // namespace Intercom
+}
