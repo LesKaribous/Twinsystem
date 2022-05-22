@@ -145,7 +145,7 @@ namespace Motion
 	void align(Vec2 coord){
 		boolean tAbsolute = isAbsolute();
 		SetAbsolute();
-		turn(coord.heading()*RAD_TO_DEG+90);
+		turn(coord.heading()*RAD_TO_DEG+180);
 		SetAbsolute(tAbsolute);
 	}
 
@@ -160,7 +160,9 @@ namespace Motion
 		while(target.c > PI) target.c -= 2.0f*PI;
 		while(target.c < -PI) target.c += 2.0f*PI;
 		cTarget = target;
-		//Intercom::focus();
+		
+		Intercom::focus();
+
 		return target;
 	}
 
