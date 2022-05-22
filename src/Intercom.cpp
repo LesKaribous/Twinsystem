@@ -74,12 +74,22 @@ namespace Intercom{
         Serial4.println(")");
     }
     
-    /*
+    
     void focus(){
         Vec3 t3 = Motion::GetTarget();
         Vec2 t2(t3.a, t3.b);
-        setFOV(t2.heading(), Settings::LIDAR_RANGE,  t2.mag());
-    }*/
+        //Vec2 t2(1, 1);
+
+        Debugger::log("Heading : ", t2.heading(), WARN);
+
+        float angleRange = (Settings::RADIUS*2)/(t2.mag() + Settings::RADIUS);
+        float distRange = Settings::RADIUS*2.5 ;
+
+        setFOV(30*RAD_TO_DEG, 200);
+
+
+        lookAt(t2.heading()*RAD_TO_DEG, t2.mag() + Settings::RADIUS);
+    }
 
     bool collision(){
         return (count > 80);
