@@ -60,7 +60,7 @@ float Vec2::mag(){
 }
 
 float Vec2::heading(){
-    return atan2f(a,b);
+    return -atan2(b,a);
 }
 
 float Vec2::magSq(){
@@ -84,7 +84,7 @@ Vec2& Vec2::setMagnitude(float newMag){
 
 Vec2& Vec2::setHeading(float head){
     Vec2 xAxis(1,0);
-    rotate(angleBetween( xAxis, *this));
+    rotate(Vec2::angleBetween( xAxis, *this));
     return *this;
 }
 
@@ -140,13 +140,18 @@ float Vec2::dot(Vec2& a, Vec2& b){
     return a.a * b.a + a.b * b.b;
 }
 
+float Vec2::det(Vec2& a, Vec2& b){
+    return a.a * b.a - a.b * b.b;
+}
+
 Vec2 Vec2::dist(Vec2& a, Vec2& b){
     a.sub(b);
     return a;
 }
 
 float Vec2::angleBetween(Vec2& a, Vec2& b){
-    return acosf( a.dot(b) / a.mag() * b.mag() );
+    return atan2(det(a,b), dot(a,b));
+    //return acosf( Vec2::dot(a,b) / a.mag() * b.mag() );
 }
 
 

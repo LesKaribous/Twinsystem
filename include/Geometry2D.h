@@ -28,7 +28,6 @@ struct Vec2 {
     Vec2& mult(Matrix2x2);
     Vec2& rotate(float);
 
-    float dot(Vec2& a);
     float mag();
     float magSq();
     float heading();
@@ -40,6 +39,7 @@ struct Vec2 {
     static Vec2 dist(Vec2&, Vec2&);
     static float angleBetween(Vec2&, Vec2&);
     static float dot(Vec2&, Vec2&);
+    static float det(Vec2&, Vec2&);
 
     void operator= (const Vec3&);
 
