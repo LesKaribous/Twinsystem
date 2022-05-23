@@ -3,19 +3,34 @@
 #include "Geometry.h"
 
 namespace Motion{
-    extern Vec3 position;
+
+    enum class State{
+        IDLE,
+        RUNNING,
+        PAUSED,
+        CANCELLED,
+        ARRIVED,
+    };
+
     extern bool probedX, probedY;
     /**
      * @brief Init kinematics
      */
     void init();
+    void pause();
+    void resume();
+    
+    void debugState();
 
     /**
      * @brief Execute this routine while moving.
      */
     void computeSync();
-    //Moves
-    //void trajectory(Trajectory traj);
+
+    /**
+     * @brief updatePosition by calculating foward kinematics. (In realtime folk's B-D )
+     */
+    void updatePosition();
 
     /**
      * @brief Turn robot arround its center by desired angle
@@ -54,26 +69,23 @@ namespace Motion{
     void probeBorder(Vec2);
 
     /**
-     * @brief Set the robot position using position of the bumped border
-     * @param border position vector of the border relative to the robot current position
-     * @param orientation of the robot when probing (side selection, default back)
-     * @warning disabled
-     * /
-    //void probeBorder(Vec2, float);
-
-
-    /**
-     * 
      * @brief Align (turn) the robot toward the desired vector
      * @param target the target vector to align with
      * @param orientation offset angle to align specific face of the robot
      */
     void align(Vec2 target, float orientation);
 
-    //Raw Move
+    /**
+     * @brief Move the robot to the desired target (last params of the Vec3 is used for arc curvature)
+     * @param target the target vector to align with
+     */
     void move(Vec3 target);
 
+    /**
+     * @brief Return true if a move is running
+     */
     bool running();
+
 
     //Setters
     Vec3 SetTarget(Vec3);
@@ -82,8 +94,6 @@ namespace Motion{
     void SetAbsolute(bool = true);
     void SetRelative(bool = true);
 
-    void updatePosition();
-    //void SetControlPoint(Vec2 point);
 
     //Getters
     Vec3 GetPosition();
@@ -97,7 +107,4 @@ namespace Motion{
     //Return true while probing
     bool isProbing();
 
-    //Inverse Kinematics
-    Vec3 ik(Vec3);
-    Vec3 fk(Vec3);
 }

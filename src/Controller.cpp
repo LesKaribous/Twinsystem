@@ -10,9 +10,12 @@ namespace Controller{
             sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
             sC(Pin::Stepper::stepC, Pin::Stepper::dirC);
 
+    volatile int32_t sA_target,
+                     sB_target,
+                     sC_target;
+
     bool engaged = false,
-         sleeping = false,
-         paused = false;
+         sleeping = false;
 
     Vec3 calibration;
 
@@ -93,9 +96,13 @@ namespace Controller{
         target.mult(calibration.toMatrix());
 
         resetPosition(); //Zero all axis
-        sA.setTargetRel(int32_t(target.a));
-        sB.setTargetRel(int32_t(target.b));
-        sC.setTargetRel(int32_t(target.c));
+        sA.setTargetAbs(int32_t(target.a));
+        sB.setTargetAbs(int32_t(target.b));
+        sC.setTargetAbs(int32_t(target.c));
+
+        sA_target = int32_t(target.a);
+        sB_target = int32_t(target.b);
+        sC_target = int32_t(target.c);
 
         if(sleeping){
             sleep(false);
@@ -145,18 +152,22 @@ namespace Controller{
     void stop(bool async){
         if(async)controller.stopAsync();
         else controller.stop();
-        paused = true;
     }
 
     void resume(){
-        Debugger::log("Resuming...", INFO);
+        Debugger::log("Controler : Resuming...", INFO);
+        sA.setTargetAbs(int32_t(sA_target));
+        sB.setTargetAbs(int32_t(sB_target));
+        sC.setTargetAbs(int32_t(sC_target));
+
         if(wasLastAsync)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);
-        paused = false;
     }
 
     bool arrived(){
-        return !controller.isRunning() && !paused;
+        return sA.getPosition() == sA_target
+            && sB.getPosition() == sB_target
+            && sC.getPosition() == sC_target;
     }
 
     void emergencyStop(){

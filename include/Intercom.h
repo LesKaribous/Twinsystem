@@ -12,6 +12,7 @@ namespace Intercom{
     void checkSerial();
     void parseRequest(String);
 
+    void askCount();
     bool collision();
     void lookAt(float angle, float dist);
     void setFOV(float angle);

@@ -52,7 +52,7 @@ namespace Intercom{
         }else if(command.startsWith("pong")){
             connected = true;
             timeout = millis();
-        }else if(command.startsWith("count")){
+        }else if(command.startsWith("count(")){
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
             count = float(argString.toInt());         
             Debugger::log( "Detected ", count, "points at targeted position");
@@ -73,12 +73,19 @@ namespace Intercom{
         Serial4.println(")");
     }
 
+
+    unsigned long int lastAsk = 0;
     void askCount(){
-        Serial4.print("getPointCount()");
+        if(millis() - lastAsk > 500){
+            Serial4.print("getPointCount()");
+            lastAsk = millis();
+        }
     }
     
     
     void focus(){
+
+        
         Vec3 t = Motion::GetAbsTarget();
         Vec3 p = Motion::GetPosition();
         t.sub(p);
@@ -87,11 +94,11 @@ namespace Intercom{
 
         Debugger::log("Heading : ", t2d.heading(), VERBOSE);
 
-        float angleRange = (Settings::RADIUS*2)/(t2d.mag() + Settings::RADIUS);
-        float distRange = Settings::RADIUS*3 ;
+        float angleRange = 45;
+        float distRange = Settings::RADIUS*4 ;
 
-        setFOV(angleRange*RAD_TO_DEG);
-        lookAt(t2d.heading()*RAD_TO_DEG, t2d.mag() + Settings::RADIUS);
+        setFOV(angleRange);
+        lookAt(t2d.heading()*RAD_TO_DEG, distRange);
     }
 
 
@@ -99,8 +106,9 @@ namespace Intercom{
         threshold = t;
     }
 
+
+    
     bool collision(){
-        askCount();
         return (count >= threshold);
     }
 }

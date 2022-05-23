@@ -87,10 +87,9 @@ namespace Debugger{
             println("Disabled motors.");
             Controller::sleep();
         }else if(command.startsWith("PAUSE")){
-            lastCmd = command;
-            Controller::stop();
+            Motion::pause();
         }else if(command.startsWith("RESUME")){
-            Controller::resume();
+            Motion::resume();
         }else if(command.startsWith("SetAbsolute")){
             Motion::SetAbsolute();
             println("Switched to absolute mode.");

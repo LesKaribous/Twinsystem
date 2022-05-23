@@ -8,6 +8,10 @@ struct Point{
     float x, y, heading;
 };
 
+//Kinematics
+Vec3 ik(Vec3 target);
+Vec3 fk(Vec3 target);
+
 struct Path{
     Point origin, end;
     Path(Point origin, Point end);
@@ -42,3 +46,5 @@ public :
     void remove(int i);
     void clear();
 };
+
+

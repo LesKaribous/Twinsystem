@@ -116,6 +116,7 @@ namespace Strategy{
 			IHM::menu();
 			Debugger::checkSerial();
 			Intercom::checkSerial();
+
 			if(Debugger::lastCommand() == "start") break;
 		}
     	while(IHM::getTirette()){
