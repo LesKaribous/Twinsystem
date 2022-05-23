@@ -71,6 +71,7 @@ namespace IHM{
         void checkListScreen  ();
         void goScreen         ();
         void matchScreen      ();
+        void sendBuffer       ();
     }
 
     namespace Sound{

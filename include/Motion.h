@@ -49,16 +49,26 @@ namespace Motion{
 
     /**
      * @brief Set the robot position using position of the bumped border
-     * @param border position relative to the robot current position
+     * @param border position vector of the border relative to the robot current position
      */
     void probeBorder(Vec2);
 
+    /**
+     * @brief Set the robot position using position of the bumped border
+     * @param border position vector of the border relative to the robot current position
+     * @param orientation of the robot when probing (side selection, default back)
+     * @warning disabled
+     * /
+    //void probeBorder(Vec2, float);
+
 
     /**
+     * 
      * @brief Align (turn) the robot toward the desired vector
-     * @param coordinateSystem position relative to the robot current position
+     * @param target the target vector to align with
+     * @param orientation offset angle to align specific face of the robot
      */
-    void align(Vec2);
+    void align(Vec2 target, float orientation);
 
     //Raw Move
     void move(Vec3 target);
@@ -72,11 +82,13 @@ namespace Motion{
     void SetAbsolute(bool = true);
     void SetRelative(bool = true);
 
+    void updatePosition();
     //void SetControlPoint(Vec2 point);
 
     //Getters
     Vec3 GetPosition();
 	Vec3 GetTarget();
+    Vec3 GetAbsTarget();
     bool isAbsolute();
     bool isRelative();
     bool isProbed();
@@ -87,4 +99,5 @@ namespace Motion{
 
     //Inverse Kinematics
     Vec3 ik(Vec3);
+    Vec3 fk(Vec3);
 }

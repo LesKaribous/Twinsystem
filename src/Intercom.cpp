@@ -12,14 +12,15 @@ namespace Intercom{
     unsigned long countTimer = 0;
 
     int count = 0;
+    int threshold = 8;
 
     void init(){
         Serial4.begin(9600);
     }
 
     void reboot(){
-        Serial2.clear();
-        Serial2.begin(9600);
+        Serial4.clear();
+        Serial4.begin(9600);
         Serial4.println("reboot()");
         connected = false;
     }
@@ -51,18 +52,16 @@ namespace Intercom{
         }else if(command.startsWith("pong")){
             connected = true;
             timeout = millis();
-        }else if(command.startsWith("detection")){
+        }else if(command.startsWith("count")){
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
             count = float(argString.toInt());         
             Debugger::log( "Detected ", count, "points at targeted position");
         }
     }
 
-    void setFOV(float angle, float dist){
+    void setFOV(float angle){
         Serial4.print("setFov(");
         Serial4.print(int(angle*100));
-        Serial4.print(',');
-        Serial4.print(int(dist*100));
         Serial4.println(")");
     }
 
@@ -73,25 +72,35 @@ namespace Intercom{
         Serial4.print(int(dist*100));
         Serial4.println(")");
     }
+
+    void askCount(){
+        Serial4.print("getPointCount()");
+    }
     
     
     void focus(){
-        Vec3 t3 = Motion::GetTarget();
-        Vec2 t2(t3.a, t3.b);
-        //Vec2 t2(1, 1);
+        Vec3 t = Motion::GetAbsTarget();
+        Vec3 p = Motion::GetPosition();
+        t.sub(p);
 
-        Debugger::log("Heading : ", t2.heading(), WARN);
+        Vec2 t2d = t;
 
-        float angleRange = (Settings::RADIUS*2)/(t2.mag() + Settings::RADIUS);
-        float distRange = Settings::RADIUS*2.5 ;
+        Debugger::log("Heading : ", t2d.heading(), VERBOSE);
 
-        setFOV(30*RAD_TO_DEG, 200);
+        float angleRange = (Settings::RADIUS*2)/(t2d.mag() + Settings::RADIUS);
+        float distRange = Settings::RADIUS*3 ;
+
+        setFOV(angleRange*RAD_TO_DEG);
+        lookAt(t2d.heading()*RAD_TO_DEG, t2d.mag() + Settings::RADIUS);
+    }
 
 
-        lookAt(t2.heading()*RAD_TO_DEG, t2.mag() + Settings::RADIUS);
+    void setThreshold(float t){
+        threshold = t;
     }
 
     bool collision(){
-        return (count > 80);
+        askCount();
+        return (count >= threshold);
     }
 }

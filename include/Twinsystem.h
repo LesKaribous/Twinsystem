@@ -34,6 +34,7 @@ namespace System{
         Debugger::init();
         IHM::init();
         Intercom::init();
+
         //--- WAIT LAUNCH---
         Strategy::waitLaunch();
     }

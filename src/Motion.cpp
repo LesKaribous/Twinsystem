@@ -11,6 +11,7 @@ namespace Motion
 {
 
 	Vec3 cPosition 		= {0,0,0};
+	Vec3 cStartPosition = {0,0,0};
 	Vec3 cTarget 		= {0,0,0};
 	Vec3 calibration 	= {1,1,1};
 
@@ -29,16 +30,34 @@ namespace Motion
 	}
 
 	void computeSync(){
+		/*
+		if(Intercom::collision()){
+			if(Controller::isRunning()){
+				Controller::stop();
+			}
+		}else{
+			if(!Controller::isRunning()){
+				Controller::resume(); 
+			}
+		}*/
+
+		Motion::updatePosition();
 		Match::update();
 		Intercom::checkSerial();
+		Debugger::checkSerial();
+		Intercom::focus();
+		
 	}
-
+	
 	Vec3 GetPosition(){
 		return Vec3(cPosition.a, cPosition.b, cPosition.c * RAD_TO_DEG);
 	}
 
 	Vec3 GetTarget(){
 		return cTarget;
+	}
+	Vec3 GetAbsTarget(){
+		return cStartPosition.copy().add(cTarget);
 	}
 
 	bool isAbsolute(){
@@ -104,12 +123,13 @@ namespace Motion
 		go(Vec2(target.a, target.b));
 		turn(target.c);
 	}
-
+	
+	
 	void probeBorder(Vec2 borderPos){
 		boolean tAbsolute = isAbsolute();
 		probing = true;
 		
-		align(borderPos);
+		align(borderPos, 180);
 
 		SetRelative();
 
@@ -138,14 +158,66 @@ namespace Motion
 		probing = false;
 	}
 
+	//Do not use yet
+	void probeBorder(Vec2 borderPos, float orientation){
+		boolean tAbsolute = isAbsolute();
+		probing = true;
+		
+		align(borderPos, orientation); //Align back of the robot (HMI side) with the desired vector
+
+		SetAbsolute();
+		Controller::setFeedrate(FAST);
+		Vec2 origin = GetPosition();
+
+		Vec2 approach = borderPos;
+		approach.mult(0.8);   	//Relative approach
+		approach.add(origin); 	//Aboslute approach point
+		go(approach);
+
+		Vec2 dest = borderPos;
+		dest.mult(1.5);			//Relative destination (50% futher than the border)
+		dest.add(origin); 	//Aboslute destination point
+
+		Controller::setFeedrate(SLOW);
+		go(dest);
+
+		//Calulate new position
+		Vec3 newPos = GetPosition();
+		Vec2 relativeOrigin = origin;
+		//relativeOrigin.sub(newPos);
+
+		float _offset = Settings::Geometry::offset ; //TODO : Adapt offset to the side of the robot
+
+		if(newPos.a < 0.0 + _offset){
+			newPos.a = 0.0 + _offset;
+			newPos.c = PI + orientation*DEG_TO_RAD;
+			probedX = true;
+		}else if(newPos.a > 3000.0 - _offset){
+			newPos.a = 3000.0 - _offset; 
+		}else if(newPos.b < 0.0){
+			newPos.b = 0.0 + _offset;
+			probedY = true;
+		}else if(newPos.b > 2000.0){
+			newPos.b = 2000.0 - _offset;
+		}
+		
+		
+		go(origin); //return to last known position
+		//SetPosition(newPos.add(relativeOrigin));//Set new Position
+		
+		Controller::setFeedrate(FAST);
+		SetAbsolute(tAbsolute);
+		probing = false;
+	}
+
 	bool isProbing(){
 		return probing;
 	}
 
-	void align(Vec2 coord){
+	void align(Vec2 coord, float orientation){
 		boolean tAbsolute = isAbsolute();
 		SetAbsolute();
-		turn(coord.heading()*RAD_TO_DEG+180);
+		turn(coord.heading()*RAD_TO_DEG - orientation);
 		SetAbsolute(tAbsolute);
 	}
 
@@ -166,9 +238,28 @@ namespace Motion
 		return target;
 	}
 
+	void updatePosition(){
+		Vec3 currentStepperPos = Controller::getPosition();
+		Vec3 relativePosition = fk(currentStepperPos);
+		
+		relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
+		relativePosition.b /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
+		relativePosition.c /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
+
+		relativePosition.a /= calibration.a;
+		relativePosition.b /= calibration.b;
+		relativePosition.c /= calibration.c;
+
+		Debugger::log("Current position", relativePosition, VERBOSE);
+		cPosition = cStartPosition.copy().add(relativePosition);
+	}
+
 	//Raw relative move request
 	void move(Vec3 target){
 		target = SetTarget(target);
+		cStartPosition = cPosition;
+
+
 
 		target.mult(calibration.toMatrix()); //Apply calibration (X mm,Y mm,ROT rad)
 		target = ik(target); //Apply inverse kinematics (X mm,Y mm,ROT rad) -> (Va, Vb, Vc) : steps
@@ -177,11 +268,12 @@ namespace Motion
 		Controller::move(target, true);
 		while(running()) computeSync();
 
-		cPosition.add(cTarget.rotateZ(-cPosition.c)); //Need to take actual rotation when adding relative target
+		cPosition = cStartPosition.add(cTarget.rotateZ(-cPosition.c)); //Need to take actual rotation when adding relative target
+		cStartPosition = cPosition;
 	}
 
 	bool running(){
-		return Controller::isRunning();
+		Controller::arrived();
 	}
 
 	Vec3 ik(Vec3 target){
@@ -197,6 +289,23 @@ namespace Motion
 		};
 
 		return target.mult(P).mult(1/R);
+	}
+
+	Vec3 fk(Vec3 target){
+		float f1sq3 = 1.0f / sqrt(3.0f),		  
+			  f1s3 = 1.0f/3.0f,
+			  f2s3 = 1.0f/3.0f,
+			  L = Settings::RADIUS,
+			  R = Settings::WHEEL_RADIUS;
+		
+
+		Matrix3x3 P = {
+			   0, -f1sq3, f1sq3,
+		   -f2s3,   f1s3 , f1s3,
+			f1s3/L, f1s3/L, f1s3/L
+		};
+		P.mult(R);
+		return target.mult(P);
 	}
 
 }

@@ -17,8 +17,11 @@ namespace Controller{
     void move(Vec3 target, bool async = false);
 
     void stop   (bool async = false);
+    void resume ();
 
+    void update();
     void reset();
+    void resetPosition();
 
     void emergencyStop();
 
@@ -30,9 +33,11 @@ namespace Controller{
     u_int32_t getAccel();
     u_int32_t getSpeed();
 
+    Vec3 getPosition();
+    bool arrived();
+
     bool isRunning();
     bool isSleeping();
-    void update();
 
     // Engaging motors make them ready to move.
     // Note : Motors may be engaged but sleeping !

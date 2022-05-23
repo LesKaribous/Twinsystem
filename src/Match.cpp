@@ -28,7 +28,11 @@ namespace Match{
 
 	void update(){
 		updateTime();
-		IHM::LCD::matchScreen();
+		if(Match::hasStarted()) IHM::LCD::matchScreen();
+		else {
+			IHM::LCD::affichePage();
+			IHM::LCD::sendBuffer();
+		}
 	}
 
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------

@@ -83,6 +83,7 @@ struct Matrix2x2 {
 };
 
 //Operators overload
+
 bool operator== (const Vec2&, const Vec2&);
 bool operator!= (const Vec2&, const Vec2&);
 

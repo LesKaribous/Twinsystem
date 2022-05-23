@@ -86,6 +86,11 @@ namespace Debugger{
             lastCmd = command;
             println("Disabled motors.");
             Controller::sleep();
+        }else if(command.startsWith("PAUSE")){
+            lastCmd = command;
+            Controller::stop();
+        }else if(command.startsWith("RESUME")){
+            Controller::resume();
         }else if(command.startsWith("SetAbsolute")){
             Motion::SetAbsolute();
             println("Switched to absolute mode.");
@@ -99,9 +104,9 @@ namespace Debugger{
             String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(',')-1);
             String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
 
-            float x = float(xStr.toInt());
-            float y = float(yStr.toInt());
-            float a = float(rotStr.toInt());
+            float x = xStr.toFloat();
+            float y = yStr.toFloat();
+            float a = rotStr.toFloat();
 
             Motion::goTurn(x, y, a);
 
@@ -112,9 +117,9 @@ namespace Debugger{
             String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(','));
             String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
 
-            float x = float(xStr.toInt());
-            float y = float(yStr.toInt());
-            float a = float(rotStr.toInt());
+            float x = xStr.toFloat();
+            float y = yStr.toFloat();
+            float a = rotStr.toFloat();
             Vec3 pos(x,y,a);
             Motion::SetPosition(pos);
 
@@ -126,7 +131,7 @@ namespace Debugger{
 
             float angle = float(angleStr.toInt());
             float dist = float(distStr.toInt());
-            Intercom::setFOV(angle, dist);
+            Intercom::setFOV(angle);
         }else if(command.startsWith("heading(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
@@ -143,8 +148,8 @@ namespace Debugger{
             String angleStr = argString.substring(0, argString.indexOf(','));
             String distStr  = argString.substring(argString.indexOf(',')+1, argString.length());
 
-            float angle = float(angleStr.toInt());
-            float dist = float(distStr.toInt());
+            float angle = float(angleStr.toFloat());
+            float dist = float(distStr.toFloat());
             Intercom::lookAt(angle, dist);
         }else if(command.startsWith("go(")){
             lastCmd = command;
@@ -152,8 +157,8 @@ namespace Debugger{
             String xStr = argString.substring(0, argString.indexOf(','));
             String yStr  = argString.substring(argString.indexOf(',')+1, argString.length());
 
-            float x = float(xStr.toInt());
-            float y = float(yStr.toInt());
+            float x = float(xStr.toFloat());
+            float y = float(yStr.toFloat());
 
             Motion::go(x, y);
 
@@ -163,7 +168,18 @@ namespace Debugger{
             float a = float(argString.toInt());
 
             Motion::turn(a);
+        }else if(command.startsWith("align(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String xStr = argString.substring(0, argString.indexOf(','));
+            String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(','));
+            String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
 
+            float x = float(xStr.toFloat());
+            float y = float(yStr.toFloat());
+            float a = float(rotStr.toFloat());
+            Vec2 pos(x,y);
+            Motion::align(pos, a);
         }else if(command == "help" || command == "?"){
             println("-------- Commands list ---------");
             println("help : show help message");
@@ -177,11 +193,27 @@ namespace Debugger{
             println("go(int X, int Y) : Go to <X Y> position");
             println("turn(int X) : Turn by <angle>");
             println("SetPosition(int X, int Y, int angle) : Set Robot absolute position");
-            println("setFOV(int angleRange, int distRange) : Arm the robot before start : Set lidar range");
+            println("setFOV(int angleRange) : Arm the robot before start : Set lidar range");
             println("lookAt(int angle, int distance) : Arm the robot before start : Lidar look at position");
         }else{
             log("Unknown command : ", command, INFO);
             println("Please run <help> to see available commands");
+        }
+
+        if(lastCmd.startsWith("PAUSE")){
+            if(Controller::isRunning()){
+                Controller::stop();
+                lastCmd = command;
+            }else{
+
+            }
+        }else if(lastCmd.startsWith("RESUME")){
+            if(!Controller::isRunning()){
+                Controller::resume();
+                lastCmd = command;
+            }else{
+                
+            }
         }
     }
 

@@ -392,6 +392,10 @@ bool getArrowDown()
 			_u8g2.sendBuffer();
 		}
 
+		void sendBuffer(){
+			_u8g2.sendBuffer();
+		}
+
 		void affichePage(){
 			switch (_page) {
 				case 0:

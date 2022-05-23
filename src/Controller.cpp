@@ -11,13 +11,15 @@ namespace Controller{
             sC(Pin::Stepper::stepC, Pin::Stepper::dirC);
 
     bool engaged = false,
-         sleeping = false;
+         sleeping = false,
+         paused = false;
 
     Vec3 calibration;
 
     u_int32_t speed, accel;
 
     float feedrate = 100;
+    bool wasLastAsync = false;
 
     void init(){
 
@@ -40,6 +42,8 @@ namespace Controller{
         setCalibration(Settings::ROBOT); //Primary WARNING
 
     }
+
+    void update(){}
 
     void setCalibration(bool state){
         calibration = state == Settings::PRIMARY ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
@@ -84,13 +88,11 @@ namespace Controller{
         }
     }
 
-    void update(){
-
-    }
-
     void move(Vec3 target, bool async){
+        wasLastAsync = async;
         target.mult(calibration.toMatrix());
 
+        resetPosition(); //Zero all axis
         sA.setTargetRel(int32_t(target.a));
         sB.setTargetRel(int32_t(target.b));
         sC.setTargetRel(int32_t(target.c));
@@ -99,10 +101,15 @@ namespace Controller{
             sleep(false);
             Match::wait(200);
         }
-        
         if(async)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);
         
+    }
+
+    void resetPosition(){
+        sA.setPosition(0);
+        sB.setPosition(0);
+        sC.setPosition(0);
     }
 
     void reset(){
@@ -138,6 +145,18 @@ namespace Controller{
     void stop(bool async){
         if(async)controller.stopAsync();
         else controller.stop();
+        paused = true;
+    }
+
+    void resume(){
+        Debugger::log("Resuming...", INFO);
+        if(wasLastAsync)controller.moveAsync(sA,sB,sC);
+        else controller.move(sA,sB,sC);
+        paused = false;
+    }
+
+    bool arrived(){
+        return !controller.isRunning() && !paused;
     }
 
     void emergencyStop(){
@@ -155,6 +174,18 @@ namespace Controller{
 
     int getCurrentSpeed(){
         return controller.getCurrentSpeed();
+    }
+
+    Vec3 getPosition(){
+        Vec3 result;
+        result.a = sA.getPosition();
+        result.b = sB.getPosition();
+        result.c = sC.getPosition();
+
+        result.a /= calibration.a;
+        result.b /= calibration.b;
+        result.c /= calibration.c;
+        return result;
     }
 
     bool isRunning(){
