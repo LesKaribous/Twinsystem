@@ -1,8 +1,8 @@
 #include "Actuators.h"
-#include "Pin.h"
-#include "Match.h"
-#include "Settings.h"
 #include "Debugger.h"
+
+#include "Twinsystem.h"
+
 namespace Actuators{
 
 	//Bras
@@ -250,7 +250,7 @@ namespace Actuators{
 		setElevator(posServoElevator);
 		setArm(posServoArm);
 		setTool(posServoTool);
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::setElevator    (byte posServoElevator, int wait)
@@ -258,7 +258,7 @@ namespace Actuators{
 		if(!_servoElevator.attached()) 
 			_servoElevator.attach(_pinServoElevator);
 		_servoElevator.write(calcPositionElevator(posServoElevator));
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::setArm (byte posServoArm, int wait)
@@ -266,7 +266,7 @@ namespace Actuators{
 		if(!_servoArm.attached()) 
 			_servoArm.attach(_pinServoArm);
 		_servoArm.write(calcPositionArm(posServoArm));
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::setTool (byte posServoTool, int wait)
@@ -274,7 +274,7 @@ namespace Actuators{
 		if(!_servoTool.attached()) 
 			_servoTool.attach(_pinServoTool);
 		_servoTool.write(calcPositionTool(posServoTool));
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::setTool2 (byte posServoTool2, int wait)
@@ -282,7 +282,7 @@ namespace Actuators{
 		if(!_servoTool2.attached()) 
 			_servoTool2.attach(_pinServoTool2);
 		_servoTool2.write(calcPositionTool2(posServoTool2));
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::enablePump (bool state){
@@ -300,17 +300,17 @@ namespace Actuators{
 		enablePump();
 		openEv(false);
 
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 	void Bras::ungrab(int wait)
 	{
 		enablePump(false);
 		openEv();
-		Match::wait(300);
+		System::wait(300);
 		openEv(false);
 
-		Match::wait(wait);
+		System::wait(wait);
 	}
 
 }

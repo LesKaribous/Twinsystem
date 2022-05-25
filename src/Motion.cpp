@@ -1,11 +1,8 @@
 #include "Motion.h"
-#include "Controller.h"
-#include "Match.h"
-
-#include "Debugger.h"
 #include "Geometry.h"
-#include "Settings.h"
-#include "Intercom.h"
+
+#include "Twinsystem.h"
+#include "Debugger.h"
 
 namespace Motion
 {
@@ -22,6 +19,8 @@ namespace Motion
  	bool probedX = false, probedY = false;
 	bool absolute 		= true;
 	bool probing = false;
+
+	bool avoidance = false;
 
 	void init(){
 		calibration = Settings::ROBOT == Settings::PRIMARY ?  
@@ -58,16 +57,21 @@ namespace Motion
 	void pause(){
 		debugState();
 		if(cState == State::RUNNING){
+			debugState();
 			cState = State::PAUSED;
+			debugState();
 			Debugger::log("Controller stopped", INFO);
 			Controller::stop();
+			Debugger::log("Hoo stopped", ERROR);
 		}
 	}
 
     void resume(){
 		debugState();
 		if(cState == State::PAUSED){
+			debugState();
 			cState = State::RUNNING;
+			debugState();
 			Debugger::log("Controller resumed", INFO);
 			Controller::resume();
 		}
@@ -75,26 +79,23 @@ namespace Motion
 
 
 	
-	void computeSync(){
-		//Intercom::askCount();
+	void update(){
+		//Motion::updatePosition();
+		System::update();
 
-		if(Intercom::collision()){
+		if(Intercom::collision() && avoidance){
 			pause();
 		}else{
 			resume();
 		}
 
-
-		Motion::updatePosition();
-		Debugger::checkSerial();
-		Match::update();
-		Intercom::checkSerial();
-
 		if(cState == State::RUNNING){
-			if(Controller::arrived()) cState = State::ARRIVED;
+			if(Controller::arrived()){
+				debugState();
+				cState = State::ARRIVED;
+				debugState();
+			}
 		}
-		
-		debugState();
 	}
 
     void turn(float angle){
@@ -188,6 +189,7 @@ namespace Motion
 	}
 
 	void updatePosition(){
+		Debugger::log("Hello There 2", ERROR);
 		Vec3 currentStepperPos = Controller::getPosition();
 		Vec3 relativePosition = fk(currentStepperPos);
 		
@@ -208,24 +210,28 @@ namespace Motion
 		//Set new target
 		target = SetTarget(target);
 		cStartPosition = cPosition; //Save start position
+		
+		debugState();
 		cState = State::RUNNING; //robot is moving from now
+		debugState();
 
 		target.mult(calibration.toMatrix()); //Apply cartesian calibration
 		target = ik(target);				 //Apply inverse kinematics result in steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); //Apply stepping multiplier
 
 		Controller::move(target, true); //Execute move
-		while(running()) computeSync(); //Wait for move to end and check for opponent
-
-		debugState();
+		while(running()) update(); //Wait for move to end and check for opponent
+		
 		//Need to take actual rotation when adding relative target
 		cPosition = cStartPosition.add(cTarget.rotateZ(-cPosition.c)); 
 		cStartPosition = cPosition;
+		debugState();
 		cState = State::IDLE; //Ready for next move
+		debugState();
 	}
 
 	bool running(){
-		return cState != State::ARRIVED;
+		return !(cState == State::ARRIVED || cState == State::CANCELLED);
 	}
 
 
@@ -277,6 +283,13 @@ namespace Motion
 
     void SetRelative(bool state){
 		SetAbsolute(!state);
+	}
+
+	
+    void SetAvoidance(bool state){
+		if(Settings::AVOIDANCE == Settings::ADVERSAIRE_OUI)
+			avoidance = state;
+		else avoidance = false;
 	}
 
 

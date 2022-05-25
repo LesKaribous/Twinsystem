@@ -18,7 +18,7 @@ struct Vec2 {
     Vec2& sub(Vec2&);
     Vec2& dist(Vec2&);
     Vec2& mult(float);
-    Matrix2x2 toMatrix();
+    Matrix2x2 toMatrix() const;
 
     Vec2& setMagnitude(float);
     Vec2& setHeading(float);

@@ -4,6 +4,7 @@
 using namespace Motion;
 using namespace Match;
 using namespace Actuators;
+using namespace System;
 
 //----------------STRATEGIES----------------
 namespace Strategy{
@@ -27,6 +28,7 @@ namespace Strategy{
 
 	void recalagePrimary(){
 		// Laisser passer le robot secondaire
+		SetAvoidance(false);
 		SetRelative();
 		go(500,0);
 		wait(12000);
@@ -47,6 +49,7 @@ namespace Strategy{
 	}
 
     void recalageSecondary(){
+		SetAvoidance(false);
 		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-100, 0	 );
 		Vec2 borderYmin(   0,-400);
@@ -62,18 +65,20 @@ namespace Strategy{
 	}
 
 	void homologationPrimary(){
-
+		matchPrimary();
 	}
     void homologationSecondary(){
-		
+		matchSecondary();
 	}
 
 	void matchPrimary(){
+
+		SetAvoidance(true);
 		updateScore(Score::STATUETTE_DEPOSEE);
 		updateScore(Score::VITRINE_DEPOSEE);
 
 		takeGroundTrio();
-		
+
 		flipElement(BrasAU);
 		flipElement(BrasInit);
 		flipElement(BrasTirette);
@@ -97,6 +102,7 @@ namespace Strategy{
 		goHome();
 	}
 	void matchSecondary(){
+		SetAvoidance(true);
 		takeAndPushUnder(BrasAU);
 		takeStatuette(BrasAU);
 		releaseCube(BrasTirette);
@@ -112,29 +118,15 @@ namespace Strategy{
 	void waitLaunch()
 	{
     	while(!IHM::getTirette()){
-			Controller::update();
-			IHM::menu();
-			Debugger::checkSerial();
-			Intercom::checkSerial();
-
+			System::update();
 			if(Debugger::lastCommand() == "start") break;
 		}
     	while(IHM::getTirette()){
-			Controller::update();
-			Debugger::checkSerial();
-			Intercom::checkSerial();
-			IHM::menu();
+			System::update();
 		}
 
-		// Lancement du Match
-		Match::start();
-    	IHM::LCD::goScreen();
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
-		// Delais d'affichage
-		wait(100);
-		//Match::update();
-
 	}
 
 //-------- SOUS-STRATEGIES --------

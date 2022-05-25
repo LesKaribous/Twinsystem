@@ -81,6 +81,8 @@ namespace IHM
 	int _tabPage[4];
 	const int _nbrPage = 4;
 
+	State state = State::INIT;
+
 	bool
 		_tirette 		= false,
 		_detection 		= false,
@@ -94,7 +96,7 @@ namespace IHM
 		_prevUpState 	= false,
 		_prevDownState 	= false,	
 		_typeRobot 		= Settings::PRIMARY,
-		_equipe 		= Settings::EQUIPE_JAUNE,
+		_equipe 		= Settings::Team::PURPLE,
 		_testBras 		= false,	
 		_optionStrat01	= false,
 		_optionStrat02	= false,
@@ -121,14 +123,16 @@ namespace IHM
 		"Poser la balise adversaire    ",
 		"Bon match !                   "};
 
-void init()
-{
+void init(){
+
+	state = State::INIT;
+
 	pinMode(Pin::tirette		, INPUT_PULLUP);
 	pinMode(Pin::checkButton	, INPUT_PULLUP);
 
 	pinMode(Pin::latchMux	, OUTPUT);
 	pinMode(Pin::clockMux	, OUTPUT);
-	pinMode(Pin::dataMux	, INPUT);
+	pinMode(Pin::dataMux	, INPUT_PULLUP);
 
 	digitalWrite(Pin::latchMux, LOW);
 	digitalWrite(Pin::clockMux, LOW);
@@ -163,11 +167,50 @@ void init()
 	LCD::splashScreen();
 }
 
+void update(){
+
+	switch(state){
+		case State::INIT :
+		break;
+		case State::READY :
+		IHM::menu();
+		break;
+		case State::PROBE :
+		IHM::LCD::initScreen();
+		break;
+		case State::GO :
+		IHM::LCD::goScreen();
+		break;
+		case State::MATCH :
+		IHM::LCD::matchScreen();
+		break;
+		case State::END :
+
+		break;
+	}
+}
+
+void start(){
+	state = State::GO;
+	update();
+	state = State::MATCH;
+}
+
+void ready(){
+	state = State::READY;
+	update();
+}
+
+void probing(){
+	state = State::PROBE;
+	update();
+}
+
 void setColor(bool colorChoosed){
 	for(int i=0;i<=ringLed.numPixels();i++){
-		if(colorChoosed == Settings::EQUIPE_JAUNE) 
+		if(colorChoosed == Settings::Team::YELLOW) 
 			ringLed.setPixelColor(i, ringLed.Color(254, 254, 0));
-		else if(colorChoosed == Settings::EQUIPE_VIOLET) 
+		else if(colorChoosed == Settings::Team::PURPLE) 
 			ringLed.setPixelColor(i, ringLed.Color(102, 0, 204));
 		else 
 			ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
@@ -179,13 +222,14 @@ void menu(){
 	updateButtonIHM();
 	LCD::startMenu();
 	if(getCheck() || Debugger::lastCommand() == "probe"){
-		while(getCheck()) delay(10) ;// Attente du front descendant
+		while(getCheck()) delay(10) ;// Attente du front descendant -> TODO : Remplacer par millis()
 		if(_page == 2) Test::testingActuators();
 		else if(_page == 3) Test::testMotion();
 		else{
-			LCD::initScreen();
+			IHM::probing();
 			Strategy::recalage();
 			setRecalage(true);
+			IHM::ready();
 		}
 	}
 }
@@ -214,7 +258,7 @@ void readButtonState()
 	for (int i = 0; i <= 7; i++)
 	{
 		// on note l'état de la sortie du HC165
-		_buttonState[7 - i] = digitalRead(Pin::dataMux);
+		_buttonState[7 - i] = stableRead(Pin::dataMux);
 		// et on envoi un front montant sur la pin 2 pour décaler les valeurs
 		digitalWrite(Pin::clockMux, HIGH);
 		delay(10);
@@ -226,6 +270,20 @@ void readButtonState()
 void setRecalage(bool state){
 	_recalage = state;
 }
+
+bool stableRead(int pin, unsigned long duration){
+	int countTrue = 0; int countFalse = 0;
+	long unsigned startTime = millis();
+
+	bool state = false;
+	while(millis() - startTime < duration){
+		state = digitalRead(pin);
+		if(state) countTrue++;
+		else countFalse++;
+	}
+	return(countTrue > countFalse);
+}
+
 bool getRecalage(){
 	return _recalage;
 }
@@ -242,17 +300,18 @@ void freezeSettings(){
 //---Gestion Boutons physiques---
 bool getTirette(){
 	if(!freezed)
-		_tirette = !digitalRead(Pin::tirette);
+		_tirette = !stableRead(Pin::tirette);
 	return _tirette;
 }
+
 bool getRobot(){
 	if(!freezed) 
-		_robot = digitalRead(Pin::robotSelect);
+		_robot = stableRead(Pin::robotSelect);
 	return _robot;
 }
 bool getCheck(){
 	if(!freezed)
-		_check = !digitalRead(Pin::checkButton);
+		_check = !stableRead(Pin::checkButton);
 	return _check;
 }
 bool waitCheck(){
@@ -268,15 +327,21 @@ bool getArrowUp()
 	return _arrowUp;
 }
 bool getEquipe(){
-	if(!freezed && !_recalage)
+	if(!freezed && !_recalage){
 		_equipe = _buttonState[5];
+		Settings::setTeam(_equipe);
+	}
+		
 	return _equipe;
 }
 bool getDetection(){
-	if(!freezed && !_recalage) 
+	if(!freezed && !_recalage){
 		_detection = _buttonState[6];
+		Settings::AVOIDANCE = _detection;
+	}
 	return _detection;
 }
+
 bool getStrategie(){
 	if(!freezed && !_recalage)
 		_strategie = _buttonState[7];
@@ -324,8 +389,6 @@ bool getArrowDown()
 			_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
 
 			_u8g2.sendBuffer();
-
-			delay(2000);
 		}
 
 		void baseMenu(){
@@ -491,14 +554,14 @@ bool getArrowDown()
 
 			//Gestion equipe
 			wChaine = _u8g2.drawStr(marginLeft, yTeam, "Equipe");
-			if (_equipe == Settings::EQUIPE_JAUNE)
+			if (_equipe == Settings::Team::YELLOW)
 				_u8g2.drawStr(marginLeft + wChaine, yTeam, " jaune");
 			else
 				_u8g2.drawStr(marginLeft + wChaine, yTeam, " violet");
 			
 			//Gestion evitement
 			wChaine = _u8g2.drawStr(marginLeft, yAvoid, "Evit.");
-			if (_detection)
+			if (_detection == Settings::ADVERSAIRE_NON)
 				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " simple");
 			else
 				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " complexe");
@@ -538,6 +601,7 @@ bool getArrowDown()
 			else
 				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
 
+			_u8g2.setFontPosTop();
 		}
 
 		void page03(){

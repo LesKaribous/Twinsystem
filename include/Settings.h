@@ -16,9 +16,6 @@ namespace Settings{
         ADVERSAIRE_NON = 1,
         ADVERSAIRE_OUI = 0,
 
-        EQUIPE_JAUNE    = 1,
-        EQUIPE_VIOLET   = 0,
-
         STRATEGIE_HOMOLOGATION = 1,
         STRATEGIE_MATCH        = 0,
 
@@ -42,7 +39,11 @@ namespace Settings{
 
 
     extern bool ROBOT;
+    extern bool AVOIDANCE;
+
     void init();
+    void setTeam(bool);
+    void setAvoidance(bool state);
 
     namespace Geometry{
 
@@ -75,6 +76,16 @@ namespace Settings{
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
             { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
         };
+
+
+    }
+
+    namespace Team{
+        const bool
+        YELLOW   = 1,
+        PURPLE   = 0;
+
+        extern Vec3 transform;
     }
 
 }

@@ -29,6 +29,7 @@ namespace Match{
     extern State state;
 
     void start();
+    void setReady();
     void waitEnd();
     void end();
 
@@ -41,8 +42,6 @@ namespace Match{
 
     inline bool hasStarted(){return state >= State::RUNNING;}
 
-    //----- AUTRES -----
-    void wait(int temps);
 }
 
 namespace Score{

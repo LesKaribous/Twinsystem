@@ -46,9 +46,7 @@ namespace Intercom{
     
     void parseRequest(String command){
         if(command.startsWith("ping")){
-
             Serial4.println("pong");
-            
         }else if(command.startsWith("pong")){
             connected = true;
             timeout = millis();
@@ -98,7 +96,7 @@ namespace Intercom{
         float distRange = Settings::RADIUS*4 ;
 
         setFOV(angleRange);
-        lookAt(t2d.heading()*RAD_TO_DEG, distRange);
+        lookAt(IHM::getEquipe() == Settings::Team::YELLOW ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);
     }
 
 

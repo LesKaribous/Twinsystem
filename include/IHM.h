@@ -26,7 +26,21 @@
 
 namespace IHM{
 
+    enum class State{
+        INIT,
+        PROBE,
+        READY,
+        GO,
+        MATCH,
+        END
+    };
+
     void init();
+    void update();
+
+    void ready();
+    void start();
+
     void menu();
 
     void updateButtonIHM  ();
@@ -36,6 +50,8 @@ namespace IHM{
     //------ Gestion du ring Neopixel ------
     void setColor(bool colorChoosed);
 
+
+    bool stableRead(int pin, unsigned long duration = 3);
     //------ Gestion des E/S ------
     bool getTirette       ();
     bool getRobot         ();

@@ -29,7 +29,9 @@ Vec3 ik(Vec3 target){
             s60 = sinf(PI/3.0f),
             L = Settings::RADIUS,
             R = Settings::WHEEL_RADIUS;
-            
+    
+    target.mult(Settings::Team::transform.toMatrix());
+
     Matrix3x3 P = {
             0,   1 , L,
         -s60, -c60, L,
@@ -53,5 +55,7 @@ Vec3 fk(Vec3 target){
         f1s3/L, f1s3/L, f1s3/L
     };
     P.mult(R);
-    return target.mult(P);
+    target.mult(P);
+    target.mult(Settings::Team::transform.toMatrix());
+    return target;
 }

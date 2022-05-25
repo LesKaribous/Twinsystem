@@ -93,6 +93,7 @@ namespace Motion{
     void SetPosition(Vec3);
     void SetAbsolute(bool = true);
     void SetRelative(bool = true);
+    void SetAvoidance(bool = true);
 
 
     //Getters

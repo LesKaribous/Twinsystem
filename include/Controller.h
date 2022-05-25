@@ -16,7 +16,7 @@ namespace Controller{
 
     void move(Vec3 target, bool async = false);
 
-    void stop   (bool async = false);
+    void stop   (bool async = true);
     void resume ();
 
     void update();

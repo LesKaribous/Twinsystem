@@ -8,10 +8,15 @@ namespace Match{
     int score = 0;
    	State state = State::INIT;
 
-	void start()
-	{
+	void start(){
+		IHM::start();
 		timeInit = millis();
 		state = State::RUNNING;
+	}
+
+	void setReady()
+	{
+		state = State::READY;
 	}
 
 	void updateScore(int points, int multiplicateur)
@@ -28,16 +33,10 @@ namespace Match{
 
 	void update(){
 		updateTime();
-		if(Match::hasStarted()) IHM::LCD::matchScreen();
-		else {
-			IHM::LCD::affichePage();
-			IHM::LCD::sendBuffer();
-		}
 	}
 
 	//----------------MISE A JOUR DU TEMPS DE MATCH----------------
 	bool updateTime(){
-		Controller::update();
 		if(Match::hasStarted()){ //Do not update time before match has started
 			tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
@@ -53,30 +52,12 @@ namespace Match{
 			}
 			else
 				return false;
-		}else{
-			if(Motion::isProbing()) IHM::LCD::initScreen();
 		}
 		return false;
 	}
 
-	//----------------PROCEDURE D'ATTENTE----------------
-	void wait(int temps)
-	{
-		int initTemps = millis();
-		while ((millis() - initTemps) <= temps)
-		{
-			if (state == State::RUNNING)
-			{
-				updateTime();
-				IHM::LCD::matchScreen();
-			}
-		}
-	}
-
 	//----------------PROCEDURE DE FIN DE MATCH----------------
-	void waitEnd()
-	{
-		//Stopper la balise
+	void waitEnd(){
 		while (!updateTime())
 		{
 			//digitalWrite(Pin::Beacon,LOW);

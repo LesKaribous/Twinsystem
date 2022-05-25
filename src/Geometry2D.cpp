@@ -67,7 +67,7 @@ float Vec2::magSq(){
     return a*a+b*b;
 }
 
-Matrix2x2 Vec2::toMatrix(){
+Matrix2x2 Vec2::toMatrix() const{
     return {a, 0,
             0, b};
 }

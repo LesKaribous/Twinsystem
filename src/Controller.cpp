@@ -1,7 +1,6 @@
 #include "Controller.h"
-#include "Settings.h"
 #include "Debugger.h"
-#include "Match.h"
+#include "Twinsystem.h"
 
 namespace Controller{
 
@@ -25,7 +24,6 @@ namespace Controller{
     bool wasLastAsync = false;
 
     void init(){
-
             //------Déclaration des I/O------
         pinMode(Pin::Stepper::enable, OUTPUT);
         engage();
@@ -106,7 +104,7 @@ namespace Controller{
 
         if(sleeping){
             sleep(false);
-            Match::wait(200);
+            System::wait(200);
         }
         if(async)controller.moveAsync(sA,sB,sC);
         else controller.move(sA,sB,sC);

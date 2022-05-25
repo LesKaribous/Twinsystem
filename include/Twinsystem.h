@@ -12,32 +12,10 @@
 #include "Test.h"
 #include "Intercom.h"
 
-
 namespace System{
-    inline void reboot(){
-        Debugger::log("Rebooting robot in 3s...");
-        delay(1000);
-        Debugger::log( "Rebooting robot in 2s...");
-        delay(1000);
-        Debugger::log( "Rebooting robot in 1s...");
-        delay(1000);
-        _reboot_Teensyduino_();
-    }
-
-
-    inline void init(){
-        //--- INIT ---
-        Settings::init();
-        Actuators::init();
-        Controller::init();
-        Motion::init();
-        Debugger::init();
-        IHM::init();
-        Intercom::init();
-
-        //--- WAIT LAUNCH---
-        Strategy::waitLaunch();
-    }
-
+    void reboot();
+    void init();
+    void update();
+	void wait(int temps);
 } // namespace System
 
