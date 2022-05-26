@@ -7,6 +7,9 @@
 namespace Motion
 {
 
+	bool yellow(){return (Settings::TEAM == Settings::Team::YELLOW); }
+	bool purple(){return (Settings::TEAM == Settings::Team::PURPLE); }
+
 	State cState = State::IDLE;
 
 	Vec3 cPosition 		= {0,0,0};
@@ -105,7 +108,9 @@ namespace Motion
 	}
 
     void goPolar(float heading, float length){
-		PolarVec target(-heading*DEG_TO_RAD, length);
+		PolarVec target;
+		if(yellow()) target = PolarVec(-heading*DEG_TO_RAD, length);
+		if(purple()) target = PolarVec(heading*DEG_TO_RAD, length);
 		go(target.toVec2());
 	}
 
