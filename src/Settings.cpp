@@ -22,12 +22,9 @@ namespace Settings{
 
     void setTeam(bool team){
         if(team == Team::PURPLE){
-            Debugger::log("CoucouA : " , Actuators::BrasAU.GetAngle());
             Actuators::BrasAU.setAngle(-Actuators::BrasAU.GetAngle());
             Actuators::BrasInit.setAngle(-Actuators::BrasInit.GetAngle());
-            Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle());
-            Debugger::log("CoucouB : " , Actuators::BrasAU.GetAngle());
-            
+            Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle()); 
             Team::transform = PurpleTransform;
         }else{
             Team::transform = YellowTransform;

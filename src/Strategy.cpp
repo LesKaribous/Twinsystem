@@ -11,6 +11,10 @@ namespace Strategy{
 
 	int nbrElBlue = 0, nbrElGreen = 0, nbrElRed = 0;
 
+	bool yellow(){return (Settings::TEAM == Settings::Team::YELLOW); }
+	bool purple(){return (Settings::TEAM == Settings::Team::PURPLE); }
+
+
 	void recalage(){
 		if(Settings::ROBOT == Settings::PRIMARY) recalagePrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) recalageSecondary();
@@ -60,14 +64,15 @@ namespace Strategy{
 		SetAbsolute();
 		goTurn(250,850,0);
 		probeBorder(borderXmin);
-		goTurn(250,850,0);
+		goTurn(260,850,0);
 		Controller::sleep();
 	}
 
 	void homologationPrimary(){
 		matchPrimary();
 	}
-    void homologationSecondary(){
+    
+	void homologationSecondary(){
 		matchSecondary();
 	}
 
@@ -101,6 +106,7 @@ namespace Strategy{
 
 		goHome();
 	}
+	
 	void matchSecondary(){
 		SetAvoidance(true);
 		takeAndPushUnder(BrasAU);
@@ -205,8 +211,8 @@ namespace Strategy{
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		align(-135,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
-		//turn(360-robotArm.GetAngle()-135);
+		if(yellow()) align(-135, robotArm.GetAngle());
+		if(purple()) align(-135,-robotArm.GetAngle());
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
 	}
@@ -224,8 +230,8 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		//
-		align(90,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
-		//turn(360-robotArm.GetAngle()+90);
+		if(yellow()) align(90, robotArm.GetAngle());
+		if(purple()) align(90,-robotArm.GetAngle());
 		go(230,200);
 		releaseElement(robotArm,MUSEUM);
 		updateScore(Score::STATUETTE_VITRINE);
@@ -238,10 +244,11 @@ namespace Strategy{
 		{
 			// Take an element on the Workshed and push it under
 			SetAbsolute();
-			if(statePush == 0) 		go(230,1550);
+			if(statePush == 0) 		go(225,1545);
 			else if(statePush == 1) go(400,1730);
 			
-			align(-135,robotArm.GetAngle());
+			if(yellow()) align(-135, robotArm.GetAngle());
+			if(purple()) align(-135,-robotArm.GetAngle());
 			//turn(360-robotArm.GetAngle()-135);
 			takeElement(robotArm,WORK_SHED);
 			updateScore(Score::ECHANTILLON_ENLEVE);
@@ -296,8 +303,8 @@ namespace Strategy{
 	void releaseCube(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		align(-135, robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
-		//turn(360-robotArm.GetAngle()-135);
+		if(yellow()) align(-135, robotArm.GetAngle());
+		if(purple()) align(-135,-robotArm.GetAngle());
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
 		robotArm.setElevator(100,500);
@@ -309,8 +316,8 @@ namespace Strategy{
 
 	void flipSquares(int squareNumber){
 		SetAbsolute();
-		alignTurn(-90, BrasTirette.GetAngle()); // TODO: Vérifier fonctionnement 
-		// turn(360-BrasTirette.GetAngle()-90);
+		if(yellow()) align(-90, BrasTirette.GetAngle());
+		if(purple()) align(-90,-BrasTirette.GetAngle());
 		go(667+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
 		else {
