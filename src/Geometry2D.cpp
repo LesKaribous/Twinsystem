@@ -2,8 +2,14 @@
 #include "Geometry3D.h"
 #include <Math.h>
 #include <Arduino.h>
+#include "Settings.h"
 
 //---------- Polar Vec --------
+
+PolarVec::PolarVec(){
+    heading = 0;
+    mag = 0;
+}
 
 PolarVec::PolarVec(float _heading , float _mag){
     heading = _heading;
@@ -26,10 +32,10 @@ Vec2::Vec2(){
     a = b = 0.0f;
 }
 
-
+/*
 Vec2::Vec2(float v){
     a = b = v;
-}
+}*/
 
 Vec2::Vec2(float x, float y){
     a = x; b = y;

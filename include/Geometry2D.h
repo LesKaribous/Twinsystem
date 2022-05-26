@@ -11,7 +11,6 @@ struct Vec2 {
     float a, b;
 
     Vec2();
-    Vec2(float);
     Vec2(float, float);
 
     Vec2& add(Vec2&);

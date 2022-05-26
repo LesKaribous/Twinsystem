@@ -62,7 +62,6 @@ namespace Motion
 			debugState();
 			Debugger::log("Controller stopped", INFO);
 			Controller::stop();
-			Debugger::log("Hoo stopped", ERROR);
 		}
 	}
 
@@ -100,13 +99,13 @@ namespace Motion
 
     void turn(float angle){
 		Controller::setFeedrate(30);
-		if (absolute) move({cPosition.a, cPosition.b, angle});
+		if (absolute) move({cPosition.a, cPosition.b, angle });
 		else move({0, 0, angle});
 		Controller::setFeedrate(100);
 	}
 
     void goPolar(float heading, float length){
-		PolarVec target(-heading*DEG_TO_RAD, length); // Switch to left hand coord system
+		PolarVec target(-heading*DEG_TO_RAD, length);
 		go(target.toVec2());
 	}
 
@@ -164,6 +163,14 @@ namespace Motion
 		return probing;
 	}
 
+
+	void align(float angleTable, float orientation){
+		boolean tAbsolute = isAbsolute();
+		SetAbsolute();
+		turn(angleTable - orientation);
+		SetAbsolute(tAbsolute);
+	}
+
 	void align(Vec2 coord, float orientation){
 		boolean tAbsolute = isAbsolute();
 		SetAbsolute();
@@ -181,7 +188,9 @@ namespace Motion
 		
 		while(target.c > PI) target.c -= 2.0f*PI;
 		while(target.c < -PI) target.c += 2.0f*PI;
+
 		cTarget = target;
+		
 		
 		Intercom::focus();
 
@@ -189,7 +198,6 @@ namespace Motion
 	}
 
 	void updatePosition(){
-		Debugger::log("Hello There 2", ERROR);
 		Vec3 currentStepperPos = Controller::getPosition();
 		Vec3 relativePosition = fk(currentStepperPos);
 		

@@ -125,8 +125,10 @@ namespace Strategy{
 			System::update();
 		}
 
+		
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
+		Settings::setTeam(IHM::getEquipe());
 	}
 
 //-------- SOUS-STRATEGIES --------
@@ -137,11 +139,11 @@ namespace Strategy{
 		takeElement(BrasInit,GROUND);
 		BrasInit.updateElement(GREEN_ELEMENT);
 		go(680,550);
-		turn(120);
+		align(0, BrasAU.GetAngle());
 		go(743,550);
 		takeElement(BrasAU,GROUND);
 		BrasAU.updateElement(BLUE_ELEMENT);
-		turn(180);
+		align(-60, BrasTirette.GetAngle());
 		go(840,668);
 		takeElement(BrasTirette,GROUND);
 		BrasTirette.updateElement(RED_ELEMENT);
@@ -187,7 +189,7 @@ namespace Strategy{
 		}
 		SetAbsolute();
 		go(xPos,230);
-		turn(360-robotArm.GetAngle()+90); // +90 car Gallerie positionnée à 90° de l'origine
+		align(90,robotArm.GetAngle());// +90 car Gallerie positionnée à 90° de l'origine
 		go(xPos,160);
 
 		SetPosition(Vec3(GetPosition().a,112.61+87,GetPosition().c));
@@ -203,7 +205,7 @@ namespace Strategy{
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		alignTurn(robotArm.GetAngle(), -135); // TODO: Vérifier fonctionnement 
+		align(-135,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
 		//turn(360-robotArm.GetAngle()-135);
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
@@ -222,7 +224,7 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		//
-		alignTurn(robotArm.GetAngle(), 90); // TODO: Vérifier fonctionnement 
+		align(90,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
 		//turn(360-robotArm.GetAngle()+90);
 		go(230,200);
 		releaseElement(robotArm,MUSEUM);
@@ -239,7 +241,8 @@ namespace Strategy{
 			if(statePush == 0) 		go(230,1550);
 			else if(statePush == 1) go(400,1730);
 			
-			turn(360-robotArm.GetAngle()-135);
+			align(-135,robotArm.GetAngle());
+			//turn(360-robotArm.GetAngle()-135);
 			takeElement(robotArm,WORK_SHED);
 			updateScore(Score::ECHANTILLON_ENLEVE);
 			// Go To center
@@ -266,8 +269,8 @@ namespace Strategy{
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 
 		SetAbsolute();
-		if(dispenser == SECOND_DISPENSER) turn(360-robotArm.GetAngle()+90);
-		else if(dispenser == FIRST_DISPENSER) turn(360-robotArm.GetAngle()+60);
+		if(dispenser == SECOND_DISPENSER) align(90,robotArm.GetAngle());
+		else if(dispenser == FIRST_DISPENSER) align(60,robotArm.GetAngle());
 
 		takeElement(robotArm,DISPENSER);
 		updateScore(Score::ECHANTILLON_ENLEVE);
@@ -293,7 +296,7 @@ namespace Strategy{
 	void releaseCube(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		alignTurn(robotArm.GetAngle(), -135); // TODO: Vérifier fonctionnement 
+		align(-135, robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
 		//turn(360-robotArm.GetAngle()-135);
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
@@ -306,7 +309,7 @@ namespace Strategy{
 
 	void flipSquares(int squareNumber){
 		SetAbsolute();
-		alignTurn(BrasTirette.GetAngle(), -90); // TODO: Vérifier fonctionnement 
+		alignTurn(-90, BrasTirette.GetAngle()); // TODO: Vérifier fonctionnement 
 		// turn(360-BrasTirette.GetAngle()-90);
 		go(667+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
@@ -516,9 +519,11 @@ namespace Strategy{
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 
 			SetAbsolute();
-			turn(360-angleFrom+angleTo);
+			
+			if(Settings::TEAM == Settings::Team::YELLOW) turn(-angleFrom+angleTo);
+			else if(Settings::TEAM == Settings::Team::PURPLE) turn(+angleFrom-angleTo);
 
-		SetAbsolute(tAbsolute); // Restaure le type de positonnement 
+		SetAbsolute(tAbsolute); // Restaure le type de positonnement */
 	}
 
 }

@@ -1,10 +1,13 @@
 #include "Settings.h"
 #include "Pin.h"
+#include "Actuators.h"
+#include "Twinsystem.h"
 
 namespace Settings{
 
     bool ROBOT;
     bool AVOIDANCE = true;
+    bool TEAM;
 
     const Vec3 
     YellowTransform = { 1.0f, 1.0f, 1.0f },
@@ -18,7 +21,19 @@ namespace Settings{
     }
 
     void setTeam(bool team){
-        Team::transform = (team == Team::YELLOW) ? YellowTransform : PurpleTransform;
+        if(team == Team::PURPLE){
+            Debugger::log("CoucouA : " , Actuators::BrasAU.GetAngle());
+            Actuators::BrasAU.setAngle(-Actuators::BrasAU.GetAngle());
+            Actuators::BrasInit.setAngle(-Actuators::BrasInit.GetAngle());
+            Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle());
+            Debugger::log("CoucouB : " , Actuators::BrasAU.GetAngle());
+            
+            Team::transform = PurpleTransform;
+        }else{
+            Team::transform = YellowTransform;
+        }
+        TEAM = team;
+        
     }
 
     void setAvoidance(bool state){

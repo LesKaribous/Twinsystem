@@ -236,19 +236,24 @@ void menu(){
 
 //----------------GESTION DES BOUTTONS DE L'IHM----------------
 void updateButtonIHM(){
-	readButtonState();
-	getArrowUp();
-	getArrowDown();
+	
 	getTirette();
-	getDetection();
 	getRobot();
-	getLidar();
-	getStrategie();
-	getOption01();
-	getOption02();
-	getOption03();
 	getCheck();
-	getEquipe();
+
+	//if(Settings::IHM){
+	if(Settings::ROBOT == Settings::SECONDARY){
+		readButtonState();
+		getArrowUp();
+		getArrowDown();
+		getDetection();
+		getLidar();
+		getStrategie();
+		getOption01();
+		getOption02();
+		getOption03();
+		getEquipe();
+	}
 }
 
 void readButtonState()
@@ -370,6 +375,11 @@ bool getArrowDown()
 	if(!freezed) 
 		_arrowDown 	= !_buttonState[3];
 	return _arrowDown;
+}
+
+
+void setTeam(bool team){
+	_equipe = team;
 }
 
 	namespace LCD{

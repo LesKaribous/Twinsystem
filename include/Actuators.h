@@ -60,6 +60,7 @@ namespace Actuators{
                         int maxServoTool2 );
     
         void setGeometry(int angle, int decalage);
+        void setAngle(int angle);
 
         int GetAngle() const;
         int GetDecalage() const;

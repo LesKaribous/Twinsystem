@@ -161,6 +161,17 @@ namespace Debugger{
 
             Motion::go(x, y);
 
+        }else if(command.startsWith("goPolar(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String xStr = argString.substring(0, argString.indexOf(','));
+            String yStr  = argString.substring(argString.indexOf(',')+1, argString.length());
+
+            float x = float(xStr.toFloat());
+            float y = float(yStr.toFloat());
+
+            Motion::goPolar(x, y);
+
         }else if(command.startsWith("turn(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
@@ -171,14 +182,23 @@ namespace Debugger{
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
             String xStr = argString.substring(0, argString.indexOf(','));
-            String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(','));
+            //String yStr = argString.substring(argString.indexOf(',')+1, argString.lastIndexOf(','));
             String rotStr  = argString.substring(argString.lastIndexOf(',')+1, argString.length());
 
             float x = float(xStr.toFloat());
-            float y = float(yStr.toFloat());
+            //float y = float(yStr.toFloat());
             float a = float(rotStr.toFloat());
-            Vec2 pos(x,y);
-            Motion::align(pos, a);
+            //Vec2 pos(x,y);
+            //Motion::align(pos, a);
+            Motion::align(x, a);
+        }else if(command.startsWith("team(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            if(argString == "YELLOW")Settings::setTeam(Settings::Team::YELLOW);
+            else if(argString == "PURPLE") Settings::setTeam(Settings::Team::PURPLE);
+            
+            IHM::setTeam(Settings::TEAM);
+
         }else if(command == "help" || command == "?"){
             println("-------- Commands list ---------");
             println("help : show help message");

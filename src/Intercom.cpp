@@ -82,8 +82,6 @@ namespace Intercom{
     
     
     void focus(){
-
-        
         Vec3 t = Motion::GetAbsTarget();
         Vec3 p = Motion::GetPosition();
         t.sub(p);
@@ -96,7 +94,7 @@ namespace Intercom{
         float distRange = Settings::RADIUS*4 ;
 
         setFOV(angleRange);
-        lookAt(IHM::getEquipe() == Settings::Team::YELLOW ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);
+        lookAt(Settings::TEAM == Settings::Team::YELLOW ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);
     }
 
 

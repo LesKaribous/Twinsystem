@@ -74,6 +74,7 @@ namespace Motion{
      * @param orientation offset angle to align specific face of the robot
      */
     void align(Vec2 target, float orientation);
+    void align(float angleTable, float orientation);
 
     /**
      * @brief Move the robot to the desired target (last params of the Vec3 is used for arc curvature)

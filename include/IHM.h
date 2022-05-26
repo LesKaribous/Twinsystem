@@ -71,6 +71,8 @@ namespace IHM{
     void setRecalage      ( bool state );
     bool getRecalage      ();
 
+    void setTeam(bool);
+
     namespace LCD{
         //------ Pages LCD ------
         void splashScreen     ();

@@ -72,7 +72,7 @@ namespace Actuators{
 										180,100); 		// Testor 2
 		}
 			//Set Geometry
-			BrasAU		.setGeometry(240,0);
+			BrasAU		.setGeometry(-120,0);
 			BrasInit	.setGeometry(0,0);
 			BrasTirette	.setGeometry(120,0);
 
@@ -174,6 +174,10 @@ namespace Actuators{
 	void Bras::setGeometry(int angle, int centerDistance){
 		_angle = angle;
 		_centerDistance = centerDistance;
+	}
+
+	void Bras::setAngle(int angle){
+		_angle = angle;
 	}
 
 	int Bras::GetAngle() const{

@@ -22,7 +22,8 @@ namespace Settings{
         PRIMARY   = 1,
         SECONDARY = 0,
 
-        ABSOLUTE = true;
+        ABSOLUTE = true,
+        IHM = true;
 
     const int 
         TEMPS_MATCH = 101000 ;
@@ -39,6 +40,7 @@ namespace Settings{
 
 
     extern bool ROBOT;
+    extern bool TEAM;
     extern bool AVOIDANCE;
 
     void init();
