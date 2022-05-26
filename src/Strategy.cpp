@@ -11,17 +11,39 @@ namespace Strategy{
 
 	int nbrElBlue = 0, nbrElGreen = 0, nbrElRed = 0;
 
+	bool yellow(){return (Settings::TEAM == Settings::Team::YELLOW); }
+	bool purple(){return (Settings::TEAM == Settings::Team::PURPLE); }
+
+	void pansement(){
+		IHM::freezeSettings();
+
+		const Vec3 
+		YellowTransform = { 1.0f, 1.0f, 1.0f },
+		PurpleTransform = { 1.0f,-1.0f,-1.0f };
+		
+		if(purple()){
+			Actuators::BrasAU.setAngle(-Actuators::BrasAU.GetAngle());
+			Actuators::BrasInit.setAngle(-Actuators::BrasInit.GetAngle());
+			Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle());
+            Settings::Team::transform = PurpleTransform;
+		}else Settings::Team::transform = YellowTransform;
+	}
+
+
 	void recalage(){
+		pansement();
 		if(Settings::ROBOT == Settings::PRIMARY) recalagePrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) recalageSecondary();
 	}
 
 	void homologation(){
+		pansement();
 		if(Settings::ROBOT == Settings::PRIMARY) homologationPrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) homologationSecondary();
 	}
 
 	void match(){
+		pansement();
 		if(Settings::ROBOT == Settings::PRIMARY) matchPrimary();
 		else if(Settings::ROBOT == Settings::SECONDARY) matchSecondary();
 	}
@@ -60,14 +82,15 @@ namespace Strategy{
 		SetAbsolute();
 		goTurn(250,850,0);
 		probeBorder(borderXmin);
-		goTurn(250,850,0);
+		goTurn(260,850,0); //250
 		Controller::sleep();
 	}
 
 	void homologationPrimary(){
 		matchPrimary();
 	}
-    void homologationSecondary(){
+    
+	void homologationSecondary(){
 		matchSecondary();
 	}
 
@@ -101,6 +124,7 @@ namespace Strategy{
 
 		goHome();
 	}
+	
 	void matchSecondary(){
 		SetAvoidance(true);
 		takeAndPushUnder(BrasAU);
@@ -128,7 +152,6 @@ namespace Strategy{
 		
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
-		Settings::setTeam(IHM::getEquipe());
 	}
 
 //-------- SOUS-STRATEGIES --------
@@ -205,8 +228,8 @@ namespace Strategy{
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		align(-135,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
-		//turn(360-robotArm.GetAngle()-135);
+		if(yellow()) align(-135, robotArm.GetAngle());
+		if(purple()) align(-135,-robotArm.GetAngle());
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
 	}
@@ -214,7 +237,7 @@ namespace Strategy{
 	void layStatuette(Bras &robotArm){
 		SetAbsolute();
 		turn(0);
-		go(300,300);
+		go(250,250);
 		//Home 
 		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-50, 0	 );
@@ -224,7 +247,8 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		//
-		align(90,robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
+		if(yellow()) align(90, robotArm.GetAngle());
+		if(purple()) align(90,-robotArm.GetAngle());
 		//turn(360-robotArm.GetAngle()+90);
 		go(230,200);
 		releaseElement(robotArm,MUSEUM);
@@ -238,10 +262,12 @@ namespace Strategy{
 		{
 			// Take an element on the Workshed and push it under
 			SetAbsolute();
-			if(statePush == 0) 		go(230,1550);
+			if(statePush == 0) 		go(240,1540); //230 1550
 			else if(statePush == 1) go(400,1730);
+
+			if(yellow()) align(-135, robotArm.GetAngle());
+			if(purple()) align(-135,-robotArm.GetAngle());
 			
-			align(-135,robotArm.GetAngle());
 			//turn(360-robotArm.GetAngle()-135);
 			takeElement(robotArm,WORK_SHED);
 			updateScore(Score::ECHANTILLON_ENLEVE);
@@ -296,7 +322,8 @@ namespace Strategy{
 	void releaseCube(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		align(-135, robotArm.GetAngle()); // TODO: Vérifier fonctionnement 
+		if(yellow()) align(-135, robotArm.GetAngle());
+		if(purple()) align(-135,-robotArm.GetAngle());
 		//turn(360-robotArm.GetAngle()-135);
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
@@ -309,8 +336,10 @@ namespace Strategy{
 
 	void flipSquares(int squareNumber){
 		SetAbsolute();
-		alignTurn(-90, BrasTirette.GetAngle()); // TODO: Vérifier fonctionnement 
-		// turn(360-BrasTirette.GetAngle()-90);
+		
+		if(yellow()) align(-90, BrasTirette.GetAngle());
+		if(purple()) align(-90,-BrasTirette.GetAngle());
+
 		go(667+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
 		else {
