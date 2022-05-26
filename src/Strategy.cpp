@@ -11,41 +11,19 @@ namespace Strategy{
 
 	int nbrElBlue = 0, nbrElGreen = 0, nbrElRed = 0;
 
-	bool yellow(){return (Settings::TEAM == Settings::Team::YELLOW); }
-	bool purple(){return (Settings::TEAM == Settings::Team::PURPLE); }
-
-	void pansement(){
-		IHM::freezeSettings();
-
-		const Vec3 
-		YellowTransform = { 1.0f, 1.0f, 1.0f },
-		PurpleTransform = { 1.0f,-1.0f,-1.0f };
-		
-		if(purple()){
-			Actuators::BrasAU.setAngle(-Actuators::BrasAU.GetAngle());
-			Actuators::BrasInit.setAngle(-Actuators::BrasInit.GetAngle());
-			Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle());
-            Settings::Team::transform = PurpleTransform;
-		}else Settings::Team::transform = YellowTransform;
-	}
-
-
 	void recalage(){
-		pansement();
-		if(Settings::ROBOT == Settings::PRIMARY) recalagePrimary();
-		else if(Settings::ROBOT == Settings::SECONDARY) recalageSecondary();
+		if(Settings::primary()) recalagePrimary();
+		else if(Settings::secondary()) recalageSecondary();
 	}
 
 	void homologation(){
-		pansement();
-		if(Settings::ROBOT == Settings::PRIMARY) homologationPrimary();
-		else if(Settings::ROBOT == Settings::SECONDARY) homologationSecondary();
+		if(Settings::primary()) homologationPrimary();
+		else if(Settings::secondary()) homologationSecondary();
 	}
 
 	void match(){
-		pansement();
-		if(Settings::ROBOT == Settings::PRIMARY) matchPrimary();
-		else if(Settings::ROBOT == Settings::SECONDARY) matchSecondary();
+		if(Settings::primary()) matchPrimary();
+		else if(Settings::secondary()) matchSecondary();
 	}
 
 	void recalagePrimary(){
@@ -148,7 +126,6 @@ namespace Strategy{
     	while(IHM::getTirette()){
 			System::update();
 		}
-
 		
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
@@ -228,8 +205,8 @@ namespace Strategy{
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		if(yellow()) align(-135, robotArm.GetAngle());
-		if(purple()) align(-135,-robotArm.GetAngle());
+		if(Settings::yellow()) align(-135, robotArm.GetAngle());
+		if(Settings::purple()) align(-135,-robotArm.GetAngle());
 		takeElement(robotArm,PEDESTAL);
 		updateScore(Score::STATUETTE_ENLEVEE);
 	}
@@ -247,8 +224,8 @@ namespace Strategy{
 		probeBorder(borderXmin);
 		probeBorder(borderYmin);
 		//
-		if(yellow()) align(90, robotArm.GetAngle());
-		if(purple()) align(90,-robotArm.GetAngle());
+		if(Settings::yellow()) align(90, robotArm.GetAngle());
+		if(Settings::purple()) align(90,-robotArm.GetAngle());
 		//turn(360-robotArm.GetAngle()+90);
 		go(230,200);
 		releaseElement(robotArm,MUSEUM);
@@ -262,11 +239,17 @@ namespace Strategy{
 		{
 			// Take an element on the Workshed and push it under
 			SetAbsolute();
-			if(statePush == 0) 		go(240,1540); //230 1550
-			else if(statePush == 1) go(400,1730);
+			if(statePush == 0){
+				if(Settings::yellow()) go(230,1545);
+				if(Settings::purple()) go(280,1545);
+			}
+			else if(statePush == 1){
+				if(Settings::yellow()) go(400,1730);
+				if(Settings::purple()) go(420,1750);
+			}
 
-			if(yellow()) align(-135, robotArm.GetAngle());
-			if(purple()) align(-135,-robotArm.GetAngle());
+			if(Settings::yellow()) align(-135, robotArm.GetAngle());
+			if(Settings::purple()) align(-135,-robotArm.GetAngle());
 			
 			//turn(360-robotArm.GetAngle()-135);
 			takeElement(robotArm,WORK_SHED);
@@ -274,7 +257,8 @@ namespace Strategy{
 			// Go To center
 			SetAbsolute();
 			//go(390,1580);
-			go(500,1500);
+			if(Settings::yellow()) go(500,1500);
+			if(Settings::purple()) go(510,1510);
 			// Go Back to free the space before releasing
 			SetRelative();
 			//goPolar(robotArm.GetAngle(),-100);
@@ -322,8 +306,8 @@ namespace Strategy{
 	void releaseCube(Bras &robotArm){
 		SetAbsolute();
 		go(390,1580);
-		if(yellow()) align(-135, robotArm.GetAngle());
-		if(purple()) align(-135,-robotArm.GetAngle());
+		if(Settings::yellow()) align(-135, robotArm.GetAngle());
+		if(Settings::purple()) align(-135,-robotArm.GetAngle());
 		//turn(360-robotArm.GetAngle()-135);
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
@@ -337,8 +321,8 @@ namespace Strategy{
 	void flipSquares(int squareNumber){
 		SetAbsolute();
 		
-		if(yellow()) align(-90, BrasTirette.GetAngle());
-		if(purple()) align(-90,-BrasTirette.GetAngle());
+		if(Settings::yellow()) align(-90, BrasTirette.GetAngle());
+		if(Settings::purple()) align(-90,-BrasTirette.GetAngle());
 
 		go(667+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
@@ -361,8 +345,8 @@ namespace Strategy{
 
 	void goHome(){
 		SetAbsolute();
-		if(Settings::ROBOT == Settings::PRIMARY) go(200,400);
-		else if(Settings::ROBOT == Settings::SECONDARY) go(200,950);
+		if(Settings::primary()) go(200,400);
+		else if(Settings::secondary()) go(200,950);
 		
 		updateScore(Score::ROBOTS_CAMPEMENT/2); // Approximation : les deux robots doivent être au campement à la fin
 	}
@@ -549,8 +533,8 @@ namespace Strategy{
 
 			SetAbsolute();
 			
-			if(Settings::TEAM == Settings::Team::YELLOW) turn(-angleFrom+angleTo);
-			else if(Settings::TEAM == Settings::Team::PURPLE) turn(+angleFrom-angleTo);
+			if(Settings::yellow()) turn(-angleFrom+angleTo);
+			else if(Settings::purple()) turn(+angleFrom-angleTo);
 
 		SetAbsolute(tAbsolute); // Restaure le type de positonnement */
 	}

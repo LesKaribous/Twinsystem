@@ -5,15 +5,12 @@
 
 namespace Settings{
 
-    bool ROBOT;
-    bool AVOIDANCE = true;
-    bool TEAM;
+    bool 
+    ROBOT = true,
+    AVOIDANCE = true,
+    TEAM = true;
 
-    const Vec3 
-    YellowTransform = { 1.0f, 1.0f, 1.0f },
-    PurpleTransform = { 1.0f,-1.0f,-1.0f };
-
-    Vec3 Team::transform; 
+    Vec3 transform; //Changement de reprère purple / yellow 
 
     void init(){ 
         pinMode(Pin::robotSelect, INPUT_PULLUP);
@@ -21,23 +18,25 @@ namespace Settings{
     }
 
     void setTeam(bool team){
-        if(team == Team::PURPLE){
-            Debugger::log("CoucouA : " , Actuators::BrasAU.GetAngle());
-            Actuators::BrasAU.setAngle(-Actuators::BrasAU.GetAngle());
-            Actuators::BrasInit.setAngle(-Actuators::BrasInit.GetAngle());
-            Actuators::BrasTirette.setAngle(-Actuators::BrasTirette.GetAngle());
-            Debugger::log("CoucouB : " , Actuators::BrasAU.GetAngle());
-            
-            Team::transform = PurpleTransform;
-        }else{
-            Team::transform = YellowTransform;
-        }
         TEAM = team;
-        
     }
 
     void setAvoidance(bool state){
         AVOIDANCE = state;
     }
+
+    bool yellow     (){ return (Settings::TEAM == Settings::YELLOW);        }
+	bool purple     (){ return (Settings::TEAM == Settings::PURPLE);        }
+    bool primary    (){ return (Settings::ROBOT == Settings::PRIMARY);      }
+	bool secondary  (){ return (Settings::ROBOT == Settings::SECONDARY);    }
+    bool avoidance  (){ return Settings::AVOIDANCE;                         }
+    bool useIHM     (){ return Settings::IHM;                               }
+
+
+
+
+
+
+
 }
 

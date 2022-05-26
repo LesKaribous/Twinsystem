@@ -90,11 +90,11 @@ namespace Intercom{
 
         Debugger::log("Heading : ", t2d.heading(), VERBOSE);
 
-        float angleRange = 45;
-        float distRange = Settings::RADIUS*4 ;
+        float angleRange = 50;
+        float distRange = Settings::RADIUS*5 ;
 
         setFOV(angleRange);
-        lookAt(Settings::TEAM == Settings::Team::YELLOW ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);
+        lookAt(Settings::yellow() ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);
     }
 
 

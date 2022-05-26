@@ -50,8 +50,6 @@ namespace IHM{
     //------ Gestion du ring Neopixel ------
     void setColor(bool colorChoosed);
 
-
-    bool stableRead(int pin, unsigned long duration = 3);
     //------ Gestion des E/S ------
     bool getTirette       ();
     bool getRobot         ();

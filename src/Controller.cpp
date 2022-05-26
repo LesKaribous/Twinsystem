@@ -40,14 +40,13 @@ namespace Controller{
 
         reset();    
 
-        setCalibration(Settings::ROBOT); //Primary WARNING
-
+        setCalibration(Settings::primary()); //WARNING
     }
 
     void update(){}
 
     void setCalibration(bool state){
-        calibration = state == Settings::PRIMARY ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
+        calibration = (state == Settings::PRIMARY) ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
     }
 
     void setFeedrate(float value){
@@ -56,13 +55,15 @@ namespace Controller{
     }
 
 
-    void setSpeed(int speed){
+    void setSpeed(int s){
+        speed = s;
         sA.setMaxSpeed(speed);
         sB.setMaxSpeed(speed);
         sC.setMaxSpeed(speed);
     }
 
-    void setAccel(int accel){
+    void setAccel(int a){
+        accel = a;
         sA.setAcceleration(accel);
         sB.setAcceleration(accel);
         sC.setAcceleration(accel);
@@ -147,7 +148,7 @@ namespace Controller{
 
     }
 
-    void stop(bool async){
+    void stop(bool async){       
         if(async)controller.stopAsync();
         else controller.stop();
     }

@@ -32,7 +32,7 @@ namespace Actuators{
 							Pin::Pump::pinPump03,
 							Pin::Pump::pinEv03);
 
-		if(Settings::ROBOT == Settings::PRIMARY ){	
+		if(Settings::primary()){	
 
 			BrasTirette	.setPin(Pin::Servo::pinServo06,
 								Pin::Servo::pinServo07,
@@ -79,7 +79,7 @@ namespace Actuators{
 			// Set zero position
 			BrasAU			.setPosition(0,0,50);
 			BrasInit		.setPosition(0,0,50);
-			if(Settings::ROBOT == Settings::PRIMARY )
+			if(Settings::primary())
 				BrasTirette		.setPosition(0,0,50,1000);
 			else{
 				BrasTirette		.setPosition(0,0,0);

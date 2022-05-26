@@ -21,6 +21,7 @@ void setup(){
 
 void loop(){
     //--- START MATCH---
+    //Settings::setTeam(IHM::getEquipe());
     Match::start();
     if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 
         Strategy::match();

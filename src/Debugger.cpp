@@ -18,7 +18,7 @@ namespace Debugger{
             Serial.print("Preparing system...");
             
             Serial.print("Robot select : ");
-            if( Settings::ROBOT == Settings::PRIMARY ) Serial.println("PRIMARY");
+            if( Settings::primary() ) Serial.println("PRIMARY");
             else Serial.println("SECONDARY");
 
             delay(200);
@@ -194,10 +194,10 @@ namespace Debugger{
         }else if(command.startsWith("team(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
-            if(argString == "YELLOW")Settings::setTeam(Settings::Team::YELLOW);
-            else if(argString == "PURPLE") Settings::setTeam(Settings::Team::PURPLE);
+            if(argString == "YELLOW")Settings::setTeam(Settings::YELLOW);
+            else if(argString == "PURPLE") Settings::setTeam(Settings::PURPLE);
             
-            IHM::setTeam(Settings::TEAM);
+            IHM::setTeam(Settings::yellow());
 
         }else if(command == "help" || command == "?"){
             println("-------- Commands list ---------");

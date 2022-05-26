@@ -96,7 +96,7 @@ namespace IHM
 		_prevUpState 	= false,
 		_prevDownState 	= false,	
 		_typeRobot 		= Settings::PRIMARY,
-		_equipe 		= Settings::Team::PURPLE,
+		_equipe 		= Settings::PURPLE,
 		_testBras 		= false,	
 		_optionStrat01	= false,
 		_optionStrat02	= false,
@@ -208,9 +208,9 @@ void probing(){
 
 void setColor(bool colorChoosed){
 	for(int i=0;i<=ringLed.numPixels();i++){
-		if(colorChoosed == Settings::Team::YELLOW) 
+		if(colorChoosed == Settings::YELLOW) 
 			ringLed.setPixelColor(i, ringLed.Color(254, 254, 0));
-		else if(colorChoosed == Settings::Team::PURPLE) 
+		else if(colorChoosed == Settings::PURPLE) 
 			ringLed.setPixelColor(i, ringLed.Color(102, 0, 204));
 		else 
 			ringLed.setPixelColor(i, ringLed.Color(0, 150, 0));
@@ -241,9 +241,9 @@ void updateButtonIHM(){
 	getRobot();
 	getCheck();
 
-	//if(Settings::IHM){
-	if(Settings::ROBOT == Settings::SECONDARY){
+	if(Settings::secondary()){
 		readButtonState();
+		
 		getArrowUp();
 		getArrowDown();
 		getDetection();
@@ -263,7 +263,7 @@ void readButtonState()
 	for (int i = 0; i <= 7; i++)
 	{
 		// on note l'état de la sortie du HC165
-		_buttonState[7 - i] = stableRead(Pin::dataMux);
+		_buttonState[7 - i] = digitalRead(Pin::dataMux);
 		// et on envoi un front montant sur la pin 2 pour décaler les valeurs
 		digitalWrite(Pin::clockMux, HIGH);
 		delay(10);
@@ -274,19 +274,6 @@ void readButtonState()
 //---Gestion Etat Robot---
 void setRecalage(bool state){
 	_recalage = state;
-}
-
-bool stableRead(int pin, unsigned long duration){
-	int countTrue = 0; int countFalse = 0;
-	long unsigned startTime = millis();
-
-	bool state = false;
-	while(millis() - startTime < duration){
-		state = digitalRead(pin);
-		if(state) countTrue++;
-		else countFalse++;
-	}
-	return(countTrue > countFalse);
 }
 
 bool getRecalage(){
@@ -305,73 +292,75 @@ void freezeSettings(){
 //---Gestion Boutons physiques---
 bool getTirette(){
 	if(!freezed)
-		_tirette = !stableRead(Pin::tirette);
+		_tirette = !digitalRead(Pin::tirette);
 	return _tirette;
 }
 
 bool getRobot(){
 	if(!freezed) 
-		_robot = stableRead(Pin::robotSelect);
+		_robot = digitalRead(Pin::robotSelect);
 	return _robot;
 }
 bool getCheck(){
 	if(!freezed)
-		_check = !stableRead(Pin::checkButton);
+		_check = !digitalRead(Pin::checkButton);
 	return _check;
 }
+
 bool waitCheck(){
 	while(!getCheck()) delay(200);
 	while(getCheck()) delay(200);
 	return true;
 }
+
 //---Gestion Boutons Multiplexeur
-bool getArrowUp()
-{
+bool getArrowUp(){
 	if(!freezed) 
 		_arrowUp 	= !_buttonState[4];
 	return _arrowUp;
 }
+
 bool getEquipe(){
-	if(!freezed && !_recalage){
+	if(!freezed){
 		_equipe = _buttonState[5];
 		Settings::setTeam(_equipe);
 	}
-		
 	return _equipe;
 }
+
 bool getDetection(){
-	if(!freezed && !_recalage){
+	if(!freezed){
 		_detection = _buttonState[6];
-		Settings::AVOIDANCE = _detection;
+		Settings::setAvoidance(_detection);
 	}
 	return _detection;
 }
 
 bool getStrategie(){
-	if(!freezed && !_recalage)
+	if(!freezed)
 		_strategie = _buttonState[7];
 	return _strategie;
 }
-bool getOption01()
-{
-	if(!freezed && !_recalage) 
+
+bool getOption01(){
+	if(!freezed) 
 		_optionStrat01 = _buttonState[0];
 	return _optionStrat01;
 }
-bool getOption02()
-{
-	if(!freezed && !_recalage) 
+
+bool getOption02(){
+	if(!freezed) 
 		_optionStrat02 = _buttonState[1];
 	return _optionStrat02;
 }
-bool getOption03()
-{
-	if(!freezed && !_recalage) 
+
+bool getOption03(){
+	if(!freezed) 
 		_optionStrat03 = _buttonState[2];
 	return _optionStrat03;
 }
-bool getArrowDown()
-{
+
+bool getArrowDown(){
 	if(!freezed) 
 		_arrowDown 	= !_buttonState[3];
 	return _arrowDown;
@@ -382,406 +371,406 @@ void setTeam(bool team){
 	_equipe = team;
 }
 
-	namespace LCD{
-		//----------------GESTION DES PAGES LCD-------------------
-		void splashScreen()
-		{
-			// Lecture de son
-			Sound::playSound(LOADING_SOUND);
-			//Demarrage affichage
-			_u8g2.clearBuffer();
-			// Affichage du menu de base
-			baseMenu();
+namespace LCD{
+	//----------------GESTION DES PAGES LCD-------------------
+	void splashScreen()
+	{
+		// Lecture de son
+		Sound::playSound(LOADING_SOUND);
+		//Demarrage affichage
+		_u8g2.clearBuffer();
+		// Affichage du menu de base
+		baseMenu();
 
-			// Affichage de l'image K
-			_u8g2.setDrawColor(1);
-			_u8g2.setBitmapMode(0);
-			_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
+		// Affichage de l'image K
+		_u8g2.setDrawColor(1);
+		_u8g2.setBitmapMode(0);
+		_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
 
-			_u8g2.sendBuffer();
+		_u8g2.sendBuffer();
+	}
+
+	void baseMenu(){
+
+		_u8g2.setFont(u8g2_font_unifont_t_75);
+		_u8g2.setFontPosCenter();
+		// Fleche de menu
+		if (_arrowUp) {
+			_u8g2.drawGlyph(57, 2, 0x25b2);
+			_prevUpState = true ;
 		}
-
-		void baseMenu(){
-
-			_u8g2.setFont(u8g2_font_unifont_t_75);
-			_u8g2.setFontPosCenter();
-			// Fleche de menu
-			if (_arrowUp) {
-				_u8g2.drawGlyph(57, 2, 0x25b2);
-				_prevUpState = true ;
-			}
-			else {
-				_u8g2.drawGlyph(57, 2, 0x25b3);
-				if (_prevUpState) {
-					_prevUpState = false ;
-					_page++;
-					Sound::playSound(UP_SOUND);
-					if (_page == _nbrPage) _page = 0;
-				}
-			}
-
-			if (_arrowDown) {
-				_u8g2.drawGlyph(57, 123, 0x25bc);
-				_prevDownState = true ;
-			}
-			else {
-				_u8g2.drawGlyph(57, 123, 0x25bd);
-				if (_prevDownState) {
-					_prevDownState = false ;
-					_page--;
-					Sound::playSound(DOWN_SOUND);
-					if (_page < 0) _page = _nbrPage-1;
-				}
-			}
-
-			// Indicateur de Page
-			// Raz marqueur page
-			for(int i=0;i<_nbrPage;i++) _tabPage[i] = 0x25ab ;
-			// Selection page 
-			_tabPage[_page] = 0x25ae ;
-			// Affichage des breadCrum
-			for(int i=0;i<_nbrPage;i++){
-				_u8g2.drawGlyph(15+i*5, 2, _tabPage[i]);
-			}
-
-			// Afficher info version
-			// TODO
-			// Affichages de la date de compilation
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.setFontPosTop();
-			_u8g2.drawStr(1, 111, __DATE__);
-			_u8g2.drawStr(1, 119, __TIME__);
-		}
-
-		void startMenu(){
-			_u8g2.clearBuffer();
-			// Affichage du menu de base
-			baseMenu();
-			// Affichage de la page
-			affichePage();
-			// MAJ du neopixel
-			setColor(_equipe);
-
-			_u8g2.sendBuffer();
-		}
-
-		void sendBuffer(){
-			_u8g2.sendBuffer();
-		}
-
-		void affichePage(){
-			switch (_page) {
-				case 0:
-					page01();
-					break;
-				case 1:
-					page02();
-					break;
-				case 2:
-					page03();
-					break;
-				case 3:
-					page04();
-					break;
-				default:
-					_u8g2.setFont(u8g2_font_5x7_mr);
-					_u8g2.drawStr(2, 60, "error 404");
-					break;
+		else {
+			_u8g2.drawGlyph(57, 2, 0x25b3);
+			if (_prevUpState) {
+				_prevUpState = false ;
+				_page++;
+				Sound::playSound(UP_SOUND);
+				if (_page == _nbrPage) _page = 0;
 			}
 		}
 
-		void page01(){
-			// Alignements
-			const int marginLeft = 2;
-			const int yTirette 		= 20;
-			const int yLidar 		= 32;
-			const int yRecalage 	= 44;
-			const int yInferieur	= 60;
-			const int xBox	= 50;
+		if (_arrowDown) {
+			_u8g2.drawGlyph(57, 123, 0x25bc);
+			_prevDownState = true ;
+		}
+		else {
+			_u8g2.drawGlyph(57, 123, 0x25bd);
+			if (_prevDownState) {
+				_prevDownState = false ;
+				_page--;
+				Sound::playSound(DOWN_SOUND);
+				if (_page < 0) _page = _nbrPage-1;
+			}
+		}
 
-			// Affichage etat Tirette
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(marginLeft, yTirette, "Tirette ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_tirette)
-				_u8g2.drawGlyph(xBox, yTirette, 0x0046);
-			else
-				_u8g2.drawGlyph(xBox, yTirette, 0x0045);
+		// Indicateur de Page
+		// Raz marqueur page
+		for(int i=0;i<_nbrPage;i++) _tabPage[i] = 0x25ab ;
+		// Selection page 
+		_tabPage[_page] = 0x25ae ;
+		// Affichage des breadCrum
+		for(int i=0;i<_nbrPage;i++){
+			_u8g2.drawGlyph(15+i*5, 2, _tabPage[i]);
+		}
 
-			// Affichage etat Lidar
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(marginLeft, yLidar, "Lidar ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_lidar)
-				_u8g2.drawGlyph(xBox, yLidar, 0x0046);
-			else
-				_u8g2.drawGlyph(xBox, yLidar, 0x0045);
+		// Afficher info version
+		// TODO
+		// Affichages de la date de compilation
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.setFontPosTop();
+		_u8g2.drawStr(1, 111, __DATE__);
+		_u8g2.drawStr(1, 119, __TIME__);
+	}
 
-			// Affichage etat recalage départ
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(marginLeft, yRecalage, "Recalage ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_recalage)
-				_u8g2.drawGlyph(xBox, yRecalage, 0x0046);
-			else
-				_u8g2.drawGlyph(xBox, yRecalage, 0x0045);
+	void startMenu(){
+		_u8g2.clearBuffer();
+		// Affichage du menu de base
+		baseMenu();
+		// Affichage de la page
+		affichePage();
+		// MAJ du neopixel
+		setColor(_equipe);
 
-			// Partie inférieure
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(0, yInferieur, "---------------");
-			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
-			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
-			_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
-			_u8g2.drawStr(0, yInferieur + 40, "---------------");
+		_u8g2.sendBuffer();
+	}
 
-			// - X position
-			_u8g2.setCursor(30, yInferieur + 10);
+	void sendBuffer(){
+		_u8g2.sendBuffer();
+	}
+
+	void affichePage(){
+		switch (_page) {
+			case 0:
+				page01();
+				break;
+			case 1:
+				page02();
+				break;
+			case 2:
+				page03();
+				break;
+			case 3:
+				page04();
+				break;
+			default:
+				_u8g2.setFont(u8g2_font_5x7_mr);
+				_u8g2.drawStr(2, 60, "error 404");
+				break;
+		}
+	}
+
+	void page01(){
+		// Alignements
+		const int marginLeft = 2;
+		const int yTirette 		= 20;
+		const int yLidar 		= 32;
+		const int yRecalage 	= 44;
+		const int yInferieur	= 60;
+		const int xBox	= 50;
+
+		// Affichage etat Tirette
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(marginLeft, yTirette, "Tirette ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_tirette)
+			_u8g2.drawGlyph(xBox, yTirette, 0x0046);
+		else
+			_u8g2.drawGlyph(xBox, yTirette, 0x0045);
+
+		// Affichage etat Lidar
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(marginLeft, yLidar, "Lidar ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_lidar)
+			_u8g2.drawGlyph(xBox, yLidar, 0x0046);
+		else
+			_u8g2.drawGlyph(xBox, yLidar, 0x0045);
+
+		// Affichage etat recalage départ
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(marginLeft, yRecalage, "Recalage ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_recalage)
+			_u8g2.drawGlyph(xBox, yRecalage, 0x0046);
+		else
+			_u8g2.drawGlyph(xBox, yRecalage, 0x0045);
+
+		// Partie inférieure
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(0, yInferieur, "---------------");
+		_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
+		_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
+		_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
+		_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+		// - X position
+		_u8g2.setCursor(30, yInferieur + 10);
+		_u8g2.print(Motion::GetPosition().a,0);
+
+		// - Y position
+		_u8g2.setCursor(30, yInferieur + 20);
+		_u8g2.print(Motion::GetPosition().b,0);
+
+		// - Rot position
+		_u8g2.setCursor(30, yInferieur + 30);
+		_u8g2.print(Motion::GetPosition().c,0);
+
+	}
+
+	void page02(){
+		// Alignements
+		const int marginLeft = 2;
+		int wChaine;
+		const int yTeam = 21;
+		const int yAvoid = 37;
+		const int yStrat = 53;
+		const int yOption01 = 69;
+		const int yOption02 = 85;
+		const int yOption03 = 101;
+
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.setFontPosCenter();
+
+		//Gestion equipe
+		wChaine = _u8g2.drawStr(marginLeft, yTeam, "Equipe");
+		if (_equipe == Settings::yellow())
+			_u8g2.drawStr(marginLeft + wChaine, yTeam, " jaune");
+		else
+			_u8g2.drawStr(marginLeft + wChaine, yTeam, " violet");
+		
+		//Gestion evitement
+		wChaine = _u8g2.drawStr(marginLeft, yAvoid, "Evit.");
+		if (_detection == Settings::ADVERSAIRE_NON)
+			_u8g2.drawStr(marginLeft + wChaine, yAvoid, " simple");
+		else
+			_u8g2.drawStr(marginLeft + wChaine, yAvoid, " complexe");
+
+		//Gestion Stratégie
+		wChaine = _u8g2.drawStr(marginLeft, yStrat, "Strat.");
+		if (_strategie)
+			_u8g2.drawStr(marginLeft + wChaine, yStrat, " homologation");
+		else
+			_u8g2.drawStr(marginLeft + wChaine, yStrat, " match");
+
+
+		//Gestion Option 01 Stratégie
+		_u8g2.setFont(u8g2_font_micro_mr);
+		wChaine = _u8g2.drawStr(marginLeft, yOption01, " - Option 01 ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_optionStrat01)
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0045);
+		else
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0046);
+
+		//Gestion Option 02 Stratégie
+		_u8g2.setFont(u8g2_font_micro_mr);
+		wChaine = _u8g2.drawStr(marginLeft, yOption02, " - Option 02 ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_optionStrat02)
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0045);
+		else
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0046);
+
+		//Gestion Option 03 Stratégie
+		_u8g2.setFont(u8g2_font_micro_mr);
+		wChaine = _u8g2.drawStr(marginLeft, yOption03, " - Option 03 ");
+		_u8g2.setFont(u8g2_font_m2icon_9_tf);
+		if (_optionStrat03)
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0045);
+		else
+			_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
+
+		_u8g2.setFontPosTop();
+	}
+
+	void page03(){
+
+		_u8g2.setFont(u8g2_font_logisoso18_tr);
+		_u8g2.drawStr(2, 22, "Adj.");
+		_u8g2.drawStr(2, 48, "Servo");
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(10, 80, "Press Check");
+		_u8g2.drawStr(20, 90, "Button");
+
+	}
+
+	void page04(){
+
+		_u8g2.setFont(u8g2_font_logisoso18_tr);
+		_u8g2.drawStr(2, 22, "Adj.");
+		_u8g2.drawStr(2, 48, "Motion");
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(10, 80, "Press Check");
+		_u8g2.drawStr(20, 90, "Button");
+
+	}
+
+	void adjustActuators(){
+		// Change Value
+		// TODO
+	
+	}
+	
+	void initScreen(){
+		// Alignements
+		const int marginLeft = 2;
+		const int yInferieur	= 60;
+		
+		_u8g2.clearBuffer();
+		_u8g2.setFont(u8g2_font_logisoso16_tr);
+		_u8g2.drawStr(3, 2, "Probing...");
+
+		// Partie inférieure
+		_u8g2.setFont(u8g2_font_micro_mr);
+		_u8g2.drawStr(0, yInferieur, "---------------");
+		_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
+		_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
+		_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
+		_u8g2.drawStr(0, yInferieur + 40, "---------------");
+
+		// - X position
+		_u8g2.setCursor(30, yInferieur + 10);
+		if(Motion::isXProbed())
 			_u8g2.print(Motion::GetPosition().a,0);
+		else 
+			_u8g2.print('?',0);
 
-			// - Y position
-			_u8g2.setCursor(30, yInferieur + 20);
+		// - Y position
+		_u8g2.setCursor(30, yInferieur + 20);
+		if(Motion::isYProbed())
 			_u8g2.print(Motion::GetPosition().b,0);
-
-			// - Rot position
-			_u8g2.setCursor(30, yInferieur + 30);
+		else 
+			_u8g2.print('?',0);
+		// - Rot position
+		_u8g2.setCursor(30, yInferieur + 30);
+		if(Motion::isProbed())
 			_u8g2.print(Motion::GetPosition().c,0);
+		else 
+			_u8g2.print('?',0);
+		_u8g2.sendBuffer();
+	}
 
-		}
-
-		void page02(){
-			// Alignements
-			const int marginLeft = 2;
-			int wChaine;
-			const int yTeam = 21;
-			const int yAvoid = 37;
-			const int yStrat = 53;
-			const int yOption01 = 69;
-			const int yOption02 = 85;
-			const int yOption03 = 101;
-
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.setFontPosCenter();
-
-			//Gestion equipe
-			wChaine = _u8g2.drawStr(marginLeft, yTeam, "Equipe");
-			if (_equipe == Settings::Team::YELLOW)
-				_u8g2.drawStr(marginLeft + wChaine, yTeam, " jaune");
-			else
-				_u8g2.drawStr(marginLeft + wChaine, yTeam, " violet");
-			
-			//Gestion evitement
-			wChaine = _u8g2.drawStr(marginLeft, yAvoid, "Evit.");
-			if (_detection == Settings::ADVERSAIRE_NON)
-				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " simple");
-			else
-				_u8g2.drawStr(marginLeft + wChaine, yAvoid, " complexe");
-
-			//Gestion Stratégie
-			wChaine = _u8g2.drawStr(marginLeft, yStrat, "Strat.");
-			if (_strategie)
-				_u8g2.drawStr(marginLeft + wChaine, yStrat, " homologation");
-			else
-				_u8g2.drawStr(marginLeft + wChaine, yStrat, " match");
-
-
-			//Gestion Option 01 Stratégie
-			_u8g2.setFont(u8g2_font_micro_mr);
-			wChaine = _u8g2.drawStr(marginLeft, yOption01, " - Option 01 ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_optionStrat01)
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0045);
-			else
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption01, 0x0046);
-
-			//Gestion Option 02 Stratégie
-			_u8g2.setFont(u8g2_font_micro_mr);
-			wChaine = _u8g2.drawStr(marginLeft, yOption02, " - Option 02 ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_optionStrat02)
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0045);
-			else
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption02, 0x0046);
-
-			//Gestion Option 03 Stratégie
-			_u8g2.setFont(u8g2_font_micro_mr);
-			wChaine = _u8g2.drawStr(marginLeft, yOption03, " - Option 03 ");
-			_u8g2.setFont(u8g2_font_m2icon_9_tf);
-			if (_optionStrat03)
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0045);
-			else
-				_u8g2.drawGlyph(marginLeft + wChaine, yOption03, 0x0046);
-
-			_u8g2.setFontPosTop();
-		}
-
-		void page03(){
-
-			_u8g2.setFont(u8g2_font_logisoso18_tr);
-			_u8g2.drawStr(2, 22, "Adj.");
-			_u8g2.drawStr(2, 48, "Servo");
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(10, 80, "Press Check");
-			_u8g2.drawStr(20, 90, "Button");
-
-		}
-
-		void page04(){
-
-			_u8g2.setFont(u8g2_font_logisoso18_tr);
-			_u8g2.drawStr(2, 22, "Adj.");
-			_u8g2.drawStr(2, 48, "Motion");
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(10, 80, "Press Check");
-			_u8g2.drawStr(20, 90, "Button");
-
-		}
-
-		void adjustActuators(){
-			// Change Value
-			// TODO
-		
-		}
-		
-		void initScreen(){
-			// Alignements
-			const int marginLeft = 2;
-			const int yInferieur	= 60;
-			
-			_u8g2.clearBuffer();
-			_u8g2.setFont(u8g2_font_logisoso16_tr);
-			_u8g2.drawStr(3, 2, "Probing...");
-
-			// Partie inférieure
-			_u8g2.setFont(u8g2_font_micro_mr);
-			_u8g2.drawStr(0, yInferieur, "---------------");
-			_u8g2.drawStr(marginLeft, yInferieur + 10, "    X:         ");
-			_u8g2.drawStr(marginLeft, yInferieur + 20, "    Y:         ");
-			_u8g2.drawStr(marginLeft, yInferieur + 30, "  rot:      deg");
-			_u8g2.drawStr(0, yInferieur + 40, "---------------");
-
-			// - X position
-			_u8g2.setCursor(30, yInferieur + 10);
-			if(Motion::isXProbed())
-				_u8g2.print(Motion::GetPosition().a,0);
-			else 
-				_u8g2.print('?',0);
-
-			// - Y position
-			_u8g2.setCursor(30, yInferieur + 20);
-			if(Motion::isYProbed())
-				_u8g2.print(Motion::GetPosition().b,0);
-			else 
-				_u8g2.print('?',0);
-			// - Rot position
-			_u8g2.setCursor(30, yInferieur + 30);
-			if(Motion::isProbed())
-				_u8g2.print(Motion::GetPosition().c,0);
-			else 
-				_u8g2.print('?',0);
-			_u8g2.sendBuffer();
-		}
-
-		void checkListScreen()
+	void checkListScreen()
+	{
+		for (int i = 0; i < 6; i++)
 		{
-			for (int i = 0; i < 6; i++)
+			int x = 128; //On commence le texte à droite
+			do
 			{
-				int x = 128; //On commence le texte à droite
-				do
-				{
-					_u8g2.clearBuffer();
-
-					_u8g2.drawBox(22, 0, 2, 33); //Ligne de séparation numéro
-					for (int j = 0; j <= 128; j = j + 4)
-						_u8g2.drawBox(j, 40, 2, 1); //Ligne de séparation texte - tirets
-
-					_u8g2.setFont(u8g2_font_logisoso32_tn); //Changer la font pour le numero
-					_u8g2.setCursor(0, 0);
-					_u8g2.print(i + 1); //Afficher le numero de l'action
-
-					_u8g2.setFont(u8g2_font_courB08_tf); //Changer la font pour la description
-					_u8g2.drawStr(28, 0, "Action :");	 //Afficher le titre de l'action
-
-					_u8g2.setFont(u8g2_font_logisoso22_tf); //Changer la font pour la description
-					_u8g2.drawStr(25, 10, _titreList[i]);	//Afficher le titre de l'action
-
-					_u8g2.setFont(u8g2_font_courB08_tf); //Changer la font pour la description
-					_u8g2.drawStr(x, 48, _list[i]);		 //Afficher l'action
-
-					_u8g2.sendBuffer();
-					delay(100);
-					x -= 10; //Scrolling
-				} while (getCheck());
-				delay(1000);
-			}
-		}
-
-		void goScreen()
-		{
-			_u8g2.clearBuffer();
-			_u8g2.setFont(u8g2_font_logisoso32_tr);
-			_u8g2.drawStr(5, 48, "GO!");
-			_u8g2.sendBuffer();
-		}
-
-		void matchScreen(){
-			if(Match::hasStarted()){
 				_u8g2.clearBuffer();
-				// Titre
-				_u8g2.setFont(u8g2_font_logisoso16_tr);
-				_u8g2.drawStr(8, 1, "Match");
-				_u8g2.drawHLine(0, 20, 64);
 
-				// Affichage partie Score
-				_u8g2.setFont(u8g2_font_micro_mr);
-				_u8g2.drawStr(4, 23, "Score:");
-				_u8g2.drawStr(38, 66, "points");
+				_u8g2.drawBox(22, 0, 2, 33); //Ligne de séparation numéro
+				for (int j = 0; j <= 128; j = j + 4)
+					_u8g2.drawBox(j, 40, 2, 1); //Ligne de séparation texte - tirets
 
-				// Score Chiffre
-				_u8g2.setFont(u8g2_font_logisoso32_tr);
-				_u8g2.setCursor(2, 31);
-				_u8g2.print(Match::GetScore());
+				_u8g2.setFont(u8g2_font_logisoso32_tn); //Changer la font pour le numero
+				_u8g2.setCursor(0, 0);
+				_u8g2.print(i + 1); //Afficher le numero de l'action
 
-				_u8g2.drawHLine(0, 75, 64);
+				_u8g2.setFont(u8g2_font_courB08_tf); //Changer la font pour la description
+				_u8g2.drawStr(28, 0, "Action :");	 //Afficher le titre de l'action
 
-				//---Partie inférieure---
-				// Affichage Statique
-				_u8g2.setFont(u8g2_font_micro_mr);
-				_u8g2.drawStr(3, 77, "Temps:      sec");
-				_u8g2.drawStr(3, 84, "    X:         ");
-				_u8g2.drawStr(3, 91, "    Y:         ");
-				_u8g2.drawStr(3, 98, "  rot:      deg");
+				_u8g2.setFont(u8g2_font_logisoso22_tf); //Changer la font pour la description
+				_u8g2.drawStr(25, 10, _titreList[i]);	//Afficher le titre de l'action
 
-				// Affichage Variable
-				// - Temps
-				_u8g2.setCursor(30, 77);
-				_u8g2.print(Match::GetTempsRestant());
-				// - X position
-				_u8g2.setCursor(30, 84);
-				_u8g2.print(Motion::GetPosition().a,0);
-				// - Y position
-				_u8g2.setCursor(30, 91);
-				_u8g2.print(Motion::GetPosition().b,0);
-				// - Rot position
-				_u8g2.setCursor(30, 98);
-				_u8g2.print(Motion::GetPosition().c,0);
+				_u8g2.setFont(u8g2_font_courB08_tf); //Changer la font pour la description
+				_u8g2.drawStr(x, 48, _list[i]);		 //Afficher l'action
 
 				_u8g2.sendBuffer();
-			}
-		}
-
-	}
-
-	namespace Sound{
-
-		void playSound (int soundfile){
-			mp3.playMp3Folder(soundfile);
-		}
-
-		void switchSound (bool state){
-			if(state) Sound::playSound(SWITCH_RIGHT_SOUND);
-			else Sound::playSound(SWITCH_LEFT_SOUND);
+				delay(100);
+				x -= 10; //Scrolling
+			} while (getCheck());
+			delay(1000);
 		}
 	}
+
+	void goScreen()
+	{
+		_u8g2.clearBuffer();
+		_u8g2.setFont(u8g2_font_logisoso32_tr);
+		_u8g2.drawStr(5, 48, "GO!");
+		_u8g2.sendBuffer();
+	}
+
+	void matchScreen(){
+		if(Match::hasStarted()){
+			_u8g2.clearBuffer();
+			// Titre
+			_u8g2.setFont(u8g2_font_logisoso16_tr);
+			_u8g2.drawStr(8, 1, "Match");
+			_u8g2.drawHLine(0, 20, 64);
+
+			// Affichage partie Score
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(4, 23, "Score:");
+			_u8g2.drawStr(38, 66, "points");
+
+			// Score Chiffre
+			_u8g2.setFont(u8g2_font_logisoso32_tr);
+			_u8g2.setCursor(2, 31);
+			_u8g2.print(Match::GetScore());
+
+			_u8g2.drawHLine(0, 75, 64);
+
+			//---Partie inférieure---
+			// Affichage Statique
+			_u8g2.setFont(u8g2_font_micro_mr);
+			_u8g2.drawStr(3, 77, "Temps:      sec");
+			_u8g2.drawStr(3, 84, "    X:         ");
+			_u8g2.drawStr(3, 91, "    Y:         ");
+			_u8g2.drawStr(3, 98, "  rot:      deg");
+
+			// Affichage Variable
+			// - Temps
+			_u8g2.setCursor(30, 77);
+			_u8g2.print(Match::GetTempsRestant());
+			// - X position
+			_u8g2.setCursor(30, 84);
+			_u8g2.print(Motion::GetPosition().a,0);
+			// - Y position
+			_u8g2.setCursor(30, 91);
+			_u8g2.print(Motion::GetPosition().b,0);
+			// - Rot position
+			_u8g2.setCursor(30, 98);
+			_u8g2.print(Motion::GetPosition().c,0);
+
+			_u8g2.sendBuffer();
+		}
+	}
+
+}
+
+namespace Sound{
+
+	void playSound (int soundfile){
+		mp3.playMp3Folder(soundfile);
+	}
+
+	void switchSound (bool state){
+		if(state) Sound::playSound(SWITCH_RIGHT_SOUND);
+		else Sound::playSound(SWITCH_LEFT_SOUND);
+	}
+}
 
 }
 

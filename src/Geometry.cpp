@@ -30,7 +30,10 @@ Vec3 ik(Vec3 target){
             L = Settings::RADIUS,
             R = Settings::WHEEL_RADIUS;
     
-    target.mult(Settings::Team::transform.toMatrix());
+    if(Settings::purple()){
+        Vec3 transform(1,-1,-1);
+        target.mult(transform.toMatrix());
+    }
 
     Matrix3x3 P = {
             0,   1 , L,
@@ -54,8 +57,14 @@ Vec3 fk(Vec3 target){
         -f2s3,   f1s3 , f1s3,
         f1s3/L, f1s3/L, f1s3/L
     };
+    
     P.mult(R);
     target.mult(P);
-    target.mult(Settings::Team::transform.toMatrix());
+
+    if(Settings::purple()){
+        Vec3 transform(1,-1,-1);
+        target.mult(transform.toMatrix());
+    }
+
     return target;
 }

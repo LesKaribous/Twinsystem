@@ -4,11 +4,7 @@
 #include "Twinsystem.h"
 #include "Debugger.h"
 
-namespace Motion
-{
-
-	bool yellow(){return (Settings::TEAM == Settings::Team::YELLOW); }
-	bool purple(){return (Settings::TEAM == Settings::Team::PURPLE); }
+namespace Motion{
 
 	State cState = State::IDLE;
 
@@ -26,7 +22,7 @@ namespace Motion
 	bool avoidance = false;
 
 	void init(){
-		calibration = Settings::ROBOT == Settings::PRIMARY ?  
+		calibration = Settings::primary() ?  
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 		
 		absolute = Settings::ABSOLUTE;
@@ -109,8 +105,8 @@ namespace Motion
 
     void goPolar(float heading, float length){
 		PolarVec target;
-		if(yellow()) target = PolarVec(-heading*DEG_TO_RAD, length);
-		if(purple()) target = PolarVec(heading*DEG_TO_RAD, length);
+		if(Settings::yellow()) target = PolarVec(-heading*DEG_TO_RAD, length);
+		if(Settings::purple()) target = PolarVec(heading*DEG_TO_RAD, length);
 		go(target.toVec2());
 	}
 
@@ -300,7 +296,7 @@ namespace Motion
 
 	
     void SetAvoidance(bool state){
-		if(Settings::AVOIDANCE == Settings::ADVERSAIRE_OUI)
+		if(Settings::avoidance())
 			avoidance = state;
 		else avoidance = false;
 	}
