@@ -73,7 +73,6 @@ namespace Strategy{
 	}
 
 	void matchPrimary(){
-
 		SetAvoidance(false);
 		updateScore(Score::STATUETTE_DEPOSEE);
 		updateScore(Score::VITRINE_DEPOSEE);
@@ -555,6 +554,14 @@ namespace Strategy{
 			else if(Settings::purple()) turn(+angleFrom-angleTo);
 
 		SetAbsolute(tAbsolute); // Restaure le type de positonnement */
+	}
+
+	void batonDanse(){
+		while(1){
+			BrasTirette.setArm(0,376);
+			BrasTirette.setArm(50,376);
+		}
+		
 	}
 
 }
