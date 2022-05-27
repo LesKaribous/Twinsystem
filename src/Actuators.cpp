@@ -89,7 +89,7 @@ namespace Actuators{
 			BrasAU			.detachBras();
 			BrasInit		.detachBras();
 			BrasTirette		.detachBras();
-		
+		IHM::addLoad(10);
 	}
 
 	void sleep(){

@@ -14,6 +14,7 @@
  * Switch 3 : Index 0 : Balise
  * Switch 4 : Index 3 : Robot
  **********/
+#include <Arduino.h>
 
 #define LOADING_SOUND 0001
 #define UP_SOUND 0002
@@ -23,6 +24,7 @@
 #define START_SOUND 0006
 #define MUSEUM_SOUND 0007
 #define DROOP_SOUND 0008
+#define BATON_SOUND 9
 
 namespace IHM{
 
@@ -49,6 +51,8 @@ namespace IHM{
 
     //------ Gestion du ring Neopixel ------
     void setColor(bool colorChoosed);
+    void addLoad(int a);
+    void setLoadingMsg(String a);
 
     //------ Gestion des E/S ------
     bool getTirette       ();
@@ -92,6 +96,7 @@ namespace IHM{
 
     namespace Sound{
         //------ Gestion des sons -------
+        void init();
         void playSound      (int soundfile);
         void switchSound    (bool state);
     }

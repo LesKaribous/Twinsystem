@@ -23,6 +23,7 @@ namespace System{
         Motion::init();
        
         Intercom::init();
+        IHM::Sound::init();
         IHM::ready();
 
         Strategy::waitLaunch();

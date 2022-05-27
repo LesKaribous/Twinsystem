@@ -16,6 +16,7 @@ namespace Intercom{
 
     void init(){
         Serial4.begin(9600);
+        IHM::addLoad(10);
     }
 
     void reboot(){

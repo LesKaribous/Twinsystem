@@ -27,6 +27,7 @@ namespace Motion{
 		
 		absolute = Settings::ABSOLUTE;
 		Controller::setFeedrate(100);
+		IHM::addLoad(10);
 	}
 
 	void debugState(){

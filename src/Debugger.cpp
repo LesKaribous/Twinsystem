@@ -24,7 +24,8 @@ namespace Debugger{
             delay(200);
             Serial.println("done.");
         }
-
+        IHM::addLoad(10);
+        IHM::setLoadingMsg("");
 
     }
 
@@ -131,12 +132,17 @@ namespace Debugger{
         }else if(command.startsWith("setFOV(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
-            String angleStr = argString.substring(0, argString.indexOf(','));
-            String distStr  = argString.substring(argString.indexOf(',')+1, argString.length());
+            String angleStr  = argString.substring(argString.indexOf(',')+1, argString.length());
 
-            float angle = float(angleStr.toInt());
-            float dist = float(distStr.toInt());
+            float angle = float(angleStr.toFloat());
             Intercom::setFOV(angle);
+        }else if(command.startsWith("sound(")){
+            lastCmd = command;
+            String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));
+            String indexStr  = argString.substring(argString.indexOf(',')+1, argString.length());
+
+            int index = float(indexStr.toInt());
+            IHM::Sound::playSound(index);
         }else if(command.startsWith("heading(")){
             lastCmd = command;
             String argString = command.substring(command.indexOf("(") +1, command.indexOf(")"));

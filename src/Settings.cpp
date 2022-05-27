@@ -8,13 +8,15 @@ namespace Settings{
     bool 
     ROBOT = true,
     AVOIDANCE = true,
-    TEAM = true;
+    TEAM = Settings::YELLOW;
 
     Vec3 transform; //Changement de reprère purple / yellow 
 
     void init(){ 
         pinMode(Pin::robotSelect, INPUT_PULLUP);
         ROBOT = digitalRead(Pin::robotSelect) ? PRIMARY : SECONDARY;
+        IHM::setTeam(TEAM);
+        IHM::addLoad(10);
     }
 
     void setTeam(bool team){

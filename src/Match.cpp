@@ -70,6 +70,7 @@ namespace Match{
 
 	void end()
 	{
+		Debugger::log("Fin de match !");
 		IHM::LCD::matchScreen();
 		// Stopper les moteurs
 		Controller::stop();
@@ -77,6 +78,7 @@ namespace Match{
 		// Stopper les actionneurs
 		Actuators::unsuck();
 		Actuators::sleep();
+		IHM::Sound::playSound(BATON_SOUND);
 		// Boucle infinie
 		while(true){
 			Debugger::checkSerial();

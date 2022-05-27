@@ -80,6 +80,9 @@ namespace IHM
 	int _page = 0;
 	int _tabPage[4];
 	const int _nbrPage = 4;
+	int loadProgress = 0;
+
+	String loadingMsg = "Loading HMI...";
 
 	State state = State::INIT;
 
@@ -137,15 +140,6 @@ void init(){
 	digitalWrite(Pin::latchMux, LOW);
 	digitalWrite(Pin::clockMux, LOW);
 
-	// Init and configuration of the MP3 module DFPlayer Mini
-	DFPlayerSerial.begin(9600);
-	mp3.begin(DFPlayerSerial);
-	Debugger::println("DFPlayer launched");
-
-	mp3.setTimeOut(500);
-	mp3.volume(29);
-	mp3.EQ(DFPLAYER_EQ_NORMAL);
-
 	// Init and configuration for the LCD
 	_u8g2.begin(); 
 	_u8g2.setFontRefHeightExtendedText();
@@ -162,15 +156,14 @@ void init(){
 
 	// Initi the IO of the IHM
 	updateButtonIHM();
-
-	// Splashscreen with the K logo
-	LCD::splashScreen();
+	IHM::addLoad(10);
 }
 
 void update(){
 
 	switch(state){
 		case State::INIT :
+		LCD::splashScreen();
 		break;
 		case State::READY :
 		IHM::menu();
@@ -198,12 +191,22 @@ void start(){
 
 void ready(){
 	state = State::READY;
+	IHM::addLoad(10);
 	update();
 }
 
 void probing(){
 	state = State::PROBE;
 	update();
+}
+
+void addLoad(int a){
+	loadProgress += a;
+	if(loadProgress > 25) LCD::splashScreen();
+}
+
+void setLoadingMsg(String a){
+	loadingMsg = a;
 }
 
 void setColor(bool colorChoosed){
@@ -375,17 +378,26 @@ namespace LCD{
 	//----------------GESTION DES PAGES LCD-------------------
 	void splashScreen()
 	{
-		// Lecture de son
-		Sound::playSound(LOADING_SOUND);
 		//Demarrage affichage
 		_u8g2.clearBuffer();
 		// Affichage du menu de base
-		baseMenu();
+		//baseMenu();
 
 		// Affichage de l'image K
 		_u8g2.setDrawColor(1);
 		_u8g2.setBitmapMode(0);
 		_u8g2.drawXBMP(0, 32, _LOGO_KARIBOUS_width, _LOGO_KARIBOUS_height, _LOGO_KARIBOUS_bits);
+		_u8g2.drawHLine(10, 100, map(loadProgress, 0,100, 0, _LOGO_KARIBOUS_width-18));
+		_u8g2.drawHLine(10, 101, map(loadProgress, 0,100, 0, _LOGO_KARIBOUS_width-18));
+		_u8g2.drawHLine(10, 102, map(loadProgress, 0,100, 0, _LOGO_KARIBOUS_width-18));
+
+		_u8g2.setFont(u8g2_font_micro_mr);
+
+		_u8g2.setCursor((_LOGO_KARIBOUS_width-10)/2, 105);
+		_u8g2.print(loadProgress,10);
+		_u8g2.print("%");
+
+		_u8g2.drawStr(0, 110, loadingMsg.c_str());
 
 		_u8g2.sendBuffer();
 	}
@@ -762,8 +774,26 @@ namespace LCD{
 
 namespace Sound{
 
+	void init(){
+		// Init and configuration of the MP3 module DFPlayer Mini
+		DFPlayerSerial.begin(9600);
+		mp3.begin(DFPlayerSerial);
+		Debugger::println("DFPlayer launched");
+
+		mp3.setTimeOut(500);
+		mp3.volume(30);
+		mp3.EQ(DFPLAYER_EQ_NORMAL);
+
+		delay(500);
+		// Lecture de son
+		Sound::playSound(LOADING_SOUND);
+		IHM::addLoad(10);
+	}
+
+
 	void playSound (int soundfile){
 		mp3.playMp3Folder(soundfile);
+		
 	}
 
 	void switchSound (bool state){

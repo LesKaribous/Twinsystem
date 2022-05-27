@@ -41,6 +41,7 @@ namespace Controller{
         reset();    
 
         setCalibration(Settings::primary()); //WARNING
+        IHM::addLoad(10);
     }
 
     void update(){}

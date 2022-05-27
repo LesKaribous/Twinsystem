@@ -33,7 +33,7 @@ namespace Settings{
     SECONDARY = 0,
     ABSOLUTE = true,
     
-    IHM = false,
+    IHM      = true,
     YELLOW   = true,
     PURPLE   = false;
 
