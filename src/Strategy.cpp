@@ -88,11 +88,11 @@ namespace Strategy{
 		layOnGallery(BrasAU,BLUE_ELEMENT);
 
 		SetAvoidance(false);
-		go(1350,290);
+		go(1330,290);
 		takeDispenser(BrasAU,SECOND_DISPENSER);
-		go(1350,275);
+		go(1330,275);
 		takeDispenser(BrasInit,SECOND_DISPENSER);
-		go(1350,260);
+		go(1330,260);
 		takeDispenser(BrasTirette,SECOND_DISPENSER);
 
 		//takeHorizontalDispenser(BrasAU);
