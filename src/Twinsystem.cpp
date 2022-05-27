@@ -15,9 +15,9 @@ namespace System{
 
     void init(){
         //--- INIT ---
-        Debugger::init();
         IHM::init();
         Settings::init();
+        Debugger::init();
         Actuators::init();
         Controller::init();
         Motion::init();

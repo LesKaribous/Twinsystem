@@ -42,6 +42,7 @@ namespace Controller{
 
         setCalibration(Settings::primary()); //WARNING
         IHM::addLoad(10);
+        IHM::setLoadingMsg("Controller OK");
     }
 
     void update(){}

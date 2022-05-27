@@ -25,7 +25,7 @@ namespace Debugger{
             Serial.println("done.");
         }
         IHM::addLoad(10);
-        IHM::setLoadingMsg("");
+        IHM::setLoadingMsg("Debugger OK");
 
     }
 

@@ -17,6 +17,7 @@ namespace Settings{
         ROBOT = digitalRead(Pin::robotSelect) ? PRIMARY : SECONDARY;
         IHM::setTeam(TEAM);
         IHM::addLoad(10);
+        IHM::setLoadingMsg("Settings OK");
     }
 
     void setTeam(bool team){

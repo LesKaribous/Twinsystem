@@ -157,6 +157,7 @@ void init(){
 	// Initi the IO of the IHM
 	updateButtonIHM();
 	IHM::addLoad(10);
+	IHM::setLoadingMsg("HMI OK");
 }
 
 void update(){
@@ -193,6 +194,7 @@ void ready(){
 	state = State::READY;
 	IHM::addLoad(10);
 	update();
+	IHM::setLoadingMsg("Ready.");
 }
 
 void probing(){
@@ -397,7 +399,10 @@ namespace LCD{
 		_u8g2.print(loadProgress,10);
 		_u8g2.print("%");
 
-		_u8g2.drawStr(0, 110, loadingMsg.c_str());
+		_u8g2.drawStr(20-(loadingMsg.length()), 115, loadingMsg.c_str());
+
+		String robotStr = Settings::primary() ? "PRIMARY" : "SECONDARY";
+		_u8g2.drawStr(20-(robotStr.length()), 20, robotStr.c_str());
 
 		_u8g2.sendBuffer();
 	}
@@ -788,6 +793,7 @@ namespace Sound{
 		// Lecture de son
 		Sound::playSound(LOADING_SOUND);
 		IHM::addLoad(10);
+		IHM::setLoadingMsg("Sound OK");
 	}
 
 
