@@ -247,13 +247,13 @@ namespace Strategy{
 			// Take an element on the Workshed and push it under
 			SetAbsolute();
 			if(statePush == 0){
-				if(Settings::yellow()) go(230,1545);
+				if(Settings::yellow()) go(235,1540);
 				if(Settings::purple()) go(280,1545);
 			}
 			else if(statePush == 1){
 				go(500,1700); //Decalage
 				if(Settings::yellow()) go(400,1730);
-				if(Settings::purple()) go(430,1750);
+				if(Settings::purple()) go(440,1740);
 			}
 
 			if(Settings::yellow()) align(-135, robotArm.GetAngle());
