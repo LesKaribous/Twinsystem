@@ -13,20 +13,29 @@
 //     Last update : 30 / 03 / 2022
                                     
 #include "Twinsystem.h"
-#include "Test.h"
+
+//#define JOKE
+
+#ifdef JOKE
+#include "Joke.h"
+#endif
 
 void setup(){
     System::init();
 }
 
 void loop(){
-    //--- START MATCH---
-    //Settings::setTeam(IHM::getEquipe());
-    Match::start();
-    if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 
-        Strategy::match();
-    else if(IHM::getStrategie() == Settings::STRATEGIE_HOMOLOGATION) 
-        Strategy::homologation();
-    //--- END MATCH---
+
+
+    #ifdef JOKE
+        Joke::dessin();
+    #else
+        Match::start();
+        if(IHM::getStrategie() == Settings::STRATEGIE_MATCH ) 
+            Strategy::match();
+        else if(IHM::getStrategie() == Settings::STRATEGIE_HOMOLOGATION) 
+            Strategy::homologation();
+    #endif
+
     Match::end();
 }
