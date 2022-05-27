@@ -22,7 +22,7 @@ namespace Settings{
     }
 
     void setAvoidance(bool state){
-        AVOIDANCE = state;
+        AVOIDANCE = state == Settings::ADVERSAIRE_OUI;
     }
 
     bool yellow     (){ return (Settings::TEAM == Settings::YELLOW);        }
@@ -31,12 +31,6 @@ namespace Settings{
 	bool secondary  (){ return (Settings::ROBOT == Settings::SECONDARY);    }
     bool avoidance  (){ return Settings::AVOIDANCE;                         }
     bool useIHM     (){ return Settings::IHM;                               }
-
-
-
-
-
-
 
 }
 

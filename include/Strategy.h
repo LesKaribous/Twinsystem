@@ -9,9 +9,6 @@ namespace Strategy{
     extern int score;
     extern bool matchEnCours;
 
-    bool yellow();
-    bool purle();
-
     //----- STRATEGIES -----
     void recalage();
     void homologation();

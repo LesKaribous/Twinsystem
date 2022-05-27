@@ -41,10 +41,11 @@ namespace Match{
 			tempsRestant = (Settings::TEMPS_MATCH - (millis() - timeInit)) / 1000;
 
 			if (tempsRestant <= 0){
+				tempsRestant = 0;
 				Match::end();
 				return true;
 			}
-			else if (tempsRestant <= 4 && state != State::HOMING){
+			else if (tempsRestant <= 5 && state != State::HOMING){
 				state = State::HOMING;
 				Strategy::goHome();
 				Match::end();

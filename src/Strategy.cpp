@@ -60,7 +60,7 @@ namespace Strategy{
 		SetAbsolute();
 		goTurn(250,850,0);
 		probeBorder(borderXmin);
-		goTurn(260,850,0); //250
+		goTurn(260,850,0);
 		Controller::sleep();
 	}
 
@@ -74,7 +74,7 @@ namespace Strategy{
 
 	void matchPrimary(){
 
-		SetAvoidance(true);
+		SetAvoidance(false);
 		updateScore(Score::STATUETTE_DEPOSEE);
 		updateScore(Score::VITRINE_DEPOSEE);
 
@@ -88,6 +88,7 @@ namespace Strategy{
 		layOnGallery(BrasInit,GREEN_ELEMENT);
 		layOnGallery(BrasAU,BLUE_ELEMENT);
 
+		SetAvoidance(true);
 		go(1350,290);
 		takeDispenser(BrasAU,SECOND_DISPENSER);
 		go(1350,275);
@@ -104,12 +105,13 @@ namespace Strategy{
 	}
 	
 	void matchSecondary(){
-		SetAvoidance(true);
+		SetAvoidance(false);
 		takeAndPushUnder(BrasAU);
 		takeStatuette(BrasAU);
 		releaseCube(BrasTirette);
 		layStatuette(BrasAU);
 		go(400,1000);
+		SetAvoidance(true);
 
 		for(int square = 0; square <=2; square++) flipSquares(square) ;
 		updateScore(Score::CARRE_NON_BASCULE);
@@ -129,6 +131,7 @@ namespace Strategy{
 		
 		// Enregistrement des paramètres de match
 		IHM::freezeSettings();
+		Settings::setTeam(IHM::getEquipe());
 	}
 
 //-------- SOUS-STRATEGIES --------
@@ -139,11 +142,13 @@ namespace Strategy{
 		takeElement(BrasInit,GROUND);
 		BrasInit.updateElement(GREEN_ELEMENT);
 		go(680,550);
-		align(0, BrasAU.GetAngle());
+		if(Settings::yellow()) align(0, BrasAU.GetAngle());
+		if(Settings::purple()) align(0,-BrasAU.GetAngle());
 		go(743,550);
 		takeElement(BrasAU,GROUND);
 		BrasAU.updateElement(BLUE_ELEMENT);
-		align(-60, BrasTirette.GetAngle());
+		if(Settings::yellow()) align(-60, BrasTirette.GetAngle());
+		if(Settings::purple()) align(-60,-BrasTirette.GetAngle());
 		go(840,668);
 		takeElement(BrasTirette,GROUND);
 		BrasTirette.updateElement(RED_ELEMENT);
@@ -189,7 +194,8 @@ namespace Strategy{
 		}
 		SetAbsolute();
 		go(xPos,230);
-		align(90,robotArm.GetAngle());// +90 car Gallerie positionnée à 90° de l'origine
+		if(Settings::yellow()) align(90, robotArm.GetAngle());// +90 car Gallerie positionnée à 90° de l'origine
+		if(Settings::purple()) align(90,-robotArm.GetAngle());
 		go(xPos,160);
 
 		SetPosition(Vec3(GetPosition().a,112.61+87,GetPosition().c));
@@ -214,7 +220,7 @@ namespace Strategy{
 	void layStatuette(Bras &robotArm){
 		SetAbsolute();
 		turn(0);
-		go(250,250);
+		go(300,300);
 		//Home 
 		SetPosition(Vec3(0,0,0));
 		Vec2 borderXmin(-50, 0	 );
@@ -279,8 +285,14 @@ namespace Strategy{
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 
 		SetAbsolute();
-		if(dispenser == SECOND_DISPENSER) align(90,robotArm.GetAngle());
-		else if(dispenser == FIRST_DISPENSER) align(60,robotArm.GetAngle());
+		if(dispenser == SECOND_DISPENSER){
+			if(Settings::yellow())align(90, robotArm.GetAngle());
+			if(Settings::purple())align(90,-robotArm.GetAngle());
+		}
+		else if(dispenser == FIRST_DISPENSER){
+			if(Settings::yellow())align(60, robotArm.GetAngle());
+			if(Settings::purple())align(60,-robotArm.GetAngle());
+		}
 
 		takeElement(robotArm,DISPENSER);
 		updateScore(Score::ECHANTILLON_ENLEVE);

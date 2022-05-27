@@ -93,6 +93,12 @@ namespace Debugger{
         }else if(command.startsWith("SetAbsolute")){
             Motion::SetAbsolute();
             println("Switched to absolute mode.");
+        }else if(command.startsWith("SetAvoid")){
+            Settings::setAvoidance(true);
+            println("Avoidance activated");
+        }else if(command.startsWith("SetNotAvoid")){
+            Settings::setAvoidance(false);
+            println("Avoidance desactivated");
         }else if(command.startsWith("SetRelative")){
             Motion::SetRelative();
             println("Switched to relative mode.");

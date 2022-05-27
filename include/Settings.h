@@ -32,7 +32,8 @@ namespace Settings{
     PRIMARY   = 1,
     SECONDARY = 0,
     ABSOLUTE = true,
-    IHM = true,
+    
+    IHM = false,
     YELLOW   = true,
     PURPLE   = false;
 

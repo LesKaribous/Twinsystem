@@ -91,7 +91,7 @@ namespace Intercom{
         Debugger::log("Heading : ", t2d.heading(), VERBOSE);
 
         float angleRange = 50;
-        float distRange = Settings::RADIUS*5 ;
+        float distRange = Settings::RADIUS*4 ;
 
         setFOV(angleRange);
         lookAt(Settings::yellow() ? t2d.heading()*RAD_TO_DEG : PI - t2d.heading()*RAD_TO_DEG, distRange);

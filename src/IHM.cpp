@@ -240,14 +240,14 @@ void updateButtonIHM(){
 	getTirette();
 	getRobot();
 	getCheck();
+	getLidar();
 
-	if(Settings::secondary()){
+	if(Settings::useIHM()){
 		readButtonState();
 		
 		getArrowUp();
 		getArrowDown();
 		getDetection();
-		getLidar();
 		getStrategie();
 		getOption01();
 		getOption02();
@@ -553,14 +553,14 @@ namespace LCD{
 
 		//Gestion equipe
 		wChaine = _u8g2.drawStr(marginLeft, yTeam, "Equipe");
-		if (_equipe == Settings::yellow())
+		if (Settings::yellow())
 			_u8g2.drawStr(marginLeft + wChaine, yTeam, " jaune");
 		else
 			_u8g2.drawStr(marginLeft + wChaine, yTeam, " violet");
 		
 		//Gestion evitement
 		wChaine = _u8g2.drawStr(marginLeft, yAvoid, "Evit.");
-		if (_detection == Settings::ADVERSAIRE_NON)
+		if (!Settings::avoidance())
 			_u8g2.drawStr(marginLeft + wChaine, yAvoid, " simple");
 		else
 			_u8g2.drawStr(marginLeft + wChaine, yAvoid, " complexe");
