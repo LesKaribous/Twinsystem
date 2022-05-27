@@ -210,7 +210,7 @@ namespace Strategy{
 
 	void takeStatuette(Bras &robotArm){
 		SetAbsolute();
-		go(390,1580);
+		go(400,1580);
 		if(Settings::yellow()) align(-135, robotArm.GetAngle());
 		if(Settings::purple()) align(-135,-robotArm.GetAngle());
 		takeElement(robotArm,PEDESTAL);
@@ -220,11 +220,11 @@ namespace Strategy{
 	void layStatuette(Bras &robotArm){
 		SetAbsolute();
 		turn(0);
-		go(300,300);
+		go(200,200);
 		//Home 
 		SetPosition(Vec3(0,0,0));
-		Vec2 borderXmin(-50, 0	 );
-		Vec2 borderYmin(   0,-50);
+		Vec2 borderXmin(-100, 0	 );
+		Vec2 borderYmin(   0,-100);
 		Vec2 borderXmax( 100, 0	 );
 		Vec2 borderYmax(   0, 100);
 		probeBorder(borderXmin);
@@ -250,8 +250,9 @@ namespace Strategy{
 				if(Settings::purple()) go(280,1545);
 			}
 			else if(statePush == 1){
+				go(500,1700); //Decalage
 				if(Settings::yellow()) go(400,1730);
-				if(Settings::purple()) go(420,1750);
+				if(Settings::purple()) go(430,1750);
 			}
 
 			if(Settings::yellow()) align(-135, robotArm.GetAngle());
