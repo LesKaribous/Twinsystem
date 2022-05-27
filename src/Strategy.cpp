@@ -88,7 +88,7 @@ namespace Strategy{
 		layOnGallery(BrasInit,GREEN_ELEMENT);
 		layOnGallery(BrasAU,BLUE_ELEMENT);
 
-		SetAvoidance(true);
+		SetAvoidance(false);
 		go(1350,290);
 		takeDispenser(BrasAU,SECOND_DISPENSER);
 		go(1350,275);
@@ -111,6 +111,8 @@ namespace Strategy{
 		releaseCube(BrasTirette);
 		layStatuette(BrasAU);
 		go(400,1000);
+
+		
 		SetAvoidance(true);
 
 		for(int square = 0; square <=2; square++) flipSquares(square) ;
@@ -324,6 +326,7 @@ namespace Strategy{
 		SetRelative();
 		goPolar(robotArm.GetAngle(),100);
 		robotArm.setElevator(100,500);
+		goPolar(robotArm.GetAngle(),-100);
 		robotArm.setElevator(0,500);
 		goPolar(robotArm.GetAngle(),-100);
 		updateScore(Score::REPLIQUE_DEPOSEE);
@@ -336,7 +339,7 @@ namespace Strategy{
 		if(Settings::yellow()) align(-90, BrasTirette.GetAngle());
 		if(Settings::purple()) align(-90,-BrasTirette.GetAngle());
 
-		go(667+(squareNumber*185) , 1800);
+		go(647+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
 		else {
 			SetRelative();
@@ -458,6 +461,8 @@ namespace Strategy{
 				// Relase the CUBE on the pedestal
 				// Warning only use it on the secondary
 				robotArm.setElevator(100,500);
+				goPolar(robotArm.GetAngle(), -70);
+				wait(1000);
 				robotArm.setElevator(0,500);
 
 			break;
@@ -489,10 +494,10 @@ namespace Strategy{
 
 		boolean tAbsolute = isAbsolute(); // Stock le type de positionnement
 		robotArm.setPosition(0,100,20,600);
-		robotArm.ungrab();
+		robotArm.ungrab(500);
 		SetRelative();
-		robotArm .setPosition(80,100,0);
 		goPolar(robotArm.GetAngle(),-70); // reculer relativement en fonction de robotArm
+		robotArm .setPosition(80,100,0);
 		goPolar(robotArm.GetAngle(),120); //avancer relativement en fonction de robotArm
 		takeElement(robotArm,GROUND);
 
