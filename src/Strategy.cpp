@@ -88,11 +88,11 @@ namespace Strategy{
 		layOnGallery(BrasAU,BLUE_ELEMENT);
 
 		SetAvoidance(false);
-		go(1350,290);
+		go(1330,290);
 		takeDispenser(BrasAU,SECOND_DISPENSER);
-		go(1350,275);
+		go(1330,275);
 		takeDispenser(BrasInit,SECOND_DISPENSER);
-		go(1350,260);
+		go(1330,260);
 		takeDispenser(BrasTirette,SECOND_DISPENSER);
 
 		//takeHorizontalDispenser(BrasAU);
@@ -247,13 +247,13 @@ namespace Strategy{
 			// Take an element on the Workshed and push it under
 			SetAbsolute();
 			if(statePush == 0){
-				if(Settings::yellow()) go(230,1545);
+				if(Settings::yellow()) go(235,1540);
 				if(Settings::purple()) go(280,1545);
 			}
 			else if(statePush == 1){
 				go(500,1700); //Decalage
 				if(Settings::yellow()) go(400,1730);
-				if(Settings::purple()) go(430,1750);
+				if(Settings::purple()) go(440,1740);
 			}
 
 			if(Settings::yellow()) align(-135, robotArm.GetAngle());
