@@ -497,8 +497,8 @@ namespace Strategy{
 		robotArm.setPosition(0,100,20,600);
 		robotArm.ungrab(500);
 		SetRelative();
-		goPolar(robotArm.GetAngle(),-70); // reculer relativement en fonction de robotArm
 		robotArm .setPosition(80,100,0);
+		goPolar(robotArm.GetAngle(),-70); // reculer relativement en fonction de robotArm
 		goPolar(robotArm.GetAngle(),120); //avancer relativement en fonction de robotArm
 		takeElement(robotArm,GROUND);
 
