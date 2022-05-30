@@ -15,6 +15,7 @@
  * Switch 4 : Index 3 : Robot
  **********/
 #include <Arduino.h>
+#include <U8g2lib.h>
 
 #define LOADING_SOUND 0001
 #define UP_SOUND 0002
@@ -100,4 +101,7 @@ namespace IHM{
         void playSound      (int soundfile);
         void switchSound    (bool state);
     }
+
+    extern U8G2_SSD1309_128X64_NONAME2_F_4W_HW_SPI 
+	_u8g2;  
 }

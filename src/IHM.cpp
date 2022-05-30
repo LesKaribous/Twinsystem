@@ -228,7 +228,7 @@ void menu(){
 	LCD::startMenu();
 	if(getCheck() || Debugger::lastCommand() == "probe"){
 		while(getCheck()) delay(10) ;// Attente du front descendant -> TODO : Remplacer par millis()
-		if(_page == 2) Test::testingActuators();
+		if(_page == 2 && Settings::primary()) Test::testingActuators();
 		else if(_page == 3) Test::testMotion();
 		else{
 			IHM::probing();

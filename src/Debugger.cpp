@@ -53,9 +53,9 @@ namespace Debugger{
     }
 
     void checkSerial(){
-        if(Serial.available()){
+        if(Serial.available() > 0 ){
             String command = Serial.readStringUntil('\n');
-            Serial.println("Received :" + command);
+            log("Received :" + command);
             parseCommand(command);
         }
     }
@@ -69,6 +69,9 @@ namespace Debugger{
             println("Not supported yet.");
         }else if(command == "reboot"){
             System::reboot();
+        }else if(command == "crayon"){
+            Actuators::BrasInit.setElevator(10);
+             Actuators::BrasInit.setElevator(0);
         }else if(command == "rebootLidar"){
             println("Trying to reboot Lidar...");
             Intercom::reboot();

@@ -19,7 +19,7 @@ namespace Match{
 		state = State::READY;
 	}
 
-	void updateScore(int points, int multiplicateur)
+	void updateScore(int points, int multiplicateur = 1)
 	{
 		score = score + (points * multiplicateur);
 	}

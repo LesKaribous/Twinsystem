@@ -16,6 +16,7 @@ namespace Settings{
         pinMode(Pin::robotSelect, INPUT_PULLUP);
         ROBOT = digitalRead(Pin::robotSelect) ? PRIMARY : SECONDARY;
         IHM::setTeam(TEAM);
+
         IHM::addLoad(10);
         IHM::setLoadingMsg("Settings OK");
     }

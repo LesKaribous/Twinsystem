@@ -2,8 +2,7 @@
 
 #include <Arduino.h>
 #include <Servo.h>
-#include <Wire.h>
-#include <Adafruit_PWMServoDriver.h>
+
 
 #define GROUND 0
 #define DISPENSER 1

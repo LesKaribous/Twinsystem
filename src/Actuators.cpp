@@ -1,7 +1,11 @@
 #include "Actuators.h"
-#include "Debugger.h"
 
+#include "Debugger.h"
 #include "Twinsystem.h"
+
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+
 
 namespace Actuators{
 

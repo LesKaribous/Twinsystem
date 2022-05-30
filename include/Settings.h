@@ -33,7 +33,7 @@ namespace Settings{
     SECONDARY = 0,
     ABSOLUTE = true,
     
-    IHM      = true,
+    IHM      = true, //FALSE for primary
     YELLOW   = true,
     PURPLE   = false;
 
@@ -71,6 +71,19 @@ namespace Settings{
             
     }
 
+    #ifdef JOKE
+    namespace Calibration{
+        const CalibrationProfile Primary = {
+            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
+            { 0.5f, -0.5f, -0.5f } //Cartesian : XYROT
+        };
+
+        const CalibrationProfile Secondary = {
+            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
+            { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
+        };
+    }
+    #else
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
@@ -82,6 +95,7 @@ namespace Settings{
             { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
         };
     }
+    #endif
 }
 
 

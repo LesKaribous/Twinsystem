@@ -44,9 +44,5 @@ namespace Strategy{
     void probeElement();
 
     //----- ALIGNMENT STRATEGIES -----
-
 	void alignTurn(float angleFrom, float angleTo);
-
-    //----- STRATEGIE DANSE -----
-    void batonDanse();
 }

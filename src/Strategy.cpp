@@ -104,6 +104,7 @@ namespace Strategy{
 	}
 	
 	void matchSecondary(){
+		updateScore(25,1);
 		SetAvoidance(false);
 		takeAndPushUnder(BrasAU);
 		takeStatuette(BrasAU);
@@ -339,7 +340,7 @@ namespace Strategy{
 		if(Settings::yellow()) align(-90, BrasTirette.GetAngle());
 		if(Settings::purple()) align(-90,-BrasTirette.GetAngle());
 
-		go(647+(squareNumber*185) , 1800);
+		go(600+(squareNumber*185) , 1800);
 		if (squareNumber != 1) probeElement();
 		else {
 			SetRelative();
