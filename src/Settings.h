@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Geometry.h"
 #include "Pin.h"
+#include "math/Geometry.h"
 
 // Struct definition
 struct  CalibrationProfile{
@@ -51,7 +51,7 @@ namespace Settings{
         SPEED = 5000; // Old : 5000
 
     namespace Geometry{
-        const float offset = 125.98f;
+        const float offset = 125.98f; //Center to max dist robot (for recalage)
     }
     
     namespace Stepper{
@@ -70,20 +70,6 @@ namespace Settings{
         STEP_MODE = 8;
             
     }
-
-    #ifdef JOKE
-    namespace Calibration{
-        const CalibrationProfile Primary = {
-            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 0.5f, -0.5f, -0.5f } //Cartesian : XYROT
-        };
-
-        const CalibrationProfile Secondary = {
-            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
-        };
-    }
-    #else
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
@@ -95,7 +81,6 @@ namespace Settings{
             { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
         };
     }
-    #endif
 }
 
 

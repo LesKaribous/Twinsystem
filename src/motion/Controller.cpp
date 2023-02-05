@@ -1,5 +1,5 @@
 #include "Controller.h"
-#include "Debugger.h"
+#include "debug/Console.h"
 #include "Twinsystem.h"
 
 namespace Controller{
@@ -156,7 +156,7 @@ namespace Controller{
     }
 
     void resume(){
-        Debugger::log("Controler : Resuming...", INFO);
+        Console::info("Controler") << "Resuming..." << Console::endl;
         sA.setTargetAbs(int32_t(sA_target));
         sB.setTargetAbs(int32_t(sB_target));
         sC.setTargetAbs(int32_t(sC_target));

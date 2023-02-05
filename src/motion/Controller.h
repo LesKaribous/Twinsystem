@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "Pin.h"
-#include "Geometry.h"
+#include "math/Geometry.h"
 
 #define SLOW 30
 #define FAST 100

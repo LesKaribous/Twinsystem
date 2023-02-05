@@ -1,0 +1,64 @@
+#pragma once
+#include <Arduino.h>
+
+namespace Pin{
+    // Declaration des pins E/S
+    // IHM Pinout
+
+    namespace Inputs{
+        const int 
+            init = 25,
+            stater = 26,
+            team = 27,
+            lidar = 28;
+ 
+    }
+
+    namespace Led{
+        const int equipe = 57;
+    }
+    
+    // TFT pinout
+    namespace TFT{
+        const int
+            TFT_CS = 43,
+            TFT_DC = 54,
+            TFT_RST = 255,
+            TFT_MOSI = 44,
+            TFT_SCK = 46,
+            TFT_MISO = 45;
+
+        const int T_CS_PIN = 51, T_IRQ_PIN = 52;
+    }
+    
+    // Stepper Pinout
+    namespace Stepper{
+        const int
+        enable = 24,
+        dirA  = 10, 
+        dirB  = 11, 
+        dirC  = 12,
+        stepA = 5, 
+        stepB = 6, 
+        stepC = 9;
+    }
+    
+
+    // Actuator Pinout
+    namespace Servo{
+        const int ServoA1 = 23; //P2
+        const int ServoA2 = 21; //A4
+        const int ServoA3 = 19; //D1
+
+        const int ServoB1 = 17; //A2
+        const int ServoB2 = 16; //A1
+        const int ServoB3 = 18; //D2
+
+        const int ServoC1 = 56; //D3
+        const int ServoC2 = 20; //A3
+        const int ServoC3 = 22; //P1
+    }
+
+
+}   
+
