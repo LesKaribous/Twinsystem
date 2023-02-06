@@ -8,7 +8,7 @@ namespace Pin{
     namespace Inputs{
         const int 
             init = 25,
-            stater = 26,
+            starter = 26,
             team = 27,
             lidar = 28;
  
@@ -21,12 +21,12 @@ namespace Pin{
     // TFT pinout
     namespace TFT{
         const int
-            TFT_CS = 43,
-            TFT_DC = 54,
-            TFT_RST = 255,
-            TFT_MOSI = 44,
-            TFT_SCK = 46,
-            TFT_MISO = 45;
+            CS = 43,
+            DC = 54,
+            RST = 255,
+            MOSI = 44,
+            SCK = 46,
+            MISO = 45;
 
         const int T_CS_PIN = 51, T_IRQ_PIN = 52;
     }

@@ -18,7 +18,9 @@ namespace TwinSystem{
         }
 
         void System::Initialize(){
-            
+            ProgressBar pb = ui->GetProgressBar();
+            pb.add(10);
+            pb.setMessage("Controller OK");
         }
 
         void System::OnEvent(Event& e){
@@ -36,7 +38,7 @@ namespace TwinSystem{
             }
         }
 
-        void System::pollEvents(){
+        bool System::pollEvents(){
             
         }
 

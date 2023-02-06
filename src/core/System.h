@@ -5,6 +5,7 @@
 #include "core/Program.h"
 #include "debug/Console.h"
 #include "ui/UI.h"
+#include "motion/Controller.h"
 
 namespace TwinSystem{
     class System{
@@ -26,7 +27,8 @@ namespace TwinSystem{
       bool pollEvents();
 		  static System* s_Instance;
 
-      UI ui;
+      Shared<UI> ui;
+      Shared<Controller> controller;
 
     };
 } // namespace System

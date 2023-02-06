@@ -1,8 +1,7 @@
 #include "Motion.h"
-#include "Geometry.h"
 
 #include "Twinsystem.h"
-#include "Debugger.h"
+#include "debug/Console.h""
 
 namespace Motion{
 

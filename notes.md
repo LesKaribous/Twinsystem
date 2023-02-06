@@ -1,5 +1,9 @@
 # Notes
 
+<!-->
+
+</-->
+
 ## Features
     - [ ] Modular architecture
     - [ ] Program with several actions

@@ -2,197 +2,173 @@
 #include "debug/Console.h"
 #include "Twinsystem.h"
 
-namespace Controller{
 
-    StepControl controller;
-    Stepper sA(Pin::Stepper::stepA, Pin::Stepper::dirA), 
-            sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-            sC(Pin::Stepper::stepC, Pin::Stepper::dirC);
 
-    volatile int32_t sA_target,
-                     sB_target,
-                     sC_target;
+namespace TwinSystem{
+    
+    Controller::Controller(){
 
-    bool engaged = false,
-         sleeping = false;
-
-    Vec3 calibration;
-
-    u_int32_t speed, accel;
-
-    float feedrate = 100;
-    bool wasLastAsync = false;
-
-    void init(){
-            //------Déclaration des I/O------
         pinMode(Pin::Stepper::enable, OUTPUT);
-        engage();
-        sleep();
 
-            //------Déclaration des I/O------
-        pinMode(Pin::Stepper::stepA, OUTPUT);
-        pinMode(Pin::Stepper::stepB, OUTPUT);
-        pinMode(Pin::Stepper::stepC, OUTPUT);
+        Engage();
+        Sleep();
+        Reset();    
 
-        pinMode(Pin::Stepper::dirA, OUTPUT);
-        pinMode(Pin::Stepper::dirB, OUTPUT);
-        pinMode(Pin::Stepper::dirC, OUTPUT);
+        sA = CreateShared<Stepper>(Pin::Stepper::stepA, Pin::Stepper::dirA); 
+        sB = CreateShared<Stepper>(Pin::Stepper::stepB, Pin::Stepper::dirB);
+        sC = CreateShared<Stepper>(Pin::Stepper::stepC, Pin::Stepper::dirC);
 
-        reset();    
+        sA_target = sB_target = sC_target = 0;
+        engaged = false,
+        sleeping = false;
 
-        setCalibration(Settings::primary()); //WARNING
-        IHM::addLoad(10);
-        IHM::setLoadingMsg("Controller OK");
+        SetCalibration(Settings::primary()); //WARNING
+
+        feedrate = 100;
+        wasLastAsync = false;
     }
 
     void update(){}
 
-    void setCalibration(bool state){
+    void Controller::SetCalibration(bool state){
         calibration = (state == Settings::PRIMARY) ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
     }
 
-    void setFeedrate(float value){
+    void Controller::SetFeedrate(float value){
         feedrate = value;
-        setSpeed(float(Settings::SPEED) * value / 100.0);
+        SetSpeed(float(Settings::SPEED) * value / 100.0);
     }
 
 
-    void setSpeed(int s){
+    void Controller::SetSpeed(int s){
         speed = s;
-        sA.setMaxSpeed(speed);
-        sB.setMaxSpeed(speed);
-        sC.setMaxSpeed(speed);
+        sA->setMaxSpeed(speed);
+        sB->setMaxSpeed(speed);
+        sC->setMaxSpeed(speed);
     }
 
-    void setAccel(int a){
+    void Controller::SetAccel(int a){
         accel = a;
-        sA.setAcceleration(accel);
-        sB.setAcceleration(accel);
-        sC.setAcceleration(accel);
+        sA->setAcceleration(accel);
+        sB->setAcceleration(accel);
+        sC->setAcceleration(accel);
     }
 
-    void engage(bool state){
+    void Controller::Engage(bool state){
         if(engaged != state){
             digitalWriteFast(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             engaged = state;
         }
     }
 
-    void disengage(){
+    void Controller::Disengage(){
         if(engaged){
             engaged = false;
             digitalWriteFast(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
         }
     }
 
-    void sleep(bool state){
+    void Controller::Sleep(bool state){
         if(engaged && sleeping != state){
             digitalWriteFast(Pin::Stepper::enable, state == Settings::Stepper::ENABLE_POLARITY);
             sleeping = state;
         }
     }
 
-    void move(Vec3 target, bool async){
+    void Controller::Move(Vec3 target, bool async){
         wasLastAsync = async;
         target.mult(calibration.toMatrix());
 
-        resetPosition(); //Zero all axis
-        sA.setTargetAbs(int32_t(target.a));
-        sB.setTargetAbs(int32_t(target.b));
-        sC.setTargetAbs(int32_t(target.c));
+        ResetPosition(); //Zero all axis
+        sA->setTargetAbs(int32_t(target.a));
+        sB->setTargetAbs(int32_t(target.b));
+        sC->setTargetAbs(int32_t(target.c));
 
         sA_target = int32_t(target.a);
         sB_target = int32_t(target.b);
         sC_target = int32_t(target.c);
 
         if(sleeping){
-            sleep(false);
-            System::wait(200);
+            Sleep(false);
+            //System::wait(200);
         }
-        if(async)controller.moveAsync(sA,sB,sC);
-        else controller.move(sA,sB,sC);
+        if(async)controller.moveAsync(*sA,*sB,*sC);
+        else controller.move(*sA,*sB,*sC);
         
     }
 
-    void resetPosition(){
-        sA.setPosition(0);
-        sB.setPosition(0);
-        sC.setPosition(0);
+    void Controller::ResetPosition(){
+        sA->setPosition(0);
+        sB->setPosition(0);
+        sC->setPosition(0);
     }
 
-    void reset(){
-        sA.setPosition(0);
-        sA.setTargetRel(0);
+    void Controller::Reset(){
+        sA->setPosition(0);
+        sA->setTargetRel(0);
 
-        sB.setPosition(0);
-        sB.setTargetRel(0);
+        sB->setPosition(0);
+        sB->setTargetRel(0);
 
-        sC.setPosition(0);
-        sC.setTargetRel(0);
+        sC->setPosition(0);
+        sC->setTargetRel(0);
 
-        sA
-        .setAcceleration(Settings::ACCEL)
+        sA->setAcceleration(Settings::ACCEL)
         .setMaxSpeed(Settings::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_A_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
 
-        sB
-        .setAcceleration(Settings::ACCEL)
+        sB->setAcceleration(Settings::ACCEL)
         .setMaxSpeed(Settings::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_B_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_B_POLARITY);
 
-        sC
-        .setAcceleration(Settings::ACCEL)
+        sC->setAcceleration(Settings::ACCEL)
         .setMaxSpeed(Settings::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_C_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_C_POLARITY);
 
     }
 
-    void stop(bool async){       
+    void Controller::Stop(bool async){       
         if(async)controller.stopAsync();
         else controller.stop();
     }
 
-    void resume(){
+    void Controller::Resume(){
         Console::info("Controler") << "Resuming..." << Console::endl;
-        sA.setTargetAbs(int32_t(sA_target));
-        sB.setTargetAbs(int32_t(sB_target));
-        sC.setTargetAbs(int32_t(sC_target));
+        sA->setTargetAbs(int32_t(sA_target));
+        sB->setTargetAbs(int32_t(sB_target));
+        sC->setTargetAbs(int32_t(sC_target));
 
-        if(wasLastAsync)controller.moveAsync(sA,sB,sC);
-        else controller.move(sA,sB,sC);
+        if(wasLastAsync)controller.moveAsync(*sA,*sB,*sC);
+        else controller.move(*sA,*sB,*sC);
     }
 
-    bool arrived(){
-        return sA.getPosition() == sA_target
-            && sB.getPosition() == sB_target
-            && sC.getPosition() == sC_target;
+    bool Controller::isArrived(){
+        return sA->getPosition() == sA_target
+            && sB->getPosition() == sB_target
+            && sC->getPosition() == sC_target;
     }
 
-    void emergencyStop(){
+    void Controller::EmergencyStop(){
         controller.emergencyStop();
         //TODO : Disengage after an emergencystop ?
     } 
 
-    u_int32_t getAccel(){
+    u_int32_t Controller::GetAccel(){
         return accel;
     }
 
-    u_int32_t getSpeed(){
+    u_int32_t Controller::GetSpeed(){
         return speed;
     }
 
-    int getCurrentSpeed(){
-        return controller.getCurrentSpeed();
-    }
-
-    Vec3 getPosition(){
+    Vec3 Controller::GetPosition(){
         Vec3 result;
-        result.a = sA.getPosition();
-        result.b = sB.getPosition();
-        result.c = sC.getPosition();
+        result.a = sA->getPosition();
+        result.b = sB->getPosition();
+        result.c = sC->getPosition();
 
         result.a /= calibration.a;
         result.b /= calibration.b;
@@ -200,11 +176,11 @@ namespace Controller{
         return result;
     }
 
-    bool isRunning(){
+    bool Controller::isRunning(){
         return controller.isRunning();
     }
 
-    bool isSleeping(){
+    bool Controller::isSleeping(){
         return sleeping;
     }
 }
