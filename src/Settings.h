@@ -12,10 +12,12 @@ struct  CalibrationProfile{
 // Namespace
 namespace Settings{
 
+    /*
     void init();
     void setTeam(bool);
     void setAvoidance(bool state);
     void setTeam(bool state);
+    */
 
     bool yellow();
 	bool purple();
@@ -56,7 +58,7 @@ namespace Settings{
     
     namespace Stepper{
         const bool 
-        ENABLE_POLARITY = true,
+        ENABLE_POLARITY = false,
         
         STEP_A_POLARITY = true,
         STEP_B_POLARITY = true,

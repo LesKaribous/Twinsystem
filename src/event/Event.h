@@ -6,9 +6,10 @@ namespace TwinSystem{
 	enum class EventType
 	{
 		None = 0,
-		SystemUpdate,
-        SensorUpdate,
-        ActuatorUpdate,
+		SystemEvent,
+        SensorEvent,
+		InputEvent,
+        ActuatorEvent,
         EmergencyStop,
         BatteryLow,
         MatchFinished,

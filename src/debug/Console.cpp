@@ -32,6 +32,32 @@ namespace TwinSystem {
 		return ConsoleStream(ConsoleLevel::_CRITICAL, origin);
 	}
 
+    void header(){
+        Serial.println("  _______       _                     _"                        );
+        Serial.println(" |__   __|     (_)                   | |"                       );
+        Serial.println("    | |_      ___ _ __  ___ _   _ ___| |_ ___ _ __ ___  "       );
+        Serial.println("    | \\ \\ /\\ / / | '_ \\/ __| | | / __| __/ _ \\ '_ ` _ \\"  );
+        Serial.println("    | |\\ V  V /| | | | \\__ \\ |_| \\__ \\ ||  __/ | | | | |"  );
+        Serial.println("    |_| \\_/\\_/ |_|_| |_|___/\\__, |___/\\__\\___|_| |_| |_|"  );
+        Serial.println("                             __/ |"                             );
+        Serial.println("                            |___/"                              );
+        Serial.println();
+        Serial.println("Author  : Nadarbreicq, JulesTopart ");
+        Serial.println();
+        Serial.print("Twinsystem... compiled  ");
+        Serial.print(__DATE__);
+        Serial.print(" at ");
+        Serial.println(__TIME__);
+
+    }
+
+
+	void Console::Initialize(){
+		Serial.begin(115200);
+		header();
+		
+	}
+
 	void Console::write(std::string str) {
 		Serial.write(str.c_str());
 	}
@@ -72,7 +98,7 @@ namespace TwinSystem {
 		Serial.print(n, base);
 	}
 	
-	void print(double n, int digits = 4){
+	void Console::print(double n, int digits = 4){
 		Serial.print(n, digits);
 	}
 
@@ -119,7 +145,7 @@ namespace TwinSystem {
 		Serial.println(n, base);
 	}
 	
-	void println(double n, int digits = 4){
+	void Console::println(double n, int digits = 4){
 		Serial.println(n, digits);
 	}
 

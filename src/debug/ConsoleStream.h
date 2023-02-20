@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Core.h"
+#include "math/Geometry.h"
 #include "Console.h"
 #include "ConsoleLevel.h"
 
@@ -15,6 +16,8 @@ namespace TwinSystem{
 		ConsoleStream& operator<<(int);
 		ConsoleStream& operator<<(long);
 		ConsoleStream& operator<<(float);
+		ConsoleStream& operator<<(Vec2);
+		ConsoleStream& operator<<(Vec3);
 		ConsoleStream& operator<<(double);
 
 		ConsoleStream& operator<<(char);

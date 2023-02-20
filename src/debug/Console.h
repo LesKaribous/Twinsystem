@@ -1,5 +1,8 @@
 #pragma once
-#include "core/Core.h"
+
+#include <string>
+#include <sstream>
+
 #include "ConsoleLevel.h"
 #include "ConsoleStream.h"
 
@@ -49,6 +52,7 @@ namespace TwinSystem {
 		static void println(double n, int digits = 4);
         static void println(std::string content);
 
+		static bool pollEvents();
 
 	private:
 		static void write(std::string str);

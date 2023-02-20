@@ -68,6 +68,28 @@ namespace TwinSystem{
 		return *this;
 	}
 
+	ConsoleStream& ConsoleStream::operator<<(Vec2 i) {
+		if (_ignored) return *this;
+				Console::print("{");
+		Console::print(i.a);
+		Console::print(",");
+		Console::print(i.b);
+		Console::print("}");
+		return *this;
+	}
+
+	ConsoleStream& ConsoleStream::operator<<(Vec3 i) {
+		if (_ignored) return *this;
+		Console::print("{");
+		Console::print(i.a);
+		Console::print(",");
+		Console::print(i.b);
+		Console::print(",");
+		Console::print(i.c);
+		Console::print("}");
+		return *this;
+	}
+
 	ConsoleStream& ConsoleStream::operator<<(double i) {
 		if (_ignored) return *this;
 		Console::print(i);

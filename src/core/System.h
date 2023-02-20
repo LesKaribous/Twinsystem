@@ -1,11 +1,11 @@
 #pragma once
 
 #include "core/Core.h"
-#include "core/Event.h"
+#include "event/Event.h"
 #include "core/Program.h"
-#include "debug/Console.h"
 #include "ui/UI.h"
-#include "motion/Controller.h"
+#include "debug/Console.h"
+#include "motion/MotionControl.h"
 
 namespace TwinSystem{
     class System{
@@ -13,8 +13,6 @@ namespace TwinSystem{
       System();
 
       void Run();
-      void Initialize();
-
 
       void OnEvent(Event& e);
       void Execute(Program prgm);
@@ -23,12 +21,14 @@ namespace TwinSystem{
 
       inline static System& GetInstance() { return *s_Instance; }
 
-    private:
+    protected:
+      void Initialize(); //Should be called once in the constructor
       bool pollEvents();
 		  static System* s_Instance;
 
+      Shared<MotionControl> motion;
+      Shared<StepperController> stepper;
       Shared<UI> ui;
-      Shared<Controller> controller;
 
     };
 } // namespace System

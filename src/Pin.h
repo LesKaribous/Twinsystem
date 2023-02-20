@@ -10,7 +10,7 @@ namespace Pin{
             init = 25,
             starter = 26,
             team = 27,
-            lidar = 28;
+            strategy = 28; 
  
     }
 

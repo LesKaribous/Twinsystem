@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Core.h"
+#include <vector>
 
 namespace TwinSystem{
     class Instruction;

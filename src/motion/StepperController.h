@@ -5,20 +5,21 @@
 #include <stdint.h>
 
 #include "Pin.h"
+#include "event/Event.h"
 #include "math/Geometry.h"
 
 #define SLOW 30
 #define FAST 100
 
 namespace TwinSystem{
-    class Controller{
+    class StepperController{
     private:
         bool engaged, sleeping;
         StepControl controller;
 
-        Shared<Stepper> sA;
-        Shared<Stepper> sB;
-        Shared<Stepper> sC;
+        Stepper sA;
+        Stepper sB;
+        Stepper sC;
 
         int32_t sA_target,
                 sB_target,
@@ -31,8 +32,10 @@ namespace TwinSystem{
         bool wasLastAsync;
 
     public:
-        Controller();
-        ~Controller(){};
+        StepperController();
+        ~StepperController(){};
+
+        void OnEvent(Event& e);
 
         void Move(Vec3 target, bool async = false);
 

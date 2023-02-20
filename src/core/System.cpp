@@ -8,6 +8,7 @@ namespace TwinSystem{
         System::System(){
             if(s_Instance == nullptr){
                 s_Instance = this;
+                Initialize();
             }else{
                Console::error("System") << "System instance already created." << Console::endl;
             }
@@ -15,16 +16,25 @@ namespace TwinSystem{
 
         void System::Run(){
             pollEvents();
+            ui->draw();
         }
 
         void System::Initialize(){
-            ProgressBar pb = ui->GetProgressBar();
-            pb.add(10);
-            pb.setMessage("Controller OK");
+            Console::Initialize();
+            Console::SetLevel(ConsoleLevel::_TRACE);
+            stepper = CreateShared<StepperController>();
+            motion = CreateShared<MotionControl>(stepper);
+            ui = CreateShared<UI>();
+            
         }
 
         void System::OnEvent(Event& e){
-            
+            //EventDispatcher dispatcher(e);
+            //dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+            //dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
+
+            ui->OnEvent(e);
+            motion->OnEvent(e);
         }
 
         void System::Execute(Program prgm){
@@ -39,7 +49,7 @@ namespace TwinSystem{
         }
 
         bool System::pollEvents(){
-            
+            ui->pollEvents(BIND_EVENT_FN(OnEvent));
         }
 
 

@@ -1,145 +1,140 @@
-#include "Motion.h"
-
+#include "motion/MotionControl.h"
 #include "Twinsystem.h"
-#include "debug/Console.h""
+#include "debug/Console.h"
 
-namespace Motion{
-
-	State cState = State::IDLE;
-
-	Vec3 cPosition 		= {0,0,0};
-	Vec3 cStartPosition = {0,0,0};
-	Vec3 cTarget 		= {0,0,0};
-	Vec3 calibration 	= {1,1,1};
-
-	Vec2 controlPoint   = {0,0};
-
- 	bool probedX = false, probedY = false;
-	bool absolute 		= true;
-	bool probing = false;
-
-	bool avoidance = false;
-
-	void init(){
+namespace TwinSystem{
+	
+	MotionControl::MotionControl(Shared<StepperController> stps){
+		controller = stps;
 		calibration = Settings::primary() ?  
 			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 		
 		absolute = Settings::ABSOLUTE;
-		Controller::setFeedrate(100);
-		IHM::addLoad(10);
-		IHM::setLoadingMsg("Motion OK");
+		controller->SetFeedrate(100);
+
 	}
 
-	void debugState(){
+	MotionControl::~MotionControl(){}
+
+	void  MotionControl::DebugState(){
 		switch(cState){
 			case State::IDLE :
-				Debugger::log("IDLE", INFO);
+				Console::println("IDLE");
 			break;
 			case State::RUNNING :
-				Debugger::log("RUNNING", INFO);
+				Console::println("RUNNING");
 			break;
 			case State::PAUSED :
-				Debugger::log("PAUSED", INFO);
+				Console::println("PAUSED");
 			break;
 			case State::CANCELLED :
-				Debugger::log("CANCELLED", INFO);
+				Console::println("CANCELLED");
 			break;
 			case State::ARRIVED :
-				Debugger::log("ARRIVED", INFO);
+				Console::println("ARRIVED");
 			break;
 			default:
-				Debugger::log("NONE", INFO);
+				Console::println("NONE");
 			break;
 		}
-		Debugger::log("Collision :", Intercom::collision(), INFO);
+		//Console::log("Collision :", Intercom::collision(), INFO);
 	}
 
-	void pause(){
-		debugState();
+	void MotionControl::OnEvent(Event& e){
+		//EventDispatcher dispatcher(e);
+		//dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+		//dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
+		controller->OnEvent(e);
+	}
+
+
+	void  MotionControl::Pause(){
+		DebugState();
 		if(cState == State::RUNNING){
-			debugState();
+			DebugState();
 			cState = State::PAUSED;
-			debugState();
-			Debugger::log("Controller stopped", INFO);
-			Controller::stop();
+			DebugState();
+			Console::info("Controller") << "stopped" << Console::endl;
+			controller->Stop();
 		}
 	}
 
-    void resume(){
-		debugState();
+    void  MotionControl::Resume(){
+		DebugState();
 		if(cState == State::PAUSED){
-			debugState();
+			DebugState();
 			cState = State::RUNNING;
-			debugState();
-			Debugger::log("Controller resumed", INFO);
-			Controller::resume();
+			DebugState();
+			Console::info("Controller resumed");
+			controller->Resume();
 		}
 	}
 
 
 	
-	void update(){
-		//Motion::updatePosition();
-		System::update();
-
+	void  MotionControl::Run(){
+		//updatePosition();
+		//System::update();
+		/*
 		if(Intercom::collision() && avoidance){
 			pause();
 		}else{
 			resume();
 		}
-
+		*/
 		if(cState == State::RUNNING){
-			if(Controller::arrived()){
-				debugState();
+			if(controller->isArrived()){
+				DebugState();
 				cState = State::ARRIVED;
-				debugState();
+				DebugState();
 			}
 		}
 	}
 
-    void turn(float angle){
-		Controller::setFeedrate(30);
-		if (absolute) move({cPosition.a, cPosition.b, angle });
-		else move({0, 0, angle});
-		Controller::setFeedrate(100);
+    void  MotionControl::Turn(float angle){
+		controller->SetFeedrate(30);
+		if (absolute) Move({cPosition.a, cPosition.b, angle });
+		else Move({0, 0, angle});
+		controller->SetFeedrate(100);
 	}
 
-    void goPolar(float heading, float length){
+    void  MotionControl::GoPolar(float heading, float length){
 		PolarVec target;
 		if(Settings::yellow()) target = PolarVec(-heading*DEG_TO_RAD, length);
 		if(Settings::purple()) target = PolarVec(heading*DEG_TO_RAD, length);
-		go(target.toVec2());
+		Go(target.toVec2());
 	}
 
-	void go(float x, float y){
+	void  MotionControl::Go(float x, float y){
 		Vec2 target = {x, y};
-		go(target);
+		Go(target);
 	}
 
-	void go(Vec2 target){
-		if (absolute) move({target.a, target.b, cPosition.c*RAD_TO_DEG});
-		else move({target.a, target.b, 0});
+	void  MotionControl::Go(Vec2 target){
+		Console::info("MotionControl") << "Go :" << target << Console::endl;
+		if (absolute) Move({target.a, target.b, cPosition.c*RAD_TO_DEG});
+		else Move({target.a, target.b, 0});
 	}
 
-	void goTurn(float x, float y, float heading){
-		goTurn({x, y, heading});
+	void  MotionControl::GoTurn(float x, float y, float heading){
+		GoTurn({x, y, heading});
 	}
-	void goTurn(Vec3 target){
-		go(Vec2(target.a, target.b));
-		turn(target.c);
+	void  MotionControl::GoTurn(Vec3 target){
+		Go(Vec2(target.a, target.b));
+		Turn(target.c);
 	}
 	
 	
-	void probeBorder(Vec2 borderPos){
+	void  MotionControl::ProbeBorder(Vec2 borderPos){
 		boolean tAbsolute = isAbsolute();
 		probing = true;
-		align(borderPos, 180);
+		Align(borderPos, 180);
 
 		SetRelative();
-		Controller::setFeedrate(FAST);
-		go(-borderPos.mag() - 80,.0);
-		Controller::setFeedrate(SLOW);
-		go(-120,.0);
+		controller->SetFeedrate(FAST);
+		Go(-borderPos.mag() - 80,.0);
+		controller->SetFeedrate(SLOW);
+		Go(-120,.0);
 
 		float _offset = Settings::Geometry::offset ;
 
@@ -154,33 +149,33 @@ namespace Motion{
 		}else if(cPosition.b > 2000.0)
 			cPosition.b = 2000.0 - _offset;
 		
-		go(100,.0);
+		Go(100,.0);
 
-		Controller::setFeedrate(FAST);
+		controller->SetFeedrate(FAST);
 		SetAbsolute(tAbsolute);
 		probing = false;
 	}
 
-	bool isProbing(){
+	bool  MotionControl::isProbing(){
 		return probing;
 	}
 
 
-	void align(float angleTable, float orientation){
+	void  MotionControl::Align(float angleTable, float orientation){
 		boolean tAbsolute = isAbsolute();
 		SetAbsolute();
-		turn(angleTable - orientation);
+		Turn(angleTable - orientation);
 		SetAbsolute(tAbsolute);
 	}
 
-	void align(Vec2 coord, float orientation){
+	void  MotionControl::Align(Vec2 coord, float orientation){
 		boolean tAbsolute = isAbsolute();
 		SetAbsolute();
-		turn(coord.heading()*RAD_TO_DEG - orientation);
+		Turn(coord.heading()*RAD_TO_DEG - orientation);
 		SetAbsolute(tAbsolute);
 	}
 
-	Vec3 SetTarget(Vec3 target){
+	Vec3  MotionControl::SetTarget(Vec3 target){
 		target.c *= DEG_TO_RAD;
 
 		if(absolute){
@@ -194,13 +189,13 @@ namespace Motion{
 		cTarget = target;
 		
 		
-		Intercom::focus();
+		//Intercom::focus();
 
 		return target;
 	}
 
-	void updatePosition(){
-		Vec3 currentStepperPos = Controller::getPosition();
+	void  MotionControl::UpdatePosition(){
+		Vec3 currentStepperPos = controller->GetPosition();
 		Vec3 relativePosition = fk(currentStepperPos);
 		
 		relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
@@ -211,36 +206,36 @@ namespace Motion{
 		relativePosition.b /= calibration.b;
 		relativePosition.c /= calibration.c;
 
-		Debugger::log("Current position", relativePosition, VERBOSE);
+		Console::trace("MotionControl") << "Current position" << relativePosition << Console::endl;
 		cPosition = cStartPosition.copy().add(relativePosition);
 	}
 
 	//Raw relative move request
-	void move(Vec3 target){
+	void  MotionControl::Move(Vec3 target){
 		//Set new target
 		target = SetTarget(target);
 		cStartPosition = cPosition; //Save start position
 		
-		debugState();
+		DebugState();
 		cState = State::RUNNING; //robot is moving from now
-		debugState();
+		DebugState();
 
 		target.mult(calibration.toMatrix()); //Apply cartesian calibration
 		target = ik(target);				 //Apply inverse kinematics result in steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); //Apply stepping multiplier
 
-		Controller::move(target, true); //Execute move
-		while(running()) update(); //Wait for move to end and check for opponent
+		controller->Move(target, true); //Execute move
+		while(Running()) Run(); //Wait for move to end and check for opponent
 		
 		//Need to take actual rotation when adding relative target
 		cPosition = cStartPosition.add(cTarget.rotateZ(-cPosition.c)); 
 		cStartPosition = cPosition;
-		debugState();
+		DebugState();
 		cState = State::IDLE; //Ready for next move
-		debugState();
+		DebugState();
 	}
 
-	bool running(){
+	bool  MotionControl::Running(){
 		return !(cState == State::ARRIVED || cState == State::CANCELLED);
 	}
 
@@ -251,52 +246,52 @@ namespace Motion{
 	// ----- Setters and Getters -----
 	// -------------------------------
 
-	Vec3 GetPosition(){
+	Vec3  MotionControl::GetPosition(){
 		return Vec3(cPosition.a, cPosition.b, cPosition.c * RAD_TO_DEG);
 	}
 
-	Vec3 GetTarget(){
+	Vec3  MotionControl::GetTarget(){
 		return cTarget;
 	}
-	Vec3 GetAbsTarget(){
+	Vec3  MotionControl::GetAbsTarget(){
 		return cStartPosition.copy().add(cTarget);
 	}
 
-	bool isAbsolute(){
+	bool  MotionControl::isAbsolute(){
 		return absolute;
 	}
 
-	bool isRelative(){
+	bool  MotionControl::isRelative(){
 		return !absolute;
 	}
 
-	bool isProbed(){
+	bool  MotionControl::isProbed(){
 		return probedX && probedY;
 	}
-	bool isXProbed(){
+	bool  MotionControl::isXProbed(){
 		return probedX;
 	}
-	bool isYProbed(){
+	bool  MotionControl::isYProbed(){
 		return probedY;
 	}
 
-	void SetPosition(Vec2 newPos){
+	void  MotionControl::SetPosition(Vec2 newPos){
 		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
 	}
-	void SetPosition(Vec3 newPos){
+	void  MotionControl::SetPosition(Vec3 newPos){
 		cPosition = newPos.mult(Vec3(1.0,1.0,DEG_TO_RAD).toMatrix());
 	}
 
-    void SetAbsolute(bool state){
+    void  MotionControl::SetAbsolute(bool state){
 		absolute = state;
 	}
 
-    void SetRelative(bool state){
+    void  MotionControl::SetRelative(bool state){
 		SetAbsolute(!state);
 	}
 
 	
-    void SetAvoidance(bool state){
+    void  MotionControl::SetAvoidance(bool state){
 		if(Settings::avoidance())
 			avoidance = state;
 		else avoidance = false;

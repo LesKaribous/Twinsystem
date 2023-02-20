@@ -1,24 +1,21 @@
-#pragma once;
-#include "core/Core.h"
-#include "core/Event.h"
+#pragma once
+#include "event/Event.h"
+#include <Arduino.h>
 
 namespace TwinSystem{
-    class Inputs{
-    public:
-
-        bool pollEvents(void(*cb)(Event& e));
-
-    private:
-
-    };
 
     class BooleanInput{
     public:
         BooleanInput(){};
+
+        virtual void update() = 0;
         virtual bool hasChanged(){
             if(state != lastState) return true;
             else return false;
         };
+        virtual bool GetState() const{
+            return state;
+        }
 
     protected:
         bool state;
@@ -27,18 +24,38 @@ namespace TwinSystem{
 
     class Switch : public BooleanInput{
     public:
-        Switch(int pin);
-
+        Switch(int pin): _pin(pin){};
+        void update() override{
+            lastState = state;
+            state = digitalRead(_pin);
+        }
     private:
-        int pin;
+        int _pin;
     };
 
     class Button : public BooleanInput{
     public:
-        Button(int pin);
-        
+        Button(int pin): _pin(pin){};
+        void update() override{
+            lastState = state;
+            state = digitalRead(_pin);
+        }
     private:
-        int pin;
+        int _pin;
     };
+
+    class Inputs{
+    public:
+        Inputs();
+        bool pollEvents(std::function<void(Event&)>);
+
+    private:
+        Button init;
+        Switch team;
+        Switch starter;
+        Switch strategy;
+    };
+
+
 
 }

@@ -1,28 +1,24 @@
 #pragma once
 #include "core/Core.h"
-#include "core/Event.h"
-#include "ui/ProgressBar.h"
+#include "event/Event.h"
+#include "ui/Screen.h"
+#include "inputs/Inputs.h"
 
 
 namespace TwinSystem{
-
-
-
     class UI{
     public:
         UI();
-
-        void init();
+        void clear();
         void draw();
 
+        bool pollEvents(std::function<void(Event&)>);
         void OnEvent(Event& e);
 
-        inline ProgressBar& GetProgressBar(){return prgBar;};
-
     private:
-        Shared<Screen> screen;
-        ProgressBar prgBar;
-
+        Screen screen;
+        Inputs inputs;
+        
         bool needDraw;
     };
 } // namespace TwinSystem
