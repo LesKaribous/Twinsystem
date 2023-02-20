@@ -4,7 +4,6 @@
 #include "ui/Screen.h"
 #include "inputs/Inputs.h"
 
-
 namespace TwinSystem{
     class UI{
     public:
@@ -12,13 +11,15 @@ namespace TwinSystem{
         void clear();
         void draw();
 
-        bool pollEvents(std::function<void(Event&)>);
+        //bool pollEvents(void(System::*cb)(&Event));
         void OnEvent(Event& e);
 
+
+        Inputs inputs;
     private:
         Screen screen;
-        Inputs inputs;
         
-        bool needDraw;
+        long lastDraw = 0;
+        bool needDraw = true;
     };
 } // namespace TwinSystem

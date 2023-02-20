@@ -74,15 +74,14 @@ namespace TwinSystem{
          * @brief Set the robot position using position of the bumped border
          * @param border position vector of the border relative to the robot current position
          */
-        void ProbeBorder(Vec2);
+        void ProbeBorder(TableCompass, RobotCompass);
 
         /**
          * @brief Align (turn) the robot toward the desired vector
          * @param target the target vector to align with
          * @param orientation offset angle to align specific face of the robot
          */
-        void Align(Vec2 target, float orientation);
-        void Align(float angleTable, float orientation);
+        void Align(RobotCompass, float orientation);
 
         /**
          * @brief Move the robot to the desired target (last params of the Vec3 is used for arc curvature)
@@ -121,7 +120,7 @@ namespace TwinSystem{
     private:
         State cState = State::IDLE;
 
-        Vec3 cPosition 		= {0,0,0};
+        Vec3 cPosition 		= {-1,-1,0};
         Vec3 cStartPosition = {0,0,0};
         Vec3 cTarget 		= {0,0,0};
         Vec3 calibration 	= {1,1,1};

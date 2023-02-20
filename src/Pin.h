@@ -35,12 +35,12 @@ namespace Pin{
     namespace Stepper{
         const int
         enable = 24,
-        dirA  = 10, 
-        dirB  = 11, 
-        dirC  = 12,
-        stepA = 5, 
-        stepB = 6, 
-        stepC = 9;
+        dirB  = 10, 
+        dirC  = 11, 
+        dirA  = 12,
+        stepB = 5, 
+        stepC = 6, 
+        stepA = 9;
     }
     
 

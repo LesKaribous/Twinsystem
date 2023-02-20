@@ -86,12 +86,12 @@ namespace TwinSystem{
 
         ResetPosition(); //Zero all axis
         sA.setTargetAbs(int32_t(target.a));
-        sB.setTargetAbs(int32_t(target.b));
-        sC.setTargetAbs(int32_t(target.c));
+        sB.setTargetAbs(int32_t(target.c));
+        sC.setTargetAbs(int32_t(target.b));
 
         sA_target = int32_t(target.a);
-        sB_target = int32_t(target.b);
-        sC_target = int32_t(target.c);
+        sB_target = int32_t(target.c);
+        sC_target = int32_t(target.b);
 
         if(sleeping){
             Sleep(false);

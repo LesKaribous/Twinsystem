@@ -15,17 +15,17 @@ namespace TwinSystem{
         }
 
         void System::Run(){
-            pollEvents();
-            ui->draw();
+            //pollEvents();
+            ui.inputs.update();
+            ui.draw();
         }
 
         void System::Initialize(){
             Console::Initialize();
+            ui.inputs.initialize();
             Console::SetLevel(ConsoleLevel::_TRACE);
             stepper = CreateShared<StepperController>();
             motion = CreateShared<MotionControl>(stepper);
-            ui = CreateShared<UI>();
-            
         }
 
         void System::OnEvent(Event& e){
@@ -33,7 +33,7 @@ namespace TwinSystem{
             //dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
             //dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
 
-            ui->OnEvent(e);
+            ui.OnEvent(e);
             motion->OnEvent(e);
         }
 
@@ -49,7 +49,7 @@ namespace TwinSystem{
         }
 
         bool System::pollEvents(){
-            ui->pollEvents(BIND_EVENT_FN(OnEvent));
+            //ui->pollEvents(&System::OnEvent);
         }
 
 

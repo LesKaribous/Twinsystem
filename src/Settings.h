@@ -75,12 +75,12 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, -1.165f, -1.0525f } //Cartesian : XYROT
+            { -1.165f, 1.165f, -1.0525f } //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.17f, -1.17f, -1.0525f } //Cartesian : XYROT
+            { -1.17f, 1.17f, -1.0525f } //Cartesian : XYROT
         };
     }
 }

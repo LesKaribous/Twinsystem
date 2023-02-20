@@ -11,6 +11,31 @@ namespace TwinSystem{
     starter(Pin::Inputs::starter),
     strategy(Pin::Inputs::strategy){}
 
+
+    void Inputs::initialize(){
+
+        init.init();
+        team.init();
+        starter.init();
+        strategy.init();
+
+    }
+
+    void Inputs::update(){
+
+        init.update();
+        team.update();
+        starter.update();
+        strategy.update();
+
+    }
+
+    bool Inputs::hasChanged(){
+        return init.hasChanged() || starter.hasChanged() || team.hasChanged() || strategy.hasChanged();
+    }
+
+
+    /*
     bool Inputs::pollEvents(std::function<void(Event&)> cb){
 
         init.update();
@@ -38,7 +63,7 @@ namespace TwinSystem{
             cb(e);
         }
     }
-    
+    */
 
 
     

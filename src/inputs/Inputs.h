@@ -8,6 +8,7 @@ namespace TwinSystem{
     public:
         BooleanInput(){};
 
+        virtual void init() = 0;
         virtual void update() = 0;
         virtual bool hasChanged(){
             if(state != lastState) return true;
@@ -24,7 +25,11 @@ namespace TwinSystem{
 
     class Switch : public BooleanInput{
     public:
+    
         Switch(int pin): _pin(pin){};
+        void init() override{
+            pinMode(_pin, INPUT_PULLUP);
+        }
         void update() override{
             lastState = state;
             state = digitalRead(_pin);
@@ -36,6 +41,9 @@ namespace TwinSystem{
     class Button : public BooleanInput{
     public:
         Button(int pin): _pin(pin){};
+        void init() override{
+            pinMode(_pin, INPUT_PULLUP);
+        }
         void update() override{
             lastState = state;
             state = digitalRead(_pin);
@@ -47,9 +55,12 @@ namespace TwinSystem{
     class Inputs{
     public:
         Inputs();
-        bool pollEvents(std::function<void(Event&)>);
+        void initialize();
+        void update();
+        bool hasChanged();
+        //bool pollEvents(std::function<void(Event&)>);
 
-    private:
+    public:
         Button init;
         Switch team;
         Switch starter;

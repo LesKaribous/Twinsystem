@@ -98,11 +98,13 @@ namespace TwinSystem{
 		controller->SetFeedrate(100);
 	}
 
+	//All goPolar are relative
     void  MotionControl::GoPolar(float heading, float length){
-		PolarVec target;
-		if(Settings::yellow()) target = PolarVec(-heading*DEG_TO_RAD, length);
-		if(Settings::purple()) target = PolarVec(heading*DEG_TO_RAD, length);
+		PolarVec target = PolarVec(heading*DEG_TO_RAD, length);
+		bool abs = isAbsolute();
+		SetRelative();
 		Go(target.toVec2());
+		SetAbsolute(abs);
 	}
 
 	void  MotionControl::Go(float x, float y){
@@ -125,31 +127,29 @@ namespace TwinSystem{
 	}
 	
 	
-	void  MotionControl::ProbeBorder(Vec2 borderPos){
+	void  MotionControl::ProbeBorder(TableCompass tc, RobotCompass rc){
 		boolean tAbsolute = isAbsolute();
 		probing = true;
-		Align(borderPos, 180);
+		Align(rc, GetCompassOrientation(tc));
 
 		SetRelative();
 		controller->SetFeedrate(FAST);
-		Go(-borderPos.mag() - 80,.0);
+		GoPolar(GetCompassOrientation(rc),200);
 		controller->SetFeedrate(SLOW);
-		Go(-120,.0);
+		GoPolar(GetCompassOrientation(rc),80);
 
-		float _offset = Settings::Geometry::offset ;
+		float _offset = GetOffsets(rc);
 
-		if(cPosition.a < 0.0 + _offset){
-			cPosition.a = 0.0 + _offset;
-			probedX = true;
-		}else if(cPosition.a > 3000.0 - _offset)
-			cPosition.a = 3000.0 - _offset; 
-		else if(cPosition.b < 0.0){
-			cPosition.b = 0.0 + _offset;
-			probedY = true;
-		}else if(cPosition.b > 2000.0)
-			cPosition.b = 2000.0 - _offset;
-		
-		Go(100,.0);
+		if(tc == TableCompass::NORTH)
+			cPosition.a = 3000.0 - _offset; //We hit Xmax
+		if(tc == TableCompass::SOUTH)
+			cPosition.a = 0.0 + _offset; //We hit Xmin
+		if(tc == TableCompass::EAST)
+			cPosition.b = 2000.0 - _offset; //We hit Ymax
+		if(tc == TableCompass::WEST)
+			cPosition.b = 0.0 + _offset; //We hit Ymin
+
+		GoPolar(GetCompassOrientation(rc),-100);
 
 		controller->SetFeedrate(FAST);
 		SetAbsolute(tAbsolute);
@@ -161,18 +161,8 @@ namespace TwinSystem{
 	}
 
 
-	void  MotionControl::Align(float angleTable, float orientation){
-		boolean tAbsolute = isAbsolute();
-		SetAbsolute();
-		Turn(angleTable - orientation);
-		SetAbsolute(tAbsolute);
-	}
-
-	void  MotionControl::Align(Vec2 coord, float orientation){
-		boolean tAbsolute = isAbsolute();
-		SetAbsolute();
-		Turn(coord.heading()*RAD_TO_DEG - orientation);
-		SetAbsolute(tAbsolute);
+	void  MotionControl::Align(RobotCompass rc, float orientation){
+		Turn(orientation - GetCompassOrientation(rc));
 	}
 
 	Vec3  MotionControl::SetTarget(Vec3 target){

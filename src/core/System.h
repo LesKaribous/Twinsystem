@@ -21,14 +21,16 @@ namespace TwinSystem{
 
       inline static System& GetInstance() { return *s_Instance; }
 
+      Shared<MotionControl> motion;
+      Shared<StepperController> stepper;
+      UI ui;
+
     protected:
       void Initialize(); //Should be called once in the constructor
       bool pollEvents();
 		  static System* s_Instance;
 
-      Shared<MotionControl> motion;
-      Shared<StepperController> stepper;
-      Shared<UI> ui;
+
 
     };
 } // namespace System

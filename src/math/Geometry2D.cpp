@@ -17,7 +17,7 @@ PolarVec::PolarVec(float _heading , float _mag){
 }
 
 Vec2 PolarVec::toVec2(){
-    Vec2 result(mag*cosf(heading),mag*sinf(heading));
+    Vec2 result(mag*cosf(-heading),mag*sinf(-heading));
     //Vec2 result(1,0);
     //result.setHeading(heading);
     //result.setMagnitude(mag);

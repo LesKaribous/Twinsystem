@@ -12,6 +12,27 @@ struct Point{
 Vec3 ik(Vec3 target);
 Vec3 fk(Vec3 target);
 
+enum class TableCompass{
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST
+};
+
+enum class RobotCompass{
+    A,
+    AB,
+    B,
+    BC,
+    C,
+    CA
+};
+
+float GetCompassOrientation(TableCompass tc);
+float GetCompassOrientation(RobotCompass rc);
+float GetOffsets(RobotCompass rc);
+//float GetOffset(TableCompass tc);
+
 struct Path{
     Point origin, end;
     Path(Point origin, Point end);
