@@ -66,7 +66,9 @@ public :
 		// Laisser passer le robot secondaire
 		//SetAvoidance(false);
 		//SetRelative();
-		
+		actuators->close(RobotCompass::AB);
+		actuators->close(RobotCompass::BC);
+		actuators->close(RobotCompass::CA);
 		// ------
 		motion->SetPosition(Vec3(-1,-1,0));
 		motion->ProbeBorder(TableCompass::SOUTH, RobotCompass::BC);
@@ -86,14 +88,26 @@ public :
 
 		Vec2 b1(225,1775);
 		
+		actuators->ungrab(RobotCompass::AB);
 		motion->Go(cakeRose1);
+		actuators->grab(RobotCompass::AB);
+		motion->Align(RobotCompass::BC, GetCompassOrientation(TableCompass::NORTH));
 		delay(1000);
+		actuators->ungrab(RobotCompass::BC);
 		motion->Go(cakeJaune1);
+		actuators->grab(RobotCompass::BC);
+		motion->Align(RobotCompass::CA, 45);
 		delay(1000);
+		actuators->ungrab(RobotCompass::CA);
 		motion->Go(cakeMarron1);
+		actuators->grab(RobotCompass::CA);
 		delay(1000);
 		motion->Go(b1);
 
+
+		actuators->unlock(RobotCompass::AB);
+		actuators->unlock(RobotCompass::BC);
+		actuators->unlock(RobotCompass::CA);
 		delay(10000);
 
 
@@ -107,22 +121,14 @@ void setup(){}
 void loop(){
     Robot robot; //Start the robot
 	robot.motion->SetAbsolute();
-
-	/*
-	robot.X(100);
-	robot.X(0);
-	delay(1000);
-	robot.Y(100);
-	robot.Y(0);
-	delay(1000);
-	robot.R(90);
-	delay(1000);
-	robot.R(0);
-	*/
-
 	while(robot.waitForLaunch()){}
-	
+
+	//robot.actuators->grab(RobotCompass::AB);	
+	//robot.actuators->applause(RobotCompass::AB);
+	//robot.actuators->applause(RobotCompass::BC);	
+	//robot.actuators->applause(RobotCompass::CA);	
 	robot.Match();
+
 
 
     Console::println("Fin du programme");

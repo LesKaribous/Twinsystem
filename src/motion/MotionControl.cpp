@@ -133,9 +133,9 @@ namespace TwinSystem{
 		Align(rc, GetCompassOrientation(tc));
 
 		SetRelative();
-		controller->SetFeedrate(FAST);
-		GoPolar(GetCompassOrientation(rc),200);
 		controller->SetFeedrate(SLOW);
+		GoPolar(GetCompassOrientation(rc),200);
+		controller->SetFeedrate(10);
 		GoPolar(GetCompassOrientation(rc),80);
 
 		float _offset = GetOffsets(rc);
@@ -177,8 +177,6 @@ namespace TwinSystem{
 		while(target.c < -PI) target.c += 2.0f*PI;
 
 		cTarget = target;
-		
-		
 		//Intercom::focus();
 
 		return target;

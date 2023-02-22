@@ -46,17 +46,17 @@ namespace Pin{
 
     // Actuator Pinout
     namespace Servo{
-        const int ServoA1 = 23; //P2
-        const int ServoA2 = 21; //A4
-        const int ServoA3 = 19; //D1
+        const int ServoC1 = 23; //P2
+        const int ServoC2 = 21; //A4
+        const int ServoC3 = 19; //D1
 
-        const int ServoB1 = 17; //A2
-        const int ServoB2 = 16; //A1
-        const int ServoB3 = 18; //D2
+        const int ServoA1 = 17; //A2
+        const int ServoA2 = 16; //A1
+        const int ServoA3 = 18; //D2
 
-        const int ServoC1 = 56; //D3
-        const int ServoC2 = 20; //A3
-        const int ServoC3 = 22; //P1
+        const int ServoB1 = 56; //D3
+        const int ServoB2 = 20; //A3
+        const int ServoB3 = 22; //P1
     }
 
 

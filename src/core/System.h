@@ -3,6 +3,7 @@
 #include "core/Core.h"
 #include "event/Event.h"
 #include "core/Program.h"
+#include "actuators/Actuators.h"
 #include "ui/UI.h"
 #include "debug/Console.h"
 #include "motion/MotionControl.h"
@@ -21,6 +22,7 @@ namespace TwinSystem{
 
       inline static System& GetInstance() { return *s_Instance; }
 
+      Shared<Actuators> actuators;
       Shared<MotionControl> motion;
       Shared<StepperController> stepper;
       UI ui;

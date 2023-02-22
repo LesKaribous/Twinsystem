@@ -26,6 +26,7 @@ namespace TwinSystem{
             Console::SetLevel(ConsoleLevel::_TRACE);
             stepper = CreateShared<StepperController>();
             motion = CreateShared<MotionControl>(stepper);
+            actuators = CreateShared<Actuators>();
         }
 
         void System::OnEvent(Event& e){
