@@ -18,7 +18,9 @@ namespace TwinSystem{
                 cherry_Close = 50,
                 right_Open = 30,
                 left_Open = 160,
-                cherry_Open = 100;
+                cherry_Open = 100,
+                right_Grab = 100,
+                left_Grab = 90;
             }
             
             namespace BC{
@@ -28,7 +30,9 @@ namespace TwinSystem{
                 cherry_Close = 50,
                 right_Open = 30,
                 left_Open = 160,
-                cherry_Open = 100;
+                cherry_Open = 100,
+                right_Grab = 100,
+                left_Grab = 90;
             }
 
             namespace CA{
@@ -38,7 +42,9 @@ namespace TwinSystem{
                 cherry_Close = 50,
                 right_Open = 30,
                 left_Open = 160,
-                cherry_Open = 100;
+                cherry_Open = 100,
+                right_Grab = 100,
+                left_Grab = 90;
             }
         }
     } // namespace name
@@ -81,9 +87,7 @@ namespace TwinSystem{
         void ungrab (RobotCompass rc);
         void applause(RobotCompass rc);
 
-
     };
-
 
 } // namespace TwinSystem
 

@@ -4,14 +4,14 @@
 namespace TwinSystem
 {
         BistableServo::BistableServo(BistableServoProps props) :
-     _pin(props.pin), _openPos(props.open), _closePos(props.close), _enabled(false), _sleeping(false), _closed(false)
+     _pin(props.pin), _openPos(props.open), _closePos(props.close), _grabPos(props.grab) , _enabled(false), _sleeping(false), _closed(false), _grabed(false)
     {
         enable();
         //sleep();
     }
 
-    BistableServo::BistableServo(int pin, int openPos, int closePos) :
-     _pin(pin), _openPos(openPos), _closePos(closePos), _enabled(false), _sleeping(false), _closed(false)
+    BistableServo::BistableServo(int pin, int openPos, int closePos, int grabPos) :
+     _pin(pin), _openPos(openPos), _closePos(closePos), _grabPos(grabPos), _enabled(false), _sleeping(false), _closed(false), _grabed(false)
     {
         enable();
         //sleep();
@@ -38,6 +38,14 @@ namespace TwinSystem
             if(_sleeping) sleep(false); //Wake
             _servo.write(_closePos);
             _closed = true;
+        }
+    }
+
+    void BistableServo::grab(){
+        if(_enabled){
+            if(_sleeping) sleep(false); //Wake
+            _servo.write(_grabPos);
+            _grabed = true;
         }
     }
 

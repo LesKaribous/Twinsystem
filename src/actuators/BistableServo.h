@@ -4,17 +4,18 @@
 namespace TwinSystem{
 
     struct BistableServoProps{
-        int pin, close, open;
+        int pin, close, open, grab;
     };
 
     class BistableServo{
     public:
         BistableServo(BistableServoProps props);
-        BistableServo(int pin, int openPos, int closePos);
+        BistableServo(int pin, int openPos, int closePos, int grabPos);
 
         void open();
         void close();
         void toggle();
+        void grab();
 
         void enable();
         void sleep(bool state = true);
@@ -22,8 +23,8 @@ namespace TwinSystem{
 
     private:
         Servo _servo;
-        int _pin, _openPos, _closePos;
-        bool _enabled, _sleeping, _closed;
+        int _pin, _openPos, _closePos, _grabPos;
+        bool _enabled, _sleeping, _closed, _grabed;
     };
 
 } // namespace TwinSystem
