@@ -49,8 +49,8 @@ namespace Settings{
         LIDAR_RANGE = 30; //° Useless
 
     const uint32_t 
-        ACCEL = 3000, // Old : 2000              
-        SPEED = 5000; // Old : 5000
+        ACCEL = 2000, // Old : 3000              
+        SPEED = 4000; // Old : 5000
 
     namespace Geometry{
         const float offset = 125.98f; //Center to max dist robot (for recalage)
