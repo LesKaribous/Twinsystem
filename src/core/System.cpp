@@ -3,31 +3,28 @@
 
 namespace TwinSystem{
 
-        System* System::s_Instance = nullptr;
-        
-        System::System(){
-            if(s_Instance == nullptr){
-                s_Instance = this;
-                Initialize();
-            }else{
-               Console::error("System") << "System instance already created." << Console::endl;
+        System::System(){}
+
+
+        void System::Initialize(){
+            if(!_initialized){
+                _initialized = true;
+                
+                ui.Initialize();
+                actuators.Initialize();
+                motion.Initialize();
+                intercom.Initialize();
+            
             }
         }
 
-        void System::Run(){
+        void System::Update(){
             //pollEvents();
-            ui.inputs.update();
-            ui.draw();
+            ui.Update();
+            intercom.Update();
         }
 
-        void System::Initialize(){
-            Console::Initialize();
-            ui.inputs.initialize();
-            Console::SetLevel(ConsoleLevel::_TRACE);
-            stepper = CreateShared<StepperController>();
-            motion = CreateShared<MotionControl>(stepper);
-            actuators = CreateShared<Actuators>();
-        }
+
 
         void System::OnEvent(Event& e){
             //EventDispatcher dispatcher(e);
@@ -35,17 +32,17 @@ namespace TwinSystem{
             //dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
 
             ui.OnEvent(e);
-            motion->OnEvent(e);
+            motion.OnEvent(e);
         }
 
         void System::Execute(Program prgm){
             
         }
 
-        void System::wait(int temps){
+        void System::Wait(int temps){
             unsigned long initTemps = millis();
             while ((millis() - initTemps) <= temps){
-                Run();
+                Update();
             }
         }
 

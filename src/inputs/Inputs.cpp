@@ -6,34 +6,55 @@
 namespace TwinSystem{
 
     Inputs::Inputs() : 
-    init(Pin::Inputs::init),
-    team(Pin::Inputs::team),
-    starter(Pin::Inputs::starter),
-    strategy(Pin::Inputs::strategy){}
+        resetButton(Pin::Inputs::resetButton),
+        teamSwitch(Pin::Inputs::teamSwitch),
+        strategySwitch(Pin::Inputs::strategySwitch),
+        twinSwitch(Pin::Inputs::twinSwitch),
+        starter(Pin::Inputs::starter)
+    {}
 
 
-    void Inputs::initialize(){
-
-        init.init();
-        team.init();
+    void Inputs::Initialize(){
+        resetButton.init();
+        teamSwitch.init();
         starter.init();
-        strategy.init();
-
+        strategySwitch.init();
+        twinSwitch.init();
     }
 
-    void Inputs::update(){
-
-        init.update();
-        team.update();
+    void Inputs::Update(){
+        resetButton.update();
+        teamSwitch.update();
         starter.update();
-        strategy.update();
+        strategySwitch.update();
+        twinSwitch.update();
+    }
+
+    bool Inputs::HasChanged(){
+        return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
+    }
+
+
+    Inputs::Inputs() : 
+        resetButton(Pin::Inputs::resetButton),
+        teamSwitch(Pin::Inputs::teamSwitch),
+        strategySwitch(Pin::Inputs::strategySwitch),
+        twinSwitch(Pin::Inputs::twinSwitch),
+        starter(Pin::Inputs::starter)
+    {}
+
+
+    void References::Initialize(){
 
     }
 
-    bool Inputs::hasChanged(){
-        return init.hasChanged() || starter.hasChanged() || team.hasChanged() || strategy.hasChanged();
+    void References::Update(){
+
     }
 
+    bool References::HasChanged(){ //TODO Add the rest
+        return x.hasChanged() || y.hasChanged() || z.hasChanged() || team.hasChanged() || avoidance.hasChanged();
+    }
 
     /*
     bool Inputs::pollEvents(std::function<void(Event&)> cb){

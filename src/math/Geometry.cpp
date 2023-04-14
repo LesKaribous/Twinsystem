@@ -98,18 +98,20 @@ float GetOffsets(RobotCompass rc){
 Vec3 ik(Vec3 target){
     float c60 = cosf(PI/3.0f),
             s60 = sinf(PI/3.0f),
-            L = Settings::RADIUS,
-            R = Settings::WHEEL_RADIUS;
+            L = Settings::Geometry::RADIUS,
+            R = Settings::Geometry::WHEEL_RADIUS;
     
-    if(Settings::purple()){
+    /*
+    if(Settings::purple()){ //Inverting rotation
         Vec3 transform(1,-1,-1);
         target.mult(transform.toMatrix());
     }
+    */
 
     Matrix3x3 P = {
-            0,   1 , L,
-        -s60, -c60, L,
-            s60, -c60, L
+        0,   1 , L,
+     -s60, -c60, L,
+      s60, -c60, L
     };
 
     return target.mult(P).mult(1/R);
@@ -119,8 +121,8 @@ Vec3 fk(Vec3 target){
     float f1sq3 = 1.0f / sqrt(3.0f),		  
             f1s3 = 1.0f/3.0f,
             f2s3 = 1.0f/3.0f,
-            L = Settings::RADIUS,
-            R = Settings::WHEEL_RADIUS;
+            L = Settings::Geometry::RADIUS,
+            R = Settings::Geometry::WHEEL_RADIUS;
     
 
     Matrix3x3 P = {
@@ -132,10 +134,11 @@ Vec3 fk(Vec3 target){
     P.mult(R);
     target.mult(P);
 
-    if(Settings::purple()){
+    /*
+    if(Settings::purple()){ //Inverting rotation
         Vec3 transform(1,-1,-1);
         target.mult(transform.toMatrix());
-    }
+    }*/
 
     return target;
 }

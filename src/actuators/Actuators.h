@@ -78,14 +78,16 @@ namespace TwinSystem{
         Actuators();
         ~Actuators();
 
-        void lock   (RobotCompass rc); //Lock Cherry locker
-        void unlock (RobotCompass rc); //Unlock Cherry locker
+        void Initialize();
 
-        void close  (RobotCompass rc);
-        void open   (RobotCompass rc);
-        void grab   (RobotCompass rc);
-        void ungrab (RobotCompass rc);
-        void applause(RobotCompass rc);
+        void Lock   (RobotCompass rc); //Lock Cherry locker
+        void Unlock (RobotCompass rc); //Unlock Cherry locker
+
+        void Close  (RobotCompass rc);
+        void Open   (RobotCompass rc);
+        void Grab   (RobotCompass rc);
+        void Ungrab (RobotCompass rc);
+        void Applause(RobotCompass rc);
 
     };
 

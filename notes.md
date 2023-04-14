@@ -21,6 +21,14 @@
                                                             
 </-->
 
+## Manual
+
+Setup the robot according to the team.
+Arm the robot.
+Pull the starter.
+
+Reminder : If you armed the robot and you forgot to set the team. Press reset while pulling the starter. The robot will go back in idle mode. Then Arm again the robot.
+
 ## Features
     - [ ] Modular architecture
     - [ ] Program with several actions

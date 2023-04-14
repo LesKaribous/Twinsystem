@@ -30,10 +30,13 @@ namespace TwinSystem{
 
         float feedrate;
         bool wasLastAsync;
+        bool _initialized = false;
 
     public:
         StepperController();
         ~StepperController(){};
+
+        void Initialize();
 
         void OnEvent(Event& e);
 

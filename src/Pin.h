@@ -7,10 +7,11 @@ namespace Pin{
 
     namespace Inputs{
         const int 
-            init = 25,
+            resetButton = 25,
             starter = 26,
-            team = 27,
-            strategy = 28; 
+            teamSwitch = 27,
+            strategySwitch = 28,
+            twinSwitch = 2;
  
     }
 

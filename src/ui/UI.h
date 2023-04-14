@@ -5,20 +5,48 @@
 #include "inputs/Inputs.h"
 
 namespace TwinSystem{
+
+    enum class Page{
+        INIT,
+        MATCH,
+        RESET
+    };
+
     class UI{
     public:
         UI();
-        void clear();
-        void draw();
+
+        void Initialize();
+        void Clear();
+        void Update();
+        void Draw();
 
         //bool pollEvents(void(System::*cb)(&Event));
         void OnEvent(Event& e);
 
-
-        Inputs inputs;
     private:
+        // Fonctions d'affichage
+        void drawBackScreenStart();
+        void drawBackScreenMatch();
+        void updateScore(int uScore);
+        void updateMatchTime(int tMatch);
+        void updatePosition(float Xpos, float Ypos, float Tpos);
+        void updateLidarState(bool lidarState);
+        void updateTiretteState(int tiretteState);
+        void updateStrategyState(bool stratState);
+        void updateAllMatchVar();
+        void updateInitState(int initState);
+        void updateTeamColor(bool team);
+        void updateAllStartVar();
+
+
+    public:
+        Inputs inputs;
+        References references;
         Screen screen;
-        
+
+    private:
+        Page currentPage = Page::INIT;
         long lastDraw = 0;
         bool needDraw = true;
     };

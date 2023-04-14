@@ -33,8 +33,11 @@ namespace TwinSystem{
     Actuators::~Actuators(){
     }
 
+    void Actuators::Initialize(){
 
-    void Actuators::lock(RobotCompass rc){
+    }
+
+    void Actuators::Lock(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
@@ -54,7 +57,7 @@ namespace TwinSystem{
         }
     }
 
-    void Actuators::unlock(RobotCompass rc){
+    void Actuators::Unlock(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
@@ -74,7 +77,7 @@ namespace TwinSystem{
         }
     }
 
-    void Actuators::close(RobotCompass rc){
+    void Actuators::Close(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
@@ -98,7 +101,7 @@ namespace TwinSystem{
         }
     }
 
-    void Actuators::open(RobotCompass rc){
+    void Actuators::Open(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
@@ -121,7 +124,7 @@ namespace TwinSystem{
         }
     }
 
-    void Actuators::grab(RobotCompass rc){
+    void Actuators::Grab(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
@@ -144,19 +147,19 @@ namespace TwinSystem{
         }
     }
 
-    void Actuators::ungrab(RobotCompass rc){
-        open(rc);
+    void Actuators::Ungrab(RobotCompass rc){
+        Open(rc);
     }
 
-    void Actuators::applause(RobotCompass rc){
-        open(rc); unlock(rc);
+    void Actuators::Applause(RobotCompass rc){
+        Open(rc); Unlock(rc);
         delay(500);
-        grab(rc);lock(rc);
+        Grab(rc); Lock(rc);
         delay(500);
-        open(rc); unlock(rc);
+        Open(rc); Unlock(rc);
         delay(500);
-        grab(rc);lock(rc);
+        Grab(rc); Lock(rc);
         delay(500);
-        open(rc); unlock(rc);
+        Open(rc); Unlock(rc);
     }
 }

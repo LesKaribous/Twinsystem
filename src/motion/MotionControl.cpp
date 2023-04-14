@@ -4,20 +4,36 @@
 
 namespace TwinSystem{
 	
-	MotionControl::MotionControl(Shared<StepperController> stps){
-		controller = stps;
-		calibration = Settings::primary() ?  
-			Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
+	MotionControl::MotionControl(){
+		_calibration = Settings::Match::PRIMARY ?  
+		Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
 		
-		absolute = Settings::ABSOLUTE;
-		controller->SetFeedrate(100);
-
+		_absolute = Settings::Motion::ABSOLUTE;
+		steppers.SetFeedrate(100);
 	}
 
 	MotionControl::~MotionControl(){}
 
+	void  MotionControl::Initialize(){
+	   steppers.Initialize();
+         
+
+        State _state = State::IDLE;
+
+        Vec3 _startPosition  = {0,0,0};
+        Vec3 _position       = {-1,-1,0};
+        Vec3 _target 	     = {0,0,0};
+
+        Vec3 _calibration 	 = {1,1,1};
+        Vec2 _controlPoint   = {0,0};
+
+        bool _probedX = false, _probedY = false;
+        bool _absolute = true;
+        bool _probing = false;
+	}
+
 	void  MotionControl::DebugState(){
-		switch(cState){
+		switch(_state){
 			case State::IDLE :
 				Console::println("IDLE");
 			break;
@@ -44,29 +60,29 @@ namespace TwinSystem{
 		//EventDispatcher dispatcher(e);
 		//dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 		//dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResized));
-		controller->OnEvent(e);
+		steppers.OnEvent(e);
 	}
 
 
 	void  MotionControl::Pause(){
 		DebugState();
-		if(cState == State::RUNNING){
+		if(_state == State::RUNNING){
 			DebugState();
-			cState = State::PAUSED;
+			_state = State::PAUSED;
 			DebugState();
 			Console::info("Controller") << "stopped" << Console::endl;
-			controller->Stop();
+			steppers.Stop();
 		}
 	}
 
     void  MotionControl::Resume(){
 		DebugState();
-		if(cState == State::PAUSED){
+		if(_state == State::PAUSED){
 			DebugState();
-			cState = State::RUNNING;
+			_state = State::RUNNING;
 			DebugState();
 			Console::info("Controller resumed");
-			controller->Resume();
+			steppers.Resume();
 		}
 	}
 
@@ -82,20 +98,20 @@ namespace TwinSystem{
 			resume();
 		}
 		*/
-		if(cState == State::RUNNING){
-			if(controller->isArrived()){
+		if(_state == State::RUNNING){
+			if(steppers.isArrived()){
 				DebugState();
-				cState = State::ARRIVED;
+				_state = State::ARRIVED;
 				DebugState();
 			}
 		}
 	}
 
     void  MotionControl::Turn(float angle){
-		controller->SetFeedrate(30);
-		if (absolute) Move({cPosition.a, cPosition.b, angle });
+		steppers.SetFeedrate(30);
+		if (_absolute) Move({_position.a, _position.b, angle });
 		else Move({0, 0, angle});
-		controller->SetFeedrate(100);
+		steppers.SetFeedrate(100);
 	}
 
 	//All goPolar are relative
@@ -114,7 +130,7 @@ namespace TwinSystem{
 
 	void  MotionControl::Go(Vec2 target){
 		Console::info("MotionControl") << "Go :" << target << Console::endl;
-		if (absolute) Move({target.a, target.b, cPosition.c*RAD_TO_DEG});
+		if (_absolute) Move({target.a, target.b, _position.c*RAD_TO_DEG});
 		else Move({target.a, target.b, 0});
 	}
 
@@ -129,35 +145,35 @@ namespace TwinSystem{
 	
 	void  MotionControl::ProbeBorder(TableCompass tc, RobotCompass rc){
 		boolean tAbsolute = isAbsolute();
-		probing = true;
+		_probing = true;
 		Align(rc, GetCompassOrientation(tc));
 
 		SetRelative();
-		controller->SetFeedrate(SLOW);
+		steppers.SetFeedrate(SLOW);
 		GoPolar(GetCompassOrientation(rc),200);
-		controller->SetFeedrate(10);
+		steppers.SetFeedrate(10);
 		GoPolar(GetCompassOrientation(rc),80);
 
 		float _offset = GetOffsets(rc);
 
 		if(tc == TableCompass::NORTH)
-			cPosition.a = 3000.0 - _offset; //We hit Xmax
+			_position.a = 3000.0 - _offset; //We hit Xmax
 		if(tc == TableCompass::SOUTH)
-			cPosition.a = 0.0 + _offset; //We hit Xmin
+			_position.a = 0.0 + _offset; //We hit Xmin
 		if(tc == TableCompass::EAST)
-			cPosition.b = 2000.0 - _offset; //We hit Ymax
+			_position.b = 2000.0 - _offset; //We hit Ymax
 		if(tc == TableCompass::WEST)
-			cPosition.b = 0.0 + _offset; //We hit Ymin
+			_position.b = 0.0 + _offset; //We hit Ymin
 
 		GoPolar(GetCompassOrientation(rc),-100);
 
-		controller->SetFeedrate(FAST);
+		steppers.SetFeedrate(FAST);
 		SetAbsolute(tAbsolute);
-		probing = false;
+		_probing = false;
 	}
 
 	bool  MotionControl::isProbing(){
-		return probing;
+		return _probing;
 	}
 
 
@@ -168,63 +184,63 @@ namespace TwinSystem{
 	Vec3  MotionControl::SetTarget(Vec3 target){
 		target.c *= DEG_TO_RAD;
 
-		if(absolute){
-			target.sub(cPosition); 		 //Convert Absolute target to relative
-			target.rotateZ(cPosition.c);
+		if(_absolute){
+			target.sub(_position); 		 //Convert Absolute target to relative
+			target.rotateZ(_position.c);
 		}
 		
 		while(target.c > PI) target.c -= 2.0f*PI;
 		while(target.c < -PI) target.c += 2.0f*PI;
 
-		cTarget = target;
+		_target = target;
 		//Intercom::focus();
 
 		return target;
 	}
 
 	void  MotionControl::UpdatePosition(){
-		Vec3 currentStepperPos = controller->GetPosition();
+		Vec3 currentStepperPos = steppers.GetPosition();
 		Vec3 relativePosition = fk(currentStepperPos);
 		
 		relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
 		relativePosition.b /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
 		relativePosition.c /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
 
-		relativePosition.a /= calibration.a;
-		relativePosition.b /= calibration.b;
-		relativePosition.c /= calibration.c;
+		relativePosition.a /= _calibration.a;
+		relativePosition.b /= _calibration.b;
+		relativePosition.c /= _calibration.c;
 
 		Console::trace("MotionControl") << "Current position" << relativePosition << Console::endl;
-		cPosition = cStartPosition.copy().add(relativePosition);
+		_position = _startPosition.copy().add(relativePosition);
 	}
 
 	//Raw relative move request
 	void  MotionControl::Move(Vec3 target){
 		//Set new target
 		target = SetTarget(target);
-		cStartPosition = cPosition; //Save start position
+		_startPosition = _position; //Save start position
 		
 		DebugState();
-		cState = State::RUNNING; //robot is moving from now
+		_state = State::RUNNING; //robot is moving from now
 		DebugState();
 
-		target.mult(calibration.toMatrix()); //Apply cartesian calibration
+		target.mult(_calibration.toMatrix()); //Apply cartesian calibration
 		target = ik(target);				 //Apply inverse kinematics result in steps
 		target.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); //Apply stepping multiplier
 
-		controller->Move(target, true); //Execute move
+		steppers.Move(target, true); //Execute move
 		while(Running()) Run(); //Wait for move to end and check for opponent
 		
 		//Need to take actual rotation when adding relative target
-		cPosition = cStartPosition.add(cTarget.rotateZ(-cPosition.c)); 
-		cStartPosition = cPosition;
+		_position = _startPosition.add(_target.rotateZ(-_position.c)); 
+		_startPosition = _position;
 		DebugState();
-		cState = State::IDLE; //Ready for next move
+		_state = State::IDLE; //Ready for next move
 		DebugState();
 	}
 
 	bool  MotionControl::Running(){
-		return !(cState == State::ARRIVED || cState == State::CANCELLED);
+		return !(_state == State::ARRIVED || _state == State::CANCELLED);
 	}
 
 
@@ -235,55 +251,50 @@ namespace TwinSystem{
 	// -------------------------------
 
 	Vec3  MotionControl::GetPosition(){
-		return Vec3(cPosition.a, cPosition.b, cPosition.c * RAD_TO_DEG);
+		return Vec3(_position.a, _position.b, _position.c * RAD_TO_DEG);
 	}
 
 	Vec3  MotionControl::GetTarget(){
-		return cTarget;
+		return _target;
 	}
 	Vec3  MotionControl::GetAbsTarget(){
-		return cStartPosition.copy().add(cTarget);
+		return _startPosition.copy().add(_target);
 	}
 
 	bool  MotionControl::isAbsolute(){
-		return absolute;
+		return _absolute;
 	}
 
 	bool  MotionControl::isRelative(){
-		return !absolute;
+		return !_absolute;
 	}
 
 	bool  MotionControl::isProbed(){
-		return probedX && probedY;
+		return _probedX && _probedY;
 	}
 	bool  MotionControl::isXProbed(){
-		return probedX;
+		return _probedX;
 	}
 	bool  MotionControl::isYProbed(){
-		return probedY;
+		return _probedY;
 	}
 
 	void  MotionControl::SetPosition(Vec2 newPos){
-		cPosition = Vec3(newPos, cPosition.c*RAD_TO_DEG);
+		_position = Vec3(newPos, _position.c*RAD_TO_DEG);
 	}
 	void  MotionControl::SetPosition(Vec3 newPos){
-		cPosition = newPos.mult(Vec3(1.0,1.0,DEG_TO_RAD).toMatrix());
+		_position = newPos.mult(Vec3(1.0,1.0,DEG_TO_RAD).toMatrix());
 	}
 
     void  MotionControl::SetAbsolute(bool state){
-		absolute = state;
+		_absolute = state;
 	}
 
     void  MotionControl::SetRelative(bool state){
 		SetAbsolute(!state);
 	}
 
-	
-    void  MotionControl::SetAvoidance(bool state){
-		if(Settings::avoidance())
-			avoidance = state;
-		else avoidance = false;
-	}
+
 
 
 

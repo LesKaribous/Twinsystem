@@ -9,22 +9,26 @@ namespace TwinSystem{
     StepperController::StepperController() :         
         sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
         sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-        sC(Pin::Stepper::stepC, Pin::Stepper::dirC){
+        sC(Pin::Stepper::stepC, Pin::Stepper::dirC){}
 
-        pinMode(Pin::Stepper::enable, OUTPUT);
+    void StepperController::Initialize(){
+        if(!_initialized){
+            _initialized = true;
+            pinMode(Pin::Stepper::enable, OUTPUT);
 
-        Engage();
-        Sleep();
-        Reset();    
+            Engage();
+            Sleep();
+            Reset();    
 
-        sA_target = sB_target = sC_target = 0;
-        engaged = false,
-        sleeping = false;
+            sA_target = sB_target = sC_target = 0;
+            engaged = false,
+            sleeping = false;
 
-        SetCalibration(Settings::primary()); //WARNING
+            SetCalibration(Settings::Match::PRIMARY); //WARNING default assisgnation
 
-        feedrate = 100;
-        wasLastAsync = false;
+            feedrate = 100;
+            wasLastAsync = false;
+        }
     }
 
 	void StepperController::OnEvent(Event& e){
@@ -36,12 +40,12 @@ namespace TwinSystem{
     void update(){}
 
     void StepperController::SetCalibration(bool state){
-        calibration = (state == Settings::PRIMARY) ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
+        calibration = (state == Settings::Match::PRIMARY) ? Settings::Calibration::Primary.Holonomic : Settings::Calibration::Secondary.Holonomic;
     }
 
     void StepperController::SetFeedrate(float value){
         feedrate = value;
-        SetSpeed(float(Settings::SPEED) * value / 100.0);
+        SetSpeed(float(Settings::Motion::SPEED) * value / 100.0);
     }
 
 
@@ -118,18 +122,18 @@ namespace TwinSystem{
         sC.setPosition(0);
         sC.setTargetRel(0);
 
-        sA.setAcceleration(Settings::ACCEL)
-        .setMaxSpeed(Settings::SPEED)
+        sA.setAcceleration(Settings::Motion::ACCEL)
+        .setMaxSpeed(Settings::Motion::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_A_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_A_POLARITY);
 
-        sB.setAcceleration(Settings::ACCEL)
-        .setMaxSpeed(Settings::SPEED)
+        sB.setAcceleration(Settings::Motion::ACCEL)
+        .setMaxSpeed(Settings::Motion::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_B_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_B_POLARITY);
 
-        sC.setAcceleration(Settings::ACCEL)
-        .setMaxSpeed(Settings::SPEED)
+        sC.setAcceleration(Settings::Motion::ACCEL)
+        .setMaxSpeed(Settings::Motion::SPEED)
         .setInverseRotation(Settings::Stepper::DIR_C_POLARITY)
         .setStepPinPolarity(Settings::Stepper::STEP_C_POLARITY);
 

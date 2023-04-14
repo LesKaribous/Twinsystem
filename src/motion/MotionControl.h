@@ -8,6 +8,7 @@ namespace TwinSystem{
 
     class MotionControl{
     public:
+
         enum class State{
             IDLE,
             RUNNING,
@@ -19,8 +20,10 @@ namespace TwinSystem{
         /**
          * @brief Constructor
          */
-        MotionControl(Shared<StepperController> stps);
+        MotionControl();
         ~MotionControl();
+
+        void Initialize();
 
         void Run();
         void Pause();
@@ -116,24 +119,22 @@ namespace TwinSystem{
         //Return true while probing
         bool isProbing();
 
-
+    public : 
+        StepperController steppers;
+         
     private:
-        State cState = State::IDLE;
+        State _state = State::IDLE;
 
-        Vec3 cPosition 		= {-1,-1,0};
-        Vec3 cStartPosition = {0,0,0};
-        Vec3 cTarget 		= {0,0,0};
-        Vec3 calibration 	= {1,1,1};
+        Vec3 _startPosition  = {0,0,0};
+        Vec3 _position       = {-1,-1,0};
+        Vec3 _target 	     = {0,0,0};
 
-        Vec2 controlPoint   = {0,0};
+        Vec3 _calibration 	 = {1,1,1};
+        Vec2 _controlPoint   = {0,0};
 
-        bool probedX = false, probedY = false;
-        bool absolute = true;
-        bool probing = false;
-
-        bool avoidance = false;
-
-        Shared<StepperController> controller;
+        bool _probedX = false, _probedY = false;
+        bool _absolute = true;
+        bool _probing = false;
 
     };
 }

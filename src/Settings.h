@@ -12,50 +12,42 @@ struct  CalibrationProfile{
 // Namespace
 namespace Settings{
 
-    /*
-    void init();
-    void setTeam(bool);
-    void setAvoidance(bool state);
-    void setTeam(bool state);
-    */
+    namespace Match{
+        const bool 
+        AVOIDANCE = 1,
+        NO_AVOIDANCE = 0,
 
-    bool yellow();
-	bool purple();
-    bool primary();
-	bool secondary();
-    bool avoidance();
-    bool useIHM();
+        PRIMARY   = 1,
+        SECONDARY = 0,
 
-    const bool 
-    ADVERSAIRE_NON = 1,
-    ADVERSAIRE_OUI = 0,
-    STRATEGIE_HOMOLOGATION = 1,
-    STRATEGIE_MATCH        = 0,
-    PRIMARY   = 1,
-    SECONDARY = 0,
-    ABSOLUTE = true,
-    
-    IHM      = true, //FALSE for primary
-    YELLOW   = true,
-    PURPLE   = false;
+        BLUE   = false,
+        GREEN  = true;
 
-    const unsigned long 
+        const unsigned long 
         TEMPS_MATCH = 101000 ;
 
-    const float 
-        FEEDRATE = 100, //%
-        RADIUS = 90,
-        WHEEL_RADIUS = 30,
-        LIDAR_RANGE = 30; //° Useless
+        const float 
+        FEEDRATE = 100; //%
+    }
 
-    const uint32_t 
-        ACCEL = 2000, // Old : 3000              
-        SPEED = 4000; // Old : 5000
 
     namespace Geometry{
-        const float offset = 125.98f; //Center to max dist robot (for recalage)
+        const float 
+        RADIUS = 125.98f,
+        WHEEL_RADIUS = 30;
     }
     
+    namespace Motion{
+        const bool
+        RELATIVE = false,
+        ABSOLUTE = true;
+
+
+        const uint32_t 
+            ACCEL = 2000, // Old : 3000
+            SPEED = 5000;
+    }
+
     namespace Stepper{
         const bool 
         ENABLE_POLARITY = false,
@@ -72,6 +64,7 @@ namespace Settings{
         STEP_MODE = 8;
             
     }
+
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC

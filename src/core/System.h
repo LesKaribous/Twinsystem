@@ -1,38 +1,53 @@
 #pragma once
 
+#include "ui/UI.h"
 #include "core/Core.h"
 #include "event/Event.h"
 #include "core/Program.h"
-#include "actuators/Actuators.h"
-#include "ui/UI.h"
+#include "com/Intercom.h"
 #include "debug/Console.h"
+#include "actuators/Actuators.h"
 #include "motion/MotionControl.h"
 
 namespace TwinSystem{
-    class System{
-    public :
-      System();
 
-      void Run();
+	enum class RobotState{
+		IDLE,
+		ARMED,
+		STARTING,
+		MOVING,
+		ROTATING,
+		STOPPED,
+		STUCK,
+		ERROR
 
-      void OnEvent(Event& e);
-      void Execute(Program prgm);
+	};
 
-      void wait(int time);
+	class System{
+	public :
+		System();
 
-      inline static System& GetInstance() { return *s_Instance; }
+		void Initialize();
+		void Update();
+		void UpdateUI();
 
-      Shared<Actuators> actuators;
-      Shared<MotionControl> motion;
-      Shared<StepperController> stepper;
-      UI ui;
+		void OnEvent(Event& e);
+		void Execute(Program prgm);
 
-    protected:
-      void Initialize(); //Should be called once in the constructor
-      bool pollEvents();
-		  static System* s_Instance;
+		void Wait(int time);
 
+		inline const RobotState& GetState(){return _state;}
 
+	protected:
+		Actuators actuators;
+		MotionControl motion;
+		Intercom intercom;
+		UI ui;
 
-    };
+		RobotState _state;
+		bool pollEvents();
+
+	private:
+		bool _initialized = false;
+	};
 } // namespace System

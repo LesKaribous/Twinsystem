@@ -4,23 +4,37 @@
 
 namespace TwinSystem{
 
-    class BooleanInput{
+    template <class T>
+    class AbstractInput{
     public:
-        BooleanInput(){};
+        AbstractInput(){};
 
         virtual void init() = 0;
         virtual void update() = 0;
         virtual bool hasChanged(){
-            if(state != lastState) return true;
+            if(value != lastValue && enabled) return true;
             else return false;
         };
-        virtual bool GetState() const{
-            return state;
+        virtual bool GetValue() const{
+            return value;
         }
 
+        inline void Enable(){enabled = true;}
+        inline void Disable(){enabled = false;}
+
     protected:
-        bool state;
-        bool lastState;
+        bool enabled;
+        T value;
+        T lastValue;
+    };
+
+    class BooleanInput : public AbstractInput<bool>{
+    public:
+        BooleanInput(){};
+
+        virtual bool GetState() const{
+            return value;
+        }
     };
 
     class Switch : public BooleanInput{
@@ -31,8 +45,9 @@ namespace TwinSystem{
             pinMode(_pin, INPUT_PULLUP);
         }
         void update() override{
-            lastState = state;
-            state = digitalRead(_pin);
+            if(!enabled) return;
+            lastValue = value;
+            value = digitalRead(_pin);
         }
     private:
         int _pin;
@@ -45,28 +60,78 @@ namespace TwinSystem{
             pinMode(_pin, INPUT_PULLUP);
         }
         void update() override{
-            lastState = state;
-            state = digitalRead(_pin);
+            if(!enabled) return;
+            lastValue = value;
+            value = digitalRead(_pin);
         }
     private:
         int _pin;
     };
 
+    class DummyBooleanInput : public BooleanInput{
+    public:
+        DummyBooleanInput(bool& reference) : _reference(reference){};
+        void init() override{}
+        void update() override{
+            if(!enabled) return;
+            lastValue = value;
+            value = _reference;
+        }
+
+    private:
+        bool& _reference;
+    };
+
     class Inputs{
     public:
         Inputs();
-        void initialize();
-        void update();
-        bool hasChanged();
+        void Initialize();
+        void Update();
+        bool HasChanged();
         //bool pollEvents(std::function<void(Event&)>);
 
     public:
-        Button init;
-        Switch team;
+        Button resetButton;
+
+        Switch twinSwitch;
+        Switch teamSwitch;
+        Switch strategySwitch;
+        //Switch avoidanceSwitch;
+        
         Switch starter;
-        Switch strategy;
     };
 
 
 
+
+    class DummyDigitalInput : public AbstractInput<int>{
+    public:
+        DummyDigitalInput(int& reference) : _reference(reference){};
+
+        void init() override{}
+        void update() override{
+            if(!enabled) return;
+            lastValue = value;
+            value = _reference;
+        }
+
+    private:
+        int& _reference;
+    };
+
+
+
+
+    class References{
+    public:
+        References();
+        void Initialize();
+        void Update();
+        bool HasChanged();
+        //bool pollEvents(std::function<void(Event&)>);
+
+    public:
+        DummyDigitalInput x, y, z;
+        DummyBooleanInput team, strategy, avoidance, intercom;
+    };
 }
