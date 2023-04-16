@@ -1,22 +1,14 @@
 #pragma once
 
+#include "core/JobExecutor.h"
 #include "math/Geometry.h"
 #include "event/Event.h"
 #include "motion/StepperController.h"
 
 namespace TwinSystem{
 
-    class MotionControl{
+    class MotionControl : public JobExecutor{
     public:
-
-        enum class State{
-            IDLE,
-            RUNNING,
-            PAUSED,
-            CANCELLED,
-            ARRIVED,
-        };
-
         /**
          * @brief Constructor
          */
@@ -25,116 +17,65 @@ namespace TwinSystem{
 
         void Initialize();
 
-        void Run();
-        void Pause();
-        void Resume();
-
         void OnEvent(Event& e);
-        
-        void DebugState();
-
-        /**
-         * @brief Execute this routine while moving.
-         */
-        void ComputeSync();
-
-        /**
-         * @brief updatePosition by calculating foward kinematics. (In realtime folk's B-D )
-         */
         void UpdatePosition();
 
-        /**
-         * @brief Turn robot arround its center by desired angle
-         * @param angle angle in degrees
-         */
-        void Turn(float);
+        void TurnAwait(float);
+        void TurnAsync(float);
 
-        /**
-         * @brief Move the robot using polar coordinates
-         * @param heading move direction
-         * @param length distance to go
-         */
-        void GoPolar(float heading, float length);
-        
-        /**
-         * @brief Move the robot using cartesian coordinates
-         * @param x X coordinate
-         * @param y Y coordinate
-         */
-        void Go(float x, float y);
-        void Go(Vec2);
+        void GoAwait(Vec2);
+        void GoAsync(Vec2);
+        void GoAwait(float x, float y);
+        void GoAsync(float x, float y);
 
-        /**
-         * @brief Move the robot using cartesian coordinates & turn by desired angle
-         * @param x X coordinate
-         * @param y Y coordinate
-         * @param w Y coordinate
-         */
-        void GoTurn(float x, float y, float w);
-        void GoTurn(Vec3);
+        void AlignAwait(RobotCompass, float orientation);
+        void AlignAsync(RobotCompass, float orientation);
 
-        /**
-         * @brief Set the robot position using position of the bumped border
-         * @param border position vector of the border relative to the robot current position
-         */
-        void ProbeBorder(TableCompass, RobotCompass);
+        void OptmizeTarget();
+        Vec3 TargetToSteps(Vec3 relativeTarget);
+        Vec3 ToRelativeTarget(Vec3 absTarget);
+        Vec3 ToAbsoluteTarget(Vec3 absTarget);
 
-        /**
-         * @brief Align (turn) the robot toward the desired vector
-         * @param target the target vector to align with
-         * @param orientation offset angle to align specific face of the robot
-         */
-        void Align(RobotCompass, float orientation);
+    private:
+        void MoveAwait(Vec3 target);
+        void MoveAsync(Vec3 target);
 
-        /**
-         * @brief Move the robot to the desired target (last params of the Vec3 is used for arc curvature)
-         * @param target the target vector to align with
-         */
-        void Move(Vec3 target);
-
-        /**
-         * @brief Return true if a move is running
-         */
-        bool Running();
-
-
+    public:
         //Setters
-        Vec3 SetTarget(Vec3);
-        void SetPosition(Vec2);
-        void SetPosition(Vec3);
-        void SetAbsolute(bool = true);
-        void SetRelative(bool = true);
-        void SetAvoidance(bool = true);
+        void SetAbsTarget(Vec3);    //mm, mm, rad
+        void SetAbsPosition(Vec3);  //mm, mm, rad
 
-
+        void SetAbsolute();
+        void SetRelative();
+ 
         //Getters
-        Vec3 GetPosition();
-        Vec3 GetTarget();
-        Vec3 GetAbsTarget();
-        bool isAbsolute();
-        bool isRelative();
-        bool isProbed();
-        bool isXProbed();
-        bool isYProbed();
-        //Return true while probing
-        bool isProbing();
+        Vec3 GetAbsPosition() const;
+        Vec3 GetAbsTarget() const;
+
+        bool IsAbsolute() const;
+        bool IsRelative() const;
+
+        //Inherited
+        void Run() override;
+        void Pause() override;
+        void Resume() override;
+        void Cancel() override;
+        void Finish() override;
 
     public : 
         StepperController steppers;
          
     private:
-        State _state = State::IDLE;
 
-        Vec3 _startPosition  = {0,0,0};
-        Vec3 _position       = {-1,-1,0};
-        Vec3 _target 	     = {0,0,0};
+        Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
+        Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
+        Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
+        Vec3 _relTarget      = { 0, 0, 0}; //Relative mm, mm, rad
 
-        Vec3 _calibration 	 = {1,1,1};
-        Vec2 _controlPoint   = {0,0};
+        Vec3 _calibration 	 = { 1, 1, 1};
+        Vec2 _controlPoint   = { 0, 0};
 
-        bool _probedX = false, _probedY = false;
         bool _absolute = true;
-        bool _probing = false;
 
     };
 }

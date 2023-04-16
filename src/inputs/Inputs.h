@@ -9,11 +9,11 @@ namespace TwinSystem{
     public:
         AbstractInput(){};
 
-        virtual void init() = 0;
-        virtual void update() = 0;
-        virtual bool hasChanged(){
-            if(value != lastValue && enabled) return true;
-            else return false;
+        virtual void Init() = 0;
+        virtual void Read() = 0;
+
+        virtual bool HasChanged(){
+            return(_hasChanged && enabled);
         };
         virtual bool GetValue() const{
             return value;
@@ -23,31 +23,40 @@ namespace TwinSystem{
         inline void Disable(){enabled = false;}
 
     protected:
-        bool enabled;
-        T value;
-        T lastValue;
+        bool enabled = true;
+        T value = 0;
+        T lastValue = 0;
+        bool _hasChanged = true;
     };
 
     class BooleanInput : public AbstractInput<bool>{
     public:
         BooleanInput(){};
+        inline void SetInverted(bool s = true){_inverted = s;};
 
         virtual bool GetState() const{
-            return value;
+            return _inverted ? !value : value;
         }
+
+    private:
+        bool _inverted = false;
     };
 
     class Switch : public BooleanInput{
     public:
     
         Switch(int pin): _pin(pin){};
-        void init() override{
+        void Init() override{
             pinMode(_pin, INPUT_PULLUP);
+            lastValue = false;
+            value = digitalRead(_pin);
         }
-        void update() override{
+        void Read() override{
             if(!enabled) return;
+            _hasChanged = false;
             lastValue = value;
             value = digitalRead(_pin);
+            if(value != lastValue) _hasChanged = true;
         }
     private:
         int _pin;
@@ -56,39 +65,30 @@ namespace TwinSystem{
     class Button : public BooleanInput{
     public:
         Button(int pin): _pin(pin){};
-        void init() override{
+        void Init() override{
             pinMode(_pin, INPUT_PULLUP);
+            lastValue = !digitalRead(_pin);
+            value = digitalRead(_pin);
         }
-        void update() override{
+        void Read() override{
             if(!enabled) return;
+            _hasChanged = false;
             lastValue = value;
             value = digitalRead(_pin);
+            if(value != lastValue) _hasChanged = true;
         }
     private:
         int _pin;
-    };
-
-    class DummyBooleanInput : public BooleanInput{
-    public:
-        DummyBooleanInput(bool& reference) : _reference(reference){};
-        void init() override{}
-        void update() override{
-            if(!enabled) return;
-            lastValue = value;
-            value = _reference;
-        }
-
-    private:
-        bool& _reference;
     };
 
     class Inputs{
     public:
         Inputs();
         void Initialize();
-        void Update();
+        void Read();
+        void Reset();
         bool HasChanged();
-        //bool pollEvents(std::function<void(Event&)>);
+        void OnEvent(Event& e);
 
     public:
         Button resetButton;
@@ -103,35 +103,4 @@ namespace TwinSystem{
 
 
 
-
-    class DummyDigitalInput : public AbstractInput<int>{
-    public:
-        DummyDigitalInput(int& reference) : _reference(reference){};
-
-        void init() override{}
-        void update() override{
-            if(!enabled) return;
-            lastValue = value;
-            value = _reference;
-        }
-
-    private:
-        int& _reference;
-    };
-
-
-
-
-    class References{
-    public:
-        References();
-        void Initialize();
-        void Update();
-        bool HasChanged();
-        //bool pollEvents(std::function<void(Event&)>);
-
-    public:
-        DummyDigitalInput x, y, z;
-        DummyBooleanInput team, strategy, avoidance, intercom;
-    };
 }

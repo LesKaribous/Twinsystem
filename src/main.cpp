@@ -3,7 +3,7 @@
 
 void setup(){
 	Console::Initialize();
-    Console::SetLevel(ConsoleLevel::_TRACE);
+    Console::SetLevel(ConsoleLevel::_INFO);
 }
 
 void loop(){
@@ -11,7 +11,7 @@ void loop(){
 	
 	robot.Initialize();
 	robot.WaitLaunch();
-	robot.Match();
+	robot.MatchGreen();
     Console::println("Fin du programme");
     while(true);//End of the program
 }

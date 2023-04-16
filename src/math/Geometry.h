@@ -20,11 +20,11 @@ enum class TableCompass{
 };
 
 enum class RobotCompass{
-    A,
+    A, //Turbine
     AB,
-    B,
+    B, //Battery
     BC,
-    C,
+    C, //Screen
     CA
 };
 

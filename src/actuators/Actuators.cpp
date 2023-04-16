@@ -34,7 +34,45 @@ namespace TwinSystem{
     }
 
     void Actuators::Initialize(){
+        GripperAB.cherryLocker.enable();
+        GripperAB.leftGripper.enable();
+        GripperAB.rightGripper.enable();
+        GripperBC.cherryLocker.enable();
+        GripperBC.leftGripper.enable();
+        GripperBC.rightGripper.enable();
+        GripperCA.cherryLocker.enable();
+        GripperCA.leftGripper.enable();
+        GripperCA.rightGripper.enable();
 
+        Close(RobotCompass::AB);
+        Close(RobotCompass::BC);
+        Close(RobotCompass::CA);
+
+        delay(2000);
+
+        Sleep();
+
+    }
+
+    //Inherited
+    void Actuators::Run(){
+        //Do something...
+    }
+
+    void Actuators::Pause(){
+        JobExecutor::Pause();
+    }
+
+    void Actuators::Resume(){
+        JobExecutor::Resume();
+    }
+
+    void Actuators::Cancel(){
+        JobExecutor::Cancel();
+    }
+
+    void Actuators::Finish(){
+        JobExecutor::Finish();
     }
 
     void Actuators::Lock(RobotCompass rc){
@@ -161,5 +199,17 @@ namespace TwinSystem{
         Grab(rc); Lock(rc);
         delay(500);
         Open(rc); Unlock(rc);
+    }
+    
+    void Actuators::Sleep(){
+        GripperAB.cherryLocker.sleep();
+        GripperAB.leftGripper.sleep();
+        GripperAB.rightGripper.sleep();
+        GripperBC.cherryLocker.sleep();
+        GripperBC.leftGripper.sleep();
+        GripperBC.rightGripper.sleep();
+        GripperCA.cherryLocker.sleep();
+        GripperCA.leftGripper.sleep();
+        GripperCA.rightGripper.sleep();
     }
 }

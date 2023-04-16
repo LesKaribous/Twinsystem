@@ -1,6 +1,5 @@
 #pragma once
 #include "Geometry3D.h"
-
 struct Matrix2x2;
 struct Vec3;
 
@@ -41,7 +40,6 @@ struct Vec2 {
     static float det(Vec2&, Vec2&);
 
     void operator= (const Vec3&);
-
 };
 
 //PolarVec

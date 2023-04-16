@@ -1,5 +1,6 @@
 #pragma once
 #include "core/Core.h"
+#include "core/JobExecutor.h"
 #include "BistableServo.h"
 #include "Pin.h"
 #include "math/Geometry.h"
@@ -55,9 +56,7 @@ namespace TwinSystem{
         BistableServo leftGripper;
         BistableServo cherryLocker;
 
-        GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps cherryLockProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), cherryLocker(cherryLockProps){
-
-        };
+        GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps cherryLockProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), cherryLocker(cherryLockProps){};
     };
 
     struct VacuumGroup{
@@ -68,7 +67,7 @@ namespace TwinSystem{
         //Pump p;
     };
     
-    class Actuators{
+    class Actuators : public JobExecutor {
     private:
         GripperGroup GripperAB; //Right group when facing screen
         GripperGroup GripperBC; //Opposed to the screen
@@ -88,6 +87,15 @@ namespace TwinSystem{
         void Grab   (RobotCompass rc);
         void Ungrab (RobotCompass rc);
         void Applause(RobotCompass rc);
+
+        void Sleep();
+
+        //Inherited
+        void Run() override;
+        void Pause() override;
+        void Resume() override;
+        void Cancel() override;
+        void Finish() override;
 
     };
 

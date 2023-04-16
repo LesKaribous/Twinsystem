@@ -15,45 +15,34 @@ namespace TwinSystem{
 
 
     void Inputs::Initialize(){
-        resetButton.init();
-        teamSwitch.init();
-        starter.init();
-        strategySwitch.init();
-        twinSwitch.init();
+
+        resetButton.SetInverted(true);
+        teamSwitch.SetInverted(true);
+        starter.SetInverted(true);
+        strategySwitch.SetInverted(true);
+        twinSwitch.SetInverted(true);
+
+        resetButton.Init();
+        teamSwitch.Init();
+        starter.Init();
+        strategySwitch.Init();
+        twinSwitch.Init();
     }
 
-    void Inputs::Update(){
-        resetButton.update();
-        teamSwitch.update();
-        starter.update();
-        strategySwitch.update();
-        twinSwitch.update();
+    void Inputs::Read(){
+        resetButton.Read();
+        teamSwitch.Read();
+        starter.Read();
+        strategySwitch.Read();
+        twinSwitch.Read();
     }
 
     bool Inputs::HasChanged(){
-        return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
+        return resetButton.HasChanged() || starter.HasChanged() || teamSwitch.HasChanged() || strategySwitch.HasChanged() || twinSwitch.HasChanged();
     }
 
-
-    Inputs::Inputs() : 
-        resetButton(Pin::Inputs::resetButton),
-        teamSwitch(Pin::Inputs::teamSwitch),
-        strategySwitch(Pin::Inputs::strategySwitch),
-        twinSwitch(Pin::Inputs::twinSwitch),
-        starter(Pin::Inputs::starter)
-    {}
-
-
-    void References::Initialize(){
-
-    }
-
-    void References::Update(){
-
-    }
-
-    bool References::HasChanged(){ //TODO Add the rest
-        return x.hasChanged() || y.hasChanged() || z.hasChanged() || team.hasChanged() || avoidance.hasChanged();
+    void Inputs::OnEvent(Event& e){
+        
     }
 
     /*

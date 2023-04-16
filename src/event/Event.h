@@ -6,9 +6,14 @@ namespace TwinSystem{
 	enum class EventType
 	{
 		None = 0,
+		BoolChangedEvent,
+		IntChangedEvent,
+		FloatChangedEvent,
+		Vec3ChangedEvent,
 		SystemEvent,
         SensorEvent,
 		InputEvent,
+		MoveEvent,
         ActuatorEvent,
         EmergencyStop,
         BatteryLow,
@@ -19,13 +24,15 @@ namespace TwinSystem{
 	enum EventCategory
 	{
 		None = 0,
-		EventCategorySystem    = BIT(0),
-        EventCategoryInput     = BIT(1),
-		EventCategoryUI        = BIT(2),
-		EventCategoryLidar     = BIT(3),
-		EventCategoryMatch     = BIT(4),
-		EventCategorySensor    = BIT(5),
-		EventCategoryActuator  = BIT(6)
+		EventCategorySystem     = BIT(0),
+        EventCategoryInput      = BIT(1),
+		EventCategoryUI         = BIT(2),
+		EventCategoryLidar      = BIT(3),
+		EventCategoryMatch      = BIT(4),
+		EventCategorySensor     = BIT(5),
+		EventCategoryActuator   = BIT(6),
+		EventCategoryMotion     = BIT(7),
+		EventCategoryMonitoring = BIT(8)
 	};
 
 #define EVENT_CLASS_TYPE(type) static EventType GetStaticType() { return EventType::##type; }\

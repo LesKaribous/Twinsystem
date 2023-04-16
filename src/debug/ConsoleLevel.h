@@ -1,7 +1,7 @@
 #pragma once
 
 namespace TwinSystem{
-    enum class ConsoleLevel {
+    enum ConsoleLevel {
     _TRACE,
     _INFO,
     _WARNING,

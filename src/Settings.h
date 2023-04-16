@@ -44,8 +44,8 @@ namespace Settings{
 
 
         const uint32_t 
-            ACCEL = 2000, // Old : 3000
-            SPEED = 5000;
+            ACCEL = 3000, // Old : 3000
+            SPEED = 6000;
     }
 
     namespace Stepper{
@@ -68,12 +68,12 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { -1.165f, 1.165f, -1.0525f } //Cartesian : XYROT
+            { 1.165f, 1.165f, -0.755} //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { -1.17f, 1.17f, -1.0525f } //Cartesian : XYROT
+            { 1.17f, 1.17f, -0.755} //Cartesian : XYROT
         };
     }
 }

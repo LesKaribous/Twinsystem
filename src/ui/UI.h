@@ -3,10 +3,12 @@
 #include "event/Event.h"
 #include "ui/Screen.h"
 #include "inputs/Inputs.h"
+#include "inputs/Fields.h"
 
 namespace TwinSystem{
 
     enum class Page{
+        START,
         INIT,
         MATCH,
         RESET
@@ -32,7 +34,7 @@ namespace TwinSystem{
         void updateMatchTime(int tMatch);
         void updatePosition(float Xpos, float Ypos, float Tpos);
         void updateLidarState(bool lidarState);
-        void updateTiretteState(int tiretteState);
+        void updateTiretteState(bool tiretteState);
         void updateStrategyState(bool stratState);
         void updateAllMatchVar();
         void updateInitState(int initState);
@@ -42,7 +44,7 @@ namespace TwinSystem{
 
     public:
         Inputs inputs;
-        References references;
+        Fields fields;
         Screen screen;
 
     private:

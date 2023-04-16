@@ -6,17 +6,21 @@ namespace TwinSystem{
 
     using namespace Pin;
 
-    UI::UI() : screen(screen::CS, screen::DC, screen::RST, screen::MOSI, screen::SCK, screen::MISO){}
+    UI::UI() : screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::RST, Pin::TFT::MOSI, Pin::TFT::SCK, Pin::TFT::MISO){}
     
     void UI::Initialize(){
         inputs.Initialize();
+        fields.Initialize();
         screen.begin();
         Clear();
         needDraw = true;
+        Update();
     }
     
     void UI::Update(){
-        inputs.Update();
+        inputs.Read();
+        fields.Read();
+        Draw();
     }
 
     /*
@@ -26,7 +30,8 @@ namespace TwinSystem{
     */
     void UI::OnEvent(Event& e){
         if(e.IsInCategory(EventCategory::EventCategoryUI)){
-            needDraw = true;
+        }else if(e.IsInCategory(EventCategory::EventCategoryMonitoring)){
+            inputs.OnEvent(e);
         }
     }
     
@@ -36,12 +41,18 @@ namespace TwinSystem{
     }
 
     void UI::Draw(){
-        switch (currentPage)
-        {
+        switch (currentPage){
         case Page::INIT :
-            /* code */
+            if(needDraw) drawBackScreenStart();
+            updateAllStartVar();
             break;
-        
+        case Page::MATCH :
+            if(needDraw) drawBackScreenMatch();
+            updateAllMatchVar();
+            break;
+        case Page::RESET :
+            
+            break;
         default:
             break;
         }
@@ -49,6 +60,7 @@ namespace TwinSystem{
 
 
     void UI::drawBackScreenStart() {
+        needDraw = false;
         screen.fillScreen(ILI9341_BLACK);
         screen.setTextColor(ILI9341_ORANGE);
         screen.setTextSize(2);
@@ -78,24 +90,13 @@ namespace TwinSystem{
     }
 
     void UI::updateAllStartVar() {
-        if(firstUpdate){
-            updateStrategyState(getStrategy());
-            updateTeamColor(getTeamColor());
-            updateLidarState(getLidarState());
-            updateTiretteState(getTiretteState());
-            updateInitState(getInitState());
-            updatePosition(0.0, 0.0, 0.0);
-            firstUpdate = false;
-        } 
-        else 
-        {
-            if(inputs.strategySwitch.hasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
-            if(inputs.teamSwitch.hasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
-            if(lidarHasChanged()) updateLidarState(getLidarState());
-            if(tiretteHasChanged()) updateTiretteState(getTiretteState());
-            if(initHasChanged()) updateInitState(getInitState());
-            //
-        }
+        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
+        if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
+        if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
+        if(fields.intercom.HasChanged() || true) updateLidarState(fields.intercom.GetState());
+        if(fields.probed.HasChanged()) updateInitState(fields.probed.GetState());
+        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()) updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue());
+    
     }
 
     void UI::updateTeamColor(bool team){
@@ -123,26 +124,23 @@ namespace TwinSystem{
         screen.setTextSize(2);
         screen.setCursor(100, 110);
 
-        switch (initState) {
-            case NO_INIT:
+        if(!fields.probed.GetState() && !fields.probing.GetState()){
             screen.setTextColor(ILI9341_RED);
-            screen.println("No init !");
-            break;
-            case PENDING_INIT:
+            screen.println("Not probed");
+        }else if(fields.probing.GetState()){
             screen.setTextColor(ILI9341_BLUE);
-            screen.println("Init ...");
-            break;
-            case DONE_INIT:
+            screen.println("Probing ...");
+        }else if(fields.probed.GetState()){
             screen.setTextColor(ILI9341_GREEN);
-            screen.println("Init done !");
-            break;
-            default:
+            screen.println("Probed.");
+        }else{
             screen.setTextColor(ILI9341_RED);
-            screen.println("Unknow init");
+            screen.println("?");
         }
     }
 
     void UI::drawBackScreenMatch() {
+        needDraw = false;
         screen.fillScreen(ILI9341_BLACK);
         screen.setTextColor(ILI9341_ORANGE);
         screen.setTextSize(2);
@@ -175,8 +173,8 @@ namespace TwinSystem{
         updateMatchTime(100);
         updateScore(9);
         updatePosition(1780.0, 1250.0, 180.0);
-        updateLidarState(LIDAR_STATE);
-        updateStrategyState(STRATEGY);
+        updateLidarState(fields.intercom.GetState());
+        updateStrategyState(inputs.strategySwitch.GetState());
     }
 
     void UI::updateStrategyState(bool stratState) {
@@ -184,8 +182,8 @@ namespace TwinSystem{
         screen.setTextColor(ILI9341_WHITE);
         screen.setTextSize(2);
         screen.setCursor(100, 10);
-        if(stratState == CAKE_FIRST) screen.println("CAKE");
-        else if(stratState == CHERRY_FIRST) screen.println("CHERRY");
+        if(stratState) screen.println("CAKE");
+        else screen.println("CHERRY");
     }
 
     void UI::updateLidarState(bool lidarState) {
@@ -193,7 +191,7 @@ namespace TwinSystem{
         screen.setTextSize(2);
         screen.setCursor(100, 90);
 
-        if (lidarState == LIDAR_ERROR) {
+        if (!lidarState) {
             screen.setTextColor(ILI9341_RED);
             screen.println("Waiting...");
         } else {
@@ -202,27 +200,17 @@ namespace TwinSystem{
         }
     }
 
-    void UI::updateTiretteState(int tiretteState) {
+    void UI::updateTiretteState(bool tiretteState) {
         screen.fillRect(100, 130, 140, 15, ILI9341_BLACK);
         screen.setTextSize(2);
         screen.setCursor(100, 130);
 
-        switch (tiretteState)
-        {
-        case TIRETTE_UNARMED:
-            screen.setTextColor(ILI9341_RED);
-            screen.println("unarmed !");
-            break;
-        case TIRETTE_ARMED:
+        if(tiretteState){
             screen.setTextColor(ILI9341_GREEN);
             screen.println("armed !");
-            break;
-        case TIRETTE_GO:
-            screen.setTextColor(ILI9341_BLUE);
-            screen.println("Go !");
-            break;
-        default:
-            break;
+        }else{
+            screen.setTextColor(ILI9341_RED);
+            screen.println("unarmed !");
         }
     }
 

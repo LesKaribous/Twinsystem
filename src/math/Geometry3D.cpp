@@ -20,7 +20,7 @@ Vec3::Vec3(float x,float y,float z){
     a = x; b = y; c = z;
 }
 
-Vec3 Vec3::copy(){
+Vec3 Vec3::copy() const{
     return *this;
 }
 
@@ -105,7 +105,6 @@ Vec3 Vec3::dist(Vec3& a, Vec3& b){
 float Vec3::angleBetween(Vec3& a, Vec3& b){
     return acosf(a.dot(b) / a.mag() * b.mag());
 }
-
 
 
 //---------- Matrix3x3 ------------

@@ -1,13 +1,13 @@
 #include "ConsoleStream.h"
 #include <string>
 
-
 namespace TwinSystem{
     
 	ConsoleStream::ConsoleStream(ConsoleLevel lvl, std::string origin) {
 		_level = lvl;
+		_ignored = false;
         if(lvl < Console::GetLevel()) _ignored = true;
-
+		
         if (!_ignored) {
 			if (origin == "") Console::write(header());
 			else Console::write(header() + "(" + origin + "): ");

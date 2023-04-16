@@ -101,12 +101,9 @@ Vec3 ik(Vec3 target){
             L = Settings::Geometry::RADIUS,
             R = Settings::Geometry::WHEEL_RADIUS;
     
-    /*
-    if(Settings::purple()){ //Inverting rotation
-        Vec3 transform(1,-1,-1);
-        target.mult(transform.toMatrix());
-    }
-    */
+    
+    Vec3 transform(-1,1,1);
+    target.mult(transform.toMatrix());
 
     Matrix3x3 P = {
         0,   1 , L,
@@ -134,11 +131,8 @@ Vec3 fk(Vec3 target){
     P.mult(R);
     target.mult(P);
 
-    /*
-    if(Settings::purple()){ //Inverting rotation
-        Vec3 transform(1,-1,-1);
-        target.mult(transform.toMatrix());
-    }*/
+    Vec3 transform(-1,1,1);
+    target.mult(transform.toMatrix());
 
     return target;
 }

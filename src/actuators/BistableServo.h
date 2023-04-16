@@ -18,7 +18,8 @@ namespace TwinSystem{
         void grab();
 
         void enable();
-        void sleep(bool state = true);
+        void sleep();
+        void wakeUp();
         void disable();
 
     private:

@@ -32,7 +32,7 @@ struct Vec3 {
     float mag();
     float magSq();
 
-    Vec3 copy();
+    Vec3 copy() const;
 
     static Vec3 add(Vec3&, Vec3&);
     static Vec3 sub(Vec3&, Vec3&);
@@ -42,8 +42,6 @@ struct Vec3 {
 
     operator Vec2() const;
 };
-
-
 
 //Matrix 3x3
 // | a   b   c |
