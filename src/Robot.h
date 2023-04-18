@@ -38,16 +38,16 @@ public :
     bool GetStrategyState();
 
     //Strategy
-    void RecalagePrimaryGreen();
-    void RecalageSecondaryGreen();
     void RecalagePrimaryBlue();
+    void RecalagePrimaryGreen();
     void RecalageSecondaryBlue();
+    void RecalageSecondaryGreen();
 
+    void MatchPrimaryBlue();
 	void MatchPrimaryGreen();
-	void MatchPrimaryBlue();
+    void MatchSecondaryBlue();
     void MatchSecondaryGreen();
-	void MatchSecondaryBlue();
-
+	
     //Macro
     void ProbeBorder(TableCompass, RobotCompass);
 
