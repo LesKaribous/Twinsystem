@@ -65,15 +65,14 @@ public :
     bool IsYProbed();
 
 protected:
-    bool _team;
-    bool _avoidance;
-    bool _strategy;
 
     bool _probedX = false, _probedY = false;
     bool _probing = false;
 
     //Tracked values
     ValueTracker<Vec3> robotPositionTracker;
+    ValueTracker<int>  scoreTracker;
+    ValueTracker<int>  timeTracker;
     ValueTracker<bool> robotProbedTracker;
     ValueTracker<bool> robotProbingTracker;
     ValueTracker<bool> robotArmedTracker;

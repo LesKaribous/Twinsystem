@@ -76,7 +76,8 @@ namespace TwinSystem{
         x, y, z;
 
         DigitalField
-        score;
+        score,
+        time;
 
         BooleanField
         intercom,

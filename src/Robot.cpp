@@ -10,9 +10,11 @@ void OnDummyRequestResponse(String answer){
 */
 
 Robot::Robot(){
+	/*
 	_state = RobotState::IDLE;
 	_team = Settings::Match::GREEN;
 	_avoidance = Settings::Match::AVOIDANCE;
+	*/
 	_probedX = false, 
 	_probedY = false;
 	_probing = false;
