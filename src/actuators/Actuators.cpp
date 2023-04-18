@@ -2,47 +2,48 @@
 
 namespace TwinSystem{
 
-    Actuators::Actuators() : GripperAB( {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
+    Actuators::Actuators() : gripperAB( {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
                                         {Pin::Servo::ServoA3, _GS_::AB::left_Open,  _GS_::AB::left_Close, _GS_::AB::left_Grab}, 
                                         {Pin::Servo::ServoA2, _GS_::AB::cherry_Open, _GS_::AB::cherry_Close}),
 
-                             GripperBC( {Pin::Servo::ServoB1, _GS_::BC::right_Open, _GS_::BC::right_Close, _GS_::BC::right_Grab}, 
+                             gripperBC( {Pin::Servo::ServoB1, _GS_::BC::right_Open, _GS_::BC::right_Close, _GS_::BC::right_Grab}, 
                                         {Pin::Servo::ServoB3, _GS_::BC::left_Open,  _GS_::BC::left_Close, _GS_::BC::left_Grab}, 
                                         {Pin::Servo::ServoB2, _GS_::BC::cherry_Open, _GS_::BC::cherry_Close} ),
 
-                             GripperCA( {Pin::Servo::ServoC1, _GS_::CA::right_Open, _GS_::CA::right_Close, _GS_::CA::right_Grab}, 
+                             gripperCA( {Pin::Servo::ServoC1, _GS_::CA::right_Open, _GS_::CA::right_Close, _GS_::CA::right_Grab}, 
                                         {Pin::Servo::ServoC3, _GS_::CA::left_Open,  _GS_::CA::left_Close, _GS_::CA::left_Grab}, 
-                                        {Pin::Servo::ServoC2, _GS_::CA::cherry_Open, _GS_::CA::cherry_Close} )
-                                        
-                              //Vacuum(   {Pin::Servo::, _GS_::, _GS_::})
+                                        {Pin::Servo::ServoC2, _GS_::CA::cherry_Open, _GS_::CA::cherry_Close}),
+
+                            trap(Pin::CherryPicker::pinServoTrap, ActuatorsPresets::cherryPicker::trap_Open, ActuatorsPresets::cherryPicker::trap_Close, ActuatorsPresets::cherryPicker::trap_Grab)
         {
-            GripperAB.rightGripper.close();
-            GripperAB.leftGripper.close();
-            GripperAB.cherryLocker.close();
+            gripperAB.rightGripper.close();
+            gripperAB.leftGripper.close();
+            gripperAB.cherryLocker.close();
 
-            GripperBC.rightGripper.close();
-            GripperBC.leftGripper.close();
-            GripperBC.cherryLocker.close();
+            gripperBC.rightGripper.close();
+            gripperBC.leftGripper.close();
+            gripperBC.cherryLocker.close();
 
-            GripperCA.rightGripper.close();
-            GripperCA.leftGripper.close();
-            GripperCA.cherryLocker.close();
-        
+            gripperCA.rightGripper.close();
+            gripperCA.leftGripper.close();
+            gripperCA.cherryLocker.close();
+
+            trap.close();
         }
 
     Actuators::~Actuators(){
     }
 
     void Actuators::Initialize(){
-        GripperAB.cherryLocker.enable();
-        GripperAB.leftGripper.enable();
-        GripperAB.rightGripper.enable();
-        GripperBC.cherryLocker.enable();
-        GripperBC.leftGripper.enable();
-        GripperBC.rightGripper.enable();
-        GripperCA.cherryLocker.enable();
-        GripperCA.leftGripper.enable();
-        GripperCA.rightGripper.enable();
+        gripperAB.cherryLocker.enable();
+        gripperAB.leftGripper.enable();
+        gripperAB.rightGripper.enable();
+        gripperBC.cherryLocker.enable();
+        gripperBC.leftGripper.enable();
+        gripperBC.rightGripper.enable();
+        gripperCA.cherryLocker.enable();
+        gripperCA.leftGripper.enable();
+        gripperCA.rightGripper.enable();
 
         Close(RobotCompass::AB);
         Close(RobotCompass::BC);
@@ -79,15 +80,15 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            GripperAB.cherryLocker.close();
+            gripperAB.cherryLocker.close();
             break;
 
         case RobotCompass::BC :
-            GripperBC.cherryLocker.close();
+            gripperBC.cherryLocker.close();
             break;
 
         case RobotCompass::CA :
-            GripperCA.cherryLocker.close();
+            gripperCA.cherryLocker.close();
             break;
         
         default:
@@ -99,15 +100,15 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            GripperAB.cherryLocker.open();
+            gripperAB.cherryLocker.open();
             break;
 
         case RobotCompass::BC :
-            GripperBC.cherryLocker.open();
+            gripperBC.cherryLocker.open();
             break;
 
         case RobotCompass::CA :
-            GripperCA.cherryLocker.open();
+            gripperCA.cherryLocker.open();
             break;
         
         default:
@@ -119,18 +120,18 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            GripperAB.rightGripper.close();
-            GripperAB.leftGripper.close();
+            gripperAB.rightGripper.close();
+            gripperAB.leftGripper.close();
             break;
 
         case RobotCompass::BC :
-            GripperBC.rightGripper.close();
-            GripperBC.leftGripper.close();
+            gripperBC.rightGripper.close();
+            gripperBC.leftGripper.close();
             break;
 
         case RobotCompass::CA :
-            GripperCA.rightGripper.close();
-            GripperCA.leftGripper.close();
+            gripperCA.rightGripper.close();
+            gripperCA.leftGripper.close();
             break;
         
         
@@ -143,18 +144,18 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            GripperAB.rightGripper.open();
-            GripperAB.leftGripper.open();
+            gripperAB.rightGripper.open();
+            gripperAB.leftGripper.open();
             break;
 
         case RobotCompass::BC :
-            GripperBC.rightGripper.open();
-            GripperBC.leftGripper.open();
+            gripperBC.rightGripper.open();
+            gripperBC.leftGripper.open();
             break;
 
         case RobotCompass::CA :
-            GripperCA.rightGripper.open();
-            GripperCA.leftGripper.open();
+            gripperCA.rightGripper.open();
+            gripperCA.leftGripper.open();
             break;
         
         default:
@@ -166,18 +167,18 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            GripperAB.rightGripper.grab();
-            GripperAB.leftGripper.grab();
+            gripperAB.rightGripper.grab();
+            gripperAB.leftGripper.grab();
             break;
 
         case RobotCompass::BC :
-            GripperBC.rightGripper.grab();
-            GripperBC.leftGripper.grab();
+            gripperBC.rightGripper.grab();
+            gripperBC.leftGripper.grab();
             break;
 
         case RobotCompass::CA :
-            GripperCA.rightGripper.grab();
-            GripperCA.leftGripper.grab();
+            gripperCA.rightGripper.grab();
+            gripperCA.leftGripper.grab();
             break;
         
         default:
@@ -202,14 +203,14 @@ namespace TwinSystem{
     }
     
     void Actuators::Sleep(){
-        GripperAB.cherryLocker.sleep();
-        GripperAB.leftGripper.sleep();
-        GripperAB.rightGripper.sleep();
-        GripperBC.cherryLocker.sleep();
-        GripperBC.leftGripper.sleep();
-        GripperBC.rightGripper.sleep();
-        GripperCA.cherryLocker.sleep();
-        GripperCA.leftGripper.sleep();
-        GripperCA.rightGripper.sleep();
+        gripperAB.cherryLocker.sleep();
+        gripperAB.leftGripper.sleep();
+        gripperAB.rightGripper.sleep();
+        gripperBC.cherryLocker.sleep();
+        gripperBC.leftGripper.sleep();
+        gripperBC.rightGripper.sleep();
+        gripperCA.cherryLocker.sleep();
+        gripperCA.leftGripper.sleep();
+        gripperCA.rightGripper.sleep();
     }
 }
