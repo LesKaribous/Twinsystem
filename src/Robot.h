@@ -65,9 +65,6 @@ public :
     bool IsYProbed();
 
 protected:
-    bool _team;
-    bool _avoidance;
-    bool _strategy;
 
     bool _probedX = false, _probedY = false;
     bool _probing = false;

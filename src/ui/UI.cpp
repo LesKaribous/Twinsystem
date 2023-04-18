@@ -184,7 +184,7 @@ namespace TwinSystem{
                 updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
                 lastPosDraw = millis();
             }
-        }
+        } 
 
         if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
         if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
