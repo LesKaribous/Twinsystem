@@ -116,6 +116,11 @@ void Robot::PollEvents(){
     intercomConnectionTracker.SetValue(intercom.IsConnected());
 
 
+	//TODO 
+	scoreTracker.SetValue(match.GetScore());
+    timeTracker.SetValue(match.GetTimeLeftSeconds());
+
+
 	//TODO Create events to handle this at the UI Level
 	if(robotPositionTracker.HasChanged()){
 		ui.fields.x.SetValue(robotPositionTracker.GetValue().a);
@@ -142,6 +147,15 @@ void Robot::PollEvents(){
 	if(intercomConnectionTracker.HasChanged()){
 		ui.fields.intercom.SetValue(intercomConnectionTracker.GetValue());
 	}
+
+	if(timeTracker.HasChanged()) {
+		ui.fields.time.SetValue(timeTracker.GetValue());
+	}
+
+	if(scoreTracker.HasChanged()){
+		ui.fields.score.SetValue(scoreTracker.GetValue());
+	}
+
 }
 
 void Robot::WaitLaunch(){
