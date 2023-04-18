@@ -40,7 +40,7 @@ namespace TwinSystem{
         void updateLidarState(bool lidarState);
         void updateTiretteState(bool tiretteState);
         void updateStrategyState(bool stratState);
-        void updateInitState(int initState);
+        void updateInitState(bool initState);
         void updateTeamColor(bool team);
         
 

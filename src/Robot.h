@@ -1,5 +1,6 @@
 #pragma once
 #include "core/System.h"
+#include "Match.h"
 using namespace TwinSystem;
 
 class Robot : public System{
@@ -10,6 +11,12 @@ public :
     //Sytem routines
     void Update() override;
     void PollEvents() override;
+
+    //Lidar
+    void CheckLidar();
+    bool ObstacleDetected();
+    void EnableAvoidance();
+    void DisableAvoidance();
 
     //Movements
     void Turn(float);
@@ -65,6 +72,12 @@ public :
     bool IsYProbed();
 
 protected:
+
+    TwinSystem::Match match;
+
+    bool _avoidance = false;
+    //bool _obstacle = false;
+    unsigned long _lastLidarCheck = 0;
 
     bool _probedX = false, _probedY = false;
     bool _probing = false;

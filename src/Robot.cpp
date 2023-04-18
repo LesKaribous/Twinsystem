@@ -2,12 +2,14 @@
 #include "Settings.h"
 
 #include "debug/Console.h"
-/*
-long _lastDummy = 0;
+
+
+bool obstacle = true;
 void OnDummyRequestResponse(String answer){
-    Serial.println("dummy request responded");
+    if(answer.startsWith("obstacle")) obstacle = true;
+	else obstacle = false;
 }
-*/
+
 
 Robot::Robot(){
 	/*
@@ -24,6 +26,15 @@ void Robot::Update() {
 	motion.UpdatePosition();
 	PollEvents();
 	System::Update();
+
+	if(_state != RobotState::IDLE && _state != RobotState::ARMED){ //IsRunning
+		CheckLidar();
+		
+		if(match.IsNearlyFinished()); //Todo go home
+		if(match.IsFinished()); //Todo Stop robot, motor disengage
+
+		
+	}
 }
 
 void Robot::Go(Vec2 v){
@@ -55,6 +66,42 @@ void Robot::GoPolar(float heading, float length){
 
 	if(wasAbsolute) motion.SetAbsolute();
 }
+
+
+
+void Robot::CheckLidar(){
+	if(_avoidance){
+		if(millis() - _lastLidarCheck > 500){
+
+			float heading = motion.GetAbsPosition().c * DEG_TO_RAD;
+			while (heading > 180) heading -= 180;
+			while (heading < -180) heading += 180;
+			
+			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
+		}
+
+		if(ObstacleDetected() && motion.IsRunning()){
+			motion.Pause();
+		}else if(motion.IsPaused() && !ObstacleDetected()){
+			motion.Resume();
+		}
+	}
+}
+
+bool Robot::ObstacleDetected(){
+	return obstacle;
+}
+
+void Robot::EnableAvoidance(){
+	_avoidance = true;
+}
+
+void Robot::DisableAvoidance(){
+	_avoidance = false;
+}
+
+
+
 
 void Robot::PollEvents(){
     //Tracked values
@@ -139,6 +186,7 @@ void Robot::WaitLaunch(){
 }
 
 void Robot::StartMatch(){
+	match.Start();
 	ui.SetPage(Page::MATCH);
 	motion.steppers.Engage();
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
