@@ -9,6 +9,8 @@ struct Vec3;
 struct Vec2 { 
     float a, b;
 
+    //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.GetAbsPosition())).heading())
+
     Vec2();
     Vec2(float, float);
 

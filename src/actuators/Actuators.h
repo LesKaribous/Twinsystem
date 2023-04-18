@@ -8,10 +8,8 @@
 #define _GS_ ActuatorsPresets::Gripper
 
 namespace TwinSystem{
-
     namespace ActuatorsPresets{
         namespace Gripper{
-        
             namespace AB{
                 const int 
                 right_Close = 140,
@@ -48,6 +46,12 @@ namespace TwinSystem{
                 left_Grab = 90;
             }
         }
+        namespace cherryPicker{
+            const int
+            trap_Close = 50,
+            trap_Open = 140,
+            trap_Grab = 50;
+        }
     } // namespace name
     
 
@@ -59,20 +63,18 @@ namespace TwinSystem{
         GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps cherryLockProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), cherryLocker(cherryLockProps){};
     };
 
-    struct VacuumGroup{
-        BistableServo cherryLocker;
 
-        VacuumGroup(BistableServoProps Props);
-        //Turbine t;
-        //Pump p;
-    };
-    
     class Actuators : public JobExecutor {
     private:
-        GripperGroup GripperAB; //Right group when facing screen
-        GripperGroup GripperBC; //Opposed to the screen
-        GripperGroup GripperCA; //Left group when facing screen
-        //VacuumGroup Vacuum;
+        GripperGroup gripperAB; //Right group when facing screen
+        GripperGroup gripperBC; //Opposed to the screen
+        GripperGroup gripperCA; //Left group when facing screen
+
+        int _pinTurbine;
+
+    public:
+        BistableServo trap;
+
     public:
         Actuators();
         ~Actuators();
@@ -87,6 +89,8 @@ namespace TwinSystem{
         void Grab   (RobotCompass rc);
         void Ungrab (RobotCompass rc);
         void Applause(RobotCompass rc);
+
+        void SetTurbine(int speed);
 
         void Sleep();
 

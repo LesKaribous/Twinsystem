@@ -42,14 +42,20 @@ namespace TwinSystem{
 
     public:
         //Setters
+
+        //Absolute mm, mm, rad
         void SetAbsTarget(Vec3);    //mm, mm, rad
+
+        //Absolute mm, mm, rad
         void SetAbsPosition(Vec3);  //mm, mm, rad
 
         void SetAbsolute();
         void SetRelative();
  
         //Getters
+        //Absolute mm, mm, rad
         Vec3 GetAbsPosition() const;
+        //Absolute mm, mm, rad
         Vec3 GetAbsTarget() const;
 
         bool IsAbsolute() const;
