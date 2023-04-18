@@ -60,6 +60,34 @@ namespace TwinSystem{
         }
     }
 
+    void UI::updateAllStartVar() {
+        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
+        if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
+        if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
+        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
+        if(fields.probed.HasChanged() || fields.probing.HasChanged()) updateInitState();
+        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+            if( millis() - lastPosDraw >= 50){
+                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+                lastPosDraw = millis();
+            }
+        }    
+    }
+
+    void UI::updateAllMatchVar() {
+        if(fields.time.HasChanged()) updateMatchTime(fields.time.GetValue());
+        if(fields.score.HasChanged()) updateScore(fields.score.GetValue());
+        
+        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+            if( millis() - lastPosDraw >= 50){
+                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+                lastPosDraw = millis();
+            }
+        } 
+        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
+        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
+    }
+
 
     void UI::drawBackScreenStart() {
         needDraw = false;
@@ -91,20 +119,6 @@ namespace TwinSystem{
         screen.println(__TIMESTAMP__);
     }
 
-    void UI::updateAllStartVar() {
-        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
-        if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
-        if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
-        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
-        if(fields.probed.HasChanged()) updateInitState(fields.probed.GetState());
-        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
-            if( millis() - lastPosDraw >= 50){
-                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
-                lastPosDraw = millis();
-            }
-        }    
-    }
-
     void UI::updateTeamColor(bool team){
         screen.fillRect(10, 200, 220, 98, ILI9341_BLACK);
         screen.setTextSize(4);
@@ -125,7 +139,7 @@ namespace TwinSystem{
         
     }
 
-    void UI::updateInitState(int initState) {
+    void UI::updateInitState() {
         screen.fillRect(100, 110, 140, 15, ILI9341_BLACK);
         screen.setTextSize(2);
         screen.setCursor(100, 110);
@@ -175,20 +189,6 @@ namespace TwinSystem{
         screen.println("points");
     }
 
-    void UI::updateAllMatchVar() {
-        updateMatchTime(100);
-        updateScore(9);
-        
-        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
-            if( millis() - lastPosDraw >= 50){
-                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
-                lastPosDraw = millis();
-            }
-        } 
-
-        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
-        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
-    }
 
     void UI::updateStrategyState(bool stratState) {
         screen.fillRect(100, 10, 140, 15, ILI9341_BLACK);

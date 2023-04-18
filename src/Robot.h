@@ -71,6 +71,8 @@ protected:
 
     //Tracked values
     ValueTracker<Vec3> robotPositionTracker;
+    ValueTracker<int>  scoreTracker;
+    ValueTracker<int>  timeTracker;
     ValueTracker<bool> robotProbedTracker;
     ValueTracker<bool> robotProbingTracker;
     ValueTracker<bool> robotArmedTracker;

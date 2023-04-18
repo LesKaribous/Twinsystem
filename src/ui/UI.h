@@ -29,6 +29,9 @@ namespace TwinSystem{
 
     private:
         // Fonctions d'affichage
+        void updateAllMatchVar();
+        void updateAllStartVar();
+
         void drawBackScreenStart();
         void drawBackScreenMatch();
         void updateScore(int uScore);
@@ -37,10 +40,9 @@ namespace TwinSystem{
         void updateLidarState(bool lidarState);
         void updateTiretteState(bool tiretteState);
         void updateStrategyState(bool stratState);
-        void updateAllMatchVar();
         void updateInitState(int initState);
         void updateTeamColor(bool team);
-        void updateAllStartVar();
+        
 
 
     public:
