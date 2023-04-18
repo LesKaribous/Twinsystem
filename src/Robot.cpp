@@ -40,8 +40,11 @@ void Robot::Turn(float a){
 }
 
 void Robot::Align(RobotCompass rc, float orientation){
+	bool wasRelative = motion.IsRelative();
+	motion.SetAbsolute();
 	motion.AlignAsync(rc, orientation);
 	WaitUntil(motion);
+	if(wasRelative) motion.SetRelative();
 }
 
 void Robot::GoPolar(float heading, float length){

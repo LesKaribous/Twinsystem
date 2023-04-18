@@ -117,9 +117,8 @@ namespace TwinSystem{
 		TurnAwait((orientation - GetCompassOrientation(rc)));
 	}
 	void  MotionControl::AlignAsync(RobotCompass rc, float orientation){
-
 		Console::info("MotionControl") << "Align :" << Console::endl;
-		TurnAsync(orientation - GetCompassOrientation(rc));
+		TurnAsync( orientation - GetCompassOrientation(rc));
 	}
 
 
@@ -173,7 +172,7 @@ namespace TwinSystem{
 
 	void MotionControl::OptmizeTarget(){
 		while(_target.c > PI) _target.c -= 2.0f*PI;
-		while(_target.c < -PI) _target.c += 2.0f*PI;
+		while(_target.c <= -PI) _target.c += 2.0f*PI;
 	}
 
 	Vec3 MotionControl::TargetToSteps(Vec3 relTarget){
@@ -237,11 +236,11 @@ namespace TwinSystem{
 	}
 
 	void  MotionControl::SetAbsPosition(Vec3 newPos){
-		_position = newPos; //Convert rotation to radian
+		_position = newPos; 
 	}
 
 	void  MotionControl::SetAbsTarget(Vec3 newTarget){
-		_target = newTarget; //Convert rotation to radian
+		_target = newTarget;
 	}
 
 
