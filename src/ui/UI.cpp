@@ -1,6 +1,7 @@
 #include "UI.h"
 #include "Pin.h"
 #include "core/System.h"
+#include "Settings.h"
 
 namespace TwinSystem{
 
@@ -110,7 +111,7 @@ namespace TwinSystem{
         screen.setTextSize(4);
         screen.setCursor(60,230);
         screen.setTextColor(ILI9341_WHITE);
-        if(team)
+        if(team == Settings::Match::GREEN)
         {
             screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_GREEN);
             screen.fillRoundRect(15, 218, 210, 57, 15, ILI9341_BLACK);

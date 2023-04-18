@@ -20,8 +20,8 @@ namespace Settings{
         PRIMARY   = false,
         SECONDARY = true,
 
-        BLUE   = true,
-        GREEN  = false;
+        BLUE   = false,
+        GREEN  = true;
 
         const unsigned long 
         TEMPS_MATCH = 101000 ;
