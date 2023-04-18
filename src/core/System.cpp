@@ -1,8 +1,6 @@
 #include "core/System.h"
 #include <Arduino.h>
 
-
-
 namespace TwinSystem{
 
         System::System(){}
@@ -12,30 +10,11 @@ namespace TwinSystem{
             actuators.Initialize();
             motion.Initialize();
             intercom.Initialize();
-            
         }
 
         void System::Update(){
-            PollEvents();
-            //motion.UpdatePosition();
             intercom.Update();
-            
-            /*
-            String command = "lookAt(";
-            command += (motion.GetAbsPosition().c * RAD_TO_DEG);
-            command +=  ",500);";
-
-            intercom.SendCommand(command.c_str());
-
-            if(intercom.IsSomethingAtAngle(motion.GetAbsPosition().c * RAD_TO_DEG)){
-                motion.Pause();
-            }else{
-                if(motion.IsPaused()) motion.Resume();
-            }
-            */
-
             ui.Update();
-            delay(200);
         }
 
         void System::OnEvent(Event& e){

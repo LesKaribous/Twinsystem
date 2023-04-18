@@ -17,11 +17,11 @@ namespace Settings{
         AVOIDANCE = 1,
         NO_AVOIDANCE = 0,
 
-        PRIMARY   = 1,
-        SECONDARY = 0,
+        PRIMARY   = false,
+        SECONDARY = true,
 
-        BLUE   = false,
-        GREEN  = true;
+        BLUE   = true,
+        GREEN  = false;
 
         const unsigned long 
         TEMPS_MATCH = 101000 ;

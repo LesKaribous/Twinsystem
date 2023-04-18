@@ -1,20 +1,20 @@
 #pragma once
 #include "Event.h"
-#include <sstream>
 #include "math/Geometry.h"
+#include "debug/Console.h"
 
 namespace TwinSystem{
 
     class BoolChangedEvent : public Event{
 	public:
-		BoolChangedEvent(std::string str, bool value) : _str(str), _state(value) {}
+		BoolChangedEvent(String str, bool value) : _str(str), _state(value) {}
 
 		inline bool GetValue() const { return _state; }
 
-		std::string ToString() const override{
-			std::stringstream ss;
-			ss << "BoolChangedEvent: " << _str << " : " << _state ? "true" : "false";
-			return ss.str();
+		String ToString() const override{
+			String ss;
+			ss += GetName() + _str + String(" : {") + String(_state) + "}";
+			return ss;
 		}
 
 		static EventType GetStaticType() { return EventType::BoolChangedEvent; } 
@@ -25,21 +25,21 @@ namespace TwinSystem{
 
 	private:
 		bool _state;
-        std::string _str;
+        String _str;
 	};
 
 
 
     class IntChangedEvent : public Event{
 	public:
-		IntChangedEvent(std::string str, int value) : _str(str), _state(value) {}
+		IntChangedEvent(String str, int value) : _str(str), _state(value) {}
 
 		inline int GetValue() const { return _state; }
 
-		std::string ToString() const override{
-			std::stringstream ss;
-			ss << "IntChangedEvent: " << _str << " : " << _state;
-			return ss.str();
+		String ToString() const override{
+			String ss;
+			ss += GetName() + _str + String(" : {") + String(_state) + "}";
+			return ss;
 		}
 
 		static EventType GetStaticType() { return EventType::IntChangedEvent; } 
@@ -50,20 +50,20 @@ namespace TwinSystem{
 
 	private:
 		int _state;
-        std::string _str;
+        String _str;
 	};
 
 
     class FloatChangedEvent : public Event{
 	public:
-		FloatChangedEvent(std::string str, float value) : _str(str), _state(value) {}
+		FloatChangedEvent(String str, float value) : _str(str), _state(value) {}
 
 		inline float GetValue() const { return _state; }
 
-		std::string ToString() const override{
-			std::stringstream ss;
-			ss << "FloatChangedEvent: " << _str << " : " << _state;
-			return ss.str();
+		String ToString() const override{
+			String ss;
+			ss += GetName() + _str + String(" : {") + String(_state) + "}";
+			return ss;
 		}
 
 		static EventType GetStaticType() { return EventType::FloatChangedEvent; } 
@@ -74,21 +74,21 @@ namespace TwinSystem{
 
 	private:
 		float _state;
-        std::string _str;
+        String _str;
 	};
 
 
 
     class Vec3ChangedEvent : public Event{
 	public:
-		Vec3ChangedEvent(std::string str, Vec3 value) : _str(str), _state(value) {}
+		Vec3ChangedEvent(String str, Vec3 value) : _str(str), _state(value) {}
 
 		inline Vec3 GetValue() const { return _state; }
 
-		std::string ToString() const override{
-			std::stringstream ss;
-			ss << "Vec3ChangedEvent: " << _str << " : {" << _state.a << ", "<< _state.b << ", " << _state.c << "}";
-			return ss.str();
+		String ToString() const override{
+			String ss;
+			ss += GetName() + _str + String(" : {") + String(_state.a) + ", "+ _state.b + ", " + _state.c + "}";
+			return ss;
 		}
 
 		static EventType GetStaticType() { return EventType::Vec3ChangedEvent; } 
@@ -99,7 +99,7 @@ namespace TwinSystem{
 
 	private:
 		Vec3 _state;
-        std::string _str;
+        String _str;
 	};
 
 
@@ -109,7 +109,6 @@ namespace TwinSystem{
         ValueTracker() {}
 
         void SetValue(T newValue) {
-            _hasChanged = false;
             if (newValue != _value) {
                 _value = newValue;
                 OnValueChanged();

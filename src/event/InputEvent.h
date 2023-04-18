@@ -1,20 +1,18 @@
 #pragma once
 #include "event/Event.h"
-#include <sstream>
 
 namespace TwinSystem
 {
     class InputEvent : public Event{
 	public:
-		InputEvent(std::string str, bool state) : _str(str), _state(state) {}
+		InputEvent(String str, bool state) : _str(str), _state(state) {}
 
 		inline bool state() const { return _state; }
-
-		std::string ToString() const override
-		{
-			std::stringstream ss;
-			ss << "InputEvent: " << _str << " : " << _state;
-			return ss.str();
+		
+		String ToString() const override{
+			String ss;
+			ss += GetName() + _str + String(" : {") + String(_state) + "}";
+			return ss;
 		}
 
 		static EventType GetStaticType() { return EventType::InputEvent; } 
@@ -24,6 +22,6 @@ namespace TwinSystem
 		EVENT_CLASS_CATEGORY(EventCategoryInput)
 	private:
 		bool _state;
-        std::string _str;
+        String _str;
 	};
 } // namespace TwinSystem

@@ -1,6 +1,5 @@
 #pragma once
-
-#include <string>
+#include <Arduino.h>
 
 namespace TwinSystem{
 
@@ -16,7 +15,7 @@ namespace TwinSystem{
     class JobExecutor  {
     public:
 
-        std::string ToString();
+        String ToString();
         virtual bool IsBusy();
         virtual bool IsRunning();
         virtual bool IsIdle();

@@ -15,7 +15,7 @@ namespace TwinSystem{
         virtual bool HasChanged(){
             return(_hasChanged && enabled);
         };
-        virtual bool GetValue() const{
+        virtual T GetValue() const{
             return value;
         }
 

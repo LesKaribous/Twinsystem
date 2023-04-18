@@ -12,7 +12,7 @@
 #include "actuators/Actuators.h"
 #include "motion/MotionControl.h"
 
-
+void OnDummyRequestResponse(String answer);
 
 namespace TwinSystem{
 
@@ -30,28 +30,20 @@ namespace TwinSystem{
 
 	class System{
 	public :
-		System();
-
 		void Initialize();
-		void Update();
+		virtual void Update();
 
 		void OnEvent(Event& e);
 		void Execute(Program prgm);
 
 		void Wait(int time);
 		void WaitUntil(JobExecutor& obj);
-
-        void Turn(float);
-		void GoTurn(Vec3);
-        void Go(float x, float y);
-        void GoTurn(float x, float y, float w);
-        void GoPolar(float heading, float length);
-        void Align(RobotCompass, float orientation);
-
+		
 		virtual void PollEvents();
 		inline const RobotState& GetState(){return _state;}
 
 	protected :
+		System();
 		RobotState _state;
 		Intercom intercom;
 		MotionControl motion;

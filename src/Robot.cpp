@@ -2,6 +2,12 @@
 #include "Settings.h"
 
 #include "debug/Console.h"
+/*
+long _lastDummy = 0;
+void OnDummyRequestResponse(String answer){
+    Serial.println("dummy request responded");
+}
+*/
 
 Robot::Robot(){
 	_state = RobotState::IDLE;
@@ -10,6 +16,12 @@ Robot::Robot(){
 	_probedX = false, 
 	_probedY = false;
 	_probing = false;
+}
+
+void Robot::Update() {
+	motion.UpdatePosition();
+	PollEvents();
+	System::Update();
 }
 
 void Robot::Go(Vec2 v){
@@ -43,8 +55,6 @@ void Robot::GoPolar(float heading, float length){
 }
 
 void Robot::PollEvents(){
-	//Console::info("Robot") << "Updating fields" << Console::endl;
-
     //Tracked values
     robotPositionTracker.SetValue(motion.GetAbsPosition());
     robotProbedTracker.SetValue(IsProbed());
@@ -53,6 +63,8 @@ void Robot::PollEvents(){
     robotStartedTracker.SetValue(_state != RobotState::ARMED && _state != RobotState::IDLE);
     intercomConnectionTracker.SetValue(intercom.IsConnected());
 
+
+	//TODO Create events to handle this at the UI Level
 	if(robotPositionTracker.HasChanged()){
 		ui.fields.x.SetValue(robotPositionTracker.GetValue().a);
 		ui.fields.y.SetValue(robotPositionTracker.GetValue().b);
@@ -78,65 +90,39 @@ void Robot::PollEvents(){
 	if(intercomConnectionTracker.HasChanged()){
 		ui.fields.intercom.SetValue(intercomConnectionTracker.GetValue());
 	}
-
-	/*
-	if(robotPositionTracker.HasChanged()){
-		Vec3ChangedEvent e("Position changed", motion.GetPosition());
-		OnEvent(e);
-	}
-
-	if(robotProbedTracker.HasChanged()){
-		BoolChangedEvent e("Probed state changed", motion.isProbed());
-		OnEvent(e);
-	}
-
-	if(robotProbingTracker.HasChanged()){
-		BoolChangedEvent e("Probing state changed", motion.isProbing());
-		OnEvent(e);
-	}
-
-	if(robotArmedTracker.HasChanged()){
-		BoolChangedEvent e("Robot armed state changed", _state == RobotState::ARMED);
-		OnEvent(e);
-	}
-
-	if(robotStartedTracker.HasChanged()) {
-		BoolChangedEvent e("Robot armed stated changed", _state != RobotState::ARMED && _state != RobotState::IDLE);
-		OnEvent(e);
-	}
-
-	if(intercomConnectionTracker.HasChanged()){
-		Vec3ChangedEvent e("Position changed", motion.GetPosition());
-		OnEvent(e);
-	}
-	*/
 }
 
 void Robot::WaitLaunch(){
-	do{
+	while (_state != RobotState::STARTING){
 		Update();
 		switch (_state){
 		case RobotState::IDLE :
-			if(ui.inputs.starter.GetState()){ //Arm
+			if(StarterPlaced()){ //Arm
 				_state = RobotState::ARMED;
 				FreezeSettings();
-				intercom.SendMessage("displayLidar();");
+
+				if(intercom.IsConnected()){
+					intercom.SendRequest("displayLidar");
+				}
 			}
-			if(ui.inputs.resetButton.HasChanged() && !ui.inputs.resetButton.GetState()){ //Recalage
-				RecalageBlue();
+			if(ButtonReleased()){ //Recalage
+				if	   (IsBlue()  && IsPrimary()	) RecalagePrimaryBlue		();
+				else if(IsBlue()  && IsSecondary()	) RecalageSecondaryBlue		();
+				else if(IsGreen() && IsPrimary()	) RecalagePrimaryGreen		();
+				else if(IsGreen() && IsSecondary()	) RecalageSecondaryGreen	();
 				//TestOrientation();
 				//TestSteppers();
 			}
 			break;
 
 		case RobotState::ARMED :
-			if(!ui.inputs.starter.GetState() && !ui.inputs.resetButton.GetState()){ //Start match
+			if(StarterPulled()){ //Start match
 				_state = RobotState::STARTING;
-			}else if(!ui.inputs.starter.GetState() && ui.inputs.resetButton.GetState()){ //Unarm
+			}else if(StarterCancelled()){ //Unarm
 				_state = RobotState::IDLE;
 				UnfreezeSettings();
-				intercom.SendMessage("displayIntercom();");
-				while(ui.inputs.resetButton.GetState()) Update(); //Wait for resetButton to be released
+				intercom.SendRequest("displayIntercom");
+				while(ButtonPressed()) Update(); //Wait for resetButton to be released
 			}
 			break;
 	
@@ -145,23 +131,67 @@ void Robot::WaitLaunch(){
 		}
 
 		delay(10);
-	}while (_state != RobotState::STARTING);
+	};
 
 	
 }
 
-
-void Robot::FreezeSettings(){
-	ui.inputs.teamSwitch.Disable();
-	ui.inputs.strategySwitch.Disable();
-	//ui.inputs.avoidanceSwitch.Disable();
+void Robot::StartMatch(){
+	ui.SetPage(Page::MATCH);
+	motion.steppers.Engage();
+	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
+	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();
+	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();
+	else if(IsGreen() && IsSecondary()	) MatchSecondaryGreen();
+	motion.steppers.Disengage();
 }
 
-void Robot::UnfreezeSettings(){
-	ui.inputs.teamSwitch.Enable();
-	ui.inputs.strategySwitch.Enable();
-	//ui.inputs.avoidanceSwitch.Enable();
+
+bool Robot::ButtonPressed(){
+	return ui.inputs.resetButton.GetState();
 }
+
+bool Robot::ButtonReleased(){
+	return ui.inputs.resetButton.HasChanged() && !ui.inputs.resetButton.GetState();
+}
+
+bool Robot::HasStarter(){
+	return ui.inputs.starter.GetState();
+}
+
+bool Robot::StarterPulled(){
+	return !ui.inputs.starter.GetState() && !ui.inputs.resetButton.GetState();
+}
+
+bool Robot::StarterPlaced(){
+	return ui.inputs.starter.GetState() && ui.inputs.starter.HasChanged();
+}
+
+bool Robot::StarterCancelled(){
+	return !ui.inputs.starter.GetState() && ui.inputs.resetButton.GetState();
+}
+
+bool Robot::IsPrimary(){
+	return ui.inputs.twinSwitch.GetState() == Settings::Match::PRIMARY;
+}
+bool Robot::IsSecondary(){
+	return ui.inputs.twinSwitch.GetState() == Settings::Match::SECONDARY;
+}
+bool Robot::IsBlue(){
+	return ui.inputs.teamSwitch.GetState() == Settings::Match::BLUE;
+}
+bool Robot::IsGreen(){
+	return ui.inputs.teamSwitch.GetState() == Settings::Match::GREEN;
+}
+
+bool Robot::GetStrategyState(){
+	return ui.inputs.strategySwitch.GetState();
+}
+
+bool Robot::GetRobotType(){
+	return ui.inputs.twinSwitch.GetState();
+}
+
 
 void Robot::TestSteppers(){
 	/*
@@ -220,7 +250,7 @@ void Robot::TestOrientation(){
 	Align(RobotCompass::AB, GetCompassOrientation(TableCompass::EAST));
 }
 
-void Robot::RecalageBlue(){
+void Robot::RecalagePrimaryBlue(){
 	// Laisser passer le robot secondaire
 	//SetAvoidance(false);
 	motion.SetRelative();
@@ -241,7 +271,7 @@ void Robot::RecalageBlue(){
 }
 
 
-void Robot::RecalageGreen(){
+void Robot::RecalagePrimaryGreen(){
 	// Laisser passer le robot secondaire
 	//SetAvoidance(false);
 	motion.SetRelative();
@@ -261,6 +291,13 @@ void Robot::RecalageGreen(){
 	motion.steppers.Sleep();
 }
 
+void Robot::RecalageSecondaryGreen(){
+
+}
+
+void Robot::RecalageSecondaryBlue(){
+
+}
 
 void  Robot::ProbeBorder(TableCompass tc, RobotCompass rc){
 	boolean wasAbsolute = motion.IsAbsolute();
@@ -324,7 +361,7 @@ bool  Robot::IsProbing(){
 }
 
 
-void Robot::MatchBlue(){
+void Robot::MatchPrimaryBlue(){
 	motion.steppers.Engage();
 	motion.SetAbsolute();
 	Vec2 cakeRose1(575,1775);
@@ -414,7 +451,7 @@ void Robot::MatchBlue(){
 }
 
 
-void Robot::MatchGreen(){
+void Robot::MatchPrimaryGreen(){
 	motion.steppers.Engage();
 	motion.SetAbsolute();
 	Vec2 cakeRose1(575,2000 - 1775);
@@ -501,4 +538,20 @@ void Robot::MatchGreen(){
 	Go(b5safe);
 	motion.steppers.Disengage();
 
+}
+
+void Robot::MatchSecondaryGreen(){}
+void Robot::MatchSecondaryBlue(){}
+
+
+void Robot::FreezeSettings(){
+	ui.inputs.teamSwitch.Disable();
+	ui.inputs.strategySwitch.Disable();
+	//ui.inputs.avoidanceSwitch.Disable();
+}
+
+void Robot::UnfreezeSettings(){
+	ui.inputs.teamSwitch.Enable();
+	ui.inputs.strategySwitch.Enable();
+	//ui.inputs.avoidanceSwitch.Enable();
 }

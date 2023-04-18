@@ -14,6 +14,7 @@ namespace TwinSystem{
         screen.begin();
         Clear();
         needDraw = true;
+        Draw();
         Update();
     }
     
@@ -23,11 +24,6 @@ namespace TwinSystem{
         Draw();
     }
 
-    /*
-    bool UI::pollEvents(std::function<void(Event&)> cb){
-        inputs.pollEvents(cb);
-    }
-    */
     void UI::OnEvent(Event& e){
         if(e.IsInCategory(EventCategory::EventCategoryUI)){
         }else if(e.IsInCategory(EventCategory::EventCategoryMonitoring)){
@@ -38,6 +34,12 @@ namespace TwinSystem{
     void UI::Clear(){
         screen.fillScreen(ILI9341_BLACK);
         screen.setTextSize(2);
+    }
+
+    void UI::SetPage(Page p){
+        currentPage = p;
+        Clear();
+        needDraw = true;
     }
 
     void UI::Draw(){
@@ -93,10 +95,14 @@ namespace TwinSystem{
         if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
         if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
         if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
-        if(fields.intercom.HasChanged() || true) updateLidarState(fields.intercom.GetState());
+        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
         if(fields.probed.HasChanged()) updateInitState(fields.probed.GetState());
-        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()) updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue());
-    
+        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+            if( millis() - lastPosDraw >= 50){
+                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+                lastPosDraw = millis();
+            }
+        }    
     }
 
     void UI::updateTeamColor(bool team){
@@ -172,9 +178,16 @@ namespace TwinSystem{
     void UI::updateAllMatchVar() {
         updateMatchTime(100);
         updateScore(9);
-        updatePosition(1780.0, 1250.0, 180.0);
-        updateLidarState(fields.intercom.GetState());
-        updateStrategyState(inputs.strategySwitch.GetState());
+        
+        if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+            if( millis() - lastPosDraw >= 50){
+                updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+                lastPosDraw = millis();
+            }
+        }
+
+        if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
+        if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
     }
 
     void UI::updateStrategyState(bool stratState) {

@@ -23,6 +23,7 @@ namespace TwinSystem{
         void Update();
         void Draw();
 
+        void SetPage(Page p);
         //bool pollEvents(void(System::*cb)(&Event));
         void OnEvent(Event& e);
 
@@ -49,7 +50,10 @@ namespace TwinSystem{
 
     private:
         Page currentPage = Page::INIT;
-        long lastDraw = 0;
+
+        unsigned long lastDraw = 0;
+        unsigned long lastPosDraw = 0;
+
         bool needDraw = true;
     };
 } // namespace TwinSystem

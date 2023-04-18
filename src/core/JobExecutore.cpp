@@ -4,7 +4,7 @@
 namespace TwinSystem{
 
 
-	std::string  JobExecutor::ToString(){
+	String  JobExecutor::ToString(){
 		switch(_state){
 			case JobState::IDLE :
 				return "IDLE";

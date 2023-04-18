@@ -5,33 +5,64 @@ using namespace TwinSystem;
 class Robot : public System{
 public :
     Robot();
+    ~Robot(){};
 
+    //Sytem routines
+    void Update() override;
+    void PollEvents() override;
+
+    //Movements
+    void Turn(float);
     void Go(Vec2);
     void Go(float x, float y);
-    void Turn(float a);
+    void GoPolar(float heading, float length);
     void Align(RobotCompass, float orientation);
 
-    void GoPolar(float heading, float length);
-
 	void WaitLaunch();
-    void RecalageGreen();
-    void RecalageBlue();
-	void MatchGreen();
-	void MatchBlue();
+	void StartMatch();
 
-    void FreezeSettings();
-    void UnfreezeSettings();
+    //UI
+    bool ButtonPressed();
+    bool ButtonReleased();
+    bool HasStarter();
+    bool StarterPulled();
+    bool StarterPlaced();
+    bool StarterCancelled();
+
+    bool IsPrimary();
+    bool IsSecondary();
+    bool IsBlue();
+    bool IsGreen();
+
+    bool GetRobotType();
+    bool GetStrategyState();
+
+    //Strategy
+    void RecalagePrimaryGreen();
+    void RecalageSecondaryGreen();
+    void RecalagePrimaryBlue();
+    void RecalageSecondaryBlue();
+
+	void MatchPrimaryGreen();
+	void MatchPrimaryBlue();
+    void MatchSecondaryGreen();
+	void MatchSecondaryBlue();
+
+    //Macro
+    void ProbeBorder(TableCompass, RobotCompass);
+
+    //Tests
     void TestSteppers();
     void TestOrientation();
 
-    void ProbeBorder(TableCompass, RobotCompass);
+    //Util
+    void FreezeSettings();
+    void UnfreezeSettings();
+
     bool IsProbed();
+    bool IsProbing();
     bool IsXProbed();
     bool IsYProbed();
-    //Return true while probing
-    bool IsProbing();
-
-    void PollEvents() override;
 
 protected:
     bool _team;
@@ -48,5 +79,4 @@ protected:
     ValueTracker<bool> robotArmedTracker;
     ValueTracker<bool> robotStartedTracker;
     ValueTracker<bool> intercomConnectionTracker;
-
 };
