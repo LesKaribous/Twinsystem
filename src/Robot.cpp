@@ -14,7 +14,6 @@ void OnDummyRequestResponse(String answer){
 Robot::Robot(){
 	
 	_state = RobotState::IDLE;
-	
 	/*
 	_team = Settings::Match::GREEN;
 	_avoidance = Settings::Match::AVOIDANCE;
@@ -261,8 +260,6 @@ bool Robot::GetRobotType(){
 	return ui.inputs.twinSwitch.GetState();
 }
 
-
-
 bool  Robot::IsProbed(){
 	return _probedX && _probedY;
 }
@@ -276,7 +273,6 @@ bool  Robot::IsYProbed(){
 bool  Robot::IsProbing(){
 	return _probing;
 }
-
 
 void Robot::FreezeSettings(){
 	ui.inputs.teamSwitch.Disable();

@@ -88,7 +88,7 @@ void Robot::MatchPrimaryBlue(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
-    //match.AddToScore(basket);
+    match.AddToScore(basket);
 
     actuators.Ungrab(RobotCompass::AB);
 	actuators.Ungrab(RobotCompass::BC);
@@ -116,7 +116,7 @@ void Robot::MatchPrimaryBlue(){
     actuators.Ungrab(RobotCompass::BC);
     Go(retreatBlue2);
     actuators.Close(RobotCompass::BC);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     //Dépose du second Gateau
     Align(RobotCompass::AB, -120);
@@ -125,7 +125,7 @@ void Robot::MatchPrimaryBlue(){
     actuators.Ungrab(RobotCompass::AB);
     Go(retreatBlue3);
     actuators.Close(RobotCompass::AB);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     //Dépose du troisieme Gateau
     Align(RobotCompass::CA, -120);
@@ -134,7 +134,7 @@ void Robot::MatchPrimaryBlue(){
     actuators.Ungrab(RobotCompass::CA);
     Go(retreatBlue3);
     actuators.Close(RobotCompass::CA);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
     
     //recalage
     Go(retreatBlue1);
@@ -153,13 +153,13 @@ void Robot::MatchPrimaryBlue(){
     actuators.trap.open();
     Wait(2000);
     actuators.trap.close();
-    //match.AddToScore(exactCherryCounting);
+    match.AddToScore(exactCherryCounting);
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
     // Fin de match
     Go(blueEndPrimary);
-    //match.AddToScore(wheelsOnPlate/2);
+    match.AddToScore(wheelsOnPlate/2);
 	// Fin de match
 	motion.steppers.Disengage();
 
@@ -169,7 +169,7 @@ void Robot::MatchPrimaryGreen(){
 	motion.steppers.Engage();
 	motion.SetAbsolute();
 
-    //match.AddToScore(basket);
+    match.AddToScore(basket);
 
     actuators.Ungrab(RobotCompass::AB);
     actuators.Ungrab(RobotCompass::BC);
@@ -197,7 +197,7 @@ void Robot::MatchPrimaryGreen(){
     actuators.Ungrab(RobotCompass::BC);
     Go(retreatGreen2);
     actuators.Close(RobotCompass::BC);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     //Dépose du second Gateau
     Align(RobotCompass::AB, 120);
@@ -206,7 +206,7 @@ void Robot::MatchPrimaryGreen(){
     actuators.Ungrab(RobotCompass::AB);
     Go(retreatGreen3);
     actuators.Close(RobotCompass::AB);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     //Dépose du troisieme Gateau
     Align(RobotCompass::CA, 120);
@@ -215,7 +215,7 @@ void Robot::MatchPrimaryGreen(){
     actuators.Ungrab(RobotCompass::CA);
     Go(retreatGreen3);
     actuators.Close(RobotCompass::CA);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
     
     //recalage
     Go(retreatGreen1);
@@ -234,13 +234,13 @@ void Robot::MatchPrimaryGreen(){
     actuators.trap.open();
     Wait(2000);
     actuators.trap.close();
-    //match.AddToScore(exactCherryCounting);
+    match.AddToScore(exactCherryCounting);
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
     // Fin de match
     Go(greenEndPrimary);
-    //match.AddToScore(wheelsOnPlate/2);
+    match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
 	motion.steppers.Disengage();
@@ -293,7 +293,7 @@ void Robot::MatchSecondaryBlue(){
     actuators.Unlock(RobotCompass::AB);
     Go(dropB2_01);
     actuators.Ungrab(RobotCompass::AB);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     actuators.Unlock(RobotCompass::BC);
     actuators.Unlock(RobotCompass::CA);
@@ -301,18 +301,18 @@ void Robot::MatchSecondaryBlue(){
     Go(dropB2_02);
     Align(RobotCompass::BC, GetCompassOrientation(TableCompass::EAST));
     actuators.Ungrab(RobotCompass::BC);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     Go(dropB2_03);
     Align(RobotCompass::CA, GetCompassOrientation(TableCompass::EAST));
     actuators.Ungrab(RobotCompass::CA);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNE);
     //Fin du match
     Go(blueEndSecondary);
 
-    //match.AddToScore(wheelsOnPlate/2);
+    match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
     motion.steppers.Disengage();
@@ -364,7 +364,7 @@ void Robot::MatchSecondaryGreen(){
     actuators.Unlock(RobotCompass::AB);
     Go(dropV2_01);
     actuators.Ungrab(RobotCompass::AB);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     actuators.Unlock(RobotCompass::BC);
     actuators.Unlock(RobotCompass::CA);
@@ -372,18 +372,18 @@ void Robot::MatchSecondaryGreen(){
     Go(dropV2_02);
     Align(RobotCompass::BC, GetCompassOrientation(TableCompass::WEST));
     actuators.Ungrab(RobotCompass::BC);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     Go(dropV2_03);
     Align(RobotCompass::CA, GetCompassOrientation(TableCompass::WEST));
     actuators.Ungrab(RobotCompass::CA);
-    //match.AddToScore(cakeWithCherry);
+    match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNW);
     //Fin du match
     Go(greenEndSecondary);
 
-    //match.AddToScore(wheelsOnPlate/2);
+    match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
     motion.steppers.Disengage();
