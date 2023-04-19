@@ -4,7 +4,7 @@
 #include "debug/Console.h"
 
 
-bool obstacle = true;
+bool obstacle = false;
 void OnDummyRequestResponse(String answer){
     if(answer.startsWith("obstacle")) obstacle = true;
 	else obstacle = false;
@@ -34,7 +34,6 @@ void Robot::Update() {
 		if(match.IsNearlyFinished()); //Todo go home
 		if(match.IsFinished()); //Todo Stop robot, motor disengage
 
-		
 	}
 }
 
@@ -75,8 +74,8 @@ void Robot::GoPolar(float heading, float length){
 
 void Robot::CheckLidar(){
 	if(_avoidance){
-		if(millis() - _lastLidarCheck > 500){
-
+		if(millis() - _lastLidarCheck > 100){
+			_lastLidarCheck = millis();
 			float heading = motion.GetAbsPosition().c * DEG_TO_RAD;
 			while (heading > 180) heading -= 180;
 			while (heading < -180) heading += 180;

@@ -75,7 +75,7 @@ protected:
 
     TwinSystem::Match match;
 
-    bool _avoidance = false;
+    bool _avoidance = true;
     //bool _obstacle = false;
     unsigned long _lastLidarCheck = 0;
 
