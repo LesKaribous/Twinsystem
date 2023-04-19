@@ -60,6 +60,7 @@ public :
 
     //Tests
     void TestSteppers();
+    void TestDetection();
     void TestOrientation();
 
     //Util

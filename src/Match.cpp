@@ -8,6 +8,7 @@ namespace TwinSystem{
         _timeLeft = Settings::Match::MATCH_DURATION;
         _startTime = 0;
         _score = 0;
+        _state = State::IDLE;
     }
 
     void Match::Start(){

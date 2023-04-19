@@ -42,6 +42,10 @@ Vec3& Vec3::dist(Vec3& v){
     return this->sub(v);
 }
 
+float Vec3::dot(Vec3& a){
+    Vec3::dot(*this, a);
+}
+
 float Vec3::mag(){
     return sqrt(magSq());
 }

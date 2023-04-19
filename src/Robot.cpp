@@ -13,7 +13,7 @@ void OnDummyRequestResponse(String answer){
 
 Robot::Robot(){
 	
-	_state = RobotState::IDLE;
+	_state = RobotState::IDLE; //Do not remove
 	/*
 	_team = Settings::Match::GREEN;
 	_avoidance = Settings::Match::AVOIDANCE;
@@ -27,6 +27,7 @@ void Robot::Update() {
 	motion.UpdatePosition();
 	PollEvents();
 	System::Update();
+	match.GetTimeLeft();
 
 	if(_state != RobotState::IDLE && _state != RobotState::ARMED){ //IsRunning
 		CheckLidar();
@@ -76,9 +77,11 @@ void Robot::CheckLidar(){
 	if(_avoidance){
 		if(millis() - _lastLidarCheck > 100){
 			_lastLidarCheck = millis();
-			float heading = motion.GetAbsPosition().c * DEG_TO_RAD;
-			while (heading > 180) heading -= 180;
-			while (heading < -180) heading += 180;
+			float heading = -motion.GetAbsoluteTargetDirection() * RAD_TO_DEG;
+			heading = fmod(heading, 360.0);
+			if(heading < 0) heading += 360.0;
+
+			//Console::info("Motion") << "GetTargetDirection : " << heading <<  Console::endl;
 			
 			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
 		}
@@ -120,6 +123,7 @@ void Robot::PollEvents(){
 	scoreTracker.SetValue(match.GetScore());
     timeTracker.SetValue(match.GetTimeLeftSeconds());
 
+	//Console::info("Time left :") << match.GetTimeLeftSeconds() << "s" << Console::endl;
 
 	//TODO Create events to handle this at the UI Level
 	if(robotPositionTracker.HasChanged()){
@@ -196,7 +200,7 @@ void Robot::WaitLaunch(){
 			break;
 		}
 
-		delay(10);
+		//delay(10);
 	};
 
 	
@@ -206,6 +210,9 @@ void Robot::StartMatch(){
 	match.Start();
 	ui.SetPage(Page::MATCH);
 	motion.steppers.Engage();
+
+	//TestDetection();motion.steppers.Disengage();return;
+
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();
 	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();

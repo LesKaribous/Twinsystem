@@ -11,6 +11,8 @@ namespace TwinSystem{
         started.Init();
         armed.Init();
         intercom.Init();
+        score.Init();
+        time.Init();
     }
 
     void Fields::Read(){
@@ -22,6 +24,8 @@ namespace TwinSystem{
         started.Read();
         armed.Read();
         intercom.Read();
+        score.Read();
+        time.Read();
     }
 
     bool Fields::HasChanged(){ //TODO Add the rest
@@ -32,7 +36,9 @@ namespace TwinSystem{
                 probing.HasChanged()    ||
                 started.HasChanged()    ||
                 armed.HasChanged()      ||
-                intercom.HasChanged();
+                intercom.HasChanged()   ||
+                score.HasChanged()      ||
+                time.HasChanged();
     }
 
 

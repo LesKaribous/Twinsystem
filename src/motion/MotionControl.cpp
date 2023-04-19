@@ -227,6 +227,18 @@ namespace TwinSystem{
 		return _target;
 	}
 
+	Vec3  MotionControl::GetRelTarget() const{
+		return _relTarget;
+	}
+
+	float MotionControl::GetTargetDirection() const{
+		return Vec2(_relTarget).heading();
+	}
+
+	float MotionControl::GetAbsoluteTargetDirection() const{
+		return Vec2(_relTarget).heading() + _position.c;
+	}
+
 	bool  MotionControl::IsAbsolute() const{
 		return _absolute;
 	}

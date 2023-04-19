@@ -57,6 +57,11 @@ namespace TwinSystem{
         Vec3 GetAbsPosition() const;
         //Absolute mm, mm, rad
         Vec3 GetAbsTarget() const;
+        //Absolute mm, mm, rad
+        Vec3 GetRelTarget() const;
+
+        float GetTargetDirection() const;
+        float GetAbsoluteTargetDirection() const;
 
         bool IsAbsolute() const;
         bool IsRelative() const;

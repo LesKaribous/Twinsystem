@@ -120,26 +120,26 @@ namespace TwinSystem{
             Request& request = it->second;
             Request::Status status = request.GetStatus();
 
-            Console::info("Intercom") << "Request[" << String(request.ID()) << "]:";
+            //Console::info("Intercom") << "Request[" << String(request.ID()) << "]:";
         
             if (status == Request::Status::IDLE) {
-                Console::println("IDLE");
+                //Console::println("IDLE");
                 request.Send(*this);
                 ++it;
             } else if (status == Request::Status::SENT) {
-                Console::println("SENT");
+                //Console::println("SENT");
                 if (request.IsTimedOut()) {
-                    Console::info("Intercom") << "Request[" << String(request.ID()) << "]:" << "TIMEDOUT" << Console::endl;
+                    //Console::trace("Intercom") << "Request[" << String(request.ID()) << "]:" << "TIMEDOUT" << Console::endl;
                     request.OnTimeout();
                     it = _pendingRequest.erase(it); // Remove the request from the map
                 } else {
                     ++it;
                 }
             } else if (status == Request::Status::OK) {
-                Console::println("OK");
+                //Console::println("OK");
                 it = _pendingRequest.erase(it); // Remove the request from the map
             }  else if (status == Request::Status::TIMEOUT) {
-                Console::println("TIMEDOUT");
+                //Console::println("TIMEDOUT");
                 it = _pendingRequest.erase(it); // Remove the request from the map
             } else {
                 ++it;

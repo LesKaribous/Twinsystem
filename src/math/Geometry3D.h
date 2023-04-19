@@ -28,6 +28,7 @@ struct Vec3 {
     Vec3& mult(Matrix3x3);
     Vec3& rotateZ(float);
 
+    float heading();
     float dot(Vec3& a);
     float mag();
     float magSq();
