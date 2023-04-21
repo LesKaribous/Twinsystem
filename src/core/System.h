@@ -20,12 +20,8 @@ namespace TwinSystem{
 		IDLE,
 		ARMED,
 		STARTING,
-		MOVING,
-		ROTATING,
-		STOPPED,
-		STUCK,
-		ERROR
-
+		STARTED,
+		STOPPED
 	};
 
 	class System{

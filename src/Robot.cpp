@@ -33,8 +33,14 @@ void Robot::Update() {
 	PollEvents();
 	System::Update();
 	match.GetTimeLeft();
+	if(_state == RobotState::IDLE)Console::println("IDLE");
+	if(_state == RobotState::ARMED)Console::println("ARMED");
+	if(_state == RobotState::STARTING)Console::println("STARTING");
+	if(_state == RobotState::STARTED)Console::println("STARTED");
+	if(_state == RobotState::STOPPED)Console::println("STOPPED");
 
-	if(_state != RobotState::IDLE && _state != RobotState::ARMED){ //IsRunning
+	if(_state == RobotState::STARTED){
+		Console::error("Robot") << "Checking lidar" << Console::endl;
 		CheckLidar();
 		
 		if(match.IsNearlyFinished()) NearlyFinishedMatch();//go home
@@ -79,19 +85,16 @@ void Robot::GoPolar(float heading, float length){
 
 
 void Robot::CheckLidar(){
-	if(_avoidance){
+	if(_avoidance && motion.IsBusy()){
 		if(millis() - _lastLidarCheck > 100){
 			_lastLidarCheck = millis();
 			float heading = -motion.GetAbsoluteTargetDirection() * RAD_TO_DEG;
 			heading = fmod(heading, 360.0);
 			if(heading < 0) heading += 360.0;
-
-			//Console::info("Motion") << "GetTargetDirection : " << heading <<  Console::endl;
-			
 			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
 		}
 
-		if(ObstacleDetected() && motion.IsRunning()){
+		if(ObstacleDetected() && motion.IsRunning() && !motion.IsRotating()){
 			motion.Pause();
 		}else if(motion.IsPaused() && !ObstacleDetected()){
 			motion.Resume();
@@ -109,6 +112,11 @@ void Robot::EnableAvoidance(){
 
 void Robot::DisableAvoidance(){
 	_avoidance = false;
+	if(motion.IsPaused() && ObstacleDetected()){
+		obstacle = false;
+		motion.Resume();
+	}
+	
 }
 
 
@@ -216,8 +224,9 @@ void Robot::StartMatch(){
 	DisableDisguisement();
 	ui.SetPage(Page::MATCH);
 	motion.steppers.Engage();
+	_state = RobotState::STARTED;
 
-	//TestDetection();motion.steppers.Disengage();return;
+	TestDetection();motion.steppers.Disengage();return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();

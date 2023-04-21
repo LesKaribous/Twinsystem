@@ -66,6 +66,10 @@ namespace TwinSystem{
         bool IsAbsolute() const;
         bool IsRelative() const;
 
+        bool IsRotating() const;
+        bool IsMoving() const;
+
+
         //Inherited
         void Run() override;
         void Pause() override;

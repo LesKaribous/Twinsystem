@@ -66,19 +66,7 @@ void Robot::TestDetection(){
 	motion.SetAbsPosition({0,0,0});
 	motion.SetAbsolute();
 
-
-	intercom.SendRequest("checkLidar(" + String(0) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(45) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(90) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(135) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(180) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(225) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(270) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(315) + ")"); delay(500);
-	intercom.SendRequest("checkLidar(" + String(360) + ")"); delay(500);
-
-	Turn(30);
-
+	//Turn(30);
 	Go(100,0);
 	Wait(500);
 	Go(0,0);

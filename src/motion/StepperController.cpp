@@ -37,7 +37,7 @@ namespace TwinSystem{
         JobExecutor::Pause();
         if(_state == JobState::PAUSED){
             _controller.stop();
-
+            
         }
     }
 
