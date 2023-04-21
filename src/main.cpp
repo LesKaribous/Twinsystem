@@ -3,7 +3,7 @@
 
 void setup(){
 	Console::Initialize();
-    Console::SetLevel(ConsoleLevel::_INFO);
+    Console::SetLevel(ConsoleLevel::_TRACE);
 }
 
 void loop(){

@@ -209,7 +209,7 @@ namespace TwinSystem{
 
 
 		_position = _startPosition.copy().add(relativePosition);
-		Console::trace("MotionControl") << "Current position" << _position << Console::endl;
+		//Console::trace("MotionControl") << "Current position" << _position << Console::endl;
 	}
 
 
@@ -246,6 +246,17 @@ namespace TwinSystem{
 	bool  MotionControl::IsRelative() const{
 		return !_absolute;
 	}
+
+
+	bool MotionControl::IsRotating() const{
+		return (_state == JobState::RUNNING && _target.c != _position.c);
+	}
+
+	bool MotionControl::IsMoving() const{
+		return (_state == JobState::RUNNING &&_target != _position);
+	}
+
+
 
 	void  MotionControl::SetAbsPosition(Vec3 newPos){
 		_position = newPos; 
