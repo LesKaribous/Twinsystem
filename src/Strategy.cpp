@@ -83,7 +83,6 @@ void Robot::RecalageSecondaryGreen(){
     motion.steppers.Sleep();
 }
 
-
 void Robot::MatchPrimaryBlue(){
 
     motion.steppers.Engage();
@@ -387,5 +386,56 @@ void Robot::MatchSecondaryGreen(){
     match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
+    motion.steppers.Disengage();
+}
+
+
+void Robot::NearlyFinishPrimaryBlue(){
+    // Go to End Position
+    Go(blueEndPrimary);
+    match.AddToScore(wheelsOnPlate/2);
+}
+
+void Robot::NearlyFinishPrimaryGreen(){
+    // Go to End Position
+    Go(greenEndPrimary);
+    match.AddToScore(wheelsOnPlate/2);
+}
+
+void Robot::NearlyFinishSecondaryBlue(){
+    // Go to End Position
+    Go(blueEndSecondary);
+    match.AddToScore(wheelsOnPlate/2);
+}
+
+void Robot::NearlyFinishSecondaryGreen(){
+    // Go to End Position
+    Go(greenEndSecondary);
+    match.AddToScore(wheelsOnPlate/2);
+}
+
+void Robot::FinishPrimaryBlue(){
+    // Fin de match
+    EnableDisguisement();
+    actuators.Disengage();
+    motion.steppers.Disengage();
+}
+
+void Robot::FinishPrimaryGreen(){
+    // Fin de match
+    EnableDisguisement();
+    actuators.Disengage();
+    motion.steppers.Disengage();
+}
+
+void Robot::FinishSecondaryBlue(){
+    // Fin de match
+    actuators.Disengage();
+    motion.steppers.Disengage();
+}
+
+void Robot::FinishSecondaryGreen(){
+    // Fin de match
+    actuators.Disengage();
     motion.steppers.Disengage();
 }

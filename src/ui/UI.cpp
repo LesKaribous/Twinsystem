@@ -66,7 +66,7 @@ namespace TwinSystem{
         if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
         if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
         if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
-        if(fields.probed.HasChanged() || fields.probing.HasChanged()) updateInitState(true);
+        if(fields.probed.HasChanged() || fields.probing.HasChanged()) updateInitState();
         if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
             if( millis() - lastPosDraw >= 50){
                 updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
@@ -140,7 +140,7 @@ namespace TwinSystem{
         
     }
 
-    void UI::updateInitState(bool state) {
+    void UI::updateInitState() {
         screen.fillRect(100, 110, 140, 15, ILI9341_BLACK);
         screen.setTextSize(2);
         screen.setCursor(100, 110);

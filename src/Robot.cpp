@@ -3,6 +3,11 @@
 
 #include "debug/Console.h"
 
+#include <Adafruit_NeoPixel.h>
+#define NEOPIXEL_PIN Pin::Led::neopixel   // Change this to match the pin you are using
+#define NUM_LEDS 8       // Change this to match the number of LEDs in your strip
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 bool obstacle = false;
 void OnDummyRequestResponse(String answer){
@@ -32,8 +37,8 @@ void Robot::Update() {
 	if(_state != RobotState::IDLE && _state != RobotState::ARMED){ //IsRunning
 		CheckLidar();
 		
-		if(match.IsNearlyFinished()); //Todo go home
-		if(match.IsFinished()); //Todo Stop robot, motor disengage
+		if(match.IsNearlyFinished()) NearlyFinishedMatch();//go home
+		if(match.IsFinished()) FinishedMatch(); //Stop robot, motor disengage
 
 	}
 }
@@ -208,6 +213,7 @@ void Robot::WaitLaunch(){
 
 void Robot::StartMatch(){
 	match.Start();
+	DisableDisguisement();
 	ui.SetPage(Page::MATCH);
 	motion.steppers.Engage();
 
@@ -218,6 +224,38 @@ void Robot::StartMatch(){
 	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();
 	else if(IsGreen() && IsSecondary()	) MatchSecondaryGreen();
 	motion.steppers.Disengage();
+}
+
+void Robot::FinishedMatch(){
+
+	if	   (IsBlue()  && IsPrimary()	) FinishPrimaryBlue();
+	else if(IsBlue()  && IsSecondary()	) FinishSecondaryBlue();
+	else if(IsGreen() && IsPrimary()	) FinishPrimaryGreen();
+	else if(IsGreen() && IsSecondary()	) FinishSecondaryGreen();
+	motion.steppers.Disengage();
+}
+
+void Robot::NearlyFinishedMatch(){
+	if	   (IsBlue()  && IsPrimary()	) NearlyFinishPrimaryBlue();
+	else if(IsBlue()  && IsSecondary()	) NearlyFinishSecondaryBlue();
+	else if(IsGreen() && IsPrimary()	) NearlyFinishPrimaryGreen();
+	else if(IsGreen() && IsSecondary()	) NearlyFinishSecondaryGreen();
+	motion.steppers.Disengage();
+}
+
+void Robot::EnableDisguisement(){
+  strip.begin();
+  for(int i=0; i<NUM_LEDS; i++) {
+    strip.setPixelColor(i, 0, 0, 255);
+  }
+  strip.show();
+}
+
+void Robot::DisableDisguisement(){
+  for(int i=0; i<NUM_LEDS; i++) {
+    strip.setPixelColor(i, 0, 0, 0);
+  }
+  strip.show();
 }
 
 

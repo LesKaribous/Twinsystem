@@ -28,6 +28,14 @@ public :
 	void WaitLaunch();
 	void StartMatch();
 
+    void FinishedMatch();
+    void NearlyFinishedMatch();
+
+    //Deguisement
+
+    void EnableDisguisement();
+    void DisableDisguisement();
+
     //UI
     bool ButtonPressed();
     bool ButtonReleased();
@@ -54,6 +62,16 @@ public :
 	void MatchPrimaryGreen();
     void MatchSecondaryBlue();
     void MatchSecondaryGreen();
+
+    void NearlyFinishPrimaryBlue();
+    void NearlyFinishPrimaryGreen();
+    void NearlyFinishSecondaryBlue();
+    void NearlyFinishSecondaryGreen();
+
+    void FinishPrimaryBlue();
+    void FinishPrimaryGreen();
+    void FinishSecondaryBlue();
+    void FinishSecondaryGreen();
 	
     //Macro
     void ProbeBorder(TableCompass, RobotCompass);

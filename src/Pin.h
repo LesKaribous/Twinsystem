@@ -16,7 +16,7 @@ namespace Pin{
     }
 
     namespace Led{
-        const int equipe = 57;
+        const int neopixel = 57;
     }
     
     // TFT pinout

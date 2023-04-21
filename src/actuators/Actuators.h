@@ -90,9 +90,14 @@ namespace TwinSystem{
         void Ungrab (RobotCompass rc);
         void Applause(RobotCompass rc);
 
-        void SetTurbine(int speed);
+        void SetTurbine(int speed); //in %
+        void StopTurbine();
+        void SuckBall();
+        void DropBall();
 
         void Sleep();
+        void Engage();
+        void Disengage();
 
         //Inherited
         void Run() override;

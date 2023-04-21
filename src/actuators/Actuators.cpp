@@ -186,6 +186,24 @@ namespace TwinSystem{
         }
     }
 
+    void Actuators::SetTurbine(int speed){
+        analogWrite(_pinTurbine, map(speed, 0, 100, 0, 255));
+    }
+
+    void Actuators::StopTurbine(){
+        digitalWrite(_pinTurbine, LOW);
+    }
+
+    void Actuators::SuckBall(){
+        trap.close();
+        SetTurbine(100);
+    }
+
+    void Actuators::DropBall(){
+        StopTurbine();
+        trap.open();
+    }
+
     void Actuators::Ungrab(RobotCompass rc){
         Open(rc);
     }
@@ -213,4 +231,33 @@ namespace TwinSystem{
         gripperCA.leftGripper.sleep();
         gripperCA.rightGripper.sleep();
     }
+
+
+    void Actuators::Engage(){
+        gripperAB.cherryLocker.enable();
+        gripperAB.leftGripper.enable();
+        gripperAB.rightGripper.enable();
+        gripperBC.cherryLocker.enable();
+        gripperBC.leftGripper.enable();
+        gripperBC.rightGripper.enable();
+        gripperCA.cherryLocker.enable();
+        gripperCA.leftGripper.enable();
+        gripperCA.rightGripper.enable();
+        digitalWrite(_pinTurbine, LOW);
+    }
+
+    void Actuators::Disengage(){
+        gripperAB.cherryLocker.disable();
+        gripperAB.leftGripper.disable();
+        gripperAB.rightGripper.disable();
+        gripperBC.cherryLocker.disable();
+        gripperBC.leftGripper.disable();
+        gripperBC.rightGripper.disable();
+        gripperCA.cherryLocker.disable();
+        gripperCA.leftGripper.disable();
+        gripperCA.rightGripper.disable();
+        trap.disable();
+        digitalWrite(_pinTurbine, LOW);
+    }
+
 }
