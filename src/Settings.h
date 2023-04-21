@@ -44,8 +44,8 @@ namespace Settings{
 
 
         const uint32_t 
-            ACCEL = 3000, // Old : 3000
-            SPEED = 6000;
+            ACCEL = 4000, // Old : 3000
+            SPEED = 5000; //Old : 5000
     }
 
     namespace Stepper{

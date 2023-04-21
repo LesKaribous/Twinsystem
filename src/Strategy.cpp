@@ -142,10 +142,10 @@ void Robot::MatchPrimaryBlue(){
     motion.SetAbsolute();
     //Va chercher les balles
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::WEST));
-    //setTurbine(255);
+    actuators.SuckBall();
     Go(ballBeginSE);
     Go(ballEndSE);
-    //setTurbine(0);
+    actuators.StopTurbine();
     // Va en dépose des balles
     Go(ballBlueBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
@@ -160,7 +160,10 @@ void Robot::MatchPrimaryBlue(){
     // Fin de match
     Go(blueEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
-	// Fin de match
+	EnableDisguisement();
+
+    // Fin de match
+    actuators.Disengage();
 	motion.steppers.Disengage();
 
 }
@@ -223,10 +226,10 @@ void Robot::MatchPrimaryGreen(){
     motion.SetAbsolute();
     //Va chercher les balles
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
-    //setTurbine(255);
+    actuators.SuckBall();
     Go(ballBeginSW);
     Go(ballEndSW);
-    //setTurbine(0);
+    actuators.StopTurbine();
     // Va en dépose des balles
     Go(ballGreenBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
@@ -241,8 +244,10 @@ void Robot::MatchPrimaryGreen(){
     // Fin de match
     Go(greenEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
+    EnableDisguisement();
 
     // Fin de match
+    actuators.Disengage();
 	motion.steppers.Disengage();
 
 }
@@ -253,13 +258,13 @@ void Robot::MatchSecondaryBlue(){
 
     // Va chercher les balles
     // Lance la turbine
-    //setTurbine(255);
+    actuators.SuckBall();
     // Prendre les balles
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::WEST));
     Go(ballEndNE);
     Go(ballBeginNE);
     // Stop la turbine
-    //setTurbine(0);
+    actuators.StopTurbine();
 
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
@@ -315,6 +320,7 @@ void Robot::MatchSecondaryBlue(){
     match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
+    actuators.Disengage();
     motion.steppers.Disengage();
 }
 
@@ -324,13 +330,13 @@ void Robot::MatchSecondaryGreen(){
 
     // Va chercher les balles
     // Lance la turbine
-    //setTurbine(255);
+    actuators.SuckBall();
     // Prendre les balles
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
     Go(ballEndNW);
     Go(ballBeginNW);
-    // Stop la turbine
-    //setTurbine(0);
+    //Stop Turbine
+    actuators.StopTurbine();
 
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
@@ -386,6 +392,7 @@ void Robot::MatchSecondaryGreen(){
     match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
+    actuators.Disengage();
     motion.steppers.Disengage();
 }
 

@@ -9,6 +9,7 @@
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(NUM_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
+unsigned long lastSeen = 0;
 bool obstacle = false;
 void OnDummyRequestResponse(String answer){
     if(answer.startsWith("obstacle")) obstacle = true;
@@ -86,18 +87,20 @@ void Robot::GoPolar(float heading, float length){
 
 void Robot::CheckLidar(){
 	if(_avoidance && motion.IsBusy()){
-		if(millis() - _lastLidarCheck > 100){
+		if(millis() - _lastLidarCheck > 20){
 			_lastLidarCheck = millis();
-			float heading = -motion.GetAbsoluteTargetDirection() * RAD_TO_DEG;
+			float heading = -motion.GetTargetDirection() * RAD_TO_DEG;
 			heading = fmod(heading, 360.0);
 			if(heading < 0) heading += 360.0;
 			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
 		}
 
+		if(ObstacleDetected())lastSeen = millis();
+		
 		if(ObstacleDetected() && motion.IsRunning() && !motion.IsRotating()){
 			motion.Pause();
 		}else if(motion.IsPaused() && !ObstacleDetected()){
-			motion.Resume();
+			if(millis() - lastSeen > 1000) motion.Resume();
 		}
 	}
 }
@@ -223,10 +226,11 @@ void Robot::StartMatch(){
 	match.Start();
 	DisableDisguisement();
 	ui.SetPage(Page::MATCH);
+	actuators.Engage();
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
-	TestDetection();motion.steppers.Disengage();return;
+	//TestDetection();motion.steppers.Disengage();return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();

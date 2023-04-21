@@ -66,7 +66,12 @@ void Robot::TestDetection(){
 	motion.SetAbsPosition({0,0,0});
 	motion.SetAbsolute();
 
-	//Turn(30);
+	actuators.SuckBall();
+	Wait(1000);
+	actuators.DropBall();
+	
+
+	Turn(30);
 	Go(100,0);
 	Wait(500);
 	Go(0,0);

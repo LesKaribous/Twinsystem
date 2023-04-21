@@ -27,6 +27,8 @@ namespace TwinSystem{
             gripperCA.rightGripper.close();
             gripperCA.leftGripper.close();
             gripperCA.cherryLocker.close();
+            
+            _pinTurbine = Pin::CherryPicker::pinTurbine;
 
             trap.close();
         }
@@ -44,6 +46,8 @@ namespace TwinSystem{
         gripperCA.cherryLocker.enable();
         gripperCA.leftGripper.enable();
         gripperCA.rightGripper.enable();
+        trap.enable();
+        pinMode(_pinTurbine, OUTPUT);
 
         Close(RobotCompass::AB);
         Close(RobotCompass::BC);
@@ -191,7 +195,7 @@ namespace TwinSystem{
     }
 
     void Actuators::StopTurbine(){
-        digitalWrite(_pinTurbine, LOW);
+        analogWrite(_pinTurbine, 0);
     }
 
     void Actuators::SuckBall(){

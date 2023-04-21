@@ -236,7 +236,7 @@ namespace TwinSystem{
 	}
 
 	float MotionControl::GetAbsoluteTargetDirection() const{
-		return Vec2(_relTarget).heading() + _position.c;
+		return Vec2(_relTarget).heading() - _position.c;
 	}
 
 	bool  MotionControl::IsAbsolute() const{
