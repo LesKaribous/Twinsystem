@@ -34,18 +34,25 @@ void Robot::Update() {
 	PollEvents();
 	System::Update();
 	match.GetTimeLeft();
-	if(_state == RobotState::IDLE)Console::println("IDLE");
-	if(_state == RobotState::ARMED)Console::println("ARMED");
-	if(_state == RobotState::STARTING)Console::println("STARTING");
-	if(_state == RobotState::STARTED)Console::println("STARTED");
-	if(_state == RobotState::STOPPED)Console::println("STOPPED");
+	if(_state == RobotState::IDLE)		Console::trace("RoboState") << "IDLE" 		<< Console::endl;
+	if(_state == RobotState::ARMED)		Console::trace("RoboState") <<"ARMED" 		<< Console::endl;
+	if(_state == RobotState::STARTING)	Console::trace("RoboState") <<"STARTING" 	<< Console::endl;
+	if(_state == RobotState::STARTED)	Console::trace("RoboState") <<"STARTED" 	<< Console::endl;
+	if(_state == RobotState::FINISHING)	Console::trace("RoboState") <<"FINISHING" 	<< Console::endl;
+	if(_state == RobotState::FINISHED)	Console::trace("RoboState") <<"FINISHED" 	<< Console::endl;
 
 	if(_state == RobotState::STARTED){
 		Console::error("Robot") << "Checking lidar" << Console::endl;
 		CheckLidar();
 		
-		if(match.IsNearlyFinished()) NearlyFinishedMatch();//go home
-		if(match.IsFinished()) FinishedMatch(); //Stop robot, motor disengage
+		if(match.IsNearlyFinished()){
+			motion.Cancel();
+			NearlyFinishedMatch();//go home
+		}
+		if(match.IsFinished()){
+			motion.Cancel();
+			FinishedMatch(); //Stop robot, motor disengage
+		}
 
 	}
 }
@@ -240,20 +247,27 @@ void Robot::StartMatch(){
 }
 
 void Robot::FinishedMatch(){
-
-	if	   (IsBlue()  && IsPrimary()	) FinishPrimaryBlue();
-	else if(IsBlue()  && IsSecondary()	) FinishSecondaryBlue();
-	else if(IsGreen() && IsPrimary()	) FinishPrimaryGreen();
-	else if(IsGreen() && IsSecondary()	) FinishSecondaryGreen();
-	motion.steppers.Disengage();
+	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
+		_state = RobotState::FINISHING;
+		motion.Cancel();
+		if	   (IsBlue()  && IsPrimary()	) FinishPrimaryBlue();
+		else if(IsBlue()  && IsSecondary()	) FinishSecondaryBlue();
+		else if(IsGreen() && IsPrimary()	) FinishPrimaryGreen();
+		else if(IsGreen() && IsSecondary()	) FinishSecondaryGreen();
+		motion.steppers.Disengage();
+	}
 }
 
 void Robot::NearlyFinishedMatch(){
-	if	   (IsBlue()  && IsPrimary()	) NearlyFinishPrimaryBlue();
-	else if(IsBlue()  && IsSecondary()	) NearlyFinishSecondaryBlue();
-	else if(IsGreen() && IsPrimary()	) NearlyFinishPrimaryGreen();
-	else if(IsGreen() && IsSecondary()	) NearlyFinishSecondaryGreen();
-	motion.steppers.Disengage();
+	if(_state == RobotState::STARTED){
+		_state = RobotState::FINISHING;
+		motion.Cancel();
+		if	   (IsBlue()  && IsPrimary()	) NearlyFinishPrimaryBlue();
+		else if(IsBlue()  && IsSecondary()	) NearlyFinishSecondaryBlue();
+		else if(IsGreen() && IsPrimary()	) NearlyFinishPrimaryGreen();
+		else if(IsGreen() && IsSecondary()	) NearlyFinishSecondaryGreen();
+		motion.steppers.Disengage();
+	}
 }
 
 void Robot::EnableDisguisement(){
