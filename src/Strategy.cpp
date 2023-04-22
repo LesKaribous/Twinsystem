@@ -108,6 +108,8 @@ void Robot::MatchPrimaryBlue(){
     Go(cakeBrownSE);
     actuators.Grab(RobotCompass::CA);
 
+    //----ATTENTION----
+    DisableAvoidance();
     //Dépose du premier Gateau
     Align(RobotCompass::BC, -120);
     Go(retreatBlue1);
@@ -157,6 +159,10 @@ void Robot::MatchPrimaryBlue(){
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
+
+    //----ATTENTION----
+    EnableAvoidance();
+
     // Fin de match
     Go(blueEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
@@ -191,6 +197,9 @@ void Robot::MatchPrimaryGreen(){
     actuators.Ungrab(RobotCompass::CA);
     Go(cakeBrownSW);
     actuators.Grab(RobotCompass::CA);
+
+    //----ATTENTION----
+    DisableAvoidance();
 
     //Dépose du premier Gateau
     Align(RobotCompass::BC, 120);
@@ -241,6 +250,10 @@ void Robot::MatchPrimaryGreen(){
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
+
+    //----ATTENTION----
+    EnableAvoidance();
+
     // Fin de match
     Go(greenEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
@@ -256,6 +269,9 @@ void Robot::MatchSecondaryBlue(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
+    //----ATTENTION----
+    DisableAvoidance();
+
     // Va chercher les balles
     // Lance la turbine
     actuators.SuckBall();
@@ -266,6 +282,9 @@ void Robot::MatchSecondaryBlue(){
     // Stop la turbine
     actuators.StopTurbine();
 
+    //----ATTENTION----
+    EnableAvoidance();
+
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
     actuators.Ungrab(RobotCompass::BC);
@@ -273,9 +292,10 @@ void Robot::MatchSecondaryBlue(){
     // Postionnement et orientation "comme en vert"
     Go(v4);
 
-    actuators.trap.open();
-    Wait(2000);
-    actuators.trap.close();
+    // ToDo
+    //actuators.trap.open();
+    //Wait(2000);
+    //actuators.trap.close();
 
     Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux
@@ -320,6 +340,8 @@ void Robot::MatchSecondaryBlue(){
     match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
+    actuators.trap.open();
+    Wait(1000);
     actuators.Disengage();
     motion.steppers.Disengage();
 }
@@ -327,6 +349,9 @@ void Robot::MatchSecondaryBlue(){
 void Robot::MatchSecondaryGreen(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
+
+    //----ATTENTION----
+    DisableAvoidance();
 
     // Va chercher les balles
     // Lance la turbine
@@ -338,6 +363,9 @@ void Robot::MatchSecondaryGreen(){
     //Stop Turbine
     actuators.StopTurbine();
 
+    //----ATTENTION----
+    EnableAvoidance();
+
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
     actuators.Ungrab(RobotCompass::BC);
@@ -345,9 +373,10 @@ void Robot::MatchSecondaryGreen(){
     // Postionnement et orientation "comme en vert"
     Go(b4);
 
-    actuators.trap.open();
-    Wait(2000);
-    actuators.trap.close();
+    // ToDo 
+    //actuators.trap.open();
+    //Wait(2000);
+    //actuators.trap.close();
 
     Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux
@@ -392,6 +421,8 @@ void Robot::MatchSecondaryGreen(){
     match.AddToScore(wheelsOnPlate/2);
 
     // Fin de match
+    actuators.trap.open();
+    Wait(1000);
     actuators.Disengage();
     motion.steppers.Disengage();
 }
