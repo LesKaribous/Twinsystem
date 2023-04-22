@@ -151,14 +151,15 @@ void Robot::MatchPrimaryBlue(){
     // Va en dépose des balles
     Go(ballBlueBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
-    //recalage
-    ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
-    motion.SetAbsolute();
+    Go(ballBlueBasketPlus);
     // Dépose
     actuators.trap.open();
     Wait(2000);
     actuators.trap.close();
     match.AddToScore(exactCherryCounting);
+    //recalage
+    ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
+    motion.SetAbsolute();
 
     //----ATTENTION----
     EnableAvoidance();
@@ -242,14 +243,15 @@ void Robot::MatchPrimaryGreen(){
     // Va en dépose des balles
     Go(ballGreenBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
-    //recalage
-    ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
-    motion.SetAbsolute();
+    Go(ballBlueBasketPlus);
     // Dépose
     actuators.trap.open();
     Wait(2000);
     actuators.trap.close();
     match.AddToScore(exactCherryCounting);
+    //recalage
+    ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
+    motion.SetAbsolute();
     
     //----ATTENTION----
     EnableAvoidance();
