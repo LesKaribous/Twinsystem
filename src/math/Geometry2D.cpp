@@ -1,6 +1,6 @@
 #include "Geometry2D.h"
 #include "Geometry3D.h"
-#include <Math.h>
+#include <math.h>
 #include <Arduino.h>
 #include "Settings.h"
 

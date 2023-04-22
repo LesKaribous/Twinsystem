@@ -1,5 +1,5 @@
 #include "Geometry3D.h"
-#include <Math.h>
+#include <math.h>
 
 //---------- Vector3 ------------
 //Methods
