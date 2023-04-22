@@ -63,15 +63,17 @@ void Robot::TestOrientation(){
 
 void Robot::TestDetection(){
 
-	motion.SetAbsPosition({0,0,0});
+	motion.SetAbsPosition({10,10,0});
 	motion.SetAbsolute();
-
-	actuators.SuckBall();
-	Wait(1000);
-	actuators.DropBall();
 	
+	Wait(100);		
+	Turn(90);
+	Wait(100);
+	Turn(180);
+	Wait(100);
+	Turn(270);
+	Wait(2000);
 
-	Turn(30);
 	Go(100,0);
 	Wait(500);
 	Go(0,0);

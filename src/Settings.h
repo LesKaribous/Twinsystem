@@ -24,7 +24,7 @@ namespace Settings{
         GREEN  = true;
 
         const unsigned long 
-        MATCH_DURATION = 101000 ;
+        MATCH_DURATION = 100000 ;
 
         const float 
         FEEDRATE = 100; //%
