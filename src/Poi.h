@@ -65,6 +65,8 @@ namespace POI{
 		// Dépose des balles
 		const Vec2 ballBlueBasket   = Vec2(150,1675);  //ORANGE
 		const Vec2 ballGreenBasket  = Vec2(150,325);  //ORANGE
+		const Vec2 ballBlueBasketPlus   = Vec2(120,1675);  //ORANGE
+		const Vec2 ballGreenBasketPlus  = Vec2(120,325);  //ORANGE
 
 		const Vec2 blueEndPrimary   = Vec2(900,400);       //BLUE
 		const Vec2 blueEndSecondary = Vec2(1350,400);    //BLUE
