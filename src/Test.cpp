@@ -75,12 +75,6 @@ void Robot::TestDetection(){
 	actuators.Grab(RobotCompass::AB);
 	actuators.Grab(RobotCompass::BC);
 	actuators.Grab(RobotCompass::CA);
-
-	Wait(1000);
-
-	actuators.Close(RobotCompass::AB);
-	actuators.Close(RobotCompass::BC);
-	actuators.Close(RobotCompass::CA);
 	
 	Wait(1000);
 }
