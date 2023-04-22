@@ -243,7 +243,7 @@ void Robot::MatchPrimaryGreen(){
     // Va en dépose des balles
     Go(ballGreenBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
-    Go(ballBlueBasketPlus);
+    Go(ballGreenBasketPlus);
     // Dépose
     actuators.trap.open();
     Wait(2000);
@@ -252,7 +252,7 @@ void Robot::MatchPrimaryGreen(){
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
-    
+
     //----ATTENTION----
     EnableAvoidance();
 
