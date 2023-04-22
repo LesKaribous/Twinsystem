@@ -229,10 +229,12 @@ void Robot::WaitLaunch(){
 				}
 			}
 			if(ButtonReleased()){ //Recalage
-				if	   (IsBlue()  && IsPrimary()	) RecalagePrimaryBlue		();
-				else if(IsBlue()  && IsSecondary()	) RecalageSecondaryBlue		();
-				else if(IsGreen() && IsPrimary()	) RecalagePrimaryGreen		();
-				else if(IsGreen() && IsSecondary()	) RecalageSecondaryGreen	();
+				if	   (IsBlue()  && IsPrimary() ) 					RecalagePrimaryBlue();
+				else if(IsBlue()  && IsSecondary() && IsCherry() ) 	RecalageSecondaryBlue();
+				else if(IsBlue()  && IsSecondary() && IsCake() ) 	RecalageSecondaryCakeBlue();
+				else if(IsGreen() && IsPrimary() ) 					RecalagePrimaryGreen();
+				else if(IsGreen() && IsSecondary() && IsCherry() ) 	RecalageSecondaryGreen();
+				else if(IsGreen() && IsSecondary() && IsCake() ) 	RecalageSecondaryCakeGreen();
 				//TestOrientation();
 				//TestSteppers();
 			}
@@ -271,9 +273,11 @@ void Robot::StartMatch(){
 	//TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
-	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();
+	else if(IsBlue()  && IsSecondary() && IsCherry()) MatchSecondaryBlue();
+	else if(IsBlue()  && IsSecondary() && IsCake()	) MatchSecondaryCakeBlue();
 	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();
-	else if(IsGreen() && IsSecondary()	) MatchSecondaryGreen();
+	else if(IsGreen() && IsSecondary() && IsCherry()) MatchSecondaryGreen();
+	else if(IsGreen() && IsSecondary() && IsCake()	) MatchSecondaryCakeGreen();
 	motion.steppers.Disengage();
 }
 
@@ -356,6 +360,12 @@ bool Robot::IsBlue(){
 }
 bool Robot::IsGreen(){
 	return ui.inputs.teamSwitch.GetState() == Settings::Match::GREEN;
+}
+bool Robot::IsCake(){
+	return ui.inputs.strategySwitch.GetState() == Settings::Match::CAKE;
+}
+bool Robot::IsCherry(){
+	return ui.inputs.strategySwitch.GetState() == Settings::Match::CHERRY;
 }
 
 bool Robot::GetStrategyState(){
