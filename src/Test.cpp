@@ -66,15 +66,12 @@ void Robot::TestDetection(){
 	motion.SetAbsPosition({10,10,0});
 	motion.SetAbsolute();
 	
-	actuators.Open(RobotCompass::AB);
-	actuators.Open(RobotCompass::BC);
-	actuators.Open(RobotCompass::CA);
-
+	actuators.Lock(RobotCompass::AB);
+	actuators.Lock(RobotCompass::BC);
+	actuators.Lock(RobotCompass::CA);
 	Wait(1000);
-
-	actuators.Grab(RobotCompass::AB);
-	actuators.Grab(RobotCompass::BC);
-	actuators.Grab(RobotCompass::CA);
-	
+	actuators.Unlock(RobotCompass::AB);
+	actuators.Unlock(RobotCompass::BC);
+	actuators.Unlock(RobotCompass::CA);
 	Wait(1000);
 }
