@@ -282,15 +282,15 @@ void Robot::MatchSecondaryBlue(){
     // Stop la turbine
     actuators.StopTurbine();
 
-    //----ATTENTION----
-    EnableAvoidance();
-
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
     actuators.Ungrab(RobotCompass::BC);
     actuators.Ungrab(RobotCompass::CA);
     // Postionnement et orientation "comme en vert"
     Go(v4);
+
+    //----ATTENTION----
+    EnableAvoidance();
 
     // ToDo
     //actuators.trap.open();
@@ -363,15 +363,15 @@ void Robot::MatchSecondaryGreen(){
     //Stop Turbine
     actuators.StopTurbine();
 
-    //----ATTENTION----
-    EnableAvoidance();
-
     // Ouvre tous les actionneurs pour gagner du temps
     actuators.Ungrab(RobotCompass::AB);
     actuators.Ungrab(RobotCompass::BC);
     actuators.Ungrab(RobotCompass::CA);
     // Postionnement et orientation "comme en vert"
     Go(b4);
+
+    //----ATTENTION----
+    EnableAvoidance();
 
     // ToDo 
     //actuators.trap.open();
