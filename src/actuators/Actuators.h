@@ -17,7 +17,7 @@ namespace TwinSystem{
                 cherry_Close = 100,
                 right_Open = 140,
                 left_Open = 50,
-                cherry_Open = 50,
+                cherry_Open = 30,
                 right_Grab = 80,
                 left_Grab = 110;
             }
@@ -29,7 +29,7 @@ namespace TwinSystem{
                 cherry_Close = 100,
                 right_Open = 140,
                 left_Open = 50,
-                cherry_Open = 50,
+                cherry_Open = 30,
                 right_Grab = 80,
                 left_Grab = 110;
             }
@@ -41,7 +41,7 @@ namespace TwinSystem{
                 cherry_Close = 100,
                 right_Open = 140,
                 left_Open = 50,
-                cherry_Open = 50,
+                cherry_Open = 30,
                 right_Grab = 80,
                 left_Grab = 110;
             }

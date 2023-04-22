@@ -241,9 +241,11 @@ void Robot::WaitLaunch(){
 		case RobotState::ARMED :
 			if(StarterPulled()){ //Start match
 				_state = RobotState::STARTING;
+				DisableDisguisement();
 			}else if(StarterCancelled()){ //Unarm
 				_state = RobotState::IDLE;
 				UnfreezeSettings();
+				EnableDisguisement();
 				intercom.SendRequest("displayIntercom");
 				while(ButtonPressed()) Update(); //Wait for resetButton to be released
 			}
@@ -261,7 +263,6 @@ void Robot::WaitLaunch(){
 
 void Robot::StartMatch(){
 	match.Start();
-	DisableDisguisement();
 	ui.SetPage(Page::MATCH);
 	//actuators.Engage();
 	motion.steppers.Engage();
@@ -312,6 +313,7 @@ void Robot::EnableDisguisement(){
 }
 
 void Robot::DisableDisguisement(){
+strip.begin();
   for(int i=0; i<NUM_LEDS; i++) {
     strip.setPixelColor(i, 0, 0, 0);
   }
