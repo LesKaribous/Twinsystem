@@ -21,7 +21,8 @@ namespace TwinSystem{
 		ARMED,
 		STARTING,
 		STARTED,
-		STOPPED
+		FINISHING,
+		FINISHED
 	};
 
 	class System{
