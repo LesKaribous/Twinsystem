@@ -78,8 +78,6 @@ namespace TwinSystem{
         _sA.setTargetAbs(0);
         _sB.setTargetAbs(0);
         _sC.setTargetAbs(0);
-
-        _controller.stop();
     }
 	
 	void  StepperController::Run(){

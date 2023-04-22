@@ -41,20 +41,22 @@ void Robot::Update() {
 	if(_state == RobotState::FINISHING)	Console::trace("RoboState") <<"FINISHING" 	<< Console::endl;
 	if(_state == RobotState::FINISHED)	Console::trace("RoboState") <<"FINISHED" 	<< Console::endl;
 
-	if(_state == RobotState::STARTED){
-		Console::error("Robot") << "Checking lidar" << Console::endl;
+	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
+		//Console::error("Robot") << "Checking lidar" << Console::endl;
 		CheckLidar();
 		
 		if(match.IsNearlyFinished()){
 			motion.Cancel();
 			NearlyFinishedMatch();//go home
 		}
+
 		if(match.IsFinished()){
 			motion.Cancel();
 			FinishedMatch(); //Stop robot, motor disengage
 		}
-
 	}
+
+
 }
 
 void Robot::Go(Vec2 v){
@@ -248,13 +250,16 @@ void Robot::StartMatch(){
 
 void Robot::FinishedMatch(){
 	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
-		_state = RobotState::FINISHING;
+		_state = RobotState::FINISHED;
 		motion.Cancel();
 		if	   (IsBlue()  && IsPrimary()	) FinishPrimaryBlue();
 		else if(IsBlue()  && IsSecondary()	) FinishSecondaryBlue();
 		else if(IsGreen() && IsPrimary()	) FinishPrimaryGreen();
 		else if(IsGreen() && IsSecondary()	) FinishSecondaryGreen();
 		motion.steppers.Disengage();
+		actuators.Disengage();
+		EnableDisguisement();
+		while (true){delay(100);}
 	}
 }
 
