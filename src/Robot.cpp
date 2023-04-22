@@ -263,11 +263,11 @@ void Robot::StartMatch(){
 	match.Start();
 	DisableDisguisement();
 	ui.SetPage(Page::MATCH);
-	actuators.Engage();
+	//actuators.Engage();
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
-	//TestDetection();motion.steppers.Disengage();return;
+	TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();

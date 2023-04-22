@@ -12,38 +12,38 @@ namespace TwinSystem{
         namespace Gripper{
             namespace AB{
                 const int 
-                right_Close = 140,
-                left_Close = 50,
+                right_Close = 30,
+                left_Close = 160,
                 cherry_Close = 50,
-                right_Open = 30,
-                left_Open = 160,
+                right_Open = 140,
+                left_Open = 50,
                 cherry_Open = 100,
-                right_Grab = 130,
-                left_Grab = 60;
+                right_Grab = 100,
+                left_Grab = 90;
             }
             
             namespace BC{
                 const int 
-                right_Close = 140,
-                left_Close = 50,
+                right_Close = 30,
+                left_Close = 160,
                 cherry_Close = 50,
-                right_Open = 30,
-                left_Open = 160,
+                right_Open = 140,
+                left_Open = 50,
                 cherry_Open = 100,
-                right_Grab = 130,
-                left_Grab = 60;
+                right_Grab = 100,
+                left_Grab = 90;
             }
 
             namespace CA{
                 const int 
-                right_Close = 140,
-                left_Close = 50,
+                right_Close = 30,
+                left_Close = 160,
                 cherry_Close = 50,
-                right_Open = 30,
-                left_Open = 160,
+                right_Open = 140,
+                left_Open = 50,
                 cherry_Open = 100,
-                right_Grab = 130,
-                left_Grab = 60;
+                right_Grab = 100,
+                left_Grab = 90;
             }
         }
         namespace cherryPicker{

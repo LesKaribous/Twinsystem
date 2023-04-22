@@ -4,7 +4,7 @@
 namespace TwinSystem{
 
     struct BistableServoProps{
-        int pin, close, open, grab;
+        int pin, open, close, grab;
     };
 
     class BistableServo{
