@@ -85,6 +85,7 @@ public :
 	
     //Macro
     void ProbeBorder(TableCompass, RobotCompass);
+    void ProbeObstacle(Vec2 obstaclePosition,TableCompass, RobotCompass);
 
     //Tests
     void TestSteppers();

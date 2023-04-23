@@ -112,14 +112,18 @@ float Robot::GetMaxLidarDist(Vec2 pos, float angle){
 	if(tableHit.b > 2000) tableHit.b = 2000;
 	if(tableHit.b <0) tableHit.b = 0;
 
-	float maxdist = GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
-	
+
+	tableHit.sub(pos);
+
+
+	float maxdist = tableHit.mag();
+
 	Console::print("Current pos : {");
-	Console::print(motion.GetAbsPosition().a);
+	Console::print(pos.a);
 	Console::print(",");
-	Console::print(motion.GetAbsPosition().b);
+	Console::print(pos.b);
 	Console::print("}, Angle : ");
-	Console::print(motion.GetTargetDirection() * RAD_TO_DEG);
+	Console::print((angle * RAD_TO_DEG));
 	Console::print(", max Dist : ");
 	Console::println(maxdist);
 
@@ -297,6 +301,9 @@ void Robot::FinishedMatch(){
 		motion.steppers.Disengage();
 		actuators.Disengage();
 		EnableDisguisement();
+		ui.Update();
+		delay(1000);
+		//Suicide
 		while (true){delay(100);}
 	}
 }

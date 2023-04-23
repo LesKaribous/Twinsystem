@@ -128,7 +128,7 @@ namespace TwinSystem{
 		target.c *= DEG_TO_RAD;
 		
 		if(!_absolute){
-			if(target.magSq() == 0){
+			if(target.magSq() == 0){//magSq is faster thatn mag
 				Console::error("MotionControl") << "Move is null" << Console::endl;
 				_state = JobState::FINISHED; //robot is null
 				return;
@@ -161,7 +161,7 @@ namespace TwinSystem{
 		//Set new target
 		target.c *= DEG_TO_RAD;
 		if(!_absolute){
-			if(target.mag() == 0){
+			if(target.magSq() == 0){ //magSq is faster thatn mag
 				Console::error("MotionControl") << "Move is null" << Console::endl;
 				_state = JobState::FINISHED; //robot is null
 				return;
@@ -176,7 +176,7 @@ namespace TwinSystem{
 			_target = target;
 		}
 
-		
+		//Optimize target rotation while taking actual pos into acount
 		_relTarget  = ToRelativeTarget(_target);
 		_relTarget = OptmizeRelTarget(_relTarget);
 

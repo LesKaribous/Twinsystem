@@ -5,6 +5,8 @@
 //Useful macros
 #define BIT(x) (1 << x)
 
+#define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+
 template<typename T>
 using Shared = std::shared_ptr<T>; //Shared pointer exist as lons as you need it.
 template<typename T, typename ... Args>
