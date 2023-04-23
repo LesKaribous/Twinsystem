@@ -128,23 +128,32 @@ namespace TwinSystem{
 		target.c *= DEG_TO_RAD;
 		
 		if(!_absolute){
+			if(target.magSq() == 0){
+				Console::error("MotionControl") << "Move is null" << Console::endl;
+				_state = JobState::FINISHED; //robot is null
+				return;
+			}
 			_target = ToAbsoluteTarget(target);
 		}else{
+			if(target == _target){
+				Console::error("MotionControl") << "Move is null" << Console::endl;
+				_state = JobState::FINISHED; //robot is null
+				return;
+			}
 			_target = target;
 		}
 
-		OptmizeTarget();
-		Vec3 relativeTarget = ToRelativeTarget(target);
-		
+		_relTarget  = ToRelativeTarget(_target);
+		_relTarget = OptmizeRelTarget(_relTarget);
+
 		Console::info("MotionControl") << "Current position : " << GetAbsPosition() << Console::endl;
 		Console::info("MotionControl") << "Current target   : " << GetAbsTarget() << Console::endl;
-		Console::info("MotionControl") << "Current relative target : " << relativeTarget << Console::endl;
+		Console::info("MotionControl") << "Current relative target : " << _relTarget << Console::endl;
 		
 		_state = JobState::RUNNING; //robot is moving from now
 
 		steppers.DisableAsync();
-		steppers.Move(TargetToSteps(relativeTarget)); //Execute move await
-		Finish();
+		steppers.Move(TargetToSteps(_relTarget)); //Execute move await
 	}
 
 	//Raw relative move request
@@ -152,14 +161,25 @@ namespace TwinSystem{
 		//Set new target
 		target.c *= DEG_TO_RAD;
 		if(!_absolute){
+			if(target.mag() == 0){
+				Console::error("MotionControl") << "Move is null" << Console::endl;
+				_state = JobState::FINISHED; //robot is null
+				return;
+			}
 			_target = ToAbsoluteTarget(target);
 		}else{
+			if(target == _target){
+				Console::error("MotionControl") << "Move is null" << Console::endl;
+				_state = JobState::FINISHED; //robot is null
+				return;
+			}
 			_target = target;
 		}
 
-		OptmizeTarget();
-		_relTarget  = ToRelativeTarget(_target);
 		
+		_relTarget  = ToRelativeTarget(_target);
+		_relTarget = OptmizeRelTarget(_relTarget);
+
 		Console::info("MotionControl") << "Current position : " << GetAbsPosition() << Console::endl;
 		Console::info("MotionControl") << "Current target   : " << GetAbsTarget() << Console::endl;
 		Console::info("MotionControl") << "Current relative target : " << _relTarget << Console::endl;
@@ -170,9 +190,10 @@ namespace TwinSystem{
 		steppers.Move(TargetToSteps(_relTarget)); //Execute move await
 	}
 
-	void MotionControl::OptmizeTarget(){
-		while(_target.c > PI) _target.c -= 2.0f*PI;
-		while(_target.c <= -PI) _target.c += 2.0f*PI;
+	Vec3 MotionControl::OptmizeRelTarget(Vec3 relTarget){
+		while(relTarget.c > PI) relTarget.c -= 2.0f*PI;
+		while(relTarget.c <= -PI) relTarget.c += 2.0f*PI;
+		return relTarget;
 	}
 
 	Vec3 MotionControl::TargetToSteps(Vec3 relTarget){
