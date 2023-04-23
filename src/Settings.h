@@ -20,6 +20,9 @@ namespace Settings{
         PRIMARY   = false,
         SECONDARY = true,
 
+        CHERRY = false,
+        CAKE = true,
+
         BLUE   = false,
         GREEN  = true;
 

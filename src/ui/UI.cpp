@@ -190,13 +190,12 @@ namespace TwinSystem{
         screen.println("points");
     }
 
-
     void UI::updateStrategyState(bool stratState) {
         screen.fillRect(100, 10, 140, 15, ILI9341_BLACK);
         screen.setTextColor(ILI9341_WHITE);
         screen.setTextSize(2);
         screen.setCursor(100, 10);
-        if(stratState) screen.println("CAKE");
+        if(stratState==Settings::Match::CAKE) screen.println("CAKE");
         else screen.println("CHERRY");
     }
 

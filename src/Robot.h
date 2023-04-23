@@ -50,6 +50,8 @@ public :
     bool IsSecondary();
     bool IsBlue();
     bool IsGreen();
+    bool IsCake();
+    bool IsCherry();
 
     bool GetRobotType();
     bool GetStrategyState();
@@ -59,11 +61,15 @@ public :
     void RecalagePrimaryGreen();
     void RecalageSecondaryBlue();
     void RecalageSecondaryGreen();
+    void RecalageSecondaryCakeBlue();
+    void RecalageSecondaryCakeGreen();
 
     void MatchPrimaryBlue();
 	void MatchPrimaryGreen();
     void MatchSecondaryBlue();
     void MatchSecondaryGreen();
+    void MatchSecondaryCakeBlue();
+    void MatchSecondaryCakeGreen();
 
     void NearlyFinishPrimaryBlue();
     void NearlyFinishPrimaryGreen();

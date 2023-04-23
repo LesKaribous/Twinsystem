@@ -48,7 +48,7 @@ void Robot::RecalagePrimaryGreen(){
 }
 
 void Robot::RecalageSecondaryBlue(){
-    Console::info("Robot") << "Recalage Secondary Blue" << Console::endl;
+    Console::info("Robot") << "Recalage Secondary Blue Cherry" << Console::endl;
     motion.steppers.Engage();
 
     actuators.Close(RobotCompass::AB);
@@ -66,7 +66,7 @@ void Robot::RecalageSecondaryBlue(){
 }
 
 void Robot::RecalageSecondaryGreen(){
-    Console::info("Robot") << "Recalage Secondary Green" << Console::endl;
+    Console::info("Robot") << "Recalage Secondary Green Cherry" << Console::endl;
     motion.steppers.Engage();
 
     actuators.Close(RobotCompass::AB);
@@ -79,6 +79,46 @@ void Robot::RecalageSecondaryGreen(){
 	motion.SetAbsolute();
     Go(v3);
 	Align(RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
+
+    motion.steppers.Sleep();
+}
+
+void Robot::RecalageSecondaryCakeBlue(){
+    Console::info("Robot") << "Recalage Secondary Blue Cake" << Console::endl;
+    motion.steppers.Engage();
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
+    motion.SetAbsPosition(Vec3(-1,-1,PI));
+    ProbeBorder(TableCompass::NORTH, RobotCompass::BC);
+    ProbeBorder(TableCompass::WEST, RobotCompass::AB);
+	motion.SetAbsolute();
+    Go(b4);
+	Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
+
+    actuators.Ungrab(RobotCompass::AB);
+
+    motion.steppers.Sleep();
+}
+
+void Robot::RecalageSecondaryCakeGreen(){
+    Console::info("Robot") << "Recalage Secondary Green Cake " << Console::endl;
+    motion.steppers.Engage();
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
+    motion.SetAbsPosition(Vec3(-1,-1,PI));
+    ProbeBorder(TableCompass::NORTH, RobotCompass::BC);
+    ProbeBorder(TableCompass::EAST, RobotCompass::AB);
+	motion.SetAbsolute();
+    Go(v4);
+	Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
+
+    actuators.Ungrab(RobotCompass::AB);
 
     motion.steppers.Sleep();
 }
@@ -243,7 +283,7 @@ void Robot::MatchPrimaryGreen(){
     // Va en dépose des balles
     Go(ballGreenBasket);
     Align(RobotCompass::A, GetCompassOrientation(TableCompass::SOUTH));
-    Go(ballBlueBasketPlus);
+    Go(ballGreenBasketPlus);
     // Dépose
     actuators.trap.open();
     Wait(2000);
@@ -252,7 +292,7 @@ void Robot::MatchPrimaryGreen(){
     //recalage
     ProbeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.SetAbsolute();
-    
+
     //----ATTENTION----
     EnableAvoidance();
 
@@ -293,11 +333,6 @@ void Robot::MatchSecondaryBlue(){
 
     //----ATTENTION----
     EnableAvoidance();
-
-    // ToDo
-    //actuators.trap.open();
-    //Wait(2000);
-    //actuators.trap.close();
 
     Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux
@@ -375,11 +410,6 @@ void Robot::MatchSecondaryGreen(){
     //----ATTENTION----
     EnableAvoidance();
 
-    // ToDo 
-    //actuators.trap.open();
-    //Wait(2000);
-    //actuators.trap.close();
-
     Align(RobotCompass::AB, GetCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux
     actuators.Ungrab(RobotCompass::AB);
@@ -417,6 +447,118 @@ void Robot::MatchSecondaryGreen(){
     match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNW);
+    //Fin du match
+    Go(greenEndSecondary);
+
+    match.AddToScore(wheelsOnPlate/2);
+
+    // Fin de match
+    actuators.trap.open();
+    Wait(1000);
+    actuators.Disengage();
+    motion.steppers.Disengage();
+}
+
+void Robot::MatchSecondaryCakeBlue(){
+    motion.steppers.Engage();
+	motion.SetAbsolute();
+
+    actuators.Ungrab(RobotCompass::AB);
+	actuators.Ungrab(RobotCompass::BC);
+	actuators.Ungrab(RobotCompass::CA);
+
+    actuators.Ungrab(RobotCompass::AB);
+	Go(cakePinkNW);
+	actuators.Grab(RobotCompass::AB);
+	Align(RobotCompass::BC, GetCompassOrientation(TableCompass::SOUTH));
+
+    actuators.Ungrab(RobotCompass::BC);
+    Go(cakeYellowNW);
+    actuators.Grab(RobotCompass::BC);
+    Align(RobotCompass::CA, -135);
+
+    actuators.Ungrab(RobotCompass::CA);
+    Go(cakeBrownNW);
+    actuators.Grab(RobotCompass::CA);
+
+    // Depose les gateaux
+    Align(RobotCompass::AB, GetCompassOrientation(TableCompass::EAST));
+    actuators.Unlock(RobotCompass::AB);
+    Go(dropB2_01);
+    actuators.Ungrab(RobotCompass::AB);
+    match.AddToScore(cakeWithCherry);
+
+    actuators.Unlock(RobotCompass::BC);
+    actuators.Unlock(RobotCompass::CA);
+
+    Go(dropB2_02);
+    Align(RobotCompass::BC, GetCompassOrientation(TableCompass::EAST));
+    actuators.Ungrab(RobotCompass::BC);
+    match.AddToScore(cakeWithCherry);
+
+    Go(dropB2_03);
+    Align(RobotCompass::CA, GetCompassOrientation(TableCompass::EAST));
+    actuators.Ungrab(RobotCompass::CA);
+    match.AddToScore(cakeWithCherry);
+
+    Go(cakeBrownNE);
+
+    //Fin du match
+    Go(blueEndSecondary);
+
+    match.AddToScore(wheelsOnPlate/2);
+
+    // Fin de match
+    actuators.trap.open();
+    Wait(1000);
+    actuators.Disengage();
+    motion.steppers.Disengage();
+}
+
+void Robot::MatchSecondaryCakeGreen(){
+    motion.steppers.Engage();
+	motion.SetAbsolute();
+
+    actuators.Ungrab(RobotCompass::AB);
+	actuators.Ungrab(RobotCompass::BC);
+	actuators.Ungrab(RobotCompass::CA);
+
+    actuators.Ungrab(RobotCompass::AB);
+	Go(cakePinkNE);
+	actuators.Grab(RobotCompass::AB);
+	Align(RobotCompass::BC, GetCompassOrientation(TableCompass::SOUTH));
+
+    actuators.Ungrab(RobotCompass::BC);
+    Go(cakeYellowNE);
+    actuators.Grab(RobotCompass::BC);
+    Align(RobotCompass::CA, 135);
+
+    actuators.Ungrab(RobotCompass::CA);
+    Go(cakeBrownNE);
+    actuators.Grab(RobotCompass::CA);
+
+    // Depose les gateaux
+    Align(RobotCompass::AB, GetCompassOrientation(TableCompass::WEST));
+    actuators.Unlock(RobotCompass::AB);
+    Go(dropV2_01);
+    actuators.Ungrab(RobotCompass::AB);
+    match.AddToScore(cakeWithCherry);
+
+    actuators.Unlock(RobotCompass::BC);
+    actuators.Unlock(RobotCompass::CA);
+
+    Go(dropV2_02);
+    Align(RobotCompass::BC, GetCompassOrientation(TableCompass::WEST));
+    actuators.Ungrab(RobotCompass::BC);
+    match.AddToScore(cakeWithCherry);
+
+    Go(dropV2_03);
+    Align(RobotCompass::CA, GetCompassOrientation(TableCompass::WEST));
+    actuators.Ungrab(RobotCompass::CA);
+    match.AddToScore(cakeWithCherry);
+
+    Go(cakeBrownNW);
+
     //Fin du match
     Go(greenEndSecondary);
 
