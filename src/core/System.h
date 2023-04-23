@@ -27,7 +27,7 @@ namespace TwinSystem{
 
 	class System{
 	public :
-		void Initialize();
+		virtual void Initialize();
 		virtual void Update();
 
 		void OnEvent(Event& e);

@@ -31,7 +31,7 @@ namespace TwinSystem{
         void AlignAwait(RobotCompass, float orientation);
         void AlignAsync(RobotCompass, float orientation);
 
-        void OptmizeTarget();
+        Vec3 OptmizeRelTarget(Vec3 relTarget);
         Vec3 TargetToSteps(Vec3 relativeTarget);
         Vec3 ToRelativeTarget(Vec3 absTarget);
         Vec3 ToAbsoluteTarget(Vec3 absTarget);

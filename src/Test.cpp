@@ -34,18 +34,24 @@ void Robot::TestDetection(){
 	motion.SetAbsPosition({10,10,0});
 	motion.SetAbsolute();
 
-	DisableAvoidance();
-	Turn(0);
+	//DisableAvoidance();
+	Turn(10);
+	motion.GetAbsPosition().a;
+	Turn(10);
+	motion.GetAbsPosition().b;
+	Turn(10);
+	motion.GetAbsoluteTargetDirection();
+	Turn(10);
+
 	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
 
 	Turn(90);
-	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
 	
 	Turn(180);
-	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
 	
 	Turn(270);
-	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
 	
-
 }
