@@ -39,10 +39,10 @@ namespace POI{
 		// Distributeurs de balles
 		// Distributeur SOUTH
 		const Vec2 ballBeginSE  = Vec2(300,1125); //RED
-		const Vec2 ballEndSE    = Vec2(150,1125);   //RED
+		const Vec2 ballEndSE    = Vec2(200,1125);   //RED
 
 		const Vec2 ballBeginSW  = Vec2(300,875);  //RED
-		const Vec2 ballEndSW    = Vec2(150,875);    //RED
+		const Vec2 ballEndSW    = Vec2(200,875);    //RED
 
 		// Distributeur NORTH
 		const Vec2 ballBeginNE  = Vec2(2700,1125);//RED
@@ -63,8 +63,9 @@ namespace POI{
 
 		// ------------------------------------------
 		// Dépose des balles
-		const Vec2 ballBlueBasket   = Vec2(150,1675);  //ORANGE
-		const Vec2 ballGreenBasket  = Vec2(150,325);  //ORANGE
+		const Vec2 ballBlueBasket   = Vec2(200,1675);  //ORANGE
+		const Vec2 ballGreenBasket  = Vec2(200,325);  //ORANGE
+		
 		const Vec2 ballBlueBasketPlus   = Vec2(120,1675);  //ORANGE
 		const Vec2 ballGreenBasketPlus  = Vec2(120,325);  //ORANGE
 
@@ -77,18 +78,18 @@ namespace POI{
 		// ------------------------------------------
 		// Dépose des cakes
 		// Blue B1
-		const Vec2 dropBlue1 = Vec2(180,1800);
-		const Vec2 dropBlue2 = Vec2(320,1800);
-		const Vec2 dropBlue3 = Vec2(460,1800);
+		const Vec2 dropBlue1 = Vec2(180,1760);
+		const Vec2 dropBlue2 = Vec2(320,1760);
+		const Vec2 dropBlue3 = Vec2(460,1760);
 		
 		const Vec2 retreatBlue1 = Vec2(180,1600);
 		const Vec2 retreatBlue2 = Vec2(320,1600);
 		const Vec2 retreatBlue3 = Vec2(460,1600);
 
 		// Green V1
-		const Vec2 dropGreen1 = Vec2(180,200);
-		const Vec2 dropGreen2 = Vec2(320,200);
-		const Vec2 dropGreen3 = Vec2(460,200);
+		const Vec2 dropGreen1 = Vec2(180,260);
+		const Vec2 dropGreen2 = Vec2(320,260);
+		const Vec2 dropGreen3 = Vec2(460,260);
 				
 		const Vec2 retreatGreen1 = Vec2(180,400);
 		const Vec2 retreatGreen2 = Vec2(320,400);

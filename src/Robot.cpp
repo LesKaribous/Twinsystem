@@ -269,7 +269,7 @@ void Robot::StartMatch(){
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
-	TestDetection(); motion.steppers.Disengage(); return;
+	//TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary() && IsCherry()) MatchSecondaryBlue();
