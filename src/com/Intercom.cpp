@@ -96,7 +96,7 @@ namespace TwinSystem{
            if (incomingMessage.startsWith("ping")) {
                 OnPingReceived();
             } else if (incomingMessage.startsWith("pong")) {
-                OnConnectionSuccess();
+                if(!IsConnected())OnConnectionSuccess();
             }else if (!_pendingRequest.empty()) {
                 int separatorIndex = incomingMessage.indexOf(':');
                 if (separatorIndex > 0) {

@@ -8,7 +8,9 @@ public :
     Robot();
     ~Robot(){};
 
+
     //Sytem routines
+    void Initialize() override;
     void Update() override;
     void PollEvents() override;
 

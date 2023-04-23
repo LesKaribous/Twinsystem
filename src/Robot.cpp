@@ -17,8 +17,6 @@ void OnDummyRequestResponse(String answer){
 }
 
 
-
-
 Robot::Robot(){
 	
 	_state = RobotState::IDLE; //Do not remove
@@ -29,6 +27,14 @@ Robot::Robot(){
 	_probedX = false, 
 	_probedY = false;
 	_probing = false;
+}
+
+
+void Robot::Initialize(){
+	System::Initialize();
+	strip.begin();
+
+	EnableDisguisement();
 }
 
 void Robot::Update() {
@@ -269,7 +275,7 @@ void Robot::StartMatch(){
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
-	TestDetection(); motion.steppers.Disengage(); return;
+	//TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary() && IsCherry()) MatchSecondaryBlue();
@@ -308,7 +314,6 @@ void Robot::NearlyFinishedMatch(){
 }
 
 void Robot::EnableDisguisement(){
-  strip.begin();
   for(int i=0; i<NUM_LEDS; i++) {
     strip.setPixelColor(i, 0, 0, 255);
   }
@@ -316,7 +321,6 @@ void Robot::EnableDisguisement(){
 }
 
 void Robot::DisableDisguisement(){
-strip.begin();
   for(int i=0; i<NUM_LEDS; i++) {
     strip.setPixelColor(i, 0, 0, 0);
   }
