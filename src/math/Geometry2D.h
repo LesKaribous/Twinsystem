@@ -14,9 +14,9 @@ struct Vec2 {
     Vec2();
     Vec2(float, float);
 
-    Vec2& add(Vec2&);
-    Vec2& sub(Vec2&);
-    Vec2& dist(Vec2&);
+    Vec2& add(const Vec2&);
+    Vec2& sub(const Vec2&);
+    Vec2& dist(const Vec2&);
     Vec2& mult(float);
     Matrix2x2 toMatrix() const;
 
@@ -32,14 +32,14 @@ struct Vec2 {
     float magSq();
     float heading();
 
-    Vec2 copy();
+    Vec2 copy() const;
 
-    static Vec2 add(Vec2&, Vec2&);
-    static Vec2 sub(Vec2&, Vec2&);
-    static Vec2 dist(Vec2&, Vec2&);
-    static float angleBetween(Vec2&, Vec2&);
-    static float dot(Vec2&, Vec2&);
-    static float det(Vec2&, Vec2&);
+    static Vec2 add(const Vec2&, const Vec2&);
+    static Vec2 sub( const Vec2&, const Vec2&);
+    static Vec2 dist( const Vec2&, const Vec2&);
+    static float angleBetween(const Vec2&, const Vec2&);
+    static float dot( const Vec2&, const Vec2&);
+    static float det( const Vec2&, const Vec2&);
 
     void operator= (const Vec3&);
 };
