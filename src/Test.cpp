@@ -4,39 +4,7 @@
 #include "debug/Console.h"
 
 void Robot::TestSteppers(){
-	/*
-	motion.steppers.DisableAsync();
-	motion.steppers.Move(Vec3(1000,0,0));
-	motion.steppers.Move(Vec3(0,1000,0));
-	motion.steppers.Move(Vec3(0,0,1000));
-	motion.steppers.Sleep();
-	
 
-	motion.steppers.EnableAsync();
-	motion.steppers.Move(Vec3(1000,0,0));
-	WaitUntil(motion.steppers);
-	motion.steppers.Move(Vec3(-1000,0,0));
-	WaitUntil(motion.steppers);
-
-	motion.steppers.Move(Vec3(0,1000,0));
-	WaitUntil(motion.steppers);
-	motion.steppers.Move(Vec3(0,-1000,0));
-	WaitUntil(motion.steppers);
-
-	motion.steppers.Move(Vec3(0,0,1000));
-	WaitUntil(motion.steppers);
-	motion.steppers.Move(Vec3(0,0,-1000));
-	WaitUntil(motion.steppers);
-
-
-	motion.steppers.Move(Vec3(1000,1000,1000));
-	WaitUntil(motion.steppers);
-	motion.steppers.Move(Vec3(-1000,-1000,-1000));
-	WaitUntil(motion.steppers);
-
-	motion.steppers.Sleep();
-	*/
-	
 	motion.SetAbsPosition(Vec3(0,0,0));
 	motion.SetAbsolute();
 	Go(100,0);
@@ -65,13 +33,19 @@ void Robot::TestDetection(){
 
 	motion.SetAbsPosition({10,10,0});
 	motion.SetAbsolute();
+
+	DisableAvoidance();
+	Turn(0);
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+
+	Turn(90);
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
 	
-	actuators.Lock(RobotCompass::AB);
-	actuators.Lock(RobotCompass::BC);
-	actuators.Lock(RobotCompass::CA);
-	Wait(1000);
-	actuators.Unlock(RobotCompass::AB);
-	actuators.Unlock(RobotCompass::BC);
-	actuators.Unlock(RobotCompass::CA);
-	Wait(1000);
+	Turn(180);
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	
+	Turn(270);
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	
+
 }

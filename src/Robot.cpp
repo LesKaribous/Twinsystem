@@ -16,20 +16,7 @@ void OnDummyRequestResponse(String answer){
 	else obstacle = false;
 }
 
-//mm rad (absolute)
-float GetMaxLidarDist(Vec2 pos, float angle){
 
-	Vec2 tableHit = Vec2(3000,0);
-	tableHit.rotate(angle);
-	tableHit = Vec2::add(pos, tableHit);
-
-	if(tableHit.a > 3000) tableHit.a = 3000;
-	if(tableHit.a < 0) tableHit.a = 0;
-	if(tableHit.b > 3000) tableHit.b = 2000;
-	if(tableHit.b > 3000) tableHit.b = 0;
-
-	return Vec2::sub(tableHit, pos).mag();
-}
 
 
 Robot::Robot(){
@@ -107,7 +94,31 @@ void Robot::GoPolar(float heading, float length){
 	if(wasAbsolute) motion.SetAbsolute();
 }
 
+//mm rad (absolute)
+float Robot::GetMaxLidarDist(Vec2 pos, float angle){
 
+	Vec2 tableHit = Vec2(3000,0);
+	tableHit.rotate(angle);
+	tableHit = Vec2::add(pos, tableHit);
+
+	if(tableHit.a > 3000) tableHit.a = 3000;
+	if(tableHit.a < 0) tableHit.a = 0;
+	if(tableHit.b > 2000) tableHit.b = 2000;
+	if(tableHit.b <0) tableHit.b = 0;
+
+	float maxdist = GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	
+	Console::print("Current pos : {");
+	Console::print(motion.GetAbsPosition().a);
+	Console::print(",");
+	Console::print(motion.GetAbsPosition().b);
+	Console::print("}, Angle : ");
+	Console::print(motion.GetTargetDirection() * RAD_TO_DEG);
+	Console::print(", max Dist : ");
+	Console::println(maxdist);
+
+	return maxdist;
+}
 
 void Robot::CheckLidar(){
 	if(_avoidance && motion.IsBusy()){
@@ -116,18 +127,6 @@ void Robot::CheckLidar(){
 			float heading = -motion.GetTargetDirection() * RAD_TO_DEG;
 			heading = fmod(heading, 360.0);
 			if(heading < 0) heading += 360.0;
-
-			//int maxdist = GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
-			
-			/*
-			Console::print("Current pos : {");
-			Console::print(motion.GetAbsPosition().a);
-			Console::print(",");
-			Console::print(motion.GetAbsPosition().b);
-			Console::print("}, Angle : ");
-			Console::print(motion.GetTargetDirection() * RAD_TO_DEG);
-			Console::print(", max Dist : ");
-			Console::println(maxdist);*/
 
 			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
 		}
@@ -268,7 +267,7 @@ void Robot::StartMatch(){
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
-	//TestDetection(); motion.steppers.Disengage(); return;
+	TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary()	) MatchSecondaryBlue();

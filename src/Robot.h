@@ -33,6 +33,8 @@ public :
 
     //Deguisement
 
+    float GetMaxLidarDist(Vec2 pos, float angle);
+
     void EnableDisguisement();
     void DisableDisguisement();
 
