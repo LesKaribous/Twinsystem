@@ -7,18 +7,7 @@ void Robot::TestSteppers(){
 
 	motion.SetAbsPosition(Vec3(0,0,0));
 	motion.SetAbsolute();
-	Go(100,0);
-	Go(0,0);
-
-	Turn(90);
-	Turn(0);
-
-	motion.SetRelative();
-	Go(100,0);
-	Go(-100,0);
-
-	Turn(90);
-	Turn(-90);
+	Go(1000,1000);
 }
 
 void Robot::TestOrientation(){
@@ -35,23 +24,19 @@ void Robot::TestDetection(){
 	motion.SetAbsolute();
 
 	//DisableAvoidance();
-	Turn(10);
-	motion.GetAbsPosition().a;
-	Turn(10);
-	motion.GetAbsPosition().b;
-	Turn(10);
-	motion.GetAbsoluteTargetDirection();
-	Turn(10);
 
-	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	Console::print("Current pos : {");
+	Console::print(motion.GetAbsPosition().a);
+	Console::print(",");
+	Console::print(motion.GetAbsPosition().b);
+	Console::println("}");
 
-	Turn(90);
-	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), 0);
+
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), 90*DEG_TO_RAD);
 	
-	Turn(180);
-	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), 270*DEG_TO_RAD);
 	
-	Turn(270);
-	//GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), motion.GetAbsoluteTargetDirection());
+	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), -90*DEG_TO_RAD);
 	
 }

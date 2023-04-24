@@ -41,23 +41,26 @@ Vec2::Vec2(float x, float y){
     a = x; b = y;
 }
 
-Vec2 Vec2::copy(){
-    return *this;
+Vec2 Vec2::copy() const{
+    Vec2 r;
+    r.a = a;
+    r.b = b;
+    return r;
 }
 
-Vec2& Vec2::add(Vec2& v){
+Vec2& Vec2::add(const Vec2& v){
     a += v.a;
     b += v.b;
     return *this;
 }
 
-Vec2& Vec2::sub(Vec2& v){
+Vec2& Vec2::sub(const Vec2& v){
     a -= v.a; 
     b -= v.b;
     return *this;
 }
 
-Vec2& Vec2::dist(Vec2& v){
+Vec2& Vec2::dist(const Vec2& v){
     return this->sub(v);
 }
 
@@ -131,31 +134,34 @@ Vec2& Vec2::rotate(float x){
 }
 
 //Static Methods
-Vec2 Vec2::add(Vec2& a, Vec2& b){
-    a.a += b.a; 
-    a.b += b.b;
-    return a;
+Vec2 Vec2::add(const Vec2& a, const Vec2& b){
+    Vec2 r = a.copy();
+    r.a += b.a; 
+    r.b += b.b;
+    return r;
 }
 
-Vec2 Vec2::sub(Vec2& a, Vec2& b){
-    a.a -= b.a; a.b -= b.b;
-    return a;
+Vec2 Vec2::sub(const Vec2& a, const Vec2& b){
+    Vec2 r = a.copy();
+    r.a -= b.a; 
+    r.b -= b.b;
+    return r;
 }
 
-float Vec2::dot(Vec2& a, Vec2& b){
+float Vec2::dot(const Vec2& a, const Vec2& b){
     return a.a * b.a + a.b * b.b;
 }
 
-float Vec2::det(Vec2& a, Vec2& b){
+float Vec2::det(const Vec2& a, const Vec2& b){
     return a.a * b.a - a.b * b.b;
 }
 
-Vec2 Vec2::dist(Vec2& a, Vec2& b){
-    a.sub(b);
-    return a;
+Vec2 Vec2::dist(const Vec2& a, const Vec2& b){
+    Vec2 r = a.copy().sub(b);
+    return r;
 }
 
-float Vec2::angleBetween(Vec2& a, Vec2& b){
+float Vec2::angleBetween(const Vec2& a, const Vec2& b){
     return atan2(det(a,b), dot(a,b));
     //return acosf( Vec2::dot(a,b) / a.mag() * b.mag() );
 }

@@ -106,25 +106,20 @@ float Robot::GetMaxLidarDist(Vec2 pos, float angle){
 	Vec2 tableHit = Vec2(3000,0);
 	tableHit.rotate(angle);
 	tableHit = Vec2::add(pos, tableHit);
-
 	if(tableHit.a > 3000) tableHit.a = 3000;
 	if(tableHit.a < 0) tableHit.a = 0;
 	if(tableHit.b > 2000) tableHit.b = 2000;
 	if(tableHit.b <0) tableHit.b = 0;
-
-
 	tableHit.sub(pos);
-
-
 	float maxdist = tableHit.mag();
 
-	Console::print("Current pos : {");
+	Console::print("Lidar current pos : {");
 	Console::print(pos.a);
 	Console::print(",");
 	Console::print(pos.b);
 	Console::print("}, Angle : ");
 	Console::print((angle * RAD_TO_DEG));
-	Console::print(", max Dist : ");
+	Console::print(", max lidar dist : ");
 	Console::println(maxdist);
 
 	return maxdist;
@@ -279,6 +274,7 @@ void Robot::StartMatch(){
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
+	//TestSteppers(); motion.steppers.Disengage(); return;
 	//TestDetection(); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
