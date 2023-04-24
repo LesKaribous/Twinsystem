@@ -273,12 +273,15 @@ void Robot::MatchPrimaryGreen(){
     //recalage
     Go(retreatGreen1);
     ProbeBorder(TableCompass::SOUTH, RobotCompass::C);
-    motion.SetAbsolute();
+    motion.SetAbsolute(); // Todo : utile ? Déja fait dans ProbeBorder ?
     //Va chercher les balles
-    Align(RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
     actuators.SuckBall();
-    Go(ballBeginSW);
+    Align(RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
+    // Todo Probe Ball support
     Go(ballEndSW);
+    ProbeObstacle(Vec2(200,990),TableCompass::EAST,RobotCompass::A); // Todo : POI pour probe obstacle
+    Go(ballEndSW);
+    Go(ballBeginSW);
     actuators.StopTurbine();
     // Va en dépose des balles
     Go(ballGreenBasket);
