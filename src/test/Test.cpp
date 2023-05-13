@@ -1,3 +1,5 @@
+/*
+
 #include "Robot.h"
 #include "Settings.h"
 
@@ -40,3 +42,17 @@ void Robot::TestDetection(){
 	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), -90*DEG_TO_RAD);
 	
 }
+
+
+void Robot::TestMotion(){
+
+	motion.SetAbsPosition({0,0,0});
+	motion.SetAbsolute();
+
+	DisableAvoidance();
+
+	GoAlign(Vec2(100,0), RobotCompass::A, GetCompassOrientation(TableCompass::EAST));
+	
+}
+
+*/

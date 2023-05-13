@@ -1,5 +1,5 @@
 #pragma once
-#include "core/System.h"
+#include "system.h"
 #include "Match.h"
 using namespace TwinSystem;
 
@@ -24,6 +24,9 @@ public :
     void Turn(float);
     void Go(Vec2);
     void Go(float x, float y);
+
+    void GoAlign(Vec2, RobotCompass, float orientation); //Go align
+
     void GoPolar(float heading, float length);
     void Align(RobotCompass, float orientation);
 
@@ -89,6 +92,7 @@ public :
 
     //Tests
     void TestSteppers();
+    void TestMotion();
     void TestDetection();
     void TestOrientation();
 

@@ -1,6 +1,6 @@
 #pragma once
-
-#include "ConsoleStream.h"
+#include "core/lib.h"
+#include "consoleStream.h"
 
 namespace TwinSystem {
 

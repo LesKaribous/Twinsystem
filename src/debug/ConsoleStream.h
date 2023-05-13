@@ -1,7 +1,8 @@
 #pragma once
-#include "core/Core.h"
-#include "math/Geometry.h"
-#include "ConsoleLevel.h"
+#include "core/lib.h"
+#include "consoleLevel.h"
+
+#include "math/geometry.h"
 
 namespace TwinSystem{
 

@@ -1,17 +1,9 @@
-#include "TwinSystem.h"
-#include "Robot.h"
+#include "system.h"
 
-void setup(){
-	Console::Initialize();
-    Console::SetLevel(ConsoleLevel::_INFO);
-}
+System sys;
+
+void setup(){}
 
 void loop(){
-	Robot robot; //Start the robot
-	
-	robot.Initialize();
-	robot.WaitLaunch();
-	robot.StartMatch();
-    Console::println("Fin du programme");
-    while(true);//End of the program
+	sys.update(); //Update the whole system
 }

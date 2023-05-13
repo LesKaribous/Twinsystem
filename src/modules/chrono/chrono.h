@@ -2,7 +2,7 @@
 
 namespace TwinSystem{
 
-    class Match{
+    class Chronometer{
     public:
 
         enum class State{
@@ -11,7 +11,7 @@ namespace TwinSystem{
             FINISHED
         };
 
-        Match();
+        Chronometer();
         void Start();
         bool IsFinished();
         bool IsNearlyFinished();

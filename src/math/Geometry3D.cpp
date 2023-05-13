@@ -1,5 +1,4 @@
-#include "Geometry3D.h"
-#include <math.h>
+#include "geometry3D.h"
 
 //---------- Vector3 ------------
 //Methods
@@ -8,7 +7,7 @@ Vec3::Vec3(){
     a = b = c = 0.0f;
 }
 
-Vec3::Vec3(Vec2 v, float f){
+Vec3::Vec3(const Vec2& v, float f){
     a = v.a; b = v.b; c = f; 
 }
 
@@ -24,33 +23,30 @@ Vec3 Vec3::copy() const{
     return *this;
 }
 
-Vec3& Vec3::add(Vec3& v){
+Vec3& Vec3::add(const Vec3& v){
     a += v.a; 
     b += v.b;  
     c += v.c;
     return *this;
 }
 
-Vec3& Vec3::sub(Vec3& v){
+Vec3& Vec3::sub(const Vec3& v){
     a -= v.a; 
     b -= v.b; 
     c -= v.c;
     return *this;
 }
 
-Vec3& Vec3::dist(Vec3& v){
-    return this->sub(v);
+
+float Vec3::dot(const Vec3& a) const{
+    return Vec3::dot(*this, a);
 }
 
-float Vec3::dot(Vec3& a){
-    Vec3::dot(*this, a);
-}
-
-float Vec3::mag(){
+float Vec3::mag() const{
     return sqrt(magSq());
 }
 
-float Vec3::magSq(){
+float Vec3::magSq() const{
     return a*a + b*b + c*c;
 }
 
@@ -58,6 +54,13 @@ Vec3& Vec3::mult(float v){
     a *= v; 
     b *= v;
     c *= v;
+    return *this;
+}
+
+Vec3& Vec3::div(float v){
+    a /= v; 
+    b /= v;
+    c /= v;
     return *this;
 }
 
@@ -71,12 +74,6 @@ Vec3& Vec3::mult(Matrix3x3 m){
     return *this;
 }
 
-Matrix3x3 Vec3::toMatrix(){
-    return {a,0,0,
-            0,b,0,
-            0,0,c};
-}
-
 Vec3& Vec3::rotateZ(float x){
 
     this->mult({ cosf(x), -sinf(x), 0, 
@@ -87,28 +84,99 @@ Vec3& Vec3::rotateZ(float x){
 }
 
 //Static Methods
-Vec3 Vec3::add(Vec3& a, Vec3& b){
-    a.a += b.a; a.b += b.b;
-    return a;
+Vec3 Vec3::add(const Vec3& a, const Vec3& b){
+    Vec3 result = a;
+
+    result.a += result.a; 
+    result.b += result.b; 
+    result.c += result.c;
+    
+    return result;
 }
 
-Vec3 Vec3::sub(Vec3& a, Vec3& b){
-    a.a -= b.a; a.b -= b.b;
-    return a;
+Vec3 Vec3::sub(const Vec3& a,const Vec3& b){
+    Vec3 result = a;
+
+    result.a -= result.a; 
+    result.b -= result.b; 
+    result.c -= result.c;
+
+    return result;
 }
 
-float Vec3::dot(Vec3& a, Vec3& b){
+float Vec3::dot(const Vec3& a,const Vec3& b){
     return a.a * b.a + a.b * b.b + a.c * b.c;
 }
 
-Vec3 Vec3::dist(Vec3& a, Vec3& b){
-    a.sub(b);
-    return a;
+float Vec3::distanceBetween(const Vec3& a,const Vec3& b){
+    return sub(a,b).mag();
 }
 
-float Vec3::angleBetween(Vec3& a, Vec3& b){
-    return acosf(a.dot(b) / a.mag() * b.mag());
+float Vec3::angleBetween(const Vec3& a, const Vec3& b){
+    return acosf(dot(a,b) / a.mag() * b.mag());
 }
+
+
+Vec3::operator Vec2() const{
+    Vec2 v = Vec2(a, b);
+    return v;
+}
+Vec3& Vec3::operator= (const Vec3& u){
+    a=u.a;
+    b=u.b;
+    c=u.c;
+    return *this;
+}
+Vec3& Vec3::operator+=(const Vec3& u){
+    a+=u.a;
+    b+=u.b;
+    c+=u.c;
+    return *this;
+}
+Vec3& Vec3::operator-=(const Vec3& u){
+    a-=u.a;
+    b-=u.b;
+    c-=u.c;
+    return *this;
+}
+Vec3& Vec3::operator+=(const Vec2& u){
+    a+=u.a;
+    b+=u.b;
+    return *this;
+}
+Vec3& Vec3::operator-=(const Vec2& u){
+    a-=u.a;
+    b-=u.b;
+    return *this;
+}
+
+Vec3& Vec3::operator+=(float u){
+    a+=u;
+    b+=u;
+    c+=u;
+    return *this;
+}
+Vec3& Vec3::operator-=(float u){
+    a-=u;
+    b-=u;
+    c-=u;
+    return *this;
+}
+Vec3& Vec3::operator*=(float u){
+    a*=u;
+    b*=u;
+    c*=u;
+    return *this;
+}
+Vec3& Vec3::operator/=(float u){
+    a/=u;
+    b/=u;
+    c/=u;
+    return *this;
+}
+
+
+
 
 
 //---------- Matrix3x3 ------------
@@ -233,19 +301,11 @@ float Matrix3x3::trace(){
     return a+e+i;
 }
 
-
 //Static methods
 Matrix3x3 Matrix3x3::GetIdentity(){
     return {1,0,0,
             0,1,0,
             0,0,1};
-}
-
-Vec3::operator Vec2() const{ 
-    Vec2 result;
-    result.a = a;
-    result.b = b;
-    return result; 
 }
 
 bool operator== (const Vec3& a, const Vec3& b){ 
@@ -258,7 +318,6 @@ bool operator!= (const Vec3& a, const Vec3& b){
             a.b != b.b || 
             a.c != b.c  );
 }
-
 
 bool operator== (const Matrix3x3& a, const Matrix3x3& b){ 
     return (a.a == b.a &&
@@ -282,3 +341,29 @@ bool operator!= (const Matrix3x3& a, const Matrix3x3& b){
             a.h != b.h ||
             a.i != b.i );
 }
+
+Vec3 operator+(const Vec3& u, const Vec3& v){
+    return Vec3(u.x + v.x, u.y + v.y, u.z + v.z);
+}
+Vec3 operator-(const Vec3& u, const Vec3& v){
+    return Vec3(u.x - v.x, u.y - v.y, u.z - v.z);
+}
+Vec3 operator+(const Vec3& u, const Vec2& v){
+    return Vec3(u.x + v.x, u.y + v.y, u.z);
+}
+Vec3 operator-(const Vec3& u, const Vec2& v){
+    return Vec3(u.x - v.x, u.y - v.y, u.z);
+}
+
+Vec3 operator*(const Vec3& u, const Vec3& v){ //hamadard product
+    return Vec3(u.a * v.a, u.b * v.b, u.c * v.c);
+} 
+Vec3 operator/(const Vec3& u, const Vec3& v){ //hamadard division
+    return Vec3(u.a / v.a, u.b / v.b, u.c / v.c);
+} 
+Vec3 operator*(const Vec3& u, float v){ //scalar multiplication
+    return Vec3(u.a*v, u.b*v, u.c*v);
+} 
+Vec3 operator/(const Vec3& u, float v){ //scalar division
+    return Vec3(u.a/v, u.b/v, u.c/v);
+} 

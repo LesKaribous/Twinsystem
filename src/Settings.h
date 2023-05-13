@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Pin.h"
+#include "pin.h"
 #include "math/Geometry.h"
 
 // Struct definition
@@ -27,7 +27,7 @@ namespace Settings{
         GREEN  = true;
 
         const unsigned long 
-        MATCH_DURATION = 100000 ;
+        DURATION = 100000 ;
 
         const float 
         FEEDRATE = 100; //%

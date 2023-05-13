@@ -1,8 +1,5 @@
-#include "Geometry2D.h"
-#include "Geometry3D.h"
-#include <math.h>
-#include <Arduino.h>
-#include "Settings.h"
+#include "geometry2D.h"
+#include "geometry3D.h"
 
 //---------- Polar Vec --------
 
@@ -125,8 +122,8 @@ Vec2& Vec2::mult(Matrix2x2 m){
 
 Vec2& Vec2::rotate(float x){
 
-    while(x > PI) x -= 2.0f*PI;
-    while(x < -PI) x += 2.0f*PI;
+    while(x > M_PI) x -= 2.0f*M_PI;
+    while(x < -M_PI) x += 2.0f*M_PI;
 
     this->mult( { cosf(x), -sinf(x), 
                   sinf(x), cosf(x)} );
@@ -262,21 +259,74 @@ Matrix2x2 Matrix2x2::GetIdentity(){
 }
 
 
-
 // Operators overload
+Vec2 operator+(const Vec2& a, const Vec2& b){
+    Vec2 r = a;
+    r.a += b.a;
+    r.b += b.b;
+    return r;
+}
+Vec2 operator-(const Vec2& a, const Vec2& b){
+    Vec2 r = a;
+    r.a -= b.a;
+    r.b -= b.b;
+    return r;
+}
+Vec2 operator*(const Vec2& a, float u){
+    Vec2 r = a;
+    r.a *= u;
+    r.b *= u;
+    return r;
+}
+Vec2 operator/(const Vec2& a, float u ){
+    Vec2 r = a;
+    r.a /= u;
+    r.b /= u;
+    return r;
+}
 
-void Vec2::operator= (const Vec3& copy){
+Vec2& Vec2::operator+=(const Vec2& u ){
+    a += u.a;
+    b += u.b;
+    return *this;
+}
+Vec2& Vec2::operator-=(const Vec2& u ){
+    a -= u.a;
+    b -= u.b;
+    return *this;
+}
+Vec2& Vec2::operator+=(float u ){
+    a += u;
+    b += u;
+    return *this;
+}
+Vec2& Vec2::operator-=(float u ){
+    a -= u;
+    b -= u;
+    return *this;
+}
+Vec2& Vec2::operator*=(float u){
+    a *= u;
+    b *= u;
+    return *this;
+}
+Vec2& Vec2::operator/=(float u ){
+    a /= u;
+    b /= u;
+    return *this;
+}
+
+Vec2& Vec2::operator=(const Vec2& copy){
     a = copy.a;
     b = copy.b;
+    return *this;
 }
 
 bool operator== (const Vec2& a, const Vec2& b){ 
-    return (a.a == b.a &&
-                a.b == b.b);
+    return (a.a == b.a && a.b == b.b);
 }
 bool operator!= (const Vec2& a, const Vec2& b){ 
-    return (a.a != b.a ||
-                a.b != b.b);
+    return (a.a != b.a || a.b != b.b);
 }
 
 bool operator== (const Matrix2x2& a, const Matrix2x2& b){ 
@@ -291,4 +341,3 @@ bool operator!= (const Matrix2x2& a, const Matrix2x2& b){
             a.c != b.c ||
             a.d != b.d  );
 }
-

@@ -1,6 +1,5 @@
-#include "ConsoleStream.h"
-#include "Console.h"
-#include "core/Core.h"
+#include "consoleStream.h"
+#include "console.h"
 
 namespace TwinSystem{
 

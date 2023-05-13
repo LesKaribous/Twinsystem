@@ -1,16 +1,11 @@
 #pragma once
 
-#include "Geometry2D.h"
-#include "Geometry3D.h"
-#include <vector>
+#include "geometry2D.h"
+#include "geometry3D.h"
 
-struct Point{
+struct WayPoint{
     float x, y, heading;
 };
-
-//Kinematics
-Vec3 ik(Vec3 target);
-Vec3 fk(Vec3 target);
 
 enum class TableCompass{
     NORTH,
@@ -31,41 +26,3 @@ enum class RobotCompass{
 float GetCompassOrientation(TableCompass tc);
 float GetCompassOrientation(RobotCompass rc);
 float GetOffsets(RobotCompass rc);
-//float GetOffset(TableCompass tc);
-
-struct Path{
-    Point origin, end;
-    Path(Point origin, Point end);
-    ~Path();
-
-    bool isClosed();
-    virtual void execute() = 0;
-};
-
-struct Arc : public Path{ 
-    float radius, length;
-    virtual void execute();
-};
-
-struct Line : public Path{
-    float length;
-    virtual void execute();
-};
-
-class Trajectory : public Path{
-    std::vector<Path*> path;
-
-public :
-    virtual void execute();
-
-    Trajectory(Point origin);
-    Trajectory(Point origin, Point end);
-
-    ~Trajectory();
-
-    void add(Path*);
-    void remove(int i);
-    void clear();
-};
-
-

@@ -1,13 +1,20 @@
 #pragma once
-#include "Geometry3D.h"
+#include "geometry3D.h"
+
+#define _USE_MATH_DEFINES // for C++
+#include <cmath>
+
 struct Matrix2x2;
 struct Vec3;
 
 //Vector2
 // | a |
 // | b |
-struct Vec2 { 
-    float a, b;
+struct Vec2 {
+    union {
+        struct { float x, y; };
+        struct { float a, b; };
+    };
 
     //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.GetAbsPosition())).heading())
 
@@ -41,7 +48,14 @@ struct Vec2 {
     static float dot( const Vec2&, const Vec2&);
     static float det( const Vec2&, const Vec2&);
 
-    void operator= (const Vec3&);
+    // Operators overload
+    Vec2& operator= (const Vec2&);
+    Vec2& operator+=(const Vec2& u);
+    Vec2& operator-=(const Vec2& u);
+    Vec2& operator+=(float u);
+    Vec2& operator-=(float u);
+    Vec2& operator*=(float u);
+    Vec2& operator/=(float u);
 };
 
 //PolarVec
@@ -88,3 +102,8 @@ bool operator!= (const Vec2&, const Vec2&);
 
 bool operator== (const Matrix2x2&, const Matrix2x2&);
 bool operator!= (const Matrix2x2&, const Matrix2x2&);
+
+Vec2 operator+(const Vec2& a, const Vec2& b);
+Vec2 operator-(const Vec2& a, const Vec2& b);
+Vec2 operator*(const Vec2& a, float u);
+Vec2 operator/(const Vec2& a, float u );

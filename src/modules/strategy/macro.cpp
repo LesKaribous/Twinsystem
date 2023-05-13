@@ -1,3 +1,5 @@
+
+/*
 #include "Robot.h"
 #include "Settings.h"
 
@@ -94,3 +96,4 @@ void Robot::ProbeObstacle(Vec2 obstaclePosition,TableCompass tc, RobotCompass rc
 	if(wasAbsolute) motion.SetAbsolute();
 	_probing = false;
 }
+*/

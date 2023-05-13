@@ -77,6 +77,11 @@ void Robot::Go(float x, float y){
 	WaitUntil(motion);
 }
 
+void Robot::GoAlign(Vec2 target, RobotCompass rc, float orientation){
+	motion.GoAlignAsync(target, rc, orientation);
+	WaitUntil(motion);
+}
+
 void Robot::Turn(float a){
 	motion.TurnAsync(a);
 	WaitUntil(motion);
@@ -274,6 +279,8 @@ void Robot::StartMatch(){
 	motion.steppers.Engage();
 	_state = RobotState::STARTED;
 
+	
+	TestMotion(); motion.steppers.Disengage(); return;
 	//TestSteppers(); motion.steppers.Disengage(); return;
 	//TestDetection(); motion.steppers.Disengage(); return;
 

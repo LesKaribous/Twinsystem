@@ -28,6 +28,8 @@ namespace TwinSystem{
         void GoAwait(float x, float y);
         void GoAsync(float x, float y);
 
+        void GoAlignAsync(Vec2 target, RobotCompass rc, float orientation);
+
         void AlignAwait(RobotCompass, float orientation);
         void AlignAsync(RobotCompass, float orientation);
 

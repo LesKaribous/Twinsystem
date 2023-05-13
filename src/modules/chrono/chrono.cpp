@@ -1,60 +1,60 @@
-#include "Match.h"
-#include "Settings.h"
+#include "chrono/chrono.h"
+#include "settings.h"
 
 namespace TwinSystem{
         
-    Match::Match(){
+    Chronometer::Chronometer(){
         _elapsed = 0;
-        _timeLeft = Settings::Match::MATCH_DURATION;
+        _timeLeft = Settings::Match::DURATION;
         _startTime = 0;
         _score = 0;
         _state = State::IDLE;
     }
 
-    void Match::Start(){
+    void Chronometer::Start(){
         if(_state == State::IDLE){
             _startTime = millis();
             _state = State::STARTED;
         }
     }
 
-    bool Match::IsFinished(){
+    bool Chronometer::IsFinished(){
         UpdateTime();
         return _state == State::FINISHED;
     }
 
-    bool Match::IsNearlyFinished(){
+    bool Chronometer::IsNearlyFinished(){
         UpdateTime();
         return _timeLeft <= 5000; // <= 5s
     }
 
-    void Match::AddToScore(int points, int multiplicateur){
+    void Chronometer::AddToScore(int points, int multiplicateur){
         _score = _score + (points * multiplicateur);
     }
 
-    int  Match::GetScore(){
+    int  Chronometer::GetScore(){
         return _score;
     }
 
-    void Match::UpdateTime(){
+    void Chronometer::UpdateTime(){
         if(_state == State::STARTED){
             _elapsed = millis() - _startTime;
-            _timeLeft = Settings::Match::MATCH_DURATION - _elapsed;
+            _timeLeft = Settings::Match::DURATION - _elapsed;
             if(_timeLeft <= 0) _state = State::FINISHED;
         }
     }
 
-    int Match::GetTimeLeftSeconds(){
+    int Chronometer::GetTimeLeftSeconds(){
         UpdateTime();
         return _timeLeft/1000;
     }
 
-    unsigned long Match::GetTimeLeft(){
+    unsigned long Chronometer::GetTimeLeft(){
         UpdateTime();
         return _timeLeft;
     }
 
-    unsigned long Match::GetElapsedTime(){
+    unsigned long Chronometer::GetElapsedTime(){
         UpdateTime();
         return _elapsed;
     }

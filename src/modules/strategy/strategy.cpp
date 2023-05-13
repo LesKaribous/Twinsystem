@@ -1,7 +1,7 @@
-#include "Robot.h"
-#include "Settings.h"
-#include "Poi.h"
-#include "Points.h"
+/*
+#include "settings.h"
+#include "map/poi.h"
+#include "map/score.h"
 
 #include "debug/Console.h"
 
@@ -9,7 +9,7 @@ using namespace POI;
 using namespace Score;
 
 
-void Robot::RecalagePrimaryBlue(){
+void RecalagePrimaryBlue(){
 
     motion.steppers.Engage();
 
@@ -28,7 +28,7 @@ void Robot::RecalagePrimaryBlue(){
     motion.steppers.Sleep();
 }
 
-void Robot::RecalagePrimaryGreen(){
+void RecalagePrimaryGreen(){
 	
     motion.steppers.Engage();
 
@@ -47,7 +47,7 @@ void Robot::RecalagePrimaryGreen(){
     motion.steppers.Sleep();
 }
 
-void Robot::RecalageSecondaryBlue(){
+void RecalageSecondaryBlue(){
     Console::info("Robot") << "Recalage Secondary Blue Cherry" << Console::endl;
     motion.steppers.Engage();
 
@@ -65,7 +65,7 @@ void Robot::RecalageSecondaryBlue(){
     motion.steppers.Sleep();
 }
 
-void Robot::RecalageSecondaryGreen(){
+void RecalageSecondaryGreen(){
     Console::info("Robot") << "Recalage Secondary Green Cherry" << Console::endl;
     motion.steppers.Engage();
 
@@ -83,7 +83,7 @@ void Robot::RecalageSecondaryGreen(){
     motion.steppers.Sleep();
 }
 
-void Robot::RecalageSecondaryCakeBlue(){
+void RecalageSecondaryCakeBlue(){
     Console::info("Robot") << "Recalage Secondary Blue Cake" << Console::endl;
     motion.steppers.Engage();
 
@@ -103,7 +103,7 @@ void Robot::RecalageSecondaryCakeBlue(){
     motion.steppers.Sleep();
 }
 
-void Robot::RecalageSecondaryCakeGreen(){
+void RecalageSecondaryCakeGreen(){
     Console::info("Robot") << "Recalage Secondary Green Cake " << Console::endl;
     motion.steppers.Engage();
 
@@ -123,7 +123,7 @@ void Robot::RecalageSecondaryCakeGreen(){
     motion.steppers.Sleep();
 }
 
-void Robot::MatchPrimaryBlue(){
+void MatchPrimaryBlue(){
 
     motion.steppers.Engage();
 	motion.SetAbsolute();
@@ -215,7 +215,7 @@ void Robot::MatchPrimaryBlue(){
 
 }
 
-void Robot::MatchPrimaryGreen(){
+void MatchPrimaryGreen(){
 	motion.steppers.Engage();
 	motion.SetAbsolute();
 
@@ -310,7 +310,7 @@ void Robot::MatchPrimaryGreen(){
 
 }
 
-void Robot::MatchSecondaryBlue(){
+void MatchSecondaryBlue(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
@@ -386,7 +386,7 @@ void Robot::MatchSecondaryBlue(){
     motion.steppers.Disengage();
 }
 
-void Robot::MatchSecondaryGreen(){
+void MatchSecondaryGreen(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
@@ -462,7 +462,7 @@ void Robot::MatchSecondaryGreen(){
     motion.steppers.Disengage();
 }
 
-void Robot::MatchSecondaryCakeBlue(){
+void MatchSecondaryCakeBlue(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
@@ -518,7 +518,7 @@ void Robot::MatchSecondaryCakeBlue(){
     motion.steppers.Disengage();
 }
 
-void Robot::MatchSecondaryCakeGreen(){
+void MatchSecondaryCakeGreen(){
     motion.steppers.Engage();
 	motion.SetAbsolute();
 
@@ -575,52 +575,54 @@ void Robot::MatchSecondaryCakeGreen(){
 }
 
 
-void Robot::NearlyFinishPrimaryBlue(){
+void NearlyFinishPrimaryBlue(){
     // Go to End Position
     Go(blueEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
 }
 
-void Robot::NearlyFinishPrimaryGreen(){
+void NearlyFinishPrimaryGreen(){
     // Go to End Position
     Go(greenEndPrimary);
     match.AddToScore(wheelsOnPlate/2);
 }
 
-void Robot::NearlyFinishSecondaryBlue(){
+void NearlyFinishSecondaryBlue(){
     // Go to End Position
     Go(blueEndSecondary);
     match.AddToScore(wheelsOnPlate/2);
 }
 
-void Robot::NearlyFinishSecondaryGreen(){
+void NearlyFinishSecondaryGreen(){
     // Go to End Position
     Go(greenEndSecondary);
     match.AddToScore(wheelsOnPlate/2);
 }
 
-void Robot::FinishPrimaryBlue(){
+void FinishPrimaryBlue(){
     // Fin de match
     EnableDisguisement();
     actuators.Disengage();
     motion.steppers.Disengage();
 }
 
-void Robot::FinishPrimaryGreen(){
+void FinishPrimaryGreen(){
     // Fin de match
     EnableDisguisement();
     actuators.Disengage();
     motion.steppers.Disengage();
 }
 
-void Robot::FinishSecondaryBlue(){
+void FinishSecondaryBlue(){
     // Fin de match
     actuators.Disengage();
     motion.steppers.Disengage();
 }
 
-void Robot::FinishSecondaryGreen(){
+void FinishSecondaryGreen(){
     // Fin de match
     actuators.Disengage();
     motion.steppers.Disengage();
 }
+
+*/

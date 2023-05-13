@@ -16,15 +16,7 @@ namespace TwinSystem{
 
 	void  MotionControl::Initialize(){
 	   steppers.Initialize();
-        _state = JobState::IDLE;
 
-        _startPosition  = {0,0,0};
-        _position       = {-1,-1,0};
-        _target 	     = {0,0,0};
-
-        _calibration 	= Settings::Calibration::Primary.Cartesian;
-        _controlPoint   = {0,0};
-		_absolute = true;
 	}
 
 	void MotionControl::OnEvent(Event& e){
@@ -110,6 +102,16 @@ namespace TwinSystem{
 		Console::info("MotionControl") << "Go :" << target << Console::endl;
 		if (_absolute) MoveAsync({target.a, target.b, _position.c*RAD_TO_DEG});
 		else MoveAsync({target.a, target.b, 0});
+	}
+
+
+	void MotionControl::GoAlignAsync(Vec2 target, RobotCompass rc, float orientation){
+		float rotation = (orientation - GetCompassOrientation(rc));
+		steppers.SetFeedrate(100);
+		Console::info("MotionControl") << "GoAlign :" << target << Console::endl;
+
+		if (_absolute) MoveAsync({target.a, target.b, rotation});
+		else MoveAsync({target.a, target.b, rotation - _position.c*RAD_TO_DEG});
 	}
 
 	void  MotionControl::AlignAwait(RobotCompass rc, float orientation){
