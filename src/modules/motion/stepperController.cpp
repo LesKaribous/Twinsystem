@@ -170,7 +170,7 @@ void StepperController::wakeUp(){
 
 void StepperController::move(Vec3 target){
     _currentJob.start();
-    target.mult(_calibration.toMatrix());
+    target *=_calibration;
 
     _sA_target = int32_t(target.a);
     _sB_target = int32_t(target.b);

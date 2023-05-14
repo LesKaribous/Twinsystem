@@ -1,7 +1,9 @@
 #include "pin.h"
+#include "system.h"
+#include "settings.h"
 #include "modules/screen/screen.h"
 
-Screen::Screen(const System& sys) : Module(SCREEN), system(sys), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::RST, Pin::TFT::MOSI, Pin::TFT::SCK, Pin::TFT::MISO) {
+Screen::Screen(System& sys) : Module(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::RST, Pin::TFT::MOSI, Pin::TFT::SCK, Pin::TFT::MISO) {
     screen.begin();
     clear();
     needDraw = true;
@@ -56,31 +58,31 @@ void Screen::draw(){
 }
 
 void Screen::updateAllStartVar() {
-    if(system.inputs->strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
-    if(inputs.teamSwitch.HasChanged()) updateTeamColor(inputs.teamSwitch.GetState());
-    if(inputs.starter.HasChanged()) updateTiretteState(inputs.starter.GetState());
-    if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
-    if(fields.probed.HasChanged() || fields.probing.HasChanged()) updateInitState();
-    if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+    if(strategySwitch.hasChanged()) updateStrategyState(strategySwitch.getState());
+    if(teamSwitch.hasChanged()) updateTeamColor(teamSwitch.getState());
+    if(starter.hasChanged()) updateTiretteState(starter.getState());
+    if(intercom.hasChanged()) updateLidarState(intercom.getState());
+    if(probed.hasChanged() || probing.hasChanged()) updateInitState();
+    if(x.hasChanged() || y.hasChanged() || z.hasChanged()){
         if( millis() - lastPosDraw >= 50){
-            updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+            updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
             lastPosDraw = millis();
         }
     }    
 }
 
 void Screen::updateAllMatchVar() {
-    if(fields.time.HasChanged()) updateMatchTime(fields.time.GetValue());
-    if(fields.score.HasChanged()) updateScore(fields.score.GetValue());
+    if(time.hasChanged()) updateMatchTime(time.getValue());
+    if(score.hasChanged()) updateScore(score.getValue());
     
-    if(fields.x.HasChanged() || fields.y.HasChanged() || fields.z.HasChanged()){
+    if(x.hasChanged() || y.hasChanged() || z.hasChanged()){
         if( millis() - lastPosDraw >= 50){
-            updatePosition(fields.x.GetValue(), fields.y.GetValue(), fields.z.GetValue()*RAD_TO_DEG);
+            updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
             lastPosDraw = millis();
         }
     } 
-    if(inputs.strategySwitch.HasChanged()) updateStrategyState(inputs.strategySwitch.GetState());
-    if(fields.intercom.HasChanged()) updateLidarState(fields.intercom.GetState());
+    if(strategySwitch.hasChanged()) updateStrategyState(strategySwitch.getState());
+    if(intercom.hasChanged()) updateLidarState(intercom.getState());
 }
 
 
@@ -139,13 +141,13 @@ void Screen::updateInitState() {
     screen.setTextSize(2);
     screen.setCursor(100, 110);
 
-    if(!fields.probed.GetState() && !fields.probing.GetState()){
+    if(!probed.getState() && !probing.getState()){
         screen.setTextColor(ILI9341_RED);
         screen.println("Not probed");
-    }else if(fields.probing.GetState()){
+    }else if(probing.getState()){
         screen.setTextColor(ILI9341_BLUE);
         screen.println("Probing ...");
-    }else if(fields.probed.GetState()){
+    }else if(probed.getState()){
         screen.setTextColor(ILI9341_GREEN);
         screen.println("Probed.");
     }else{

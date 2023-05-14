@@ -1,6 +1,5 @@
 #pragma once
 #include "core/lib.h"
-#include "system.h"
 #include "core/module.h"
 #include "modules/screen/fields.h"
 
@@ -11,10 +10,10 @@ enum class Page{
     RESET
 };
 
-#pragma once
-
-
+class Screen;
 typedef ILI9341_t3n TFTScreen;
+
+class System;
 
 class Screen : public Module{
 public:
@@ -27,11 +26,7 @@ public:
     void draw();
     void setPage(Page p);
 
-    friend class System;
-
 private:
-
-    System& system;
 
     // Fonctions d'affichage
     void updateAllMatchVar();
@@ -65,6 +60,13 @@ private:
     probed,
     armed,
     started;
+
+    BooleanField
+    starter,
+    teamSwitch,
+    twinSwitch,
+    resetButton,
+    strategySwitch;
 
     Page currentPage = Page::INIT;
 
