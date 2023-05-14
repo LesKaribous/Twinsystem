@@ -2,6 +2,7 @@
 
 #include <Arduino.h>
 
+#include <map>
 #include <array>
 #include <deque>
 #include <memory>

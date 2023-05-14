@@ -16,8 +16,8 @@ String  Job::toString(){
 		case JobState::CANCELLED :
 			return "CANCELLED";
 		break;
-		case JobState::FINISHED :
-			return "FINISHED";
+		case JobState::COMPLETED :
+			return "COMPLETED";
 		break;
 		default:
 			return "NONE";
@@ -51,13 +51,12 @@ void  Job::resume(){
 }
 
 void  Job::cancel(){
-	if(m_state != JobState::IDLE && m_state != JobState::FINISHED){
+	if(m_state != JobState::IDLE && m_state != JobState::COMPLETED){
 		m_state = JobState::CANCELLED;
 	}
 }
 
 void  Job::finish(){
-	m_state = JobState::FINISHED;
-	m_state = JobState::IDLE;
+	m_state = JobState::COMPLETED;
 }
 

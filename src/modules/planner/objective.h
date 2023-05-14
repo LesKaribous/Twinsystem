@@ -3,12 +3,7 @@
 #include "modules/planner/job.h"
 
 
-class Task : public Job {
-public:
 
-    bool isComplete();
-
-};
 
 class Objective {
 public:
@@ -36,7 +31,7 @@ bool Objective::isComplete() const {
     // An objective is complete if all tasks are complete
     // This assumes that a Task has a isComplete() method
     for (const auto& task : m_tasks) {
-        if (!task->isComplete()) {
+        if (!task->isCompleted()) {
             return false;
         }
     }

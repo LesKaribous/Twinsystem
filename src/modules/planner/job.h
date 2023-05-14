@@ -7,7 +7,7 @@ enum class JobState{
     PAUSED,
     PENDING,
     CANCELLED,
-    FINISHED
+    COMPLETED
 };
 
 
@@ -18,12 +18,13 @@ public:
     virtual bool isPending();
     virtual bool isPaused();
     virtual bool isCancelled();
+    virtual bool isCompleted();
 
     virtual void update() = 0;
     virtual void pause();
     virtual void resume();
     virtual void cancel();
-    virtual void finish();
+    virtual void complete();
 
     virtual ~Job() {} // make the class polymorphic by providing a virtual destructor
 

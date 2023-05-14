@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pin.h"
-#include "math/Geometry.h"
+#include "math/geometry.h"
 
 // Struct definition
 struct  CalibrationProfile{

@@ -1,11 +1,15 @@
 #pragma once
 #include "core/lib.h"
 #include "core/module.h"
+#include "modules/planner/task.h"
 #include "modules/planner/objective.h"
 
 
 class Planner : public Module{
 public:
+
+    Planner();
+    ~Planner();
 
     void update() override;
 
@@ -26,6 +30,8 @@ private:
     decltype(m_objectives)::iterator m_activeObjective;
 };
 
+Planner::Planner() : Module(PLANNER){}
+Planner::~Planner(){}
 
 std::shared_ptr<Objective> Planner::getCurrentObjective() const {
         if (m_activeObjective != m_objectives.end()) {
@@ -35,11 +41,12 @@ std::shared_ptr<Objective> Planner::getCurrentObjective() const {
     }
 }
 
+/*
 void Planner::nextObjective() {
     if (m_activeObjective != m_objectives.end()) {
         ++m_activeObjective;
     }
-}
+}*/
 
 void Planner::loadStrategy(std::deque<std::shared_ptr<Objective>>& objectives, bool erase){
     if (erase) {

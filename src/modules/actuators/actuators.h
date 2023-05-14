@@ -11,7 +11,7 @@ public:
     void update() override;
 };
 
-Actuators::Actuators(){
+Actuators::Actuators() : Module(ACTUATOR){
 }
 
 Actuators::~Actuators(){

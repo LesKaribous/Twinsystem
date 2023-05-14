@@ -1,16 +1,16 @@
 #pragma once
 #include "core/module.h"
+#include <Adafruit_NeoPixel.h>
 
-class Lidar : public Module{
+class NeoPixel : public Module{
 private:
-    bool m_obstacle;
+    Adafruit_NeoPixel strip;
 public:
-    Lidar();
-    ~Lidar();
+    NeoPixel();
+    ~NeoPixel();
 
     void update() override;
     void enable() override;
     void disable() override;
-
-    bool obstacleDetected();
 };
+

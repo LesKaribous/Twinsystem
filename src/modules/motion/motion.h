@@ -22,7 +22,7 @@ private:
     bool _absolute = true;
 };
 
-Motion::Motion(){
+Motion::Motion() : Module(MOTION){
 }
 
 Motion::~Motion(){

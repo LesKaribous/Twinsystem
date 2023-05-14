@@ -2,21 +2,13 @@
 #include "core/lib.h"
 #include "core/module.h"
 
-#include "modules/screen/screen.h"
 #include "modules/lidar/lidar.h"
+#include "modules/inputs/inputs.h"
 #include "modules/motion/motion.h"
+#include "modules/screen/screen.h"
 #include "modules/planner/planner.h"
+#include "modules/neopixel/neopixel.h"
 #include "modules/actuators/actuators.h"
-
-enum SystemModule{
-    LIDAR,
-    SCREEN,
-    INPUTS,
-    MOTION,
-    PLANNER,
-    NEOPIXEL,
-    ACTUATOR
-};
 
 enum SystemState{
     BOOT,
@@ -37,8 +29,71 @@ public :
     void execute(const String& command);
     void execute(std::shared_ptr<Task> task);
 
-    void freezeSettings();
-    void unFreezeSettings();
+    //Hardcoded blocking routines
+    //Lidar
+    void CheckLidar();
+    void EnableAvoidance();
+    void DisableAvoidance();
+    bool ObstacleDetected();
+    float GetMaxLidarDist(Vec2 pos, float angle);
+
+    //Movements
+    void Turn(float);
+    void Go(Vec2);
+    void Go(float x, float y);
+
+    void GoAlign(Vec2, RobotCompass, float orientation); //Go align
+
+    void GoPolar(float heading, float length);
+    void Align(RobotCompass, float orientation);
+
+	void WaitLaunch();
+	void StartMatch();
+
+    void FinishedMatch();
+    void NearlyFinishedMatch();
+
+
+    //Strategy
+    void recalagePrimaryBlue();
+    void recalagePrimaryGreen();
+    void recalageSecondaryBlue();
+    void recalageSecondaryGreen();
+    void recalageSecondaryCakeBlue();
+    void recalageSecondaryCakeGreen();
+
+    void matchPrimaryBlue();
+	void matchPrimaryGreen();
+    void matchSecondaryBlue();
+    void matchSecondaryGreen();
+    void matchSecondaryCakeBlue();
+    void matchSecondaryCakeGreen();
+
+    void nearlyFinishPrimaryBlue();
+    void nearlyFinishPrimaryGreen();
+    void nearlyFinishSecondaryBlue();
+    void nearlyFinishSecondaryGreen();
+
+    void finishPrimaryBlue();
+    void finishPrimaryGreen();
+    void finishSecondaryBlue();
+    void finishSecondaryGreen();
+	
+    //Macro
+    void probeBorder(TableCompass, RobotCompass);
+    void probeObstacle(Vec2 obstaclePosition,TableCompass, RobotCompass);
+
+    //Tests
+    void testSteppers();
+    void testMotion();
+    void testDetection();
+    void testOrientation();
+
+    bool isProbed();
+    bool isProbing();
+    bool isXProbed();
+    bool isYProbed();
+
 
 private:
 
@@ -60,13 +115,14 @@ private:
     std::unique_ptr<NeoPixel> m_neopixel = nullptr;
     std::unique_ptr<Actuators> m_actuators = nullptr;
 
-    std::array<Module*, 7> m_modules;
+    std::array<Module*, 8> m_modules;
 };
 
 System::System(){
     m_score = 0;
     m_currentState = BOOT;
 
+    m_test = std::make_unique<Test>();
     m_lidar = std::make_unique<Lidar>();
     m_screen = std::make_unique<Screen>();
     m_inputs = std::make_unique<Inputs>();
@@ -76,12 +132,13 @@ System::System(){
     m_actuators = std::make_unique<Actuators>();
 
     m_modules[0] = m_lidar.get();
-    m_modules[1] = m_screen.get();
-    m_modules[2] = m_inputs.get();
-    m_modules[3] = m_motion.get();
-    m_modules[4] = m_planner.get();
-    m_modules[5] = m_neopixel.get();
-    m_modules[6] = m_actuators.get();
+    m_modules[1] = m_lidar.get();
+    m_modules[2] = m_screen.get();
+    m_modules[3] = m_inputs.get();
+    m_modules[4] = m_motion.get();
+    m_modules[5] = m_planner.get();
+    m_modules[6] = m_neopixel.get();
+    m_modules[7] = m_actuators.get();
 }
 
 System::~System(){

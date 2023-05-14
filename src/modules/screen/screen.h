@@ -12,7 +12,7 @@ public:
 private:
 };
 
-Screen::Screen(){
+Screen::Screen() : Module(SCREEN) {
 }
 
 Screen::~Screen(){
