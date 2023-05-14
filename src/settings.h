@@ -33,6 +33,52 @@ namespace Settings{
         FEEDRATE = 100; //%
     }
 
+    namespace Actuators{
+        namespace Gripper{
+            namespace AB{
+                const int 
+                right_Close = 30,
+                left_Close = 160,
+                cherry_Close = 100,
+                right_Open = 140,
+                left_Open = 50,
+                cherry_Open = 30,
+                right_Grab = 80,
+                left_Grab = 110;
+            }
+            
+            namespace BC{
+                const int 
+                right_Close = 30,
+                left_Close = 160,
+                cherry_Close = 100,
+                right_Open = 140,
+                left_Open = 50,
+                cherry_Open = 30,
+                right_Grab = 80,
+                left_Grab = 110;
+            }
+
+            namespace CA{
+                const int 
+                right_Close = 30,
+                left_Close = 160,
+                cherry_Close = 100,
+                right_Open = 140,
+                left_Open = 50,
+                cherry_Open = 30,
+                right_Grab = 80,
+                left_Grab = 110;
+            }
+        }
+        
+        namespace cherryPicker{
+            const int
+            trap_Close = 50,
+            trap_Open = 140,
+            trap_Grab = 50;
+        }
+    }
 
     namespace Geometry{
         const float 

@@ -38,6 +38,14 @@ bool Inputs::hasChanged() const{
     return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
 }
  
+void Inputs::waitButtonRelease(){
+    long time = millis();
+    while (buttonPressed()){
+        resetButton.read();
+        if(millis() - time  > 2000) return;
+    }
+}
+
 void Inputs::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();

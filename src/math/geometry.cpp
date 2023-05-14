@@ -1,6 +1,6 @@
 #include "geometry.h"
 
-float GetCompassOrientation(TableCompass tc){
+float getCompassOrientation(TableCompass tc){
     switch (tc){
     case TableCompass::NORTH:
         return 0;
@@ -21,7 +21,7 @@ float GetCompassOrientation(TableCompass tc){
     
 }
 
-float GetCompassOrientation(RobotCompass rc){
+float getCompassOrientation(RobotCompass rc){
     switch (rc){
     case RobotCompass::A:
         return 0;
@@ -47,7 +47,7 @@ float GetCompassOrientation(RobotCompass rc){
     }
 }
 
-float GetOffsets(RobotCompass rc){
+float getOffsets(RobotCompass rc){
     switch (rc){
     case RobotCompass::A:
         return 157.01;

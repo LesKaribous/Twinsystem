@@ -1,6 +1,7 @@
 #pragma once
+#include "core/job.h"
 #include "core/module.h"
-#include "modules/planner/job.h"
+
 
 
 class Task : public Job {

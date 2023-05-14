@@ -1,7 +1,6 @@
 #pragma once
 
-namespace TwinSystem{
-    enum ConsoleLevel {
+enum ConsoleLevel {
     _TRACE,
     _INFO,
     _WARNING,
@@ -10,5 +9,5 @@ namespace TwinSystem{
     _CRITICAL,
     _NO_HEADER,
 };
-} // namespace TwinSystem
+
 

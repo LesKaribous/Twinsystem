@@ -12,7 +12,7 @@ Vec3 ik(Vec3 target){
     
     
     Vec3 transform(-1,1,1);
-    target.mult(transform.toMatrix());
+    target *= transform;
 
     Matrix3x3 P = {
         0,   1 , L,
@@ -41,7 +41,7 @@ Vec3 fk(Vec3 target){
     target.mult(R);
 
     Vec3 transform(-1,-1,1);
-    target.mult(transform.toMatrix());
+    target *= transform;
 
     return target;
 }

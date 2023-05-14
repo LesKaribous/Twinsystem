@@ -139,6 +139,18 @@ Vec3& Vec3::operator-=(const Vec3& u){
     c-=u.c;
     return *this;
 }
+Vec3& Vec3::operator*=(const Vec3& u){
+    a*=u.a;
+    b*=u.b;
+    c*=u.c;
+    return *this;
+}
+Vec3& Vec3::operator/=(const Vec3& u){
+    a/=u.a;
+    b/=u.b;
+    c/=u.c;
+    return *this;
+}
 Vec3& Vec3::operator+=(const Vec2& u){
     a+=u.a;
     b+=u.b;

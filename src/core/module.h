@@ -1,7 +1,6 @@
 #pragma once
 
 enum SystemModule{
-    TEST,
     LIDAR,
     SCREEN,
     INPUTS,

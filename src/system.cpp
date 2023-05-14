@@ -2,25 +2,254 @@
 #include "Settings.h"
 
 unsigned long lastSeen = 0;
-bool obstacle = false;
 void OnDummyRequestResponse(String answer){
     if(answer.startsWith("obstacle")) obstacle = true;
 	else obstacle = false;
 }
 
+System::System(){
+    m_score = 0;
+    m_currentState = BOOT;
+
+    //Standalone modules
+    lidar = std::make_unique<Lidar>();
+    screen = std::make_unique<Screen>();
+    inputs = std::make_unique<Inputs>();
+    motion = std::make_unique<Motion>();
+    planner = std::make_unique<Planner>();
+    neopixel = std::make_unique<NeoPixel>();
+    actuators = std::make_unique<Actuators>();
+
+    //Extension Modules
+    e_test = std::make_unique<ExtTest>(*this);
+    e_motion = std::make_unique<ExtMotion>(*this);
+    e_strategy = std::make_unique<ExtStrategy>(*this);
+
+    //Modules array for grouped action (update ...)
+    m_modules[0] = lidar.get();
+    m_modules[1] = screen.get();
+    m_modules[2] = inputs.get();
+    m_modules[3] = motion.get();
+    m_modules[4] = planner.get();
+    m_modules[5] = neopixel.get();
+    m_modules[6] = actuators.get();
+}
+
+System::~System(){
+    //Smart pointers destroyed
+}
+
+void System::enable(SystemModule component) {
+    // Enable a component
+    switch (component) {
+        case LIDAR:
+            lidar->enable();
+            break;
+        case SCREEN:
+            screen->enable();
+            break;
+        case INPUTS:
+            inputs->enable();
+            break;
+        case MOTION:
+            motion->enable();
+            break;
+        case PLANNER:
+            planner->enable();
+            break;
+        case NEOPIXEL:
+            neopixel->enable();
+            break;
+        case ACTUATOR:
+            actuators->enable();
+            break;
+        // ... handle other components
+    }
+}
+
+void System::disable(SystemModule component) {
+    // Enable a component
+    switch (component) {
+        case LIDAR:
+            lidar->disable();
+            break;
+        case SCREEN:
+            screen->disable();
+            break;
+        case INPUTS:
+            inputs->disable();
+            break;
+        case MOTION:
+            motion->disable();
+            break;
+        case PLANNER:
+            planner->disable();
+            break;
+        case NEOPIXEL:
+            neopixel->disable();
+            break;
+        case ACTUATOR:
+            actuators->disable();
+            break;
+        // ... handle other components
+    }
+}
 
 
-void Robot::Update() {
+void System::execute(const String& command) {
+
+}
+
+void System::execute(std::shared_ptr<Task> task){
+
+}
+
+void System::addToScore(int points, int multiplicateur){
+    m_score += (points * multiplicateur);
+}
+
+int  System::getScore(){
+    return m_score;
+}
+
+void System::update() {
+    // Update each enabled subsystem
+    for(auto& module : m_modules) {
+        if(module->isEnabled()) {
+            module->update();
+        }
+    }
+
+    switch (m_currentState){
+    case BOOT:
+        //Boot finished
+        handleBootState();
+        break;
+    case IDLE:
+        //Wait for launch
+        handleIdleState();
+        break;
+    case ARMED:
+        //Wait for launch
+        handleIdleState();
+        break;
+    case RUNNING:
+        //Match
+        handleRunningState();
+        break;
+    case STOPPED:
+        //Do nothing and display score
+        handleStoppedState();
+        break;
+    default:
+        break;
+    }
+}
+
+void System::handleBootState(){
+	enable(LIDAR);
+    enable(INPUTS);
+    enable(SCREEN);
+	enable(MOTION);
+    enable(NEOPIXEL);
+	enable(ACTUATOR);
+    m_currentState = IDLE;
+}
+
+
+void System::handleIdleState(){
+    if(inputs->starterPlaced()){ //Arm
+        m_currentState = ARMED;
+        inputs->freezeSettings();
+
+        if(lidar->isConnected()){
+            lidar->activateDisplay();
+        }
+    }
+    if(inputs->buttonReleased()){ //Recalage
+        if	   (inputs->isBlue()  && inputs->isPrimary()) 					        e_strategy->recalagePrimaryBlue();
+        else if(inputs->isBlue()  && inputs->isSecondary() && inputs->isCherry()) 	e_strategy->recalageSecondaryBlue();
+        else if(inputs->isBlue()  && inputs->isSecondary() && inputs->isCake()) 	e_strategy->recalageSecondaryCakeBlue();
+        
+        else if(inputs->isGreen() && inputs->isPrimary()) 					        e_strategy->recalagePrimaryGreen();
+        else if(inputs->isGreen() && inputs->isSecondary() && inputs->isCherry()) 	e_strategy->recalageSecondaryGreen();
+        else if(inputs->isGreen() && inputs->isSecondary() && inputs->isCake()) 	e_strategy->recalageSecondaryCakeGreen();
+    }
+}
+
+void System::handleArmedState(){
+    if(inputs->starterPulled()){ //Start match
+        m_currentState = RUNNING;
+        disable(NEOPIXEL);
+    }else if(inputs->starterCancelled()){ //Unarm
+        m_currentState = IDLE;
+        inputs->unfreezeSettings();
+        enable(NEOPIXEL);
+        lidar->activateDisplay();
+        inputs->waitButtonRelease(); //Wait for resetButton to be released
+    }
+}
+
+void System::handleRunningState(){
+
+    //Console::error("Robot") << "Checking lidar" << Console::endl;
+    lidar->checkLidar(-motion->getTargetDirection() * RAD_TO_DEG);
+    
+    if(chrono.isNearlyFinished()){
+        motion->cancel();
+        e_strategy->handleNearlyFinishedMatch();//go home
+    }
+
+    if(chrono.isFinished()){
+        motion->cancel();
+        e_strategy->handleFinishedMatch(); //Stop robot, motor disengage
+    }
+	
+
+    //Execute Objectives
+
+
+    /*
+    if (m_planner->isEnabled()) {
+        // Get a task to execute if planner has one
+        if (auto task = m_planner->getTaskToExecute()) {
+            executeTask(task);
+        }
+
+        // Handle objective completion
+        if (m_planner->isObjectiveComplete()) {
+            m_score += m_planner->collectReward(); //Reward can be collected only once
+        }
+    }
+    */
+}
+
+void System::handleStoppedState(){
+
+}
+
+void System::wait(int temps){
+	unsigned long initTemps = millis();
+	while ((millis() - initTemps) <= temps){
+		update();
+	}
+}
+
+void System::waitUntil(Job& obj){
+	while (obj.isPending()){
+		obj.update();
+		
+		update();
+	}
+}
+
+
+/*
+void System::Update() {
 	motion.UpdatePosition();
 	PollEvents();
 	System::Update();
 	match.GetTimeLeft();
-	if(_state == RobotState::IDLE)		Console::trace("RoboState") << "IDLE" 		<< Console::endl;
-	if(_state == RobotState::ARMED)		Console::trace("RoboState") <<"ARMED" 		<< Console::endl;
-	if(_state == RobotState::STARTING)	Console::trace("RoboState") <<"STARTING" 	<< Console::endl;
-	if(_state == RobotState::STARTED)	Console::trace("RoboState") <<"STARTED" 	<< Console::endl;
-	if(_state == RobotState::FINISHING)	Console::trace("RoboState") <<"FINISHING" 	<< Console::endl;
-	if(_state == RobotState::FINISHED)	Console::trace("RoboState") <<"FINISHED" 	<< Console::endl;
 
 	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
 		//Console::error("Robot") << "Checking lidar" << Console::endl;
@@ -38,150 +267,27 @@ void Robot::Update() {
 	}
 
 
-}
-
-void Robot::Go(Vec2 v){
-	motion.GoAsync(v);
-	WaitUntil(motion);
-}
-
-void Robot::Go(float x, float y){
-	motion.GoAsync(x, y);
-	WaitUntil(motion);
-}
-
-void Robot::GoAlign(Vec2 target, RobotCompass rc, float orientation){
-	motion.GoAlignAsync(target, rc, orientation);
-	WaitUntil(motion);
-}
-
-void Robot::Turn(float a){
-	motion.TurnAsync(a);
-	WaitUntil(motion);
-}
-
-void Robot::Align(RobotCompass rc, float orientation){
-	bool wasRelative = motion.IsRelative();
-	motion.SetAbsolute();
-	motion.AlignAsync(rc, orientation);
-	WaitUntil(motion);
-	if(wasRelative) motion.SetRelative();
-}
-
-void Robot::GoPolar(float heading, float length){
-	PolarVec target = PolarVec(heading*DEG_TO_RAD, length);
-	bool wasAbsolute = motion.IsAbsolute();
-	motion.SetRelative();
-	motion.GoAsync(target.toVec2());
-	WaitUntil(motion);
-
-	if(wasAbsolute) motion.SetAbsolute();
-}
-
-//mm rad (absolute)
-float Robot::GetMaxLidarDist(Vec2 pos, float angle){
-
-	Vec2 tableHit = Vec2(3000,0);
-	tableHit.rotate(angle);
-	tableHit = Vec2::add(pos, tableHit);
-	if(tableHit.a > 3000) tableHit.a = 3000;
-	if(tableHit.a < 0) tableHit.a = 0;
-	if(tableHit.b > 2000) tableHit.b = 2000;
-	if(tableHit.b <0) tableHit.b = 0;
-	tableHit.sub(pos);
-	float maxdist = tableHit.mag();
-
-	Console::print("Lidar current pos : {");
-	Console::print(pos.a);
-	Console::print(",");
-	Console::print(pos.b);
-	Console::print("}, Angle : ");
-	Console::print((angle * RAD_TO_DEG));
-	Console::print(", max lidar dist : ");
-	Console::println(maxdist);
-
-	return maxdist;
-}
-
-void Robot::CheckLidar(){
-	if(_avoidance && motion.IsBusy()){
-		if(millis() - _lastLidarCheck > 20){
-			_lastLidarCheck = millis();
-			float heading = -motion.GetTargetDirection() * RAD_TO_DEG;
-			heading = fmod(heading, 360.0);
-			if(heading < 0) heading += 360.0;
-
-			intercom.SendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
-		}
-
-		if(ObstacleDetected())lastSeen = millis();
-		
-		if(ObstacleDetected() && motion.IsRunning() && !motion.IsRotating()){
-			motion.Pause();
-		}else if(motion.IsPaused() && !ObstacleDetected()){
-			if(millis() - lastSeen > 1000) motion.Resume();
-		}
-	}
-}
+}*/
 
 
-
-
-
-
-void Robot::PollEvents(){
+void System::updateUiFields(){
     //Tracked values
-    robotPositionTracker.SetValue(motion.GetAbsPosition());
-    robotProbedTracker.SetValue(IsProbed());
-    robotProbingTracker.SetValue(IsProbing());
-    robotArmedTracker.SetValue(_state == RobotState::ARMED);
-    robotStartedTracker.SetValue(_state != RobotState::ARMED && _state != RobotState::IDLE);
-    intercomConnectionTracker.SetValue(intercom.IsConnected());
-
-
-	//TODO 
-	scoreTracker.SetValue(match.GetScore());
-    timeTracker.SetValue(match.GetTimeLeftSeconds());
-
-	//Console::info("Time left :") << match.GetTimeLeftSeconds() << "s" << Console::endl;
-
 	//TODO Create events to handle this at the UI Level
-	if(robotPositionTracker.HasChanged()){
-		ui.fields.x.SetValue(robotPositionTracker.GetValue().a);
-		ui.fields.y.SetValue(robotPositionTracker.GetValue().b);
-		ui.fields.z.SetValue(robotPositionTracker.GetValue().c);
-	}
 
-	if(robotProbedTracker.HasChanged()){
-		ui.fields.probed.SetValue(robotProbedTracker.GetValue());
-	}
-
-	if(robotProbingTracker.HasChanged()){
-		ui.fields.probing.SetValue(robotProbingTracker.GetValue());
-	}
-
-	if(robotArmedTracker.HasChanged()){
-		ui.fields.armed.SetValue(robotArmedTracker.GetValue());
-	}
-
-	if(robotStartedTracker.HasChanged()) {
-		ui.fields.started.SetValue(robotStartedTracker.GetValue());
-	}
-
-	if(intercomConnectionTracker.HasChanged()){
-		ui.fields.intercom.SetValue(intercomConnectionTracker.GetValue());
-	}
-
-	if(timeTracker.HasChanged()) {
-		ui.fields.time.SetValue(timeTracker.GetValue());
-	}
-
-	if(scoreTracker.HasChanged()){
-		ui.fields.score.SetValue(scoreTracker.GetValue());
-	}
-
+	screen->x.SetValue(motion->getAbsPosition().a);
+	screen->y.SetValue(motion->getAbsPosition().b);
+	screen->z.SetValue(motion->getAbsPosition().c);
+	screen->probed.SetValue(e_motion->isProbed());
+	screen->probing.SetValue(e_motion->isProbing());
+	screen->armed.SetValue(m_currentState != ARMED && m_currentState != IDLE);
+	screen->started.SetValue(m_currentState == IDLE);
+	screen->intercom.SetValue(lidar->isConnected());
+	screen->time.SetValue(getScore());
+	screen->score.SetValue(chrono.getTimeLeftSeconds());
+	
 }
 
+/*
 void Robot::WaitLaunch(){
 	while (_state != RobotState::STARTING){
 		Update();
@@ -226,9 +332,7 @@ void Robot::WaitLaunch(){
 
 		//delay(10);
 	};
-
-	
-}
+}*/
 
 void Robot::StartMatch(){
 	match.Start();
@@ -281,18 +385,3 @@ void Robot::NearlyFinishedMatch(){
 	}
 }
 
-
-
-bool  Robot::IsProbed(){
-	return _probedX && _probedY;
-}
-bool  Robot::IsXProbed(){
-	return _probedX;
-}
-bool  Robot::IsYProbed(){
-	return _probedY;
-}
-
-bool  Robot::IsProbing(){
-	return _probing;
-}

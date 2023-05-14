@@ -2,33 +2,30 @@
 #include "core/lib.h"
 #include "consoleStream.h"
 
-namespace TwinSystem {
+class ConsoleStream;
 
-	class ConsoleStream;
+class Console{
+public: 
+	friend class ConsoleStream;
+	static String endl;
 
-	class Console{
-	public: 
-		friend class ConsoleStream;
-		static String endl;
+	static void initialize();
 
-		static void Initialize();
+	static inline ConsoleLevel getLevel() { return _level; };
+	static inline void setLevel(ConsoleLevel l) { _level = l; };
 
-		static inline ConsoleLevel GetLevel() { return _level; };
-		static inline void SetLevel(ConsoleLevel l) { _level = l; };
+	//Use the current log level
+	static ConsoleStream trace(String origin = "");
+	static ConsoleStream info(String origin = "");
+	static ConsoleStream warn(String origin = "");
+	static ConsoleStream error(String origin = "");
+	static ConsoleStream success(String origin = "");
+	static ConsoleStream critical(String origin = "");
+	
+	static void print(String s);
+	static void println(String s);
 
-		//Use the current log level
-		static ConsoleStream trace(String origin = "");
-		static ConsoleStream info(String origin = "");
-		static ConsoleStream warn(String origin = "");
-		static ConsoleStream error(String origin = "");
-		static ConsoleStream success(String origin = "");
-		static ConsoleStream critical(String origin = "");
-		
-		static void print(String s);
-		static void println(String s);
-
-	private:
-		static void write(const char* str);
-	    static ConsoleLevel _level;
-	};
-}
+private:
+	static void write(const char* str);
+	static ConsoleLevel _level;
+};

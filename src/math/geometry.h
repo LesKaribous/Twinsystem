@@ -23,6 +23,6 @@ enum class RobotCompass{
     CA
 };
 
-float GetCompassOrientation(TableCompass tc);
-float GetCompassOrientation(RobotCompass rc);
-float GetOffsets(RobotCompass rc);
+float getCompassOrientation(TableCompass tc);
+float getCompassOrientation(RobotCompass rc);
+float getOffsets(RobotCompass rc);

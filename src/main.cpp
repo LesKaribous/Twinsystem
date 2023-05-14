@@ -2,7 +2,9 @@
 
 System sys;
 
-void setup(){}
+void setup(){
+	Console::initialize();
+}
 
 void loop(){
 	sys.update(); //Update the whole system
