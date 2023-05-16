@@ -33,7 +33,7 @@ Robot::Robot(){
 void Robot::Initialize(){
 	System::Initialize();
 	strip.begin();
-
+	motion.SetCalibration(IsPrimary()? Settings::Calibration::Primary : Settings::Calibration::Secondary);
 	EnableDisguisement();
 }
 
@@ -233,7 +233,7 @@ void Robot::WaitLaunch(){
 				}
 			}
 			if(ButtonReleased()){ //Recalage
-				if	   (IsBlue()  && IsPrimary() ) 					RecalagePrimaryBlue();
+				if	   (IsBlue()  && IsPrimary() ) 					RecalagePrimaryBlue(); 
 				else if(IsBlue()  && IsSecondary() && IsCherry() ) 	RecalageSecondaryBlue();
 				else if(IsBlue()  && IsSecondary() && IsCake() ) 	RecalageSecondaryCakeBlue();
 				else if(IsGreen() && IsPrimary() ) 					RecalagePrimaryGreen();
@@ -276,6 +276,7 @@ void Robot::StartMatch(){
 
 	//TestSteppers(); motion.steppers.Disengage(); return;
 	//TestDetection(); motion.steppers.Disengage(); return;
+	//CalibAngle(10); motion.steppers.Disengage(); return;
 
 	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
 	else if(IsBlue()  && IsSecondary() && IsCherry()) MatchSecondaryBlue();
