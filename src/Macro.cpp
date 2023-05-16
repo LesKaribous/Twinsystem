@@ -59,7 +59,7 @@ void Robot::ProbeObstacle(Vec2 obstaclePosition,TableCompass tc, RobotCompass rc
 	motion.SetRelative();
 	Align(rc, GetCompassOrientation(tc));
 
-	motion.steppers.SetFeedrate(10);
+	motion.steppers.SetFeedrate(5);
 	GoPolar(GetCompassOrientation(rc),80);
 
 	float _offset = GetOffsets(rc);

@@ -124,6 +124,7 @@ namespace TwinSystem{
         _feedrate = value;
         Console::trace("StepperController") << "Set feedrate " << value << Console::endl;
         SetSpeed( (Settings::Motion::SPEED * value) / 100.0 );
+        SetAccel( (Settings::Motion::ACCEL * value) / 100.0 );
         delay(10);
     }
 

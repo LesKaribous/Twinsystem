@@ -27,6 +27,10 @@ namespace TwinSystem{
 		_absolute = true;
 	}
 
+	void MotionControl::SetCalibration(CalibrationProfile c){
+		_calibration = c.Cartesian;
+	}
+
 	void MotionControl::OnEvent(Event& e){
 		//EventDispatcher dispatcher(e);
 		//dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
@@ -85,7 +89,7 @@ namespace TwinSystem{
     void  MotionControl::TurnAwait(float angle){
 		Console::info("MotionControl") << "Turn :" << angle << Console::endl;
 
-		steppers.SetFeedrate(50);
+		steppers.SetFeedrate(60);
 		if (_absolute) MoveAwait({_position.a, _position.b, angle });
 		else MoveAwait({0, 0, angle});
 	}
@@ -93,7 +97,7 @@ namespace TwinSystem{
 	void  MotionControl::TurnAsync(float angle){
 		Console::info("MotionControl") << "Turn :" << angle << Console::endl;
 
-		steppers.SetFeedrate(50);
+		steppers.SetFeedrate(60);
 		if (_absolute) MoveAsync({_position.a, _position.b, angle });
 		else MoveAsync({0, 0, angle});
 	}
