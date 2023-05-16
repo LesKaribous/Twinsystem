@@ -92,6 +92,10 @@ public :
     void TestDetection();
     void TestOrientation();
 
+    //Calibration
+    void CalibAngle(int turnNumber);
+    void CaliDistance(int distance,RobotCompass);
+
     //Util
     void FreezeSettings();
     void UnfreezeSettings();

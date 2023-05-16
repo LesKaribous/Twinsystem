@@ -4,6 +4,7 @@
 #include "math/Geometry.h"
 #include "event/Event.h"
 #include "motion/StepperController.h"
+#include "Settings.h"
 
 namespace TwinSystem{
 
@@ -42,6 +43,9 @@ namespace TwinSystem{
 
     public:
         //Setters
+
+        //Calibration
+        void SetCalibration(CalibrationProfile);
 
         //Absolute mm, mm, rad
         void SetAbsTarget(Vec3);    //mm, mm, rad

@@ -40,3 +40,24 @@ void Robot::TestDetection(){
 	GetMaxLidarDist(Vec2(motion.GetAbsPosition().a, motion.GetAbsPosition().b), -90*DEG_TO_RAD);
 	
 }
+
+void Robot::CalibAngle(int turnNumber){
+
+	motion.steppers.Engage();
+	motion.SetAbsolute();
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
+    DisableAvoidance();
+
+	motion.SetAbsPosition(Vec3(0,0,0));
+
+	Turn(turnNumber*360.0);
+
+	motion.steppers.Sleep();
+}
+
+void Robot::CaliDistance(int distance,RobotCompass){
+
+}
