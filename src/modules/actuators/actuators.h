@@ -22,6 +22,7 @@ private:
     public:
     BistableServo trap;
 public:
+
     Actuators();
     ~Actuators();
 

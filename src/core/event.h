@@ -8,6 +8,7 @@ enum class SystemEventType {
     MOTION_MOVE_RESUMED,
     MOTION_MOVE_CANCELLED,
     MOTION_MOVE_COMPLETED,
+    MOTION_POSITION_CHANGED,
 
     INPUTS_ENABLED,
     INPUTS_DISABLED,
@@ -31,11 +32,11 @@ enum class SystemEventType {
 class Event {
 public:
     virtual ~Event() = default;
-    virtual EventType getType() const = 0;
+    virtual SystemEventType getType() const = 0;
 };
 
 class PositionUpdateEvent : public Event {
 public:
-    EventType getType() const override { return EventType::POSITION_UPDATE; }
+    SystemEventType getType() const override { return SystemEventType::MOTION_POSITION_CHANGED; }
     // Other members...
 };

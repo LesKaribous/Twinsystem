@@ -22,12 +22,15 @@ public:
     bool isCancelled() const ;
     bool isCompleted() const ;
 
-    void update();
-    void start();
-    void pause();
-    void resume();
-    void cancel();
-    void complete();
+    
+    void update(); 
+
+    void reset();   //Set to IDLE
+    void start();   //Set to PENDING
+    void pause();   //Set to PAUSED
+    void resume();  //Set to PENDING
+    void cancel();  //Set to CANCELLED
+    void complete();//Set to COMPLETED
 
 protected:
     JobState m_state = JobState::IDLE;

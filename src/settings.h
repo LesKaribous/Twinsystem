@@ -114,15 +114,20 @@ namespace Settings{
             
     }
 
+    namespace Lidar{
+        const unsigned long persitency = 100;//ms
+    } // namespace Lidar
+    
+
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, 1.165f, -0.755} //Cartesian : XYROT
+            { 1.165f, 1.165f, -0.747} //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.17f, 1.17f, -0.755} //Cartesian : XYROT
+            { 1.165f, 1.165f, -0.747} //Cartesian : XYROT
         };
     }
 }

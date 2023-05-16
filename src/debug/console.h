@@ -2,6 +2,8 @@
 #include "core/lib.h"
 #include "consoleStream.h"
 
+#define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+
 class ConsoleStream;
 
 class Console{
@@ -9,7 +11,7 @@ public:
 	friend class ConsoleStream;
 	static String endl;
 
-	static void initialize();
+	static void initialize(ConsoleLevel lvl = ConsoleLevel::_INFO);
 
 	static inline ConsoleLevel getLevel() { return _level; };
 	static inline void setLevel(ConsoleLevel l) { _level = l; };

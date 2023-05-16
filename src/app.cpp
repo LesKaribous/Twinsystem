@@ -13,13 +13,6 @@
 using namespace POI;
 using namespace Score;
 
-/*
-unsigned long lastSeen = 0;
-void OnDummyRequestResponse(String answer){
-    if(answer.startsWith("obstacle")) obstacle = true;
-	else obstacle = false;
-}
-*/
 
 void SystemApplication::addScore(int points, int multiplicateur){
     _score += (points * multiplicateur);
@@ -33,54 +26,173 @@ void SystemApplication::connectModules(){
     //Tracked values
 	//TODO Create events to handle this at the UI Level
 
-    /*
-	screen.x.SetValue(motion.getAbsPosition().x);
-	screen.y.SetValue(motion.getAbsPosition().y);
-	screen.z.SetValue(motion.getAbsPosition().z);
-	screen.probed.SetValue(isProbed());
-	screen.probing.SetValue(isProbing());
-	screen.armed.SetValue(_state != RobotState::ARMED && _state != RobotState::IDLE);
-	screen.started.SetValue(_state == RobotState::STARTED);
-	screen.intercom.SetValue(lidar.isConnected());
-	screen.time.SetValue(getScore());
-	screen.score.SetValue(chrono.getTimeLeftSeconds());
-	*/
+    screen.x.SetValue(motion.getAbsPosition().x);
+    screen.y.SetValue(motion.getAbsPosition().y);
+    screen.z.SetValue(motion.getAbsPosition().z);
+    screen.score.SetValue(_score);
+    screen.time.SetValue(chrono.getTimeLeftSeconds());
+    screen.intercom.SetValue(lidar.isConnected());
+    screen.probing.SetValue(_probing);
+    screen.probed.SetValue(_probed);
+    screen.armed.SetValue(_state == RobotState::ARMED);
+    screen.started.SetValue(_state == RobotState::STARTED);
+    screen.starter.SetValue(inputs.hasStarter());
+    screen.teamSwitch.SetValue(inputs.isGreen());
+    screen.twinSwitch.SetValue(inputs.isPrimary());
+    screen.resetButton.SetValue(inputs.buttonPressed());
+    screen.strategySwitch.SetValue(inputs.isCake());
 
 
+	//screen.started.SetValue(_state == RobotState::STARTED);
+	//screen.intercom.SetValue(lidar.isConnected());
+	//screen.time.SetValue(score());
+	//screen.score.SetValue(chrono.getTimeLeftSeconds());
 
 }
 
 SystemApplication::SystemApplication(){
+    _state = RobotState::IDLE;
+    _score = 0;
+
     //Standalone modules
-    _lidarPtr = std::make_unique<Lidar>();
     _screenPtr = std::make_unique<Screen>();
-    _inputsPtr = std::make_unique<Inputs>();
-    _motionPtr = std::make_unique<Motion>();
-    _plannerPtr = std::make_unique<Planner>();
-    _neopixelPtr = std::make_unique<NeoPixel>();
+
+    screen.drawBootProgress(10, "Loading Actuators...");
     _actuatorsPtr = std::make_unique<Actuators>();
+
+    screen.drawBootProgress(30, "Loading Lidar...");
+    _lidarPtr = std::make_unique<Lidar>();
+
+    screen.drawBootProgress(40, "Loading Inputs...");
+    _inputsPtr = std::make_unique<Inputs>();
+
+    screen.drawBootProgress(50, "Loading Motion...");
+    _motionPtr = std::make_unique<Motion>();
+
+    //screen.drawBootProgress(40, "Loading Planner...");
+    //_plannerPtr = std::make_unique<Planner>();
+
+    screen.drawBootProgress(60, "Loading Neopixel...");
+    _neopixelPtr = std::make_unique<NeoPixel>();
+
+    screen.drawBootProgress(75, "Linking modules...");
 
     system.registerModule(_lidarPtr.get());
     system.registerModule(_screenPtr.get());
     system.registerModule(_inputsPtr.get());
     system.registerModule(_motionPtr.get());
-    system.registerModule(_plannerPtr.get());
+    //system.registerModule(_plannerPtr.get());
     system.registerModule(_neopixelPtr.get());
     system.registerModule(_actuatorsPtr.get());
+
+    system.enable(LIDAR);
+    system.enable(INPUTS);
+    system.enable(SCREEN);
+	//system.enable(MOTION);
+    system.enable(NEOPIXEL);
+	system.enable(ACTUATORS);
+
+    screen.drawBootProgress(100, "Boot complete...");
+    delay(200);
+    screen.setPage(Page::INIT);
 }
 
 SystemApplication::~SystemApplication(){}
 
+void SystemApplication::update(){
+	system.update();
+	chrono.getTimeLeft();
+    connectModules();
+
+	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
+		lidar.checkLidar(motion.getTargetDirection() * RAD_TO_DEG);
+		
+		if(lidar.obstacleDetected() && motion.isMoving() && !motion.isRotating()){
+			motion.pause();
+            THROW("PAUSED")
+		}else if(motion.getCurrentJob().isPaused() && !lidar.obstacleDetected()){
+		    motion.resume();
+            THROW("RESUMED")
+		}
+
+
+		if(chrono.isNearlyFinished()){
+			motion.cancel();
+			handleNearlyFinishedMatch();//go home
+		}
+
+		if(chrono.isFinished()){
+			motion.cancel();
+			handleFinishedMatch(); //Stop robot, motor disengage
+		}
+	}
+}
+
+void SystemApplication::waitLaunch(){
+	while (_state != RobotState::STARTING){
+		update();
+		switch (_state){
+		case RobotState::IDLE :
+			if(inputs.starterPlaced()){ //Arm
+				setState(RobotState::ARMED);
+                system.disable(NEOPIXEL);
+
+				inputs.freezeSettings();
+				if(lidar.isConnected()){
+					lidar.displayRadar(true);
+				}
+			}
+			if(inputs.buttonReleased()){ //Recalage
+                system.enable(MOTION);
+                system.disable(LIDAR);
+                
+				if	   (inputs.isBlue()  && inputs.isPrimary() )                        recalagePrimaryBlue();
+				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  recalageSecondaryBlue();
+				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeBlue();
+				else if(inputs.isGreen() && inputs.isPrimary() ) 					    recalagePrimaryGreen();
+				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry()) 	recalageSecondaryGreen();
+				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeGreen();
+				//TestOrientation();
+				//TestSteppers();
+                system.enable(LIDAR);
+                system.disable(MOTION);
+			}
+			break;
+
+		case RobotState::ARMED :
+			if(inputs.starterPulled()){ //Start match
+				setState(RobotState::STARTING);
+			}else if(inputs.starterCancelled()){ //Unarm
+				setState(RobotState::IDLE);
+				inputs.unfreezeSettings();
+				system.enable(NEOPIXEL);
+				lidar.displayRadar(false);
+				while(inputs.buttonPressed()) update(); //Wait for resetButton to be released
+			}
+			break;
+	
+		default:
+			break;
+		}
+
+		//delay(10);
+	};
+}
+
 void SystemApplication::startMatch(){
 	chrono.start();
+    system.enable(MOTION);
+    system.disable(INPUTS);
+    system.disable(NEOPIXEL);
+    lidar.displayRadar(true);
+
 	screen.setPage(Page::MATCH);
 	//actuators.Engage();
-	motion.steppers.engage();
-	_state = RobotState::STARTED;
+	setState(RobotState::STARTED);
 
-	testMotion(); motion.steppers.disengage(); return;
-	//TestSteppers(); motion.steppers.Disengage(); return;
-	//TestDetection(); motion.steppers.Disengage(); return;
+	//testMotion(); handleFinishedMatch();
+	//TestSteppers(); motion.Disengage(); return;
+	//TestDetection(); motion.Disengage(); return;
 
 	if	   (inputs.isBlue()  && inputs.isPrimary())                         matchPrimaryBlue();
 	else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  matchSecondaryBlue();
@@ -89,69 +201,92 @@ void SystemApplication::startMatch(){
 	else if(inputs.isGreen() && inputs.isPrimary())                         matchPrimaryGreen();
 	else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry())  matchSecondaryGreen();
 	else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake())    matchSecondaryCakeGreen();
-	
-    motion.steppers.disengage();
+
+    handleFinishedMatch();
+}
+
+void SystemApplication::endMatch(){
+    motion.cancel();
+    system.disable(LIDAR);
+    system.disable(MOTION);
+    system.disable(ACTUATORS);
+    system.disable(INPUTS);
+    system.disable(SCREEN);
 }
 
 
+void SystemApplication::handleFinishedMatch(){ 
 
-void SystemApplication::handleFinishedMatch(){
-	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
-		_state = RobotState::FINISHED;
-		motion.cancel();
-		if	   (inputs.isBlue()  && inputs.isPrimary())     finishPrimaryBlue();
-		else if(inputs.isBlue()  && inputs.isSecondary())   finishSecondaryBlue();
-		else if(inputs.isGreen() && inputs.isPrimary())     finishPrimaryGreen();
-		else if(inputs.isGreen() && inputs.isSecondary())   finishSecondaryGreen();
+    setState(RobotState::FINISHED);
+    motion.cancel();
+    if	   (inputs.isBlue()  && inputs.isPrimary())     finishPrimaryBlue();
+    else if(inputs.isBlue()  && inputs.isSecondary())   finishSecondaryBlue();
+    else if(inputs.isGreen() && inputs.isPrimary())     finishPrimaryGreen();
+    else if(inputs.isGreen() && inputs.isSecondary())   finishSecondaryGreen();
 
-		motion.steppers.disengage();
-		actuators.disengage();
-		system.enable(NEOPIXEL);
+    system.disable(MOTION);
+    system.disable(ACTUATORS);
+    system.enable(NEOPIXEL);
 
-		screen.update();
-		//Suicide
-		while (true){delay(100);}
-	}
+    screen.update();
+
 }
 
 void SystemApplication::handleNearlyFinishedMatch(){
 	if(_state == RobotState::STARTED){
-		_state = RobotState::FINISHING;
+		setState(RobotState::FINISHING);
 		motion.cancel();
 		if	   (inputs.isBlue()  && inputs.isPrimary())     nearlyFinishPrimaryBlue();
 		else if(inputs.isBlue()  && inputs.isSecondary())   nearlyFinishSecondaryBlue();
         else if(inputs.isGreen() && inputs.isPrimary())     nearlyFinishPrimaryGreen();
 		else if(inputs.isGreen() && inputs.isSecondary())   nearlyFinishSecondaryGreen();
-		motion.steppers.disengage();
 	}
+}
+
+
+
+void SystemApplication::wait(unsigned long temps){
+	unsigned long initTemps = millis();
+	while ((millis() - initTemps) <= temps){
+		update();
+	}
+}
+
+void SystemApplication::waitUntil(Job& obj){
+    THROW(obj.toString())
+	while (obj.isPending()){
+        THROW(obj.toString())		
+		update();
+	}
+    THROW(obj.toString())
 }
 
 
 void SystemApplication::go(Vec2 v){
 	motion.goAsync(v);
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 }
 
 void SystemApplication::go(float x, float y){
 	motion.goAsync(x, y);
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 }
 
 void SystemApplication::goAlign(Vec2 target, RobotCompass rc, float orientation){
     motion.goAlignAsync(target, rc, orientation);
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 }
 
 void SystemApplication::turn(float a){
 	motion.turnAsync(a);
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 }
 
 void SystemApplication::align(RobotCompass rc, float orientation){
  	bool wasRelative = motion.isRelative();
 	motion.setAbsolute();
 	motion.alignAsync(rc, orientation);
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 	if(wasRelative) motion.setRelative();
 }
 
@@ -160,22 +295,22 @@ void SystemApplication::goPolar(float heading, float length){
 	bool wasAbsolute = motion.isAbsolute();
 	motion.setRelative();
 	motion.goAsync(target.toVec2());
-	system.waitUntil(motion.getCurrentJob());
+	waitUntil(motion.getCurrentJob());
 
 	if(wasAbsolute) motion.setAbsolute();
 }
 
 
 void  SystemApplication::probeBorder(TableCompass tc, RobotCompass rc){
+    _probing = true;
  	boolean wasAbsolute = motion.isAbsolute();
-	_probing = true;
 
 	motion.setRelative();
 	align(rc, getCompassOrientation(tc));
 
-	motion.steppers.setFeedrate(SLOW);
+	motion.setFeedrate(10);
 	goPolar(getCompassOrientation(rc),200);
-	motion.steppers.setFeedrate(10);
+	motion.setFeedrate(5);
 	goPolar(getCompassOrientation(rc),80);
 
 	float _offset = getOffsets(rc);
@@ -184,22 +319,18 @@ void  SystemApplication::probeBorder(TableCompass tc, RobotCompass rc){
 
 	if(tc == TableCompass::NORTH){
 		position.a = 3000.0 - _offset; //We hit Xmax
-		_probedX = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::SOUTH){
 		position.a = 0.0 + _offset; //We hit Xmin
-		_probedX = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::EAST){
 		position.b = 2000.0 - _offset; //We hit Ymax
-		_probedY = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::WEST){
 		position.b = 0.0 + _offset; //We hit Ymin
-		_probedY = true;
 		motion.setAbsPosition(position);
 	}
 
@@ -207,21 +338,20 @@ void  SystemApplication::probeBorder(TableCompass tc, RobotCompass rc){
 
 	goPolar(getCompassOrientation(rc),-100);
 
-	motion.steppers.setFeedrate(FAST);
+	motion.setFeedrate(FAST);
 
 	if(wasAbsolute) motion.setAbsolute();
-	_probing = false;
+    _probing = true;
+    _probing = false;
 }
 
 void SystemApplication::probeObstacle(Vec2 obstaclePosition,TableCompass tc, RobotCompass rc){
-
     boolean wasAbsolute = motion.isAbsolute();
-	_probing = true;
 
 	motion.setRelative();
 	align(rc, getCompassOrientation(tc));
 
-	motion.steppers.setFeedrate(10);
+	motion.setFeedrate(5);
 	goPolar(getCompassOrientation(rc),80);
 
 	float _offset = getOffsets(rc);
@@ -230,47 +360,27 @@ void SystemApplication::probeObstacle(Vec2 obstaclePosition,TableCompass tc, Rob
 
 	if(tc == TableCompass::NORTH){
 		position.a = obstaclePosition.a - _offset; //We hit Xmax
-		_probedX = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::SOUTH){
 		position.a = obstaclePosition.a + _offset; //We hit Xmin
-		_probedX = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::EAST){
 		position.b = obstaclePosition.a - _offset; //We hit Ymax
-		_probedY = true;
 		motion.setAbsPosition(position);
 	}
 	if(tc == TableCompass::WEST){
 		position.b = obstaclePosition.a + _offset; //We hit Ymin
-		_probedY = true;
 		motion.setAbsPosition(position);
 	}
 
 	motion.setAbsPosition(position);
 
-	motion.steppers.setFeedrate(FAST);
+	motion.setFeedrate(FAST);
 
 	if(wasAbsolute) motion.setAbsolute();
-	_probing = false;
 }
-
-bool  SystemApplication::isProbed(){
-	return _probedX && _probedY;
-}
-bool  SystemApplication::isXProbed(){
-	return _probedX;
-}
-bool  SystemApplication::isYProbed(){
-	return _probedY;
-}
-bool  SystemApplication::isProbing(){
-	return _probing;
-}
-
-
 
 void SystemApplication::testSteppers(){
 	motion.setAbsPosition(Vec3(0,0,0));
@@ -285,6 +395,21 @@ void SystemApplication::testOrientation(){
 	align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
 }
 
+void SystemApplication::setState(RobotState st){
+    printState(_state);
+	_state = st;
+    printState(st);
+}
+
+void SystemApplication::printState(RobotState st){
+	if(st == RobotState::IDLE)		Console::trace("RoboState") << "IDLE" 		<< Console::endl;
+	else if(st == RobotState::ARMED)		Console::trace("RoboState") <<"ARMED" 		<< Console::endl;
+	else if(st == RobotState::STARTING)	Console::trace("RoboState") <<"STARTING" 	<< Console::endl;
+	else if(st == RobotState::STARTED)	Console::trace("RoboState") <<"STARTED" 	<< Console::endl;
+	else if(st == RobotState::FINISHING)	Console::trace("RoboState") <<"FINISHING" 	<< Console::endl;
+	else if(st == RobotState::FINISHED)	Console::trace("RoboState") <<"FINISHED" 	<< Console::endl;
+	else Console::trace("RoboState") << "UNKNOWN" << Console::endl;
+}
 
 void SystemApplication::testDetection(){
 	motion.setAbsPosition({10,10,0});
@@ -303,16 +428,13 @@ void SystemApplication::testDetection(){
 
 void SystemApplication::testMotion(){
 	motion.setAbsPosition({0,0,0});
-	motion.setAbsolute();
-
-	lidar.disable();
-
+	motion.setRelative();
+    go(100,100);
 }
 
 
 
 void SystemApplication::recalagePrimaryBlue(){
-    motion.steppers.engage();
 
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
@@ -325,13 +447,9 @@ void SystemApplication::recalagePrimaryBlue(){
 	align(RobotCompass::AB, getCompassOrientation(TableCompass::NORTH));
 
     actuators.ungrab(RobotCompass::AB);
-
-    motion.steppers.sleep();
 }
 
 void SystemApplication::recalagePrimaryGreen(){
-    motion.steppers.engage();
-
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
     actuators.close(RobotCompass::CA);
@@ -343,13 +461,10 @@ void SystemApplication::recalagePrimaryGreen(){
 	align(RobotCompass::AB, getCompassOrientation(TableCompass::NORTH));
 
     actuators.ungrab(RobotCompass::AB);
-
-    motion.steppers.sleep();
 }
 
 void SystemApplication::recalageSecondaryBlue(){
     Console::info("Robot") << "Recalage Secondary Blue Cherry" << Console::endl;
-    motion.steppers.engage();
 
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
@@ -361,13 +476,10 @@ void SystemApplication::recalageSecondaryBlue(){
 	motion.setAbsolute();
     go(b3);
 	align(RobotCompass::A, getCompassOrientation(TableCompass::WEST));
-
-    motion.steppers.sleep();
 }
 
 void SystemApplication::recalageSecondaryGreen(){
     Console::info("Robot") << "Recalage Secondary Green Cherry" << Console::endl;
-    motion.steppers.engage();
 
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
@@ -380,12 +492,10 @@ void SystemApplication::recalageSecondaryGreen(){
     go(v3);
 	align(RobotCompass::A, getCompassOrientation(TableCompass::EAST));
 
-    motion.steppers.sleep();
 }
 
 void SystemApplication::recalageSecondaryCakeBlue(){
     Console::info("Robot") << "Recalage Secondary Blue Cake" << Console::endl;
-    motion.steppers.engage();
 
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
@@ -400,12 +510,10 @@ void SystemApplication::recalageSecondaryCakeBlue(){
 
     actuators.ungrab(RobotCompass::AB);
 
-    motion.steppers.sleep();
 }
 
 void SystemApplication::recalageSecondaryCakeGreen(){
     Console::info("Robot") << "Recalage Secondary Green Cake " << Console::endl;
-    motion.steppers.engage();
 
     actuators.close(RobotCompass::AB);
     actuators.close(RobotCompass::BC);
@@ -420,11 +528,9 @@ void SystemApplication::recalageSecondaryCakeGreen(){
 
     actuators.ungrab(RobotCompass::AB);
 
-    motion.steppers.sleep();
 }
 
 void SystemApplication::matchPrimaryBlue(){
-    motion.steppers.engage();
 	motion.setAbsolute();
 
     addScore(basket);
@@ -493,7 +599,7 @@ void SystemApplication::matchPrimaryBlue(){
     go(ballBlueBasketPlus);
     // Dépose
     actuators.trap.open();
-    system.wait(2000);
+    wait(2000);
     actuators.trap.close();
     addScore(exactCherryCounting);
     //recalage
@@ -507,15 +613,9 @@ void SystemApplication::matchPrimaryBlue(){
     go(blueEndPrimary);
     addScore(wheelsOnPlate/2);
 	system.enable(NEOPIXEL);
-
-    // Fin de match
-    actuators.disengage();
-	motion.steppers.disengage();
-
 }
 
 void SystemApplication::matchPrimaryGreen(){
-	motion.steppers.engage();
 	motion.setAbsolute();
 
     addScore(basket);
@@ -588,7 +688,7 @@ void SystemApplication::matchPrimaryGreen(){
     go(ballGreenBasketPlus);
     // Dépose
     actuators.trap.open();
-    system.wait(2000);
+    wait(2000);
     actuators.trap.close();
     addScore(exactCherryCounting);
     //recalage
@@ -603,14 +703,9 @@ void SystemApplication::matchPrimaryGreen(){
     addScore(wheelsOnPlate/2);
     system.enable(NEOPIXEL);
 
-    // Fin de match
-    actuators.disengage();
-	motion.steppers.disengage();
-
 }
 
 void SystemApplication::matchSecondaryBlue(){
-    motion.steppers.engage();
 	motion.setAbsolute();
 
     //----ATTENTION----
@@ -680,13 +775,10 @@ void SystemApplication::matchSecondaryBlue(){
 
     // Fin de match
     actuators.trap.open();
-    system.wait(1000);
-    actuators.disengage();
-    motion.steppers.disengage();
+    wait(1000);
 }
 
 void SystemApplication::matchSecondaryGreen(){
-    motion.steppers.engage();
 	motion.setAbsolute();
 
     //----ATTENTION----
@@ -756,13 +848,10 @@ void SystemApplication::matchSecondaryGreen(){
 
     // Fin de match
     actuators.trap.open();
-    system.wait(1000);
-    actuators.disengage();
-    motion.steppers.disengage();
+    wait(1000);
 }
 
 void SystemApplication::matchSecondaryCakeBlue(){
-    motion.steppers.engage();
 	motion.setAbsolute();
 
     actuators.ungrab(RobotCompass::AB);
@@ -812,13 +901,10 @@ void SystemApplication::matchSecondaryCakeBlue(){
 
     // Fin de match
     actuators.trap.open();
-    system.wait(1000);
-    actuators.disengage();
-    motion.steppers.disengage();
+    wait(1000);
 }
 
 void SystemApplication::matchSecondaryCakeGreen(){
-    motion.steppers.engage();
 	motion.setAbsolute();
 
     actuators.ungrab(RobotCompass::AB);
@@ -868,9 +954,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
 
     // Fin de match
     actuators.trap.open();
-    system.wait(1000);
-    actuators.disengage();
-    motion.steppers.disengage();
+    wait(1000);
 }
 
 
@@ -901,26 +985,20 @@ void SystemApplication::nearlyFinishSecondaryGreen(){
 void SystemApplication::finishPrimaryBlue(){
     // Fin de match
     system.enable(NEOPIXEL);
-    actuators.disengage();
-    motion.steppers.disengage();
 }
 
 void SystemApplication::finishPrimaryGreen(){
     // Fin de match
     system.enable(NEOPIXEL);
-    actuators.disengage();
-    motion.steppers.disengage();
 }
 
 void SystemApplication::finishSecondaryBlue(){
     // Fin de match
-    actuators.disengage();
-    motion.steppers.disengage();
+
 }
 
 void SystemApplication::finishSecondaryGreen(){
     // Fin de match
-    actuators.disengage();
-    motion.steppers.disengage();
+
 }
 

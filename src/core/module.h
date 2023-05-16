@@ -7,7 +7,7 @@ enum SystemModule{
     MOTION,
     PLANNER,
     NEOPIXEL,
-    ACTUATOR
+    ACTUATORS
 };
 
 // Base class for subsystems
@@ -29,18 +29,3 @@ protected:
 
 };
 
-void Module::enable() {
-    m_enabled = true;
-}
-
-void Module::disable() {
-    m_enabled = false;
-}
-
-bool Module::isEnabled() const { 
-    return m_enabled; 
-}
-
-SystemModule Module::getModule() const { 
-    return m_module; 
-}

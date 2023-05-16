@@ -28,8 +28,8 @@ void Intercom::sendRequest(Request& req){
     _pendingRequest[req.ID()] = req;
 }
 
-void Intercom::sendRequest(const String& payload, Request::Callback callback, long timeout){
-    Request req(payload, callback, timeout);
+void Intercom::sendRequest(const String& payload, long timeout){
+    Request req(payload, timeout);
     req.send(*this);
     _pendingRequest[req.ID()] = req;
 }
@@ -86,6 +86,14 @@ bool Intercom::IsSomethingAtAngle(int angle){
     
 }*/
 
+int Intercom::available(){
+    return _readyRequest.size() > 0;
+}
+
+Request& Intercom::getReadyRequest(){
+    return _pendingRequest[_readyRequest[0]];
+}
+
 void Intercom::_processIncomingData() {
     while (_stream.available()) {
         String incomingMessage = _stream.readStringUntil('\n');
@@ -105,9 +113,8 @@ void Intercom::_processIncomingData() {
                 auto requestIt = _pendingRequest.find(responseId);
                 if (requestIt != _pendingRequest.end()) {
                     Request& request = requestIt->second;
-                    request.setStatus(Request::Status::OK);
                     request.onResponse(responseData);
-                    _pendingRequest.erase(requestIt);
+                    _readyRequest.push_back(requestIt->first);
                 }
             }
         }
@@ -136,10 +143,12 @@ void Intercom::_processPendingRequests() {
             }
         } else if (status == Request::Status::OK) {
             //Console::println("OK");
+            
+        } else if (status == Request::Status::CLOSED) {
             it = _pendingRequest.erase(it); // Remove the request from the map
+            
         }  else if (status == Request::Status::TIMEOUT) {
-            //Console::println("TIMEDOUT");
-            it = _pendingRequest.erase(it); // Remove the request from the map
+            Console::error("Intercom") << ": request " << request.getPayload() << "timedout." << Console::endl;
         } else {
             ++it;
         }
@@ -149,21 +158,19 @@ void Intercom::_processPendingRequests() {
 uint32_t Request::_uidCounter = 0;
 
 Request::Request()
-    :   _payload("bad payload"), 
-        _callback(nullptr), 
-        _timeout(0),
+    :   _uid(0),
+        _payload("bad payload"),
         _lastSent(0),
-        _status(Status::ERROR),
-        _uid(0)
+        _timeout(0),
+        _status(Status::ERROR)
         {}
 
-Request::Request(const String& payload, Callback callback, long timeout)
-    :   _payload(payload), 
-        _callback(callback), 
-        _timeout(timeout),
+Request::Request(const String& payload, long timeout)
+    :   _uid(0),
+        _payload(payload), 
         _lastSent(0),
-        _status(Status::IDLE),
-        _uid(0)
+        _timeout(timeout),
+        _status(Status::IDLE)
         {_uid = _uidCounter++;}
 
 
@@ -173,9 +180,13 @@ void Request::send(Intercom& channel){
     channel.sendMessage(getPayload());
 }
 
+void Request::close(){
+    _status = Status::CLOSED;
+}
+
 void Request::onResponse(const String& response){
     _status = Status::OK;
-    if(_callback)(_callback)(response);
+    _response = response;
 }
 
 void Request::onTimeout(){
@@ -194,12 +205,12 @@ Request::Status Request::getStatus() const{
     return _status;
 }
 
-Request::Callback Request::getCallback() const{
-    return _callback;
-}
-
 const String& Request::getMessage() const{
     return _payload;
+}
+
+const String& Request::getResponse() const{
+    return _response;
 }
 
 String Request::getPayload() const{

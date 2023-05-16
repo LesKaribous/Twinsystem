@@ -4,7 +4,7 @@
 #define _GS_ Settings::Actuators::Gripper
 #define _CPS_ Settings::Actuators::cherryPicker
 
-Actuators::Actuators() : Module(ACTUATOR), 
+Actuators::Actuators() : Module(ACTUATORS), 
 gripperAB(  {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
             {Pin::Servo::ServoA3, _GS_::AB::left_Open,  _GS_::AB::left_Close, _GS_::AB::left_Grab}, 
             {Pin::Servo::ServoA2, _GS_::AB::cherry_Open, _GS_::AB::cherry_Close}),
@@ -22,6 +22,7 @@ trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_
 {
     _pinTurbine = Pin::CherryPicker::pinTurbine;
     pinMode(_pinTurbine, OUTPUT);
+    stopTurbine();
 
     gripperAB.cherryLocker.enable();
     gripperAB.leftGripper.enable();
@@ -34,14 +35,12 @@ trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_
     gripperCA.rightGripper.enable();
     trap.enable();
     
-
-
     trap.close();
     close(RobotCompass::AB);
     close(RobotCompass::BC);
     close(RobotCompass::CA);
 
-    delay(2000);
+    delay(1000);
 
     sleep();
 }

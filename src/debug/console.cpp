@@ -50,8 +50,9 @@ void header(){
 }
 
 
-void Console::initialize(){
+void Console::initialize(ConsoleLevel lvl){
 	Serial.begin(115200);
+	setLevel(lvl);
 	header();
 	
 }

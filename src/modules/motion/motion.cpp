@@ -11,6 +11,15 @@ Motion::Motion() : Module(MOTION){
     
     _absolute = Settings::Motion::ABSOLUTE;
     steppers.setFeedrate(100);
+
+    _currentJob.reset();
+    _startPosition  = {0,0,0};
+    _position       = {-1,-1,0};
+    _target 	     = {0,0,0};
+
+    _calibration 	= Settings::Calibration::Primary.Cartesian;
+    _controlPoint   = {0,0};
+	_absolute = true;
 }
 
 Motion::~Motion(){}
@@ -43,9 +52,29 @@ Job& Motion::getCurrentJob(){
     return _currentJob;
 }
 
+void Motion::enable(){
+    Module::enable();
+    steppers.engage();
+}
+
+void Motion::disable(){
+    Module::disable();
+    steppers.disengage();
+}
+
+void Motion::setCalibration(CalibrationProfile c){
+    _calibration = c.Cartesian;
+}
+
+
+void Motion::setFeedrate(int p){
+    steppers.setFeedrate(constrain(p, 0, 100));
+}
+
 void Motion::update(){
     Console::trace("Motion") << _currentJob.toString() << Console::endl;
     steppers.update();
+    updatePosition();
     if(_currentJob.isPending()){
         if(!steppers.getCurrentJob().isPending()){
             complete();
@@ -67,7 +96,7 @@ void  Motion::goAsync(float x, float y){
 void  Motion::turnAwait(float angle){
     Console::info("Motion") << "Turn :" << angle << Console::endl;
 
-    steppers.setFeedrate(50);
+    steppers.setFeedrate(60);
     if (_absolute) moveAwait({_position.a, _position.b, angle });
     else moveAwait({0, 0, angle});
 }
@@ -75,7 +104,7 @@ void  Motion::turnAwait(float angle){
 void  Motion::turnAsync(float angle){
     Console::info("Motion") << "Turn :" << angle << Console::endl;
 
-    steppers.setFeedrate(50);
+    steppers.setFeedrate(60);
     if (_absolute) moveAsync({_position.a, _position.b, angle });
     else moveAsync({0, 0, angle});
 }
@@ -116,6 +145,7 @@ void  Motion::alignAsync(RobotCompass rc, float orientation){
 
 //Raw relative move request
 void  Motion::moveAwait(Vec3 target){
+    _currentJob.reset();
     //Set new target
     target.c *= DEG_TO_RAD;
     
@@ -150,19 +180,20 @@ void  Motion::moveAwait(Vec3 target){
 
 //Raw relative move request
 void  Motion::moveAsync(Vec3 target){
+    _currentJob.reset();
     //Set new target
     target.c *= DEG_TO_RAD;
     if(!_absolute){
         if(target.magSq() == 0){ //magSq is faster thatn mag
             Console::error("Motion") << "Move is null" << Console::endl;
-            _currentJob.complete();
+            _currentJob.cancel();
             return;
         }
         _target = toAbsoluteTarget(target);
     }else{
         if(target == _target){
             Console::error("Motion") << "Move is null" << Console::endl;
-            _currentJob.complete();
+            _currentJob.cancel();
             return;
         }
         _target = target;

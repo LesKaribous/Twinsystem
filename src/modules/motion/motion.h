@@ -1,4 +1,5 @@
 #pragma once
+#include "settings.h"
 #include "core/job.h"
 #include "core/module.h"
 #include "math/geometry.h"
@@ -6,11 +7,18 @@
 
 class Motion : public Module{
 public:
+
     Motion();
     ~Motion();
 
     //Inherited
     Job& getCurrentJob();
+
+    void enable() override;
+    void disable() override;
+
+    void setCalibration(CalibrationProfile c);
+    void setFeedrate(int); //0-100%
 
     void update();
     void pause();
@@ -72,10 +80,11 @@ public:
     bool isMoving() const;
 
 
-public : 
+private:
+
     StepperController steppers;
         
-private:
+
 
     Job _currentJob;
 

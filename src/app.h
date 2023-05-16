@@ -1,8 +1,9 @@
 #pragma once
 
-#include "system.h"
+
 #include "settings.h"
 
+#include "core/system.h"
 #include "core/chrono.h"
 
 #include "match/poi.h"
@@ -13,7 +14,7 @@
 #include "modules/inputs/inputs.h"
 #include "modules/motion/motion.h"
 #include "modules/screen/screen.h"
-#include "modules/planner/planner.h"
+//#include "modules/planner/planner.h"
 #include "modules/neopixel/neopixel.h"
 #include "modules/actuators/actuators.h"
 
@@ -34,10 +35,12 @@ public:
     SystemApplication();
     ~SystemApplication();
 
-	void initialize();
+	
+	void update();
 	void waitLaunch();
 	void startMatch();
-
+    void endMatch();
+    
     void connectModules();
 
     //Movements
@@ -81,18 +84,20 @@ public:
     //Macro
     void probeBorder(TableCompass, RobotCompass);
     void probeObstacle(Vec2 obstaclePosition,TableCompass, RobotCompass);
-
-    //Probe state
-    bool isProbed();
-    bool isProbing();
-    bool isXProbed();
-    bool isYProbed();
-
+    
     //Tests
     void testMotion();
     void testSteppers();
     void testDetection();
     void testOrientation();
+
+    //State
+    void setState(RobotState);
+    void printState(RobotState);
+
+    //wait blocking function
+    void wait(unsigned long temps);
+    void waitUntil(Job& obj);
 
 private:
     int score();
@@ -103,13 +108,13 @@ private:
     std::unique_ptr<Screen> _screenPtr = nullptr;
     std::unique_ptr<Inputs> _inputsPtr = nullptr;
     std::unique_ptr<Motion> _motionPtr = nullptr;
-    std::unique_ptr<Planner> _plannerPtr = nullptr;
+    //std::unique_ptr<Planner> _plannerPtr = nullptr;
     std::unique_ptr<NeoPixel> _neopixelPtr = nullptr;
     std::unique_ptr<Actuators> _actuatorsPtr = nullptr;
 
     RobotState _state;
 
     int _score;
-    bool _probedX = false, _probedY = false;
-    bool _probing = false;
+    bool _probed;
+    bool _probing;
 };

@@ -1,8 +1,9 @@
 #include "modules/lidar/lidar.h"
+#include "settings.h"
 #include "debug/console.h"
 
 Lidar::Lidar() : Module(LIDAR){
-    m_obstacle = false;
+	intercom.initialize();
 }
 
 Lidar::~Lidar(){}
@@ -17,39 +18,51 @@ void Lidar::enable(){
 
 void Lidar::disable(){
     Module::disable();
-    m_obstacle = false;
 }
 
 bool Lidar::obstacleDetected(){
-	return m_obstacle && m_enabled;
+	return (((millis() -_lastSeen) < Settings::Lidar::persitency)) && m_enabled;
+}
+
+
+void Lidar::onObstacleResponse(String answer){
+    if(answer.startsWith("obstacle")){
+		_lastSeen = millis();
+	}
 }
 
 bool Lidar::isConnected(){
 	return intercom.isConnected();
 }
 
-void Lidar::activateDisplay(){
-	intercom.sendRequest("displayLidar");
+void Lidar::displayRadar(bool s){
+	if(s)intercom.sendRequest("displayLidar");
+	else intercom.sendRequest("displayIntercom");
 }
 
 void Lidar::checkLidar(float heading){
+	THROW("Checking lidar")
 	if(m_enabled){
+		THROW("Checking lidar enabled")
 		if(millis() - _lastLidarCheck > 20){
 			_lastLidarCheck = millis();
 			heading = fmod(heading, 360.0);
 			if(heading < 0) heading += 360.0;
 
-			intercom.sendRequest("checkLidar(" + String(heading) + ")", OnDummyRequestResponse);
+			intercom.sendRequest("checkLidar(" + String(heading) + ")");
 		}
 
-		if(obstacleDetected())_lastSeen = millis();
-		
-		if(obstacleDetected() && motion.isRunning() && !motion.IsRotating()){
-			motion.Pause();
-		}else if(motion.IsPaused() && !obstacleDetected()){
-			if(millis() - _lastSeen > 1000) motion.Resume();
+		if(intercom.available()){
+			Request& req = intercom.getReadyRequest();
+			String response = req.getResponse();
+			THROW(response)
+
+			onObstacleResponse(response);
+
+			req.close();
 		}
 	}
+	
 }
 
 //mm rad (absolute)

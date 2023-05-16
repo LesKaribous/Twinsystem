@@ -45,15 +45,14 @@ public:
     Switch(int pin): _pin(pin){};
     void init() override{
         pinMode(_pin, INPUT_PULLUP);
-        lastValue = false;
         value = digitalRead(_pin);
+        lastValue = !value;
     }
     void read() override{
         if(!enabled) return;
-        _hasChanged = false;
         lastValue = value;
         value = digitalRead(_pin);
-        if(value != lastValue) _hasChanged = true;
+        _hasChanged = value != lastValue;
     }
 private:
     int _pin;
@@ -64,15 +63,14 @@ public:
     Button(int pin): _pin(pin){};
     void init() override{
         pinMode(_pin, INPUT_PULLUP);
+        value = !digitalRead(_pin);
         lastValue = !digitalRead(_pin);
-        value = digitalRead(_pin);
     }
     void read() override{
         if(!enabled) return;
-        _hasChanged = false;
         lastValue = value;
         value = digitalRead(_pin);
-        if(value != lastValue) _hasChanged = true;
+        _hasChanged = value != lastValue;
     }
 private:
     int _pin;

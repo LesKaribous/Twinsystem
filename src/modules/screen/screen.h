@@ -4,7 +4,7 @@
 #include "modules/screen/fields.h"
 
 enum class Page{
-    START,
+    BOOT,
     INIT,
     MATCH,
     RESET
@@ -17,7 +17,9 @@ class System;
 
 class Screen : public Module{
 public:
-    Screen(System&);
+    friend class SystemApplication;
+
+    Screen();
     ~Screen();
 
     void update() override;
@@ -25,6 +27,9 @@ public:
     void clear();
     void draw();
     void setPage(Page p);
+
+    
+    void drawBootProgress(int p, String msg);//%
 
 private:
 
@@ -68,7 +73,7 @@ private:
     resetButton,
     strategySwitch;
 
-    Page currentPage = Page::INIT;
+    Page currentPage = Page::BOOT;
 
     unsigned long lastDraw = 0;
     unsigned long lastPosDraw = 0;

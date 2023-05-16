@@ -10,15 +10,15 @@ public:
         SENT,
         TIMEOUT,
         OK,
+        CLOSED,
         ERROR
     };
-
-    typedef void (*Callback)(String response);
     
     Request();
-    Request(const String& payload, Callback callback = nullptr, long timeout = 5000);
+    Request(const String& payload, long timeout = 5000);
 
     void send(Intercom& channel);
+    void close();
     void setStatus(Status status);
     
     void onTimeout();
@@ -29,23 +29,20 @@ public:
     uint32_t ID() const;
     Status getStatus() const;
     String getPayload() const;
-    Callback getCallback() const;
     const String& getMessage() const;
+    const String& getResponse() const;
     unsigned long getTimeout() const;
     unsigned long getLastSent() const;
     
 private:
-    Status _status = Status::IDLE;
-
     uint32_t _uid;
-    static uint32_t _uidCounter;
-
     String _payload;
+    String _response;
+    unsigned long _lastSent;
+    unsigned long _timeout;
+    Status _status;
 
-    unsigned long _timeout = 10 * 1000;
-    unsigned long _lastSent = 0;
-    
-    Callback _callback;
+    static uint32_t _uidCounter;
 };
 
 class Intercom {
@@ -58,7 +55,7 @@ public:
     void sendMessage(const String& message);
 
     void sendRequest(Request& req);
-    void sendRequest(const String& payload, Request::Callback callback = nullptr, long timeout = 5000);
+    void sendRequest(const String& payload, long timeout = 5000);
 
     void update();
 
@@ -66,14 +63,15 @@ public:
     void onConnectionSuccess();
     void onConnectionLost();
 
+    int available();
+    Request& getReadyRequest();
+
     inline bool isConnected(){return _connected;}
 
 private:
     Stream& _stream;
-
     std::map<uint32_t,Request> _pendingRequest;
-
-    bool stopReceived = false;
+    std::vector<uint32_t> _readyRequest;
 
     unsigned long _lastStream = 0;
     unsigned long _lastPing = 0;

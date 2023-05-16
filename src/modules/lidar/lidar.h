@@ -5,12 +5,12 @@
 
 class Lidar : public Module{
 private:
-    bool m_obstacle;
     Intercom intercom;
 
     long _lastSeen = 0;
     long _lastLidarCheck = 0;
 public:
+
     Lidar();
     ~Lidar();
 
@@ -19,8 +19,11 @@ public:
     void disable() override;
 
     bool isConnected();
-    void activateDisplay();
     bool obstacleDetected();
+
+    void onObstacleResponse(String answer);
+
+    void displayRadar(bool);
 
     void checkLidar(float heading);
     float getMaxLidarDist(Vec2 pos, float angle);

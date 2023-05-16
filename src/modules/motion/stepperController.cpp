@@ -87,7 +87,7 @@ void  StepperController::update(){
 
     if(_currentJob.isPending()){
         if(hasFinished()){
-            _currentJob.complete();
+            complete();
         }
     }
 
@@ -121,6 +121,7 @@ void StepperController::setFeedrate(float value){
     _feedrate = value;
     Console::trace("StepperController") << "Set feedrate " << value << Console::endl;
     setSpeed( (Settings::Motion::SPEED * value) / 100.0 );
+    setAccel( (Settings::Motion::ACCEL * value) / 100.0 );
     delay(10);
 }
 
@@ -169,6 +170,7 @@ void StepperController::wakeUp(){
 }
 
 void StepperController::move(Vec3 target){
+    _currentJob.reset();
     _currentJob.start();
     target *=_calibration;
 
@@ -191,8 +193,13 @@ void StepperController::move(Vec3 target){
 
     wakeUp();
 
-    if(_async)_controller.moveAsync(_sA,_sB,_sC);
-    else _controller.move(_sA,_sB,_sC);
+    if(_async){
+        _controller.moveAsync(_sA,_sB,_sC);
+    }
+    else{
+        _controller.move(_sA,_sB,_sC);
+        complete();
+    }
     
 }
 

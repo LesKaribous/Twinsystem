@@ -54,7 +54,9 @@ bool Job::isCompleted() const{
 	return m_state == JobState::COMPLETED;
 }
 
-
+void  Job::reset(){
+	m_state = JobState::IDLE;
+}
 
 void  Job::start(){
 	if(m_state == JobState::IDLE){

@@ -32,10 +32,9 @@ public:
     void init() override{ _hasChanged = true;}
     void read() override{
         if(!enabled) return;
-        _hasChanged = false;
+        _hasChanged = _reference != value;
         lastValue = value;
         value = _reference;
-        if(value != lastValue) _hasChanged = true;
     }
 
     void SetValue(int ref) {_reference = ref;}
@@ -51,10 +50,9 @@ public:
     void init() override{ _hasChanged = true;}
     void read() override{
         if(!enabled) return;
-        _hasChanged = false;
+        _hasChanged = _reference != value;
         lastValue = value;
         value = _reference;
-        if(value != lastValue) _hasChanged = true;
     }
 
     void SetValue(float ref) {_reference = ref;}
@@ -70,10 +68,9 @@ public:
     void init() override{ _hasChanged = true;}
     void read() override{
         if(!enabled) return;
-        _hasChanged = false;
+        _hasChanged = _reference != value;
         lastValue = value;
         value = _reference;
-        if(value != lastValue) _hasChanged = true;
     }
 
     void SetValue(bool ref) {_reference = ref;}
