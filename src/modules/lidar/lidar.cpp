@@ -21,14 +21,16 @@ void Lidar::disable(){
 }
 
 bool Lidar::obstacleDetected(){
-	return (((millis() -_lastSeen) < Settings::Lidar::persitency)) && m_enabled;
+	return (((millis() -_lastSeen) <= Settings::Lidar::persitency) && !_ignoreObstacles);
+}
+
+void Lidar::ignoreObstacles(bool st){
+	_ignoreObstacles = st;
 }
 
 
-void Lidar::onObstacleResponse(String answer){
-    if(answer.startsWith("obstacle")){
-		_lastSeen = millis();
-	}
+void Lidar::onObstacle(){
+	_lastSeen = millis();
 }
 
 bool Lidar::isConnected(){
@@ -41,29 +43,28 @@ void Lidar::displayRadar(bool s){
 }
 
 void Lidar::checkLidar(float heading){
-	THROW("Checking lidar")
+	heading = -heading;
 	if(m_enabled){
-		THROW("Checking lidar enabled")
 		if(millis() - _lastLidarCheck > 20){
 			_lastLidarCheck = millis();
 			heading = fmod(heading, 360.0);
 			if(heading < 0) heading += 360.0;
 
-			intercom.sendRequest("checkLidar(" + String(heading) + ")");
-		}
-
-		if(intercom.available()){
-			Request& req = intercom.getReadyRequest();
-			String response = req.getResponse();
-			THROW(response)
-
-			onObstacleResponse(response);
-
-			req.close();
+			intercom.closeRequest(_lastUID);
+			_lastUID = intercom.sendRequest("checkLidar(" + String(heading) + ")", 500);
 		}
 	}
 	
 }
+
+void Lidar::checkObstacle(){
+	if(intercom.getRequestResponse(_lastUID).startsWith("obstacle")){
+		onObstacle();
+	}
+}
+
+
+
 
 //mm rad (absolute)
 float Lidar::getMaxLidarDist(Vec2 pos, float angle){

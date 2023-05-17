@@ -115,7 +115,7 @@ namespace Settings{
     }
 
     namespace Lidar{
-        const unsigned long persitency = 100;//ms
+        const unsigned long persitency = 1000;//ms
     } // namespace Lidar
     
 

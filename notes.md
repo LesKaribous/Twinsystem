@@ -29,6 +29,16 @@ Pull the starter.
 
 Reminder : If you armed the robot and you forgot to set the team. Press reset while pulling the starter. The robot will go back in idle mode. Then Arm again the robot.
 
+
+
+TODO 
+clear intercom when too much request buffered
+
+
+
+
+
+
 ## Features
     - [ ] Modular architecture
     - [ ] Program with several actions

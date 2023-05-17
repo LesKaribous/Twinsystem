@@ -14,7 +14,6 @@ public:
         ERROR
     };
     
-    Request();
     Request(const String& payload, long timeout = 5000);
 
     void send(Intercom& channel);
@@ -32,6 +31,7 @@ public:
     const String& getMessage() const;
     const String& getResponse() const;
     unsigned long getTimeout() const;
+    unsigned long getResponseTime() const;
     unsigned long getLastSent() const;
     
 private:
@@ -40,6 +40,7 @@ private:
     String _response;
     unsigned long _lastSent;
     unsigned long _timeout;
+    unsigned long _responseTime;
     Status _status;
 
     static uint32_t _uidCounter;
@@ -54,24 +55,21 @@ public:
     void sendMessage(const char* message);
     void sendMessage(const String& message);
 
-    void sendRequest(Request& req);
-    void sendRequest(const String& payload, long timeout = 5000);
+    uint32_t sendRequest(const String& payload, long timeout = 200);
 
     void update();
+    bool closeRequest(const uint32_t&);
+    String getRequestResponse(const uint32_t&);
 
     void onPingReceived(); 
     void onConnectionSuccess();
     void onConnectionLost();
 
-    int available();
-    Request& getReadyRequest();
-
     inline bool isConnected(){return _connected;}
 
 private:
     Stream& _stream;
-    std::map<uint32_t,Request> _pendingRequest;
-    std::vector<uint32_t> _readyRequest;
+    std::map<uint32_t,Request> _requests;
 
     unsigned long _lastStream = 0;
     unsigned long _lastPing = 0;

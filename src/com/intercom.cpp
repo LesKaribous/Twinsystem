@@ -13,25 +13,22 @@ void Intercom::initialize(){
 void Intercom::sendMessage(const char* message) {
     _stream.print(message);
     _stream.write('\n');
-    Console::trace("Intercom") << ">" << message << Console::endl;
+    Console::info("Intercom") << ">" << message << Console::endl;
 }
 
 void Intercom::sendMessage(const String& message) {
     _stream.print(message);
     _stream.write('\n');
-    Console::trace("Intercom") << ">" << message.c_str() << Console::endl;
+    Console::info("Intercom") << ">" << message.c_str() << Console::endl;
 }
 
-void Intercom::sendRequest(Request& req){
-    sendMessage(req.getPayload());
-    req.setStatus(Request::Status::SENT);
-    _pendingRequest[req.ID()] = req;
-}
 
-void Intercom::sendRequest(const String& payload, long timeout){
+uint32_t Intercom::sendRequest(const String& payload, long timeout){
     Request req(payload, timeout);
     req.send(*this);
-    _pendingRequest[req.ID()] = req;
+    _requests.insert({req.ID(), req});
+
+    return req.ID();
 }
 
 void Intercom::update() {
@@ -56,6 +53,25 @@ void Intercom::onPingReceived() {
     sendMessage("pong");
 }
 
+bool Intercom::closeRequest(const uint32_t& uid) {
+    if(_requests.count(uid)){
+        _requests.find(uid)->second.close();
+        return true;
+    }else{
+        Console::warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid) << " does not exist" << Console::endl;
+        false;
+    };
+}
+
+String Intercom::getRequestResponse(const uint32_t& uid) {
+    if(_requests.count(uid) > 0){
+        return _requests.find(uid)->second.getResponse();
+    }else{
+        Console::warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid)   << " does not exist" << Console::endl;
+        return "ERROR";
+    };
+}
+
 void Intercom::onConnectionLost() {
     Console::warn("Intercom") << "Connection lost." << Console::endl;
     _connected = false;
@@ -66,55 +82,28 @@ void Intercom::onConnectionSuccess(){
     _connected = true;
 }
 
-/*
-bool Intercom::IsSomethingAtAngle(int angle){
-    String s = "isSomethingAtAngle(";
-    s += angle;
-    s += ");";
-    SendCommand(s.c_str());
 
-    long ctime = millis();
-    while (millis() - ctime > 1000){
-        Intercom::Update();
-    }
-
-    if(stopReceived){
-        stopReceived = false;
-        return true;
-    }
-    return false;
-    
-}*/
-
-int Intercom::available(){
-    return _readyRequest.size() > 0;
-}
-
-Request& Intercom::getReadyRequest(){
-    return _pendingRequest[_readyRequest[0]];
-}
 
 void Intercom::_processIncomingData() {
     while (_stream.available()) {
         String incomingMessage = _stream.readStringUntil('\n');
         incomingMessage.trim(); // Remove any leading/trailing whitespace or newline characters
-        Console::trace("Intercom") << "<" << incomingMessage.c_str() << Console::endl;
+        Console::info("Intercom") << "<" << incomingMessage.c_str() << Console::endl;
         
         if (incomingMessage.startsWith("ping")) {
             onPingReceived();
         } else if (incomingMessage.startsWith("pong")) {
             if(!isConnected())onConnectionSuccess();
-        }else if (!_pendingRequest.empty()) {
+        }else if (!_requests.empty()) {
             int separatorIndex = incomingMessage.indexOf(':');
             if (separatorIndex > 0) {
                 uint32_t responseId = incomingMessage.substring(0, separatorIndex).toInt();
                 String responseData = incomingMessage.substring(separatorIndex + 1);
 
-                auto requestIt = _pendingRequest.find(responseId);
-                if (requestIt != _pendingRequest.end()) {
+                auto requestIt = _requests.find(responseId);
+                if (requestIt != _requests.end()) {
                     Request& request = requestIt->second;
                     request.onResponse(responseData);
-                    _readyRequest.push_back(requestIt->first);
                 }
             }
         }
@@ -122,33 +111,41 @@ void Intercom::_processIncomingData() {
 }
 
 void Intercom::_processPendingRequests() {
-    for (auto it = _pendingRequest.begin(); it != _pendingRequest.end();) {
+    for (auto it = _requests.begin(); it != _requests.end();) {
+
+        
         Request& request = it->second;
         Request::Status status = request.getStatus();
-
-        //Console::info("Intercom") << "Request[" << String(request.ID()) << "]:";
     
+        if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 1000){
+            Console::trace("Intercom") << ": request " << request.getPayload() << "too old, cleared." << Console::endl;
+            request.close();
+            ++it;
+            continue;
+        }
+
         if (status == Request::Status::IDLE) {
-            //Console::println("IDLE");
             request.send(*this);
             ++it;
         } else if (status == Request::Status::SENT) {
-            //Console::println("SENT");
             if (request.isTimedOut()) {
-                //Console::trace("Intercom") << "Request[" << String(request.ID()) << "]:" << "TIMEDOUT" << Console::endl;
                 request.onTimeout();
-                it = _pendingRequest.erase(it); // Remove the request from the map
+                
             } else {
                 ++it;
             }
         } else if (status == Request::Status::OK) {
-            //Console::println("OK");
-            
+            ++it;
         } else if (status == Request::Status::CLOSED) {
-            it = _pendingRequest.erase(it); // Remove the request from the map
-            
+            Console::trace("Intercom") << int(_requests.size()) << "currently in the buffer" << Console::endl;
+            it = _requests.erase(it); // Remove the request from the map
+
         }  else if (status == Request::Status::TIMEOUT) {
+            request.close();
             Console::error("Intercom") << ": request " << request.getPayload() << "timedout." << Console::endl;
+        } else if (status == Request::Status::ERROR) {
+            request.close();
+            Console::error("Intercom") << ": request " << request.getPayload() << "unknown error." << Console::endl;
         } else {
             ++it;
         }
@@ -157,18 +154,11 @@ void Intercom::_processPendingRequests() {
 
 uint32_t Request::_uidCounter = 0;
 
-Request::Request()
-    :   _uid(0),
-        _payload("bad payload"),
-        _lastSent(0),
-        _timeout(0),
-        _status(Status::ERROR)
-        {}
-
 Request::Request(const String& payload, long timeout)
     :   _uid(0),
         _payload(payload), 
         _lastSent(0),
+        _responseTime(0),
         _timeout(timeout),
         _status(Status::IDLE)
         {_uid = _uidCounter++;}
@@ -186,6 +176,7 @@ void Request::close(){
 
 void Request::onResponse(const String& response){
     _status = Status::OK;
+    _responseTime = millis();
     _response = response;
 }
 
@@ -197,7 +188,7 @@ void Request::setStatus(Status status){
     _status = status;
 }
     
-u_int32_t Request::ID() const{
+uint32_t Request::ID() const{
     return _uid;
 }
 
@@ -210,6 +201,7 @@ const String& Request::getMessage() const{
 }
 
 const String& Request::getResponse() const{
+
     return _response;
 }
 
@@ -223,6 +215,10 @@ bool Request::isTimedOut() const{
 
 unsigned long Request::getTimeout() const{
     return _timeout;
+}
+
+unsigned long Request::getResponseTime() const{
+    return _responseTime;
 }
 
 unsigned long Request::getLastSent() const{

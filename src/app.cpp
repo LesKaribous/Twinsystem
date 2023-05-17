@@ -13,7 +13,6 @@
 using namespace POI;
 using namespace Score;
 
-
 void SystemApplication::addScore(int points, int multiplicateur){
     _score += (points * multiplicateur);
 }
@@ -100,13 +99,17 @@ SystemApplication::SystemApplication(){
 SystemApplication::~SystemApplication(){}
 
 void SystemApplication::update(){
+    //delay(100);
 	system.update();
 	chrono.getTimeLeft();
     connectModules();
 
 	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
 		lidar.checkLidar(motion.getTargetDirection() * RAD_TO_DEG);
-		
+		lidar.checkObstacle();
+
+        //THROW(motion.isRotating())
+
 		if(lidar.obstacleDetected() && motion.isMoving() && !motion.isRotating()){
 			motion.pause();
             THROW("PAUSED")
@@ -144,7 +147,7 @@ void SystemApplication::waitLaunch(){
 			}
 			if(inputs.buttonReleased()){ //Recalage
                 system.enable(MOTION);
-                system.disable(LIDAR);
+                lidar.ignoreObstacles(true);
                 
 				if	   (inputs.isBlue()  && inputs.isPrimary() )                        recalagePrimaryBlue();
 				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  recalageSecondaryBlue();
@@ -152,9 +155,8 @@ void SystemApplication::waitLaunch(){
 				else if(inputs.isGreen() && inputs.isPrimary() ) 					    recalagePrimaryGreen();
 				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry()) 	recalageSecondaryGreen();
 				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeGreen();
-				//TestOrientation();
 				//TestSteppers();
-                system.enable(LIDAR);
+                lidar.ignoreObstacles(false);
                 system.disable(MOTION);
 			}
 			break;
@@ -253,9 +255,9 @@ void SystemApplication::wait(unsigned long temps){
 }
 
 void SystemApplication::waitUntil(Job& obj){
-    THROW(obj.toString())
-	while (obj.isPending()){
-        THROW(obj.toString())		
+    THROW("WaitUntil Job finished or cancelled")
+	while (obj.isPending() || obj.isPaused()){
+        //THROW(obj.toString())		
 		update();
 	}
     THROW(obj.toString())
@@ -390,9 +392,17 @@ void SystemApplication::testSteppers(){
 
 void SystemApplication::testOrientation(){
 	motion.setAbsPosition({0,0,0});
-	motion.setAbsolute();
-	align(RobotCompass::A, getCompassOrientation(TableCompass::EAST));
-	align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+	motion.setRelative();
+	//align(RobotCompass::A, getCompassOrientation(TableCompass::EAST));
+	//align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+    int i = 0;
+    lidar.displayRadar();
+
+    again:
+    goPolar(i, 50);lidar.checkLidar(-motion.getTargetDirection() * RAD_TO_DEG);delay(1000);
+    goPolar(i, -50);
+    i+=15;
+    goto again;
 }
 
 void SystemApplication::setState(RobotState st){
@@ -533,6 +543,7 @@ void SystemApplication::recalageSecondaryCakeGreen(){
 void SystemApplication::matchPrimaryBlue(){
 	motion.setAbsolute();
 
+
     addScore(basket);
 
     actuators.ungrab(RobotCompass::AB);
@@ -554,7 +565,7 @@ void SystemApplication::matchPrimaryBlue(){
     actuators.grab(RobotCompass::CA);
 
     //----ATTENTION----
-    system.disable(LIDAR);
+    lidar.ignoreObstacles(true);
     //Dépose du premier Gateau
     align(RobotCompass::BC, -120);
     go(retreatBlue1);
@@ -607,7 +618,7 @@ void SystemApplication::matchPrimaryBlue(){
     motion.setAbsolute();
 
     //----ATTENTION----
-    system.enable(LIDAR);
+    lidar.ignoreObstacles(false);
 
     // Fin de match
     go(blueEndPrimary);
@@ -639,7 +650,7 @@ void SystemApplication::matchPrimaryGreen(){
     actuators.grab(RobotCompass::CA);
 
     //----ATTENTION----
-    system.disable(LIDAR);
+    lidar.ignoreObstacles(true);
 
     //Dépose du premier Gateau
     align(RobotCompass::BC, 120);
@@ -696,7 +707,7 @@ void SystemApplication::matchPrimaryGreen(){
     motion.setAbsolute();
 
     //----ATTENTION----
-    system.enable(LIDAR);
+    lidar.ignoreObstacles(false);
 
     // Fin de match
     go(greenEndPrimary);
@@ -709,7 +720,7 @@ void SystemApplication::matchSecondaryBlue(){
 	motion.setAbsolute();
 
     //----ATTENTION----
-    system.disable(LIDAR);
+    lidar.ignoreObstacles(true);
 
     // Va chercher les balles
     // Lance la turbine
@@ -729,7 +740,7 @@ void SystemApplication::matchSecondaryBlue(){
     go(v4);
 
     //----ATTENTION----
-    system.enable(LIDAR);
+    lidar.ignoreObstacles(false);
 
     align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux
@@ -782,7 +793,7 @@ void SystemApplication::matchSecondaryGreen(){
 	motion.setAbsolute();
 
     //----ATTENTION----
-    system.disable(LIDAR);
+    lidar.ignoreObstacles(true);
 
     // Va chercher les balles
     // Lance la turbine
@@ -802,7 +813,7 @@ void SystemApplication::matchSecondaryGreen(){
     go(b4);
 
     //----ATTENTION----
-    system.enable(LIDAR);
+    lidar.ignoreObstacles(false);
 
     align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
     // Va chercher les gateaux

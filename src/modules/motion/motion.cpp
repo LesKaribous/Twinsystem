@@ -293,7 +293,7 @@ bool  Motion::isRelative() const{
 
 
 bool Motion::isRotating() const{
-    return (_currentJob.isPending() && _target.c != _position.c);
+    return (_currentJob.isPending() && _relTarget.c != 0);
 }
 
 bool Motion::isMoving() const{

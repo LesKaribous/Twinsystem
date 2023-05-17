@@ -31,12 +31,7 @@ public :
 
 protected:
 
-    //Warning blocking routines
-    void wait(unsigned long time);
-	void waitUntil(Job& job);
-    
     SystemState state();
-
 
 private:
 
