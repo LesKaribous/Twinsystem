@@ -142,12 +142,16 @@ void SystemApplication::waitLaunch(){
                 system.enable(MOTION);
                 lidar.ignoreObstacles(true);
                 
+                //testMotion(); break;
+
 				if	   (inputs.isBlue()  && inputs.isPrimary() )                        recalagePrimaryBlue();
 				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  recalageSecondaryBlue();
 				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeBlue();
 				else if(inputs.isGreen() && inputs.isPrimary() ) 					    recalagePrimaryGreen();
 				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry()) 	recalageSecondaryGreen();
 				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeGreen();
+                
+
 				//TestSteppers();
                 lidar.ignoreObstacles(false);
                 system.disable(MOTION);
@@ -435,8 +439,20 @@ void SystemApplication::testDetection(){
 
 void SystemApplication::testMotion(){
 	motion.setAbsPosition({0,0,0});
-	motion.setRelative();
-    go(100,100);
+	motion.setAbsolute();
+
+    motion.turnAwait(30);
+
+    motion.goAwait(100,0);
+    motion.goAwait(0,0);
+
+    motion.goAsync(100,0);
+    delay(500);
+    motion.cancel();
+    motion.goAsync(100,0);
+    waitUntil(motion.getCurrentJob());
+    motion.goAwait(0,0);
+    motion.goAwait(100,0);
 }
 
 

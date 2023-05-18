@@ -88,7 +88,7 @@ void Intercom::_processIncomingData() {
     while (_stream.available()) {
         String incomingMessage = _stream.readStringUntil('\n');
         incomingMessage.trim(); // Remove any leading/trailing whitespace or newline characters
-        Console::info("Intercom") << "<" << incomingMessage.c_str() << Console::endl;
+        Console::trace("Intercom") << "<" << incomingMessage.c_str() << Console::endl;
         
         if (incomingMessage.startsWith("ping")) {
             onPingReceived();

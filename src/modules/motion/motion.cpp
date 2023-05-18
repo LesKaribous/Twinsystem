@@ -35,22 +35,42 @@ void Motion::resume(){
 }
 
 void Motion::cancel() {
-    steppers.pause();
-    updatePosition();
-    steppers.cancel();
     _currentJob.cancel();
+    steppers.pause();
+    
+    updatePosition();
+    Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Final position : " << _position << Console::endl;
+    Console::info("Motion") << "Target was : " << _target << Console::endl;
+    //Need to take actual rotation when adding relative target
+    //_position = _startPosition.add(_target.rotateZ(-_position.c));
+    _startPosition = _position;
+
+    steppers.cancel();
 }
 
 void Motion::forceCancel() {
-    steppers.emergencyStop();
-    updatePosition();
-    steppers.cancel();
     _currentJob.cancel();
+    steppers.emergencyStop();
+
+    updatePosition();
+    Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Final position : " << _position << Console::endl;
+    Console::info("Motion") << "Target was : " << _target << Console::endl;
+    //Need to take actual rotation when adding relative target
+    //_position = _startPosition.add(_target.rotateZ(-_position.c));
+    _startPosition = _position;
+
+
+    steppers.forceCancel();
 }
 
 void Motion::complete() {
     _currentJob.complete();
-    
+    updatePosition();
+    Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Final position : " << _position << Console::endl;
+    Console::info("Motion") << "Target was : " << _target << Console::endl;
     //Need to take actual rotation when adding relative target
     //_position = _startPosition.add(_target.rotateZ(-_position.c));
     _position = _target;
@@ -166,7 +186,7 @@ void  Motion::moveAwait(Vec3 target){
         }
         _target = toAbsoluteTarget(target);
     }else{
-        if(target == _target){
+        if(target == _position){
             Console::error("Motion") << "Move is null" << Console::endl;
             _currentJob.complete(); //robot is null
             return;
@@ -185,6 +205,7 @@ void  Motion::moveAwait(Vec3 target){
 
     steppers.disableAsync();
     steppers.move(targetToSteps(_relTarget)); //Execute move await
+    complete();
 }
 
 //Raw relative move request
@@ -200,7 +221,7 @@ void  Motion::moveAsync(Vec3 target){
         }
         _target = toAbsoluteTarget(target);
     }else{
-        if(target == _target){
+        if(target == _position){
             Console::error("Motion") << "Move is null" << Console::endl;
             _currentJob.cancel();
             return;
@@ -261,7 +282,7 @@ void  Motion::updatePosition(){
     relativePosition.c /= _calibration.c;
 
 
-    _position = _startPosition.copy().add(relativePosition);
+    _position = _startPosition.copy().add(relativePosition.rotateZ(-_position.c));
     //Console::trace("Motion") << "Current position" << _position << Console::endl;
 }
 
