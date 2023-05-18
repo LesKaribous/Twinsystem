@@ -310,9 +310,9 @@ void  SystemApplication::probeBorder(TableCompass tc, RobotCompass rc){
 	motion.setRelative();
 	align(rc, getCompassOrientation(tc));
 
-	motion.setFeedrate(10);
-	goPolar(getCompassOrientation(rc),200);
 	motion.setFeedrate(5);
+	goPolar(getCompassOrientation(rc),200);
+	motion.setFeedrate(2);
 	goPolar(getCompassOrientation(rc),80);
 
 	float _offset = getOffsets(rc);
@@ -542,30 +542,34 @@ void SystemApplication::recalageSecondaryCakeGreen(){
 
 void SystemApplication::matchPrimaryBlue(){
 	motion.setAbsolute();
-
-
     addScore(basket);
+
+    lidar.ignoreObstacles(true); //Ignore obstacle as match start
 
     actuators.ungrab(RobotCompass::AB);
 	actuators.ungrab(RobotCompass::BC);
 	actuators.ungrab(RobotCompass::CA);
 
+    //Cake Rose
     actuators.ungrab(RobotCompass::AB);
 	go(cakePinkSE);
 	actuators.grab(RobotCompass::AB);
 	align(RobotCompass::BC, getCompassOrientation(TableCompass::NORTH));
 
+    //Cake Jaune
+    lidar.ignoreObstacles(false);//Watch out now
     actuators.ungrab(RobotCompass::BC);
     go(cakeYellowSE);
     actuators.grab(RobotCompass::BC);
     align(RobotCompass::CA, 45);
-
+    
+    //Cake Marron
     actuators.ungrab(RobotCompass::CA);
     go(cakeBrownSE);
     actuators.grab(RobotCompass::CA);
 
     //----ATTENTION----
-    lidar.ignoreObstacles(true);
+    lidar.ignoreObstacles(true); //Ignore obstacles while going home
     //Dépose du premier Gateau
     align(RobotCompass::BC, -120);
     go(retreatBlue1);
@@ -627,7 +631,8 @@ void SystemApplication::matchPrimaryBlue(){
 }
 
 void SystemApplication::matchPrimaryGreen(){
-	motion.setAbsolute();
+	lidar.ignoreObstacles(true); //Ignore as match begin
+    motion.setAbsolute();
 
     addScore(basket);
 
@@ -635,19 +640,24 @@ void SystemApplication::matchPrimaryGreen(){
     actuators.ungrab(RobotCompass::BC);
     actuators.ungrab(RobotCompass::CA);
 
+    //Cake Rose
     actuators.ungrab(RobotCompass::AB);
     go(cakePinkSW);
     actuators.grab(RobotCompass::AB);
     align(RobotCompass::BC, getCompassOrientation(TableCompass::NORTH));
 
+    //Cake Jaune
+    lidar.ignoreObstacles(false);//Watch out
     actuators.ungrab(RobotCompass::BC);
     go(cakeYellowSW);
     actuators.grab(RobotCompass::BC);
     align(RobotCompass::CA, -45);
 
+    //Cake marron
     actuators.ungrab(RobotCompass::CA);
     go(cakeBrownSW);
     actuators.grab(RobotCompass::CA);
+    
 
     //----ATTENTION----
     lidar.ignoreObstacles(true);
@@ -779,6 +789,11 @@ void SystemApplication::matchSecondaryBlue(){
     addScore(cakeWithCherry);
 
     go(cakeBrownNE);
+
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
+
     //Fin du match
     go(blueEndSecondary);
 
@@ -852,6 +867,10 @@ void SystemApplication::matchSecondaryGreen(){
     addScore(cakeWithCherry);
 
     go(cakeBrownNW);
+
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
     //Fin du match
     go(greenEndSecondary);
 
@@ -905,6 +924,9 @@ void SystemApplication::matchSecondaryCakeBlue(){
 
     go(cakeBrownNE);
 
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
     //Fin du match
     go(blueEndSecondary);
 
@@ -957,6 +979,47 @@ void SystemApplication::matchSecondaryCakeGreen(){
     addScore(cakeWithCherry);
 
     go(cakeBrownNW);
+
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
+
+    //Go take some other Cake ! 17/05/2023
+
+    go(2210,724);
+
+    // Take YellowNW
+    actuators.open(RobotCompass::CA);
+    align(RobotCompass::CA, getCompassOrientation(TableCompass::WEST));
+    go(cakeYellowNW);
+    actuators.grab(RobotCompass::CA);
+
+    // Take YellowNW
+    actuators.open(RobotCompass::BC);
+    align(RobotCompass::BC, getCompassOrientation(TableCompass::NORTH));
+    go(cakePinkNW);
+    actuators.grab(RobotCompass::BC);
+
+    // Pos face to the depose Zone
+    go(dropV3_03);
+
+    // Depose des Cake
+    align(RobotCompass::BC, getCompassOrientation(TableCompass::NORTH));
+    go(v3);
+    actuators.ungrab(RobotCompass::BC);
+    addScore(cake,3);
+    go(dropV3_02);
+    align(RobotCompass::CA, getCompassOrientation(TableCompass::NORTH));
+    actuators.ungrab(RobotCompass::CA);
+    addScore(cake,3);
+    go(dropV3_03);
+
+    // Close All before end Match
+
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
+
 
     //Fin du match
     go(greenEndSecondary);

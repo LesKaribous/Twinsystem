@@ -33,8 +33,7 @@ Reminder : If you armed the robot and you forgot to set the team. Press reset wh
 
 TODO 
 clear intercom when too much request buffered
-
-
+fix probe border
 
 
 
