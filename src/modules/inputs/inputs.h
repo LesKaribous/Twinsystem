@@ -1,6 +1,8 @@
 #pragma once
 #include "core/module.h"
+#include "debug/console.h"
 #include "modules/inputs/button.h"
+#include "modules/inputs/localisationSensor.h"
 
 class Inputs : public Module{
 private:
@@ -13,6 +15,10 @@ private:
     Button downTrapSwith;
     Switch lowTurbineSwitch;
     Switch highTurbineSwitch;
+    LocalisationSensor localisationSensor1;
+    LocalisationSensor localisationSensor2;
+    LocalisationSensor localisationSensor3;
+    
 
 public:
     Inputs();
@@ -44,6 +50,10 @@ public:
     bool getHighTurbineState() const;
 
     void waitButtonRelease();
+
+    float getDistanceSensor1() const;
+    float getDistanceSensor2() const;
+    float getDistanceSensor3() const;
 
     bool hasChanged() const;
     void update() override;

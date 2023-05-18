@@ -52,6 +52,12 @@ namespace Pin{
         enable = 39,
         speed = 37;
     }
+
+    namespace LocalisationSensors{
+        const int Sensor1 = 40;
+        const int Sensor2 = 41;
+        const int Sensor3 = 42;
+    }
     
 
     // Actuator Pinout
