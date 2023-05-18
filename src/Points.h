@@ -3,6 +3,7 @@
 namespace Score {
 
 const int 	cakeWithCherry = 6,
+			cake = 1,
 			wheelsOnPlate = 15,
 			funnyAction = 5,
 			basket = 5,

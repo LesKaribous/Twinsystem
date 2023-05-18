@@ -18,8 +18,8 @@ namespace TwinSystem{
                 right_Open = 140,
                 left_Open = 50,
                 cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
+                right_Grab = 100,
+                left_Grab = 90;
             }
             
             namespace BC{
@@ -30,8 +30,8 @@ namespace TwinSystem{
                 right_Open = 140,
                 left_Open = 50,
                 cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
+                right_Grab = 100,
+                left_Grab = 90;
             }
 
             namespace CA{
@@ -42,8 +42,8 @@ namespace TwinSystem{
                 right_Open = 140,
                 left_Open = 50,
                 cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
+                right_Grab = 100,
+                left_Grab = 90;
             }
         }
         namespace cherryPicker{

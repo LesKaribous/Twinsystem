@@ -374,6 +374,11 @@ void Robot::MatchSecondaryBlue(){
     match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNE);
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
     //Fin du match
     Go(blueEndSecondary);
 
@@ -450,6 +455,11 @@ void Robot::MatchSecondaryGreen(){
     match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNW);
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
     //Fin du match
     Go(greenEndSecondary);
 
@@ -506,6 +516,10 @@ void Robot::MatchSecondaryCakeBlue(){
 
     Go(cakeBrownNE);
 
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
     //Fin du match
     Go(blueEndSecondary);
 
@@ -561,6 +575,46 @@ void Robot::MatchSecondaryCakeGreen(){
     match.AddToScore(cakeWithCherry);
 
     Go(cakeBrownNW);
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
+
+    //Go take some other Cake ! 17/05/2023
+
+    Go(2210,724);
+
+    // Take YellowNW
+    actuators.Open(RobotCompass::CA);
+    Align(RobotCompass::CA, GetCompassOrientation(TableCompass::WEST));
+    Go(cakeYellowNW);
+    actuators.Grab(RobotCompass::CA);
+
+    // Take YellowNW
+    actuators.Open(RobotCompass::BC);
+    Align(RobotCompass::BC, GetCompassOrientation(TableCompass::NORTH));
+    Go(cakePinkNW);
+    actuators.Grab(RobotCompass::BC);
+
+    // Pos face to the depose Zone
+    Go(dropV3_03);
+
+    // Depose des Cake
+    Align(RobotCompass::BC, GetCompassOrientation(TableCompass::NORTH));
+    Go(v3);
+    actuators.Ungrab(RobotCompass::BC);
+    match.AddToScore(cake,3);
+    Go(dropV3_02);
+    Align(RobotCompass::CA, GetCompassOrientation(TableCompass::NORTH));
+    actuators.Ungrab(RobotCompass::CA);
+    match.AddToScore(cake,3);
+    Go(dropV3_03);
+
+    // Close All before end Match
+
+    actuators.Close(RobotCompass::AB);
+    actuators.Close(RobotCompass::BC);
+    actuators.Close(RobotCompass::CA);
 
     //Fin du match
     Go(greenEndSecondary);

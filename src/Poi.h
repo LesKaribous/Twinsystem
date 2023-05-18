@@ -87,24 +87,33 @@ namespace POI{
 		const Vec2 retreatBlue3 = Vec2(460,1600);
 
 		// Green V1
-		const Vec2 dropGreen1 = Vec2(180,280);
-		const Vec2 dropGreen2 = Vec2(320,280);
-		const Vec2 dropGreen3 = Vec2(460,280);
+		const Vec2 dropGreen1 = Vec2(180,240);
+		const Vec2 dropGreen2 = Vec2(320,240);
+		const Vec2 dropGreen3 = Vec2(460,240);
 				
 		const Vec2 retreatGreen1 = Vec2(180,400);
 		const Vec2 retreatGreen2 = Vec2(320,400);
 		const Vec2 retreatGreen3 = Vec2(460,400);
 
-        // Blue B2
+		// Blue B2
 		const Vec2 dropB2_01 = Vec2(1875,1775);
 		const Vec2 dropB2_02 = Vec2(1875,1635);
 		const Vec2 dropB2_03 = Vec2(1875,1495);
+
+		// Blue B3
+		const Vec2 dropB3_01 = Vec2(2775,1275);
+		const Vec2 dropB3_02 = Vec2(2635,1275);
+		const Vec2 dropB3_03 = Vec2(2495,1275);
 
 		// Green V2
 		const Vec2 dropV2_01 = Vec2(1875,225);
 		const Vec2 dropV2_02 = Vec2(1875,365);
 		const Vec2 dropV2_03 = Vec2(1875,505);
 
-		// ------------------------------------------
+		// Green V3
+		const Vec2 dropV3_01 = Vec2(2775,725);
+		const Vec2 dropV3_02 = Vec2(2635,725);
+		const Vec2 dropV3_03 = Vec2(2495,725);
 
+		// ------------------------------------------
 }
