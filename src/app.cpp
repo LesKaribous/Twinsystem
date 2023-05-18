@@ -623,7 +623,6 @@ void SystemApplication::matchPrimaryBlue(){
 
     // Fin de match
     go(blueEndPrimary);
-    addScore(wheelsOnPlate/2);
 	system.enable(NEOPIXEL);
 }
 
@@ -718,7 +717,6 @@ void SystemApplication::matchPrimaryGreen(){
 
     // Fin de match
     go(greenEndPrimary);
-    addScore(wheelsOnPlate/2);
     system.enable(NEOPIXEL);
 
 }
@@ -793,8 +791,6 @@ void SystemApplication::matchSecondaryBlue(){
 
     //Fin du match
     go(blueEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
@@ -871,14 +867,160 @@ void SystemApplication::matchSecondaryGreen(){
     //Fin du match
     go(greenEndSecondary);
 
-    addScore(wheelsOnPlate/2);
-
     // Fin de match
     actuators.trap.open();
     wait(1000);
 }
 
 void SystemApplication::matchSecondaryCakeBlue(){
+	motion.setAbsolute();
+
+    actuators.ungrab(RobotCompass::AB);
+	actuators.ungrab(RobotCompass::BC);
+	actuators.ungrab(RobotCompass::CA);
+
+    actuators.ungrab(RobotCompass::AB);
+	go(cakePinkNW);
+	actuators.grab(RobotCompass::AB);
+	align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
+
+    actuators.ungrab(RobotCompass::BC);
+    go(cakeYellowNW);
+    actuators.grab(RobotCompass::BC);
+    align(RobotCompass::CA, -135);
+
+    actuators.ungrab(RobotCompass::CA);
+    go(cakeBrownNW);
+    actuators.grab(RobotCompass::CA);
+
+    // ----------------------------------------
+    // Depose les gateaux 
+    // (Version 2 - Protégés)
+    // ----------------------------------------
+    //Dépose du premier Gateau
+    align(RobotCompass::BC, -120);
+    go(retreatB2_04);
+    actuators.unlock(RobotCompass::BC);
+    go(dropB2_04);
+    actuators.ungrab(RobotCompass::BC);
+    go(retreatB2_05);
+    actuators.close(RobotCompass::BC);
+    addScore(cakeWithCherry);
+
+    //Dépose du second Gateau
+    align(RobotCompass::AB, -120);
+    actuators.unlock(RobotCompass::AB);
+    go(dropB2_05);
+    actuators.ungrab(RobotCompass::AB);
+    go(retreatB2_06);
+    actuators.close(RobotCompass::AB);
+    addScore(cakeWithCherry);
+
+    //Dépose du troisieme Gateau
+    align(RobotCompass::CA, -120);
+    actuators.unlock(RobotCompass::CA);
+    go(dropB2_06);
+    actuators.ungrab(RobotCompass::CA);
+    go(retreatB2_06);
+    actuators.close(RobotCompass::CA);
+    addScore(cakeWithCherry);
+
+    // Close All before end Match
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
+
+    //Securise
+    go(dropB2_03);
+    while(chrono.getTimeLeftSeconds() >= 10)
+    {
+        go(protectB2_01);
+        go(protectB2_02);
+    }
+
+    //Fin du match
+    go(blueEndSecondary);
+
+    // Fin de match
+    actuators.trap.open();
+    wait(1000);
+}
+
+void SystemApplication::matchSecondaryCakeGreen(){
+	motion.setAbsolute();
+
+    actuators.ungrab(RobotCompass::AB);
+	actuators.ungrab(RobotCompass::BC);
+	actuators.ungrab(RobotCompass::CA);
+
+    actuators.ungrab(RobotCompass::AB);
+	go(cakePinkNE);
+	actuators.grab(RobotCompass::AB);
+	align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
+
+    actuators.ungrab(RobotCompass::BC);
+    go(cakeYellowNE);
+    actuators.grab(RobotCompass::BC);
+    align(RobotCompass::CA, 135);
+
+    actuators.ungrab(RobotCompass::CA);
+    go(cakeBrownNE);
+    actuators.grab(RobotCompass::CA);
+
+    // ----------------------------------------
+    // Depose les gateaux 
+    // (Version 2 - Protégés)
+    // ----------------------------------------
+    //Dépose du premier Gateau
+    align(RobotCompass::BC, 120);
+    go(retreatV2_04);
+    actuators.unlock(RobotCompass::BC);
+    go(dropV2_04);
+    actuators.ungrab(RobotCompass::BC);
+    go(retreatV2_05);
+    actuators.close(RobotCompass::BC);
+    addScore(cakeWithCherry);
+
+    //Dépose du second Gateau
+    align(RobotCompass::AB, 120);
+    actuators.unlock(RobotCompass::AB);
+    go(dropV2_05);
+    actuators.ungrab(RobotCompass::AB);
+    go(retreatV2_06);
+    actuators.close(RobotCompass::AB);
+    addScore(cakeWithCherry);
+
+    //Dépose du troisieme Gateau
+    align(RobotCompass::CA, 120);
+    actuators.unlock(RobotCompass::CA);
+    go(dropV2_06);
+    actuators.ungrab(RobotCompass::CA);
+    go(retreatV2_06);
+    actuators.close(RobotCompass::CA);
+    addScore(cakeWithCherry);
+
+    // Close All before end Match
+    actuators.close(RobotCompass::AB);
+    actuators.close(RobotCompass::BC);
+    actuators.close(RobotCompass::CA);
+
+    //Securise
+    go(dropV2_03);
+    while(chrono.getTimeLeftSeconds() >= 10)
+    {
+        go(protectV2_01);
+        go(protectV2_02);
+    }
+
+    //Fin du match
+    go(greenEndSecondary);
+
+    // Fin de match
+    actuators.trap.open();
+    wait(1000);
+}
+
+void SystemApplication::matchSecondaryCakeBlueOld(){
 	motion.setAbsolute();
 
     actuators.ungrab(RobotCompass::AB);
@@ -927,14 +1069,12 @@ void SystemApplication::matchSecondaryCakeBlue(){
     //Fin du match
     go(blueEndSecondary);
 
-    addScore(wheelsOnPlate/2);
-
     // Fin de match
     actuators.trap.open();
     wait(1000);
 }
 
-void SystemApplication::matchSecondaryCakeGreen(){
+void SystemApplication::matchSecondaryCakeGreenOld(){
 	motion.setAbsolute();
 
     actuators.ungrab(RobotCompass::AB);
@@ -955,7 +1095,10 @@ void SystemApplication::matchSecondaryCakeGreen(){
     go(cakeBrownNE);
     actuators.grab(RobotCompass::CA);
 
-    // Depose les gateaux
+    // ----------------------------------------
+    // Depose les gateaux 
+    // (Version 1 - En ligne - Non protégée)
+    // ----------------------------------------
     align(RobotCompass::AB, getCompassOrientation(TableCompass::WEST));
     actuators.unlock(RobotCompass::AB);
     go(dropV2_01);
@@ -1017,11 +1160,8 @@ void SystemApplication::matchSecondaryCakeGreen(){
     actuators.close(RobotCompass::BC);
     actuators.close(RobotCompass::CA);
 
-
     //Fin du match
     go(greenEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
