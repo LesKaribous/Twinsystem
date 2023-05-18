@@ -27,7 +27,7 @@ namespace Settings{
         GREEN  = true;
 
         const unsigned long 
-        DURATION = 20*1000,//100 * 1000,
+        DURATION = 100*1000,//100 * 1000,
         ENDMATCH = 200;
         
         const float 
