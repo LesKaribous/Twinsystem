@@ -1,5 +1,5 @@
 #include "system.h"
-#include "Settings.h"
+#include "settings.h"
 
 System::System(){
     m_currentState = BOOT;

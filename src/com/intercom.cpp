@@ -1,5 +1,5 @@
-#include "com/Intercom.h"
-#include "debug/Console.h"
+#include "com/intercom.h"
+#include "debug/console.h"
 
 #define LIDAR_SERIAL Serial1
 

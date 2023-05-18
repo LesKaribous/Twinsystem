@@ -1,6 +1,6 @@
 #pragma once
 
-#include "math/Geometry.h"
+#include "math/geometry.h"
 
 namespace POI{
 

@@ -1,4 +1,4 @@
-#include "BistableServo.h"
+#include "bistableServo.h"
 
 BistableServo::BistableServo(BistableServoProps props) :
     _pin(props.pin), _openPos(props.open), _closePos(props.close), _grabPos(props.grab) , _enabled(false), _sleeping(false), _closed(false), _grabed(false)

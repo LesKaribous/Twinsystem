@@ -1,8 +1,8 @@
 #pragma once
 #include "pin.h"
 #include "core/lib.h"
-#include "core/Job.h"
-#include "math/Geometry.h"
+#include "core/job.h"
+#include "math/geometry.h"
 
 #define SLOW 30
 #define FAST 100

@@ -1,6 +1,6 @@
 #include "stepperController.h"
 #include "settings.h"
-#include "debug/Console.h"
+#include "debug/console.h"
 
 
 StepperController::StepperController() :         
