@@ -108,8 +108,6 @@ void SystemApplication::update(){
 		lidar.checkLidar(motion.getTargetDirection() * RAD_TO_DEG);
 		lidar.checkObstacle();
 
-        //THROW(motion.isRotating())
-
 		if(lidar.obstacleDetected() && motion.isMoving() && !motion.isRotating()){
 			motion.pause();
             THROW("PAUSED")
@@ -119,7 +117,7 @@ void SystemApplication::update(){
 		}
 
 
-		if(chrono.isNearlyFinished()){
+		if(chrono.isNearlyFinished() && _state != RobotState::FINISHING){
 			motion.cancel();
 			handleNearlyFinishedMatch();//go home
 		}
