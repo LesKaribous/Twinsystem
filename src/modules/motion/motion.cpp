@@ -35,13 +35,17 @@ void Motion::resume(){
 }
 
 void Motion::cancel() {
-    _currentJob.cancel();
+    steppers.pause();
+    updatePosition();
     steppers.cancel();
+    _currentJob.cancel();
 }
 
 void Motion::forceCancel() {
+    steppers.emergencyStop();
+    updatePosition();
+    steppers.cancel();
     _currentJob.cancel();
-    steppers.forceCancel();
 }
 
 void Motion::complete() {

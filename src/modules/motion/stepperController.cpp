@@ -48,18 +48,37 @@ void StepperController::resume(){
 
 void StepperController::cancel() {
     _currentJob.cancel();
-    if(_currentJob.isCancelled()){
-        _controller.stop();
-        complete();
+    if(_controller.isRunning()){
+        _controller.stop(); //Blocking
     }
+    _sA_target = 0;
+    _sB_target = 0;
+    _sC_target = 0;
+
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
 }
 
 void StepperController::forceCancel() {
     _currentJob.cancel();
-    if(_currentJob.isCancelled()){
+    if(_controller.isRunning()){
         _controller.emergencyStop();
-        complete();
     }
+    
+    _sA_target = 0;
+    _sB_target = 0;
+    _sC_target = 0;
+
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
 }
 
 
