@@ -623,7 +623,6 @@ void SystemApplication::matchPrimaryBlue(){
 
     // Fin de match
     go(blueEndPrimary);
-    addScore(wheelsOnPlate/2);
 	system.enable(NEOPIXEL);
 }
 
@@ -718,7 +717,6 @@ void SystemApplication::matchPrimaryGreen(){
 
     // Fin de match
     go(greenEndPrimary);
-    addScore(wheelsOnPlate/2);
     system.enable(NEOPIXEL);
 
 }
@@ -793,8 +791,6 @@ void SystemApplication::matchSecondaryBlue(){
 
     //Fin du match
     go(blueEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
@@ -871,8 +867,6 @@ void SystemApplication::matchSecondaryGreen(){
     //Fin du match
     go(greenEndSecondary);
 
-    addScore(wheelsOnPlate/2);
-
     // Fin de match
     actuators.trap.open();
     wait(1000);
@@ -944,17 +938,13 @@ void SystemApplication::matchSecondaryCakeBlue(){
         go(protectB2_02);
     }
 
-
     //Fin du match
     go(blueEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
     wait(1000);
 }
-
 
 void SystemApplication::matchSecondaryCakeGreen(){
 	motion.setAbsolute();
@@ -1025,8 +1015,6 @@ void SystemApplication::matchSecondaryCakeGreen(){
     //Fin du match
     go(greenEndSecondary);
 
-    addScore(wheelsOnPlate/2);
-
     // Fin de match
     actuators.trap.open();
     wait(1000);
@@ -1080,8 +1068,6 @@ void SystemApplication::matchSecondaryCakeBlueOld(){
     actuators.close(RobotCompass::CA);
     //Fin du match
     go(blueEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
@@ -1174,11 +1160,8 @@ void SystemApplication::matchSecondaryCakeGreenOld(){
     actuators.close(RobotCompass::BC);
     actuators.close(RobotCompass::CA);
 
-
     //Fin du match
     go(greenEndSecondary);
-
-    addScore(wheelsOnPlate/2);
 
     // Fin de match
     actuators.trap.open();
