@@ -32,7 +32,7 @@ void Chronometer::updateTime(){
     if(_state == State::STARTED){
         _elapsed = millis() - _startTime;
         _timeLeft = Settings::Match::DURATION - _elapsed;
-        if(_timeLeft <= 0) _state = State::FINISHED;
+        if(_timeLeft <= Settings::Match::ENDMATCH) _state = State::FINISHED;
     }
 }
 

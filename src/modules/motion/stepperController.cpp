@@ -54,6 +54,15 @@ void StepperController::cancel() {
     }
 }
 
+void StepperController::forceCancel() {
+    _currentJob.cancel();
+    if(_currentJob.isCancelled()){
+        _controller.emergencyStop();
+        complete();
+    }
+}
+
+
 bool StepperController::hasFinished() {
     return !_controller.isRunning() && (_sA.getPosition() == _sA_target && _sB.getPosition() == _sB_target && _sC.getPosition() == _sC_target);
 }

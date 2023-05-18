@@ -27,8 +27,9 @@ namespace Settings{
         GREEN  = true;
 
         const unsigned long 
-        DURATION = 100000 ;
-
+        DURATION = 20*1000,//100 * 1000,
+        ENDMATCH = 200;
+        
         const float 
         FEEDRATE = 100; //%
     }

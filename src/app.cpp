@@ -99,12 +99,18 @@ SystemApplication::SystemApplication(){
 SystemApplication::~SystemApplication(){}
 
 void SystemApplication::update(){
-    //delay(100);
 	system.update();
 	chrono.getTimeLeft();
     connectModules();
 
 	if(_state == RobotState::STARTED || _state == RobotState::FINISHING){
+
+		if(chrono.isFinished()){
+			handleFinishedMatch(); //Stop robot, motor disengage
+		}else if(chrono.isNearlyFinished()){
+			handleNearlyFinishedMatch();//go home
+		}
+
 		lidar.checkLidar(motion.getTargetDirection() * RAD_TO_DEG);
 		lidar.checkObstacle();
 
@@ -114,17 +120,6 @@ void SystemApplication::update(){
 		}else if(motion.getCurrentJob().isPaused() && !lidar.obstacleDetected()){
 		    motion.resume();
             THROW("RESUMED")
-		}
-
-
-		if(chrono.isNearlyFinished() && _state != RobotState::FINISHING){
-			motion.cancel();
-			handleNearlyFinishedMatch();//go home
-		}
-
-		if(chrono.isFinished()){
-			motion.cancel();
-			handleFinishedMatch(); //Stop robot, motor disengage
 		}
 	}
 }
@@ -216,19 +211,23 @@ void SystemApplication::endMatch(){
 
 
 void SystemApplication::handleFinishedMatch(){ 
+    if(_state != RobotState::FINISHED){
+        setState(RobotState::FINISHED);
+        motion.forceCancel();
+        system.disable(MOTION);
 
-    setState(RobotState::FINISHED);
-    motion.cancel();
-    if	   (inputs.isBlue()  && inputs.isPrimary())     finishPrimaryBlue();
-    else if(inputs.isBlue()  && inputs.isSecondary())   finishSecondaryBlue();
-    else if(inputs.isGreen() && inputs.isPrimary())     finishPrimaryGreen();
-    else if(inputs.isGreen() && inputs.isSecondary())   finishSecondaryGreen();
+        if	   (inputs.isBlue()  && inputs.isPrimary())     finishPrimaryBlue();
+        else if(inputs.isBlue()  && inputs.isSecondary())   finishSecondaryBlue();
+        else if(inputs.isGreen() && inputs.isPrimary())     finishPrimaryGreen();
+        else if(inputs.isGreen() && inputs.isSecondary())   finishSecondaryGreen();
 
-    system.disable(MOTION);
-    system.disable(ACTUATORS);
-    system.enable(NEOPIXEL);
+        system.disable(MOTION);
+        system.disable(ACTUATORS);
+        system.enable(NEOPIXEL);
 
-    screen.update();
+        screen.update();
+
+    }
 
 }
 

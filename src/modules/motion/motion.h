@@ -24,6 +24,7 @@ public:
     void pause();
     void resume();
     void cancel();
+    void forceCancel();
     void complete();
 
     void updatePosition();

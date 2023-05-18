@@ -77,7 +77,7 @@ void  Job::resume(){
 }
 
 void  Job::cancel(){
-	if(m_state != JobState::IDLE && m_state != JobState::COMPLETED){
+	if(m_state != JobState::COMPLETED){
 		m_state = JobState::CANCELLED;
 	}
 }

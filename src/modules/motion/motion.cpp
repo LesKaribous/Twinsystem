@@ -39,6 +39,11 @@ void Motion::cancel() {
     steppers.cancel();
 }
 
+void Motion::forceCancel() {
+    _currentJob.cancel();
+    steppers.forceCancel();
+}
+
 void Motion::complete() {
     _currentJob.complete();
     
