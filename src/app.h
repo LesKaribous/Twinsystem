@@ -67,6 +67,9 @@ public:
     void matchSecondaryGreen();
     void matchSecondaryCakeBlue();
     void matchSecondaryCakeGreen();
+    void matchSecondaryCakeBlueOld();
+    void matchSecondaryCakeGreenOld();
+    
 
     void nearlyFinishPrimaryBlue();
     void nearlyFinishPrimaryGreen();
