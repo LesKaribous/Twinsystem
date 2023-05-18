@@ -18,6 +18,7 @@ public:
 
     inline void enable(){enabled = true;}
     inline void disable(){enabled = false;}
+    inline bool isEnable(){return enabled;}
 
 protected:
     bool enabled = true;

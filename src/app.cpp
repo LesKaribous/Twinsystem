@@ -46,12 +46,13 @@ void SystemApplication::connectModules(){
     else if(inputs.getUpTrapState() && actuators.trap.isClosed())
         actuators.trap.open();
     
-    if(inputs.getLowTurbineSate())
+    if(inputs.getLowTurbineState() && inputs.hasTurbineStateChanged())
         actuators.setTurbine(50);
-    else if(inputs.getHighTurbineState())
+    else if(inputs.getHighTurbineState() && inputs.hasTurbineStateChanged())
         actuators.setTurbine(100);
-    else
+    else if((!inputs.getLowTurbineState() || !inputs.getHighTurbineState()) && inputs.hasTurbineStateChanged())
         actuators.stopTurbine();
+
 
 	//screen.started.SetValue(_state == RobotState::STARTED);
 	//screen.intercom.SetValue(lidar.isConnected());

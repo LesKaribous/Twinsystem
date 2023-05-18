@@ -12,8 +12,10 @@ Inputs::Inputs() :
     upTrapSwitch(Pin::Inputs::upTrapSwitch),
     downTrapSwith(Pin::Inputs::downTrapSwitch),
     lowTurbineSwitch(Pin::Inputs::lowTurbineSwitch),
-    highTurbineSwitch(Pin::Inputs::highTurbineSwitch)
-
+    highTurbineSwitch(Pin::Inputs::highTurbineSwitch),
+    localisationSensor1(Pin::LocalisationSensors::Sensor1),
+    localisationSensor2(Pin::LocalisationSensors::Sensor2),
+    localisationSensor3(Pin::LocalisationSensors::Sensor3)
 {
     starter.setInverted(true);
     teamSwitch.setInverted(true);
@@ -34,6 +36,9 @@ Inputs::Inputs() :
     downTrapSwith.init();
     lowTurbineSwitch.init();
     highTurbineSwitch.init();
+    localisationSensor1.init();
+    localisationSensor2.init();
+    localisationSensor3.init();
 }
 
 Inputs::~Inputs(){
@@ -49,10 +54,17 @@ void Inputs::update(){
     downTrapSwith.read();
     lowTurbineSwitch.read();
     highTurbineSwitch.read();
+    localisationSensor1.read();
+    localisationSensor2.read();
+    localisationSensor3.read();
 }
 
 bool Inputs::hasChanged() const{
-    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
+    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged() || lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
+}
+
+bool Inputs::hasTurbineStateChanged(){
+    return lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
 }
  
 void Inputs::waitButtonRelease(){
@@ -66,11 +78,20 @@ void Inputs::waitButtonRelease(){
 void Inputs::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();
+    upTrapSwitch.disable();
+    downTrapSwith.disable();
+    lowTurbineSwitch.disable();
+    highTurbineSwitch.disable();
 	//avoidanceSwitch.disable();
 }
 void Inputs::unfreezeSettings(){
 	teamSwitch.enable();
 	strategySwitch.enable();
+    upTrapSwitch.enable();
+    downTrapSwith.enable();
+    lowTurbineSwitch.enable();
+    highTurbineSwitch.enable();
+
 	//avoidanceSwitch.enable();
 }
 
@@ -133,10 +154,22 @@ bool Inputs::getDownTrapState() const{
     return downTrapSwith.getState();
 }
 
-bool Inputs::getLowTurbineSate() const{
+bool Inputs::getLowTurbineState() const{
     return lowTurbineSwitch.getState();
 }
 
 bool Inputs::getHighTurbineState() const{
     return highTurbineSwitch.getState();
+}
+
+float Inputs::getDistanceSensor1() const{
+    return localisationSensor1.getDistance();
+}
+
+float Inputs::getDistanceSensor2() const{
+    return localisationSensor2.getDistance();
+}
+
+float Inputs::getDistanceSensor3() const{
+    return localisationSensor3.getDistance();
 }
