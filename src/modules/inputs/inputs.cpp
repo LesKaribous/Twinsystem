@@ -52,7 +52,11 @@ void Inputs::update(){
 }
 
 bool Inputs::hasChanged() const{
-    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
+    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged() || lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
+}
+
+bool Inputs::hasTurbineStateChanged(){
+    return lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
 }
  
 void Inputs::waitButtonRelease(){
@@ -66,11 +70,20 @@ void Inputs::waitButtonRelease(){
 void Inputs::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();
+    upTrapSwitch.disable();
+    downTrapSwith.disable();
+    lowTurbineSwitch.disable();
+    highTurbineSwitch.disable();
 	//avoidanceSwitch.disable();
 }
 void Inputs::unfreezeSettings(){
 	teamSwitch.enable();
 	strategySwitch.enable();
+    upTrapSwitch.enable();
+    downTrapSwith.enable();
+    lowTurbineSwitch.enable();
+    highTurbineSwitch.enable();
+
 	//avoidanceSwitch.enable();
 }
 
@@ -133,7 +146,7 @@ bool Inputs::getDownTrapState() const{
     return downTrapSwith.getState();
 }
 
-bool Inputs::getLowTurbineSate() const{
+bool Inputs::getLowTurbineState() const{
     return lowTurbineSwitch.getState();
 }
 

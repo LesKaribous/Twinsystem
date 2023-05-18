@@ -28,6 +28,8 @@ public:
     bool buttonReleased() const;
     bool starterCancelled() const;
 
+    bool hasTurbineStateChanged();
+
     bool isBlue() const;
     bool isCake() const;
     bool isGreen() const;
@@ -38,7 +40,7 @@ public:
     bool getStrategyState() const;
     bool getUpTrapState() const;
     bool getDownTrapState() const;
-    bool getLowTurbineSate() const;
+    bool getLowTurbineState() const;
     bool getHighTurbineState() const;
 
     void waitButtonRelease();
