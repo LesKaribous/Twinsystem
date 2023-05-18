@@ -24,21 +24,22 @@ public:
     float getDistance() const{return _distance;}
 
     virtual float getDitance(){
-        bool state = digitalReadFast(_pin);
-        if(state != lastState){
-            lastState = state;
-            if(state){
-                tlastUp = micros();   //Montant
-            }else{
-                tlastDown = micros(); //Descendant
-                pulseWidth = tlastDown - tlastUp;
-                _distance = 3/4 * (pulseWidth - 1000);
-
-                return  _distance; // return distance
-            }
+        int16_t t = pulseIn(_pin, HIGH);
+        
+        if (t == 0)
+        {
+            _distance = -1;
         }
-
-        return 0;
+        else if (t > 1850)
+        {
+            _distance = -1;
+        }
+        else
+        {
+            _distance = (t - 1000) * 4;
+            // Limit minimum distance to 0.
+            if (_distance < 0) { _distance = 0; } 
+        }
     }
 
 

@@ -4,6 +4,7 @@
 
 class Localisation : public Module{
 
+public:
     Localisation();
 
     void update() override;
@@ -13,7 +14,7 @@ class Localisation : public Module{
     Vec3 accumulateDrift(Vec3 estimateCartesian);
 
 private:
-    int _samples = 10;
+    unsigned int _samples = 10;
     Vec2 _driftAccumulator;
     Vec3 _measureRaw;
     std::deque<Vec3> _samplesMeasure;
