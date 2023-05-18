@@ -17,6 +17,7 @@
 //#include "modules/planner/planner.h"
 #include "modules/neopixel/neopixel.h"
 #include "modules/actuators/actuators.h"
+#include "modules/localisation/localisation.h"
 
 enum class RobotState{
     IDLE,
@@ -117,6 +118,7 @@ private:
     //std::unique_ptr<Planner> _plannerPtr = nullptr;
     std::unique_ptr<NeoPixel> _neopixelPtr = nullptr;
     std::unique_ptr<Actuators> _actuatorsPtr = nullptr;
+    std::unique_ptr<Localisation> _localisationPtr = nullptr;
 
     RobotState _state;
 

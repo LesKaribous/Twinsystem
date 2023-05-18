@@ -25,4 +25,5 @@ enum class RobotCompass{
 
 float getCompassOrientation(TableCompass tc);
 float getCompassOrientation(RobotCompass rc);
+float getBorderDistance( Vec2 cartesianPos, float heading);
 float getOffsets(RobotCompass rc);

@@ -47,6 +47,25 @@ float getCompassOrientation(RobotCompass rc){
     }
 }
 
+
+float getBorderDistance(Vec2 pos, float angle){
+
+    //TODO Optimize that shit
+	Vec2 tableHit = Vec2(3000,0);
+	tableHit.rotate(angle);
+	tableHit = Vec2::add(pos, tableHit);
+	if(tableHit.a > 3000) tableHit.a = 3000;
+	if(tableHit.a < 0) tableHit.a = 0;
+	if(tableHit.b > 2000) tableHit.b = 2000;
+	if(tableHit.b <0) tableHit.b = 0;
+	tableHit.sub(pos);
+	float maxdist = tableHit.mag();
+
+    return maxdist;
+
+}
+
+
 float getOffsets(RobotCompass rc){
     switch (rc){
     case RobotCompass::A:

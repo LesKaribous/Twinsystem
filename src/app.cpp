@@ -85,7 +85,10 @@ SystemApplication::SystemApplication(){
     screen.drawBootProgress(60, "Loading Neopixel...");
     _neopixelPtr = std::make_unique<NeoPixel>();
 
-    screen.drawBootProgress(75, "Linking modules...");
+    screen.drawBootProgress(70, "Loading Localisation...");
+    _localisationPtr = std::make_unique<Localisation>();
+
+    screen.drawBootProgress(85, "Linking modules...");
 
     system.registerModule(_lidarPtr.get());
     system.registerModule(_screenPtr.get());
@@ -94,6 +97,7 @@ SystemApplication::SystemApplication(){
     //system.registerModule(_plannerPtr.get());
     system.registerModule(_neopixelPtr.get());
     system.registerModule(_actuatorsPtr.get());
+    system.registerModule(_localisationPtr.get());
 
     system.enable(LIDAR);
     system.enable(INPUTS);
@@ -101,6 +105,7 @@ SystemApplication::SystemApplication(){
 	//system.enable(MOTION);
     system.enable(NEOPIXEL);
 	system.enable(ACTUATORS);
+    system.enable(LOCALISATION);
 
     screen.drawBootProgress(100, "Boot complete...");
     delay(200);

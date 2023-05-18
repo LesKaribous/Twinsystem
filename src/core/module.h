@@ -7,7 +7,8 @@ enum SystemModule{
     MOTION,
     PLANNER,
     NEOPIXEL,
-    ACTUATORS
+    ACTUATORS,
+    LOCALISATION
 };
 
 // Base class for subsystems

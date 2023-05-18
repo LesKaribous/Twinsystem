@@ -19,6 +19,7 @@ struct Vec2 {
     //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.GetAbsPosition())).heading())
 
     Vec2();
+    Vec2(float);
     Vec2(float, float);
 
     Vec2& add(const Vec2&);

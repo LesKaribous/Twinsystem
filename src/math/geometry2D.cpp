@@ -34,8 +34,13 @@ Vec2::Vec2(float v){
     a = b = v;
 }*/
 
-Vec2::Vec2(float x, float y){
-    a = x; b = y;
+Vec2::Vec2(float u){
+    a = u; b = u;
+}
+
+
+Vec2::Vec2(float _x, float _y){
+    a = _x; b = _y;
 }
 
 Vec2 Vec2::copy() const{
