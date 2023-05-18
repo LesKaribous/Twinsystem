@@ -41,6 +41,17 @@ void SystemApplication::connectModules(){
     screen.resetButton.SetValue(inputs.buttonPressed());
     screen.strategySwitch.SetValue(inputs.isCake());
 
+    if(inputs.getDownTrapState() && !actuators.trap.isClosed())
+        actuators.trap.close();
+    else if(inputs.getUpTrapState() && actuators.trap.isClosed())
+        actuators.trap.open();
+    
+    if(inputs.getLowTurbineSate())
+        actuators.setTurbine(50);
+    else if(inputs.getHighTurbineState())
+        actuators.setTurbine(100);
+    else
+        actuators.stopTurbine();
 
 	//screen.started.SetValue(_state == RobotState::STARTED);
 	//screen.intercom.SetValue(lidar.isConnected());

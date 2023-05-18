@@ -8,19 +8,32 @@ Inputs::Inputs() :
     teamSwitch(Pin::Inputs::teamSwitch),
     twinSwitch(Pin::Inputs::twinSwitch),
     resetButton(Pin::Inputs::resetButton),
-    strategySwitch(Pin::Inputs::strategySwitch)
+    strategySwitch(Pin::Inputs::strategySwitch),
+    upTrapSwitch(Pin::Inputs::upTrapSwitch),
+    downTrapSwith(Pin::Inputs::downTrapSwitch),
+    lowTurbineSwitch(Pin::Inputs::lowTurbineSwitch),
+    highTurbineSwitch(Pin::Inputs::highTurbineSwitch)
+
 {
     starter.setInverted(true);
     teamSwitch.setInverted(true);
     twinSwitch.setInverted(true);
     resetButton.setInverted(true);
     strategySwitch.setInverted(true);
+    upTrapSwitch.setInverted(true);
+    downTrapSwith.setInverted(true);
+    lowTurbineSwitch.setInverted(true);
+    highTurbineSwitch.setInverted(true);
 
     starter.init();
     teamSwitch.init();
     twinSwitch.init();
     resetButton.init();
     strategySwitch.init();
+    upTrapSwitch.init();
+    downTrapSwith.init();
+    lowTurbineSwitch.init();
+    highTurbineSwitch.init();
 }
 
 Inputs::~Inputs(){
@@ -32,6 +45,10 @@ void Inputs::update(){
     twinSwitch.read();
     resetButton.read();
     strategySwitch.read();
+    upTrapSwitch.read();
+    downTrapSwith.read();
+    lowTurbineSwitch.read();
+    highTurbineSwitch.read();
 }
 
 bool Inputs::hasChanged() const{
@@ -106,4 +123,20 @@ bool Inputs::getStrategyState() const{
 
 bool Inputs::getRobotType() const{
 	return twinSwitch.getState();
+}
+
+bool Inputs::getUpTrapState() const{
+    return upTrapSwitch.getState();
+}
+
+bool Inputs::getDownTrapState() const{
+    return downTrapSwith.getState();
+}
+
+bool Inputs::getLowTurbineSate() const{
+    return lowTurbineSwitch.getState();
+}
+
+bool Inputs::getHighTurbineState() const{
+    return highTurbineSwitch.getState();
 }

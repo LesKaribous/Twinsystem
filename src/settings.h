@@ -34,6 +34,21 @@ namespace Settings{
         FEEDRATE = 100; //%
     }
 
+    namespace Inputs{
+        namespace Turbine{
+            const bool
+            LOW_MODE = true,
+            HIGH_MODE = true,
+            STANDBY = false;
+        }
+
+        namespace Trap{
+            const bool
+            UP = true,
+            DOWN = true;
+        }
+    }
+
     namespace Actuators{
         namespace Gripper{
             namespace AB{

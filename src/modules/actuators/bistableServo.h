@@ -20,6 +20,11 @@ public:
     void wakeUp();
     void disable();
 
+    inline bool isClosed() const {return _closed;}
+    inline bool isSleeping() const {return _sleeping;}
+    inline bool isEnable() const {return _enabled;}
+    inline bool idGrabed() const {return _grabed;}
+
 private:
     Servo _servo;
     int _pin, _openPos, _closePos, _grabPos;

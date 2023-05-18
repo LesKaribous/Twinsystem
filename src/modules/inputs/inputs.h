@@ -9,6 +9,10 @@ private:
     Switch twinSwitch;
     Button resetButton;
     Switch strategySwitch;
+    Button upTrapSwitch;
+    Button downTrapSwith;
+    Switch lowTurbineSwitch;
+    Switch highTurbineSwitch;
 
 public:
     Inputs();
@@ -32,6 +36,10 @@ public:
     bool isSecondary() const;
     bool getRobotType() const;
     bool getStrategyState() const;
+    bool getUpTrapState() const;
+    bool getDownTrapState() const;
+    bool getLowTurbineSate() const;
+    bool getHighTurbineState() const;
 
     void waitButtonRelease();
 

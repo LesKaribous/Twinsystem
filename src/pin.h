@@ -11,8 +11,11 @@ namespace Pin{
             starter = 26,
             teamSwitch = 27,
             strategySwitch = 28,
-            twinSwitch = 2;
- 
+            twinSwitch = 2,
+            upTrapSwitch = 34,
+            downTrapSwitch = 15,
+            lowTurbineSwitch = 14,  // I
+            highTurbineSwitch = 33;  // II
     }
 
     namespace Led{
@@ -43,6 +46,12 @@ namespace Pin{
         stepC = 5, 
         stepA = 9;
     }
+
+    namespace Turbine{
+        const int 
+        enable = 39,
+        speed = 37;
+    }
     
 
     // Actuator Pinout
@@ -58,6 +67,8 @@ namespace Pin{
         const int ServoB1 = 56; //D3
         const int ServoB2 = 20; //A3
         const int ServoB3 = 22; //P1
+        
+        const int ServoTrap = 55;
     }
 
     namespace CherryPicker{
