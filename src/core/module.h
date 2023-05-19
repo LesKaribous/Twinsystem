@@ -1,6 +1,7 @@
 #pragma once
 
 enum SystemModule{
+    CLI,
     LIDAR,
     SCREEN,
     INPUTS,

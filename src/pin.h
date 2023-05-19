@@ -54,9 +54,9 @@ namespace Pin{
     }
 
     namespace LocalisationSensors{
-        const int Sensor1 = 40;
-        const int Sensor2 = 41;
-        const int Sensor3 = 42;
+        const int SensorC = 40;
+        const int SensorA = 41;
+        const int SensorB = 42;
     }
     
 

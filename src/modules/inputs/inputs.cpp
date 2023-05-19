@@ -13,9 +13,9 @@ Inputs::Inputs() :
     downTrapSwith(Pin::Inputs::downTrapSwitch),
     lowTurbineSwitch(Pin::Inputs::lowTurbineSwitch),
     highTurbineSwitch(Pin::Inputs::highTurbineSwitch),
-    localisationSensor1(Pin::LocalisationSensors::Sensor1),
-    localisationSensor2(Pin::LocalisationSensors::Sensor2),
-    localisationSensor3(Pin::LocalisationSensors::Sensor3)
+    localisationSensorC(Pin::LocalisationSensors::SensorC),
+    localisationSensorA(Pin::LocalisationSensors::SensorA),
+    localisationSensorB(Pin::LocalisationSensors::SensorB)
 {
     starter.setInverted(true);
     teamSwitch.setInverted(true);
@@ -36,9 +36,9 @@ Inputs::Inputs() :
     downTrapSwith.init();
     lowTurbineSwitch.init();
     highTurbineSwitch.init();
-    localisationSensor1.init();
-    localisationSensor2.init();
-    localisationSensor3.init();
+    localisationSensorC.init();
+    localisationSensorA.init();
+    localisationSensorB.init();
 }
 
 Inputs::~Inputs(){
@@ -54,9 +54,9 @@ void Inputs::update(){
     downTrapSwith.read();
     lowTurbineSwitch.read();
     highTurbineSwitch.read();
-    localisationSensor1.read();
-    localisationSensor2.read();
-    localisationSensor3.read();
+    localisationSensorC.read();
+    localisationSensorA.read();
+    localisationSensorB.read();
 }
 
 bool Inputs::hasChanged() const{
@@ -162,14 +162,14 @@ bool Inputs::getHighTurbineState() const{
     return highTurbineSwitch.getState();
 }
 
-float Inputs::getDistanceSensor1() const{
-    return localisationSensor1.getDistance();
+float Inputs::getDistanceSensorC() const{
+    return localisationSensorC.getDistance();
 }
 
-float Inputs::getDistanceSensor2() const{
-    return localisationSensor2.getDistance();
+float Inputs::getDistanceSensorA() const{
+    return localisationSensorA.getDistance();
 }
 
-float Inputs::getDistanceSensor3() const{
-    return localisationSensor3.getDistance();
+float Inputs::getDistanceSensorB() const{
+    return localisationSensorB.getDistance();
 }

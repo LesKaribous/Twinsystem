@@ -10,6 +10,7 @@
 #include "match/score.h"
 #include "math/geometry.h"
 
+#include "modules/cli/cli.h"
 #include "modules/lidar/lidar.h"
 #include "modules/inputs/inputs.h"
 #include "modules/motion/motion.h"
@@ -44,6 +45,7 @@ public:
     
     void connectModules();
 
+    void processCommand(Command c);
     //Movements
     void go(Vec2);
     void go(float x, float y);
@@ -115,14 +117,19 @@ private:
     std::unique_ptr<Screen> _screenPtr = nullptr;
     std::unique_ptr<Inputs> _inputsPtr = nullptr;
     std::unique_ptr<Motion> _motionPtr = nullptr;
+    //std::unique_ptr<CommandLine> _cliPtr = nullptr;
     //std::unique_ptr<Planner> _plannerPtr = nullptr;
     std::unique_ptr<NeoPixel> _neopixelPtr = nullptr;
     std::unique_ptr<Actuators> _actuatorsPtr = nullptr;
-    std::unique_ptr<Localisation> _localisationPtr = nullptr;
+    //std::unique_ptr<Localisation> _localisationPtr = nullptr;
+    
 
     RobotState _state;
 
     int _score;
     bool _probed;
     bool _probing;
+
+
+    unsigned long _lastDrift = 0;
 };

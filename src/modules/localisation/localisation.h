@@ -3,19 +3,17 @@
 #include "math/geometry.h"
 
 class Localisation : public Module{
-
 public:
     Localisation();
 
     void update() override;
-
+    void addMeasure(const Vec3&);
     void resetDrift();
-    Vec2 getTotalDrift();
-    Vec3 accumulateDrift(Vec3 estimateCartesian);
+
+    Vec2 estimateDrift(Vec3 estimateCartesian);
 
 private:
-    unsigned int _samples = 10;
-    Vec2 _driftAccumulator;
+    int _samples = 10;
     Vec3 _measureRaw;
     std::deque<Vec3> _samplesMeasure;
 };

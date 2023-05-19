@@ -9,6 +9,7 @@
 #define planner (*_plannerPtr)
 #define neopixel (*_neopixelPtr)
 #define actuators (*_actuatorsPtr)
+#define localisation (*_localisationPtr)
 
 using namespace POI;
 using namespace Score;
@@ -31,28 +32,43 @@ void SystemApplication::connectModules(){
     screen.score.SetValue(_score);
     screen.time.SetValue(chrono.getTimeLeftSeconds());
     screen.intercom.SetValue(lidar.isConnected());
-    screen.probing.SetValue(_probing);
-    screen.probed.SetValue(_probed);
-    screen.armed.SetValue(_state == RobotState::ARMED);
-    screen.started.SetValue(_state == RobotState::STARTED);
-    screen.starter.SetValue(inputs.hasStarter());
-    screen.teamSwitch.SetValue(inputs.isGreen());
-    screen.twinSwitch.SetValue(inputs.isPrimary());
-    screen.resetButton.SetValue(inputs.buttonPressed());
-    screen.strategySwitch.SetValue(inputs.isCake());
 
-    if(inputs.getDownTrapState() && !actuators.trap.isClosed())
-        actuators.trap.close();
-    else if(inputs.getUpTrapState() && actuators.trap.isClosed())
-        actuators.trap.open();
+
+    if(_state == RobotState::IDLE){
+
+        //localisation.addMeasure(Vec3(inputs.getDistanceSensorA(), inputs.getDistanceSensorB(), inputs.getDistanceSensorC()));
+
+        
+        //if(millis() - _lastDrift > 200){
+            //_lastDrift = millis();
+            //localisation.estimateDrift(motion.getAbsPosition());
+        //}
+
+        screen.probing.SetValue(_probing);
+        screen.probed.SetValue(_probed);
+        screen.armed.SetValue(_state == RobotState::ARMED);
+        screen.started.SetValue(_state == RobotState::STARTED);
+        screen.starter.SetValue(inputs.hasStarter());
+        screen.teamSwitch.SetValue(inputs.isGreen());
+        screen.twinSwitch.SetValue(inputs.isPrimary());
+        screen.resetButton.SetValue(inputs.buttonPressed());
+        screen.strategySwitch.SetValue(inputs.isCake());
+
+        if(inputs.getDownTrapState() && !actuators.trap.isClosed())
+            actuators.trap.close();
+        else if(inputs.getUpTrapState() && actuators.trap.isClosed())
+            actuators.trap.open();
+        
+        if(inputs.getLowTurbineState() && inputs.hasTurbineStateChanged())
+            actuators.setTurbine(50);
+        else if(inputs.getHighTurbineState() && inputs.hasTurbineStateChanged())
+            actuators.setTurbine(100);
+        else if((!inputs.getLowTurbineState() || !inputs.getHighTurbineState()) && inputs.hasTurbineStateChanged())
+            actuators.stopTurbine();
+    }
+
+
     
-    if(inputs.getLowTurbineState() && inputs.hasTurbineStateChanged())
-        actuators.setTurbine(50);
-    else if(inputs.getHighTurbineState() && inputs.hasTurbineStateChanged())
-        actuators.setTurbine(100);
-    else if((!inputs.getLowTurbineState() || !inputs.getHighTurbineState()) && inputs.hasTurbineStateChanged())
-        actuators.stopTurbine();
-
 
 	//screen.started.SetValue(_state == RobotState::STARTED);
 	//screen.intercom.SetValue(lidar.isConnected());
@@ -61,11 +77,59 @@ void SystemApplication::connectModules(){
 
 }
 
+void SystemApplication::processCommand(Command c){  
+    if(c.commandName.startsWith("go")){
+            
+    }else if(c.commandName.startsWith("turn")){
+        
+    }else if(c.commandName.startsWith("align")){
+        
+    }else if(c.commandName.startsWith("goPolar")){
+        
+    }else if(c.commandName.startsWith("align")){
+        
+    }else if(c.commandName.startsWith("close")){
+        
+    }else if(c.commandName.startsWith("open")){
+        
+    }else if(c.commandName.startsWith("grab")){
+        
+    }else if(c.commandName.startsWith("ungrab")){
+        
+    }else if(c.commandName.startsWith("openTrap")){
+        
+    }else if(c.commandName.startsWith("closeTrap")){
+        
+    }else if(c.commandName.startsWith("recalage")){
+        
+    }else if(c.commandName.startsWith("start")){
+        
+    }else if(c.commandName.startsWith("pause")){
+        
+    }else if(c.commandName.startsWith("resume")){
+        
+    }else if(c.commandName.startsWith("stop")){
+        
+    }else if(c.commandName.startsWith("testMotion")){
+        
+    }else if(c.commandName.startsWith("testSteppers")){
+        
+    }else if(c.commandName.startsWith("testDetection")){
+        
+    }else if(c.commandName.startsWith("testOrientation")){
+        
+    }else{
+        Console::println("Unknown command");
+    }
+}
+
+
 SystemApplication::SystemApplication(){
     _state = RobotState::IDLE;
     _score = 0;
 
     //Standalone modules
+    //_cliPtr = std::make_unique<CommandLine>();
     _screenPtr = std::make_unique<Screen>();
 
     screen.drawBootProgress(10, "Loading Actuators...");
@@ -86,11 +150,12 @@ SystemApplication::SystemApplication(){
     screen.drawBootProgress(60, "Loading Neopixel...");
     _neopixelPtr = std::make_unique<NeoPixel>();
 
-    screen.drawBootProgress(70, "Loading Localisation...");
-    _localisationPtr = std::make_unique<Localisation>();
+    //screen.drawBootProgress(70, "Loading Localisation...");
+    //_localisationPtr = std::make_unique<Localisation>();
 
     screen.drawBootProgress(85, "Linking modules...");
 
+    //system.registerModule(_cliPtr.get());
     system.registerModule(_lidarPtr.get());
     system.registerModule(_screenPtr.get());
     system.registerModule(_inputsPtr.get());
@@ -98,15 +163,16 @@ SystemApplication::SystemApplication(){
     //system.registerModule(_plannerPtr.get());
     system.registerModule(_neopixelPtr.get());
     system.registerModule(_actuatorsPtr.get());
-    system.registerModule(_localisationPtr.get());
+    //system.registerModule(_localisationPtr.get());
 
+    //system.enable(CLI);
     system.enable(LIDAR);
     system.enable(INPUTS);
     system.enable(SCREEN);
 	//system.enable(MOTION);
     system.enable(NEOPIXEL);
 	system.enable(ACTUATORS);
-    system.enable(LOCALISATION);
+    //system.enable(LOCALISATION);
 
     screen.drawBootProgress(100, "Boot complete...");
     delay(200);
@@ -647,6 +713,7 @@ void SystemApplication::matchPrimaryBlue(){
     wait(2000);
     actuators.trap.close();
     addScore(exactCherryCounting);
+    addScore(cherryInBasket, 5);
     //recalage
     probeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.setAbsolute();
@@ -741,6 +808,7 @@ void SystemApplication::matchPrimaryGreen(){
     wait(2000);
     actuators.trap.close();
     addScore(exactCherryCounting);
+    addScore(cherryInBasket, 5);
     //recalage
     probeBorder(TableCompass::SOUTH, RobotCompass::A);
     motion.setAbsolute();
@@ -968,7 +1036,9 @@ void SystemApplication::matchSecondaryCakeBlue(){
     while(chrono.getTimeLeftSeconds() >= 10)
     {
         go(protectB2_01);
+        //wait(2000);
         go(protectB2_02);
+        //wait(2000);
     }
 
     //Fin du match
@@ -1042,7 +1112,9 @@ void SystemApplication::matchSecondaryCakeGreen(){
     while(chrono.getTimeLeftSeconds() >= 10)
     {
         go(protectV2_01);
+        //wait(2000);
         go(protectV2_02);
+        //wait(2000);
     }
 
     //Fin du match

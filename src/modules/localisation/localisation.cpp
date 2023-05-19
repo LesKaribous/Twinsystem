@@ -1,16 +1,23 @@
 #include "modules/localisation/localisation.h"
-#include <algorithm>
-
+#include "core/lib.h"
+#include "debug/console.h"
+#include "pin.h"
 Localisation::Localisation() : Module(LOCALISATION){
-    _driftAccumulator = Vec2(0.0f, 0.0f);
 }
-
 
 void Localisation::update(){
     if (m_enabled){
 
-        //Read
-        _samplesMeasure.push_front(Vec3(0.0));
+
+    }
+}
+
+void Localisation::addMeasure(const Vec3& m){
+    if (m_enabled){
+
+        if(m.a < 0 || m.b < 0 || m.c < 0) return;
+
+        _samplesMeasure.push_front(m);
         
         if(_samplesMeasure.size() >= _samples){
             _samplesMeasure.pop_back();
@@ -24,32 +31,26 @@ void Localisation::update(){
     }
 }
 
-void Localisation::resetDrift(){
-    if (m_enabled)
-        _driftAccumulator = Vec2(0.0f, 0.0f);
-}
 
-Vec2 Localisation::getTotalDrift(){
-    if (m_enabled)
-        return _driftAccumulator;
-    else return Vec2(0.0);
-}
-
-Vec3 Localisation::accumulateDrift(Vec3 estimateCartesian){
+Vec2 Localisation::estimateDrift(Vec3 estimateCartesian){
     if (m_enabled){
 
         Vec3 estimated;
         estimated.x = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c);
-        estimated.y = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c + 120);
-        estimated.z = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c - 120);
+        estimated.y = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c + 120*DEG_TO_RAD);
+        estimated.z = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c - 120*DEG_TO_RAD);
         
+        Console::info("Estimated") << Vec3(estimateCartesian.c *RAD_TO_DEG , estimateCartesian.c*RAD_TO_DEG + 120, estimateCartesian.c*RAD_TO_DEG + 120) << Console::endl;
+        Console::info("Estimated") << estimated << Console::endl;
+        Console::info("Mesured") << _measureRaw << Console::endl;
+
         Vec3 polarDrift = estimated - _measureRaw;
 
-        PolarVec dA(estimateCartesian.c, polarDrift.a);       Vec2 cdA = dA.toVec2();
-        PolarVec dB(estimateCartesian.c + 120, polarDrift.b); Vec2 cdB = dB.toVec2();
-        PolarVec dC(estimateCartesian.c - 120, polarDrift.c); Vec2 cdC = dC.toVec2();
+        PolarVec dA(estimateCartesian.c, polarDrift.a);                     Vec2 cdA = dA.toVec2();
+        PolarVec dB(estimateCartesian.c + 120*DEG_TO_RAD, polarDrift.b);    Vec2 cdB = dB.toVec2();
+        PolarVec dC(estimateCartesian.c - 120*DEG_TO_RAD, polarDrift.c);    Vec2 cdC = dC.toVec2();
 
-        _driftAccumulator += (cdA + cdB + cdC) / 3.0;
+        return (cdA + cdB + cdC) / 3.0;
     }
 }
 

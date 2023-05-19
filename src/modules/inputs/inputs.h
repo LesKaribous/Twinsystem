@@ -15,9 +15,9 @@ private:
     Button downTrapSwith;
     Switch lowTurbineSwitch;
     Switch highTurbineSwitch;
-    LocalisationSensor localisationSensor1;
-    LocalisationSensor localisationSensor2;
-    LocalisationSensor localisationSensor3;
+    LocalisationSensor localisationSensorA;
+    LocalisationSensor localisationSensorB;
+    LocalisationSensor localisationSensorC;
     
 
 public:
@@ -51,9 +51,9 @@ public:
 
     void waitButtonRelease();
 
-    float getDistanceSensor1() const;
-    float getDistanceSensor2() const;
-    float getDistanceSensor3() const;
+    float getDistanceSensorA() const;
+    float getDistanceSensorB() const;
+    float getDistanceSensorC() const;
 
     bool hasChanged() const;
     void update() override;

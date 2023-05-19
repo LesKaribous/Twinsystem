@@ -36,7 +36,7 @@ public:
         }
         else
         {
-            _distance = (t - 1000) * 4;
+            _distance = (float(t) - 1000.0) * 4.0;
             // Limit minimum distance to 0.
             if (_distance < 0) { _distance = 0; } 
         }
