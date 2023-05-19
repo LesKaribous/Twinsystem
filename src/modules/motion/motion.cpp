@@ -192,7 +192,7 @@ void  Motion::moveAwait(Vec3 target){
     }
 
     _relTarget  = toRelativeTarget(_target);
-    _relTarget = optmizeRelTarget(_relTarget);
+    //_relTarget = optmizeRelTarget(_relTarget);
 
     Console::info("Motion") << "Current position : " << getAbsPosition() << Console::endl;
     Console::info("Motion") << "Current target   : " << getAbsTarget() << Console::endl;
@@ -228,7 +228,7 @@ void  Motion::moveAsync(Vec3 target){
 
     //Optimize target rotation while taking actual pos into acount
     _relTarget  = toRelativeTarget(_target);
-    _relTarget = optmizeRelTarget(_relTarget);
+    //_relTarget = optmizeRelTarget(_relTarget);
 
     Console::info("Motion") << "Current position : " << getAbsPosition() << Console::endl;
     Console::info("Motion") << "Current target   : " << getAbsTarget() << Console::endl;

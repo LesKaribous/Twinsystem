@@ -12,7 +12,10 @@ NeoPixel::NeoPixel() : Module(NEOPIXEL), strip(Adafruit_NeoPixel(NUM_LEDS, NEOPI
 NeoPixel::~NeoPixel(){
 }
 
+unsigned long start = 0;
+
 void NeoPixel::enable(){
+    start = millis();
     Module::enable();
     for(int i=0; i<NUM_LEDS; i++) {
         strip.setPixelColor(i, 0, 0, 255);
@@ -28,6 +31,20 @@ void NeoPixel::disable() {
     strip.show();
 }
 
+
+int i = 0;
 void NeoPixel::update(){
     //TODO Fade color rainbow effect
+    if(millis() - start > 8000 && i == 0){
+        for(int k=0; k<NUM_LEDS; k++) {
+            strip.setPixelColor(i, 0, 255, 0);
+        }
+    }
+
+    if(millis() - start > 16000 && i == 2){
+        for(int k=0; k<NUM_LEDS; k++) {
+            strip.setPixelColor(i, 255, 0, 0);
+        }
+    }
+
 }

@@ -39,6 +39,9 @@ public:
 
 	
 	void update();
+
+	void danse();
+	void dessin();
 	void waitLaunch();
 	void startMatch();
     void endMatch();

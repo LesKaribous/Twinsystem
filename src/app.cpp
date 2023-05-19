@@ -219,7 +219,7 @@ SystemApplication::SystemApplication(){
     system.enable(INPUTS);
     system.enable(SCREEN);
 	//system.enable(MOTION);
-    system.enable(NEOPIXEL);
+    //system.enable(NEOPIXEL);
     system.enable(TERMINAL);
 	system.enable(ACTUATORS);
     //system.enable(LOCALISATION);
@@ -258,13 +258,14 @@ void SystemApplication::update(){
 }
 
 void SystemApplication::waitLaunch(){
+    system.disable(NEOPIXEL);
 	while (_state != RobotState::STARTING){
 		update();
 		switch (_state){
 		case RobotState::IDLE :
 			if(inputs.starterPlaced()){ //Arm
 				setState(RobotState::ARMED);
-                system.disable(NEOPIXEL);
+                //system.disable(NEOPIXEL);
 
 				inputs.freezeSettings();
 				if(lidar.isConnected()){
@@ -290,7 +291,7 @@ void SystemApplication::waitLaunch(){
 			}else if(inputs.starterCancelled()){ //Unarm
 				setState(RobotState::IDLE);
 				inputs.unfreezeSettings();
-				system.enable(NEOPIXEL);
+				//system.enable(NEOPIXEL);
 				lidar.displayRadar(false);
 				while(inputs.buttonPressed()) update(); //Wait for resetButton to be released
 			}
@@ -690,6 +691,240 @@ void SystemApplication::recalageSecondaryCakeGreen(){
 
     actuators.ungrab(RobotCompass::AB);
 
+}
+
+void SystemApplication::dessin(){
+system.disable(TERMINAL);
+	chrono.start();
+    system.enable(MOTION);
+
+    system.disable(INPUTS);
+    system.disable(NEOPIXEL);
+
+
+motion.setAbsPosition(Vec3(0,0,0));
+motion.setAbsolute();
+motion.goAwait(-50.0,77.0);
+motion.goAwait(-53.0,61.0);
+motion.goAwait(-60.0,47.0);
+motion.goAwait(-73.0,37.0);
+motion.goAwait(-87.0,29.0);
+motion.goAwait(-101.0,22.0);
+motion.goAwait(-117.0,19.0);
+motion.goAwait(-135.0,16.0);
+motion.goAwait(-153.0,17.0);
+motion.goAwait(-168.0,21.0);
+motion.goAwait(-181.0,29.0);
+motion.goAwait(-193.0,44.0);
+motion.goAwait(-201.0,57.0);
+motion.goAwait(-203.0,76.0);
+motion.goAwait(-204.0,91.0);
+motion.goAwait(-201.0,106.0);
+motion.goAwait(-188.0,119.0);
+motion.goAwait(-175.0,129.0);
+motion.goAwait(-160.0,135.0);
+motion.goAwait(-144.0,137.0);
+motion.goAwait(-127.0,136.0);
+motion.goAwait(-111.0,132.0);
+motion.goAwait(-92.0,123.0);
+motion.goAwait(-78.0,117.0);
+motion.goAwait(-72.0,103.0);
+motion.goAwait(-65.0,89.0);
+motion.goAwait(-57.0,73.0);
+motion.goAwait(-40.0,54.0);
+motion.goAwait(-26.0,46.0);
+motion.goAwait(-11.0,41.0);
+motion.goAwait(4.0,38.0);
+motion.goAwait(19.0,43.0);
+motion.goAwait(33.0,49.0);
+motion.goAwait(47.0,58.0);
+motion.goAwait(56.0,71.0);
+motion.goAwait(55.0,88.0);
+motion.goAwait(54.0,103.0);
+motion.goAwait(45.0,116.0);
+motion.goAwait(30.0,117.0);
+motion.goAwait(13.0,124.0);
+motion.goAwait(-1.0,131.0);
+motion.goAwait(-16.0,133.0);
+motion.goAwait(-32.0,132.0);
+motion.goAwait(-47.0,130.0);
+motion.goAwait(-62.0,124.0);
+motion.goAwait(-69.0,110.0);
+motion.goAwait(-53.0,53.0);
+motion.goAwait(-40.0,43.0);
+motion.goAwait(-28.0,32.0);
+motion.goAwait(-15.0,13.0);
+motion.goAwait(-5.0,0.0);
+motion.goAwait(5.0,-12.0);
+motion.goAwait(14.0,-25.0);
+motion.goAwait(21.0,-39.0);
+motion.goAwait(27.0,-54.0);
+motion.goAwait(29.0,-69.0);
+motion.goAwait(23.0,-83.0);
+motion.goAwait(15.0,-96.0);
+motion.goAwait(2.0,-106.0);
+motion.goAwait(-14.0,-106.0);
+motion.goAwait(-29.0,-105.0);
+motion.goAwait(-44.0,-101.0);
+motion.goAwait(-58.0,-90.0);
+motion.goAwait(-70.0,-76.0);
+motion.goAwait(-77.0,-62.0);
+motion.goAwait(-78.0,-47.0);
+motion.goAwait(-78.0,-31.0);
+motion.goAwait(-78.0,-15.0);
+motion.goAwait(-78.0,1.0);
+motion.goAwait(-78.0,17.0);
+motion.goAwait(-78.0,33.0);
+motion.goAwait(-83.0,18.0);
+motion.goAwait(-91.0,0.0);
+motion.goAwait(-97.0,-15.0);
+motion.goAwait(-103.0,-33.0);
+motion.goAwait(-110.0,-47.0);
+motion.goAwait(-114.0,-65.0);
+motion.goAwait(-120.0,-79.0);
+motion.goAwait(-130.0,-91.0);
+motion.goAwait(-144.0,-99.0);
+motion.goAwait(-161.0,-103.0);
+motion.goAwait(-178.0,-104.0);
+motion.goAwait(-194.0,-102.0);
+motion.goAwait(-207.0,-94.0);
+motion.goAwait(-215.0,-75.0);
+motion.goAwait(-218.0,-59.0);
+motion.goAwait(-215.0,-44.0);
+motion.goAwait(-204.0,-28.0);
+motion.goAwait(-194.0,-13.0);
+motion.goAwait(-183.0,-2.0);
+motion.goAwait(-171.0,8.0);
+motion.goAwait(-192.0,11.0);
+motion.goAwait(-215.0,4.0);
+motion.goAwait(-240.0,-3.0);
+motion.goAwait(-262.0,-9.0);
+motion.goAwait(-281.0,-16.0);
+motion.goAwait(-296.0,-20.0);
+motion.goAwait(-312.0,-9.0);
+motion.goAwait(-323.0,4.0);
+motion.goAwait(-333.0,19.0);
+motion.goAwait(-338.0,38.0);
+motion.goAwait(-341.0,53.0);
+motion.goAwait(-338.0,68.0);
+motion.goAwait(-333.0,83.0);
+motion.goAwait(-316.0,84.0);
+motion.goAwait(-298.0,85.0);
+motion.goAwait(-280.0,85.0);
+motion.goAwait(-262.0,85.0);
+motion.goAwait(-245.0,87.0);
+motion.goAwait(-229.0,89.0);
+motion.goAwait(-226.0,108.0);
+motion.goAwait(-236.0,121.0);
+motion.goAwait(-245.0,134.0);
+motion.goAwait(-254.0,147.0);
+motion.goAwait(-264.0,164.0);
+motion.goAwait(-274.0,176.0);
+motion.goAwait(-287.0,198.0);
+motion.goAwait(-294.0,214.0);
+motion.goAwait(-300.0,228.0);
+motion.goAwait(-284.0,235.0);
+motion.goAwait(-267.0,240.0);
+motion.goAwait(-251.0,241.0);
+motion.goAwait(-233.0,239.0);
+motion.goAwait(-216.0,237.0);
+motion.goAwait(-199.0,235.0);
+motion.goAwait(-184.0,230.0);
+motion.goAwait(-177.0,214.0);
+motion.goAwait(-168.0,195.0);
+motion.goAwait(-163.0,180.0);
+motion.goAwait(-155.0,160.0);
+motion.goAwait(-148.0,146.0);
+motion.goAwait(-145.0,131.0);
+motion.goAwait(-142.0,151.0);
+motion.goAwait(-138.0,171.0);
+motion.goAwait(-135.0,186.0);
+motion.goAwait(-128.0,200.0);
+motion.goAwait(-116.0,210.0);
+motion.goAwait(-100.0,216.0);
+motion.goAwait(-83.0,217.0);
+motion.goAwait(-62.0,216.0);
+motion.goAwait(-47.0,214.0);
+motion.goAwait(-30.0,213.0);
+motion.goAwait(-24.0,199.0);
+motion.goAwait(-32.0,183.0);
+motion.goAwait(-41.0,168.0);
+motion.goAwait(-47.0,154.0);
+motion.goAwait(-53.0,140.0);
+motion.goAwait(-60.0,125.0);
+
+
+}
+
+
+void SystemApplication::danse(){
+    motion.setAbsPosition(Vec3(500,500,0));
+    motion.setRelative();
+    system.enable(NEOPIXEL);
+
+    //00:00 - 8:00
+    motion.setFeedrate(20);
+    motion.moveAsync({0,0,-2000});
+    delay(2000);motion.forceCancel();
+    motion.moveAsync({0,0,2000});
+    delay(2000);motion.forceCancel();
+    motion.moveAsync({0,0,-2000});
+    delay(2000);motion.forceCancel();
+    motion.moveAsync({0,0,2000});
+    delay(2000);motion.forceCancel();
+    //delay(650);
+
+    // 8:650 : 16:00
+    motion.setFeedrate(40);
+    for(int i = 0; i < 8; i++){
+        motion.moveAsync({0,0,3000});
+        actuators.danseRight();
+        delay(460);motion.forceCancel();
+        motion.moveAsync({0,0,-3000});
+        actuators.danseLeft();
+        delay(460);motion.forceCancel();
+    }
+    motion.moveAsync({0,0,3000});
+    actuators.danseRight();
+    delay(460);motion.forceCancel();
+
+    motion.setFeedrate(60);
+    // 16:146 : 24:00
+    motion.moveAsync({0,0,3000});
+    delay(4000);motion.forceCancel();
+
+    motion.moveAsync({0,0,-3000});
+    delay(4000);motion.forceCancel();
+
+    actuators.close();
+    motion.moveAwait({0,-400,0});
+
+    motion.setFeedrate(40);
+    for(int i = 0; i < 8; i++){
+        motion.moveAsync({0,0,3000});
+        actuators.danseRight();
+        delay(460);motion.forceCancel();
+        motion.moveAsync({0,0,-3000});
+        actuators.danseLeft();
+        delay(460);motion.forceCancel();
+    }
+    motion.moveAsync({0,0,3000});
+    actuators.danseRight();
+    delay(460);motion.forceCancel();
+
+
+    motion.setFeedrate(30);
+    motion.moveAsync({0,0,3000});
+    actuators.applause(RobotCompass::AB);
+    actuators.applause(RobotCompass::BC);
+    actuators.applause(RobotCompass::CA); 
+    motion.forceCancel();
+    motion.moveAsync({0,0,-3000});
+    actuators.applause(RobotCompass::AB);
+    actuators.applause(RobotCompass::BC);
+    actuators.applause(RobotCompass::CA); 
+
+    delay(10000);
 }
 
 void SystemApplication::matchPrimaryBlue(){

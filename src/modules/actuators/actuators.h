@@ -37,6 +37,11 @@ public:
     void ungrab (RobotCompass rc);
     void applause(RobotCompass rc);
 
+    void open();
+    void close ();
+    void danseLeft();
+    void danseRight();
+
     void setTurbine(int speed); //in %
     void stopTurbine();
     void suckBall();

@@ -161,6 +161,61 @@ void Actuators::grab(RobotCompass rc){
     }
 }
 
+
+
+void Actuators::close(){
+
+    gripperAB.rightGripper.close();
+    gripperAB.leftGripper.close();
+
+    gripperBC.rightGripper.close();
+    gripperBC.leftGripper.close();
+
+    gripperCA.rightGripper.close();
+    gripperCA.leftGripper.close();
+}
+
+void Actuators::open(){
+
+    gripperAB.rightGripper.open();
+    gripperAB.leftGripper.open();
+
+    gripperBC.rightGripper.open();
+    gripperBC.leftGripper.open();
+
+    gripperCA.rightGripper.open();
+    gripperCA.leftGripper.open();
+}
+
+void Actuators::danseRight(){
+
+    gripperAB.rightGripper.open();
+    gripperAB.leftGripper.grab();
+
+    gripperBC.rightGripper.open();
+    gripperBC.leftGripper.grab();
+
+    gripperCA.rightGripper.open();
+    gripperCA.leftGripper.grab();
+}
+
+void Actuators::danseLeft(){
+
+    gripperAB.rightGripper.grab();
+    gripperAB.leftGripper.open();
+
+    gripperBC.rightGripper.grab();
+    gripperBC.leftGripper.open();
+
+    gripperCA.rightGripper.grab();
+    gripperCA.leftGripper.open();
+}
+
+
+
+
+
+
 void Actuators::setTurbine(int speed){
     analogWrite(_pinTurbine, map(speed, 0, 100, 0, 255));
 }

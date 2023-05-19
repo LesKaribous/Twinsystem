@@ -48,7 +48,7 @@ public:
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
-private:
+public:
     void moveAwait(Vec3 target);
     void moveAsync(Vec3 target);
 

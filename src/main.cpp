@@ -10,7 +10,12 @@ void setup(){
 
 void loop(){
 	app->waitLaunch();
+
+	app->danse();
+	app->dessin();
+
 	app->startMatch();
+	
 	app->endMatch();
 	
     while(true);//Safe
