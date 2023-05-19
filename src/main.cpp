@@ -13,6 +13,5 @@ void loop(){
 	app->startMatch();
 	app->endMatch();
 	
-	Console::println("Fin du programme");
-    while(true);//End of the program
+    while(true);//Safe
 }

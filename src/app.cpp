@@ -332,12 +332,20 @@ void SystemApplication::startMatch(){
 }
 
 void SystemApplication::endMatch(){
+    optimizeScore(0.8);
+    screen.score.SetValue(_score);
     motion.cancel();
     system.disable(LIDAR);
     system.disable(MOTION);
 
     system.disable(ACTUATORS);
     system.disable(INPUTS);
+
+
+    Console::println("Fin du programme");
+    while(true){
+        screen.update();
+    }
     //system.disable(SCREEN);
 }
 
@@ -367,7 +375,7 @@ void SystemApplication::handleFinishedMatch(){
         system.enable(NEOPIXEL);
 
         screen.update();
-
+        endMatch();
     }
 
 }
@@ -1344,28 +1352,24 @@ void SystemApplication::nearlyFinishPrimaryBlue(){
     // go to End Position
     go(blueEndPrimary);
     addScore(wheelsOnPlate/2);
-    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishPrimaryGreen(){
     // go to End Position
     go(greenEndPrimary);
     addScore(wheelsOnPlate/2);
-    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryBlue(){
     // go to End Position
     go(blueEndSecondary);
     addScore(wheelsOnPlate/2);
-    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryGreen(){
     // go to End Position
     go(greenEndSecondary);
     addScore(wheelsOnPlate/2);
-    optimizeScore(0.8);
 }
 
 void SystemApplication::finishPrimaryBlue(){

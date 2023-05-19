@@ -13,13 +13,13 @@ void Intercom::initialize(){
 void Intercom::sendMessage(const char* message) {
     _stream.print(message);
     _stream.write('\n');
-    Console::info("Intercom") << ">" << message << Console::endl;
+    Console::trace("Intercom") << ">" << message << Console::endl;
 }
 
 void Intercom::sendMessage(const String& message) {
     _stream.print(message);
     _stream.write('\n');
-    Console::info("Intercom") << ">" << message.c_str() << Console::endl;
+    Console::trace("Intercom") << ">" << message.c_str() << Console::endl;
 }
 
 
