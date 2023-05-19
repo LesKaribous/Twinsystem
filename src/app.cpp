@@ -18,6 +18,10 @@ void SystemApplication::addScore(int points, int multiplicateur){
     _score += (points * multiplicateur);
 }
 
+void SystemApplication::optimizeScore(float k){
+    _score *= k;
+}
+
 int SystemApplication::score(){
     return _score;
 }
@@ -1290,24 +1294,28 @@ void SystemApplication::nearlyFinishPrimaryBlue(){
     // go to End Position
     go(blueEndPrimary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishPrimaryGreen(){
     // go to End Position
     go(greenEndPrimary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryBlue(){
     // go to End Position
     go(blueEndSecondary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryGreen(){
     // go to End Position
     go(greenEndSecondary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::finishPrimaryBlue(){
