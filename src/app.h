@@ -122,7 +122,7 @@ private:
     std::unique_ptr<Motion> _motionPtr = nullptr;
     //std::unique_ptr<Planner> _plannerPtr = nullptr;
     std::unique_ptr<NeoPixel> _neopixelPtr = nullptr;
-    //std::unique_ptr<Terminal> _terminalPtr = nullptr;
+    std::unique_ptr<Terminal> _terminalPtr = nullptr;
     std::unique_ptr<Actuators> _actuatorsPtr = nullptr;
 
     //std::unique_ptr<Localisation> _localisationPtr = nullptr;

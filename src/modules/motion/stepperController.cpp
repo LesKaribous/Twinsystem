@@ -24,8 +24,6 @@ StepperController::StepperController() :
     _async = true;
 }
 
-
-
 void StepperController::pause(){
     _currentJob.pause();
     if(_currentJob.isPaused()){
@@ -51,6 +49,12 @@ void StepperController::cancel() {
     if(_controller.isRunning()){
         _controller.stop(); //Blocking
     }
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
 }
 
 void StepperController::forceCancel() {
@@ -58,6 +62,12 @@ void StepperController::forceCancel() {
     if(_controller.isRunning()){
         _controller.emergencyStop();
     }
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
 }
 
 
@@ -67,6 +77,12 @@ bool StepperController::hasFinished() {
 
 void StepperController::complete() {
     _currentJob.complete();
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
 }
 
 void  StepperController::update(){

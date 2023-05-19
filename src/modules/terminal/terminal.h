@@ -22,16 +22,16 @@ public:
         int end = arguments.indexOf(',', start);
 
         // Find the start and end position of the argument at the specified index
-        for (int i = 1; i < argIndex; i++) {
-        if (end == -1) {
-            return ""; // Argument index out of range
-        }
-        start = end + 1;
-        end = arguments.indexOf(',', start);
-        }
+        for (int i = 0; i < argIndex; i++) {
+            if (end == -1) {
+                return ""; // Argument index out of range
+            }
+            start = end + 1;
+            end = arguments.indexOf(',', start);
+            }
 
-        if (end == -1) {
-        end = arguments.length();
+            if (end == -1) {
+            end = arguments.length();
         }
 
         // Extract the argument substring
@@ -66,6 +66,7 @@ public:
         if (argCount >= argIndex) {
             // Parse argument for int type
             String arg = getArgument(argIndex);
+            THROW(arg)
             return arg.toFloat();
         }
         return 0;
@@ -141,7 +142,7 @@ public:
             return false;
         }
 
-        if(argCount < formatArgCount){
+        if(argCount > formatArgCount){
             Console::error("Terminal") << "Too many arguments in function call : expected" << formatArgCount << " provided " << argCount << Console::endl;
             return false;
         }

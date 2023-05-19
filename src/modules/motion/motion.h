@@ -27,7 +27,8 @@ public:
     void forceCancel();
     void complete();
 
-    void updatePosition();
+    Vec3 estimatePosition() const;
+    Vec3 getEstimatedAbsPosition() const;
 
     void turnAwait(float);
     void turnAsync(float);

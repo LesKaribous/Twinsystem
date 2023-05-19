@@ -8,7 +8,7 @@
 #define motion (*_motionPtr)
 #define planner (*_plannerPtr)
 #define neopixel (*_neopixelPtr)
-//#define terminal (*_terminalPtr)
+#define terminal (*_terminalPtr)
 #define actuators (*_actuatorsPtr)
 #define localisation (*_localisationPtr)
 
@@ -31,9 +31,9 @@ void SystemApplication::connectModules(){
     //Tracked values
 	//TODO Create events to handle this at the UI Level
 
-    screen.x.SetValue(motion.getAbsPosition().x);
-    screen.y.SetValue(motion.getAbsPosition().y);
-    screen.z.SetValue(motion.getAbsPosition().z);
+    screen.x.SetValue(motion.getEstimatedAbsPosition().x);
+    screen.y.SetValue(motion.getEstimatedAbsPosition().y);
+    screen.z.SetValue(motion.getEstimatedAbsPosition().z);
     screen.score.SetValue(_score);
     screen.time.SetValue(chrono.getTimeLeftSeconds());
     screen.intercom.SetValue(lidar.isConnected());
@@ -42,15 +42,14 @@ void SystemApplication::connectModules(){
     if(_state == RobotState::IDLE){
 
         //localisation.addMeasure(Vec3(inputs.getDistanceSensorA(), inputs.getDistanceSensorB(), inputs.getDistanceSensorC()));
-
         
         //if(millis() - _lastDrift > 200){
             //_lastDrift = millis();
             //localisation.estimateDrift(motion.getAbsPosition());
         //}
 
-        //if(terminal.commandAvailable())
-        //    processCommand(terminal.dequeCommand());
+        if(terminal.commandAvailable())
+            processCommand(terminal.dequeCommand());
 
         screen.probing.SetValue(_probing);
         screen.probed.SetValue(_probed);
@@ -74,18 +73,9 @@ void SystemApplication::connectModules(){
         else if((!inputs.getLowTurbineState() || !inputs.getHighTurbineState()) && inputs.hasTurbineStateChanged())
             actuators.stopTurbine();
     }
-
-
-    
-
-	//screen.started.SetValue(_state == RobotState::STARTED);
-	//screen.intercom.SetValue(lidar.isConnected());
-	//screen.time.SetValue(score());
-	//screen.score.SetValue(chrono.getTimeLeftSeconds());
-
 }
 
-/*
+
 void SystemApplication::processCommand(Command c){  
 
     if(!terminal.isEnabled())return;
@@ -93,6 +83,19 @@ void SystemApplication::processCommand(Command c){
         go(c.getVec2());
     }else if(c.isValidFormat("turn(angle)")){
         turn(c.getFloat());
+    }else if(c.isValidFormat("setAbsPosition(x,y)")){
+        motion.setAbsPosition(Vec3(c.getFloat(0), c.getFloat(1), motion.getAbsPosition().c));
+
+        THROW(c.getFloat(0));
+        THROW(c.getFloat(1));
+
+    }else if(c.isValidFormat("setAbsPosition(x,y,t)")){
+        motion.setAbsPosition(Vec3(c.getFloat(0), c.getFloat(1), c.getFloat(2)));
+
+        THROW(c.getFloat(0));
+        THROW(c.getFloat(1));
+        THROW(c.getFloat(2));
+
     }else if(c.isValidFormat("align(side, absAngle)")){
 
         String side = c.getString();
@@ -167,7 +170,7 @@ void SystemApplication::processCommand(Command c){
         Console::error("Terminal") << "Unknown command" << Console::endl;
     }
 }
-*/
+
 
 SystemApplication::SystemApplication(){
     _state = RobotState::IDLE;
@@ -194,8 +197,8 @@ SystemApplication::SystemApplication(){
     screen.drawBootProgress(60, "Loading Neopixel...");
     _neopixelPtr = std::make_unique<NeoPixel>();
 
-    //screen.drawBootProgress(70, "Loading Terminal...");
-    //_terminalPtr = std::make_unique<Terminal>();
+    screen.drawBootProgress(70, "Loading Terminal...");
+    _terminalPtr = std::make_unique<Terminal>();
 
     //screen.drawBootProgress(80, "Loading Localisation...");
     //_localisationPtr = std::make_unique<Localisation>();
@@ -208,7 +211,7 @@ SystemApplication::SystemApplication(){
     system.registerModule(_motionPtr.get());
     //system.registerModule(_plannerPtr.get());
     system.registerModule(_neopixelPtr.get());
-    //system.registerModule(_terminalPtr.get());
+    system.registerModule(_terminalPtr.get());
     system.registerModule(_actuatorsPtr.get());
     //system.registerModule(_localisationPtr.get());
 
@@ -217,7 +220,7 @@ SystemApplication::SystemApplication(){
     system.enable(SCREEN);
 	//system.enable(MOTION);
     system.enable(NEOPIXEL);
-    //system.enable(TERMINAL);
+    system.enable(TERMINAL);
 	system.enable(ACTUATORS);
     //system.enable(LOCALISATION);
 
@@ -276,7 +279,7 @@ void SystemApplication::waitLaunch(){
                 
                 handleRecalage();
 
-				//TestSteppers();
+                system.disable(MOTION);
                 lidar.ignoreObstacles(false);
 			}
 			break;
@@ -309,7 +312,6 @@ void SystemApplication::startMatch(){
     system.disable(INPUTS);
     system.disable(NEOPIXEL);
     
-
     lidar.displayRadar(true);
 
 	screen.setPage(Page::MATCH);
@@ -341,7 +343,6 @@ void SystemApplication::endMatch(){
     system.disable(ACTUATORS);
     system.disable(INPUTS);
 
-
     Console::println("Fin du programme");
     while(true){
         screen.update();
@@ -370,14 +371,12 @@ void SystemApplication::handleFinishedMatch(){
         else if(inputs.isGreen() && inputs.isPrimary())     finishPrimaryGreen();
         else if(inputs.isGreen() && inputs.isSecondary())   finishSecondaryGreen();
 
-        system.disable(MOTION);
         system.disable(ACTUATORS);
         system.enable(NEOPIXEL);
 
         screen.update();
         endMatch();
     }
-
 }
 
 void SystemApplication::handleNearlyFinishedMatch(){
@@ -403,7 +402,6 @@ void SystemApplication::wait(unsigned long temps){
 void SystemApplication::waitUntil(Job& obj){
     THROW("WaitUntil Job finished or cancelled")
 	while (obj.isPending() || obj.isPaused()){
-        //THROW(obj.toString())		
 		update();
 	}
     THROW(obj.toString())
@@ -578,9 +576,7 @@ void SystemApplication::testDetection(){
 	lidar.getMaxLidarDist(Vec2(motion.getAbsPosition().a, motion.getAbsPosition().b), 270*DEG_TO_RAD);
 	
 	lidar.getMaxLidarDist(Vec2(motion.getAbsPosition().a, motion.getAbsPosition().b), -90*DEG_TO_RAD);
-	
 }
-
 
 void SystemApplication::testMotion(){
 	motion.setAbsPosition({0,0,0});
@@ -599,8 +595,6 @@ void SystemApplication::testMotion(){
     motion.goAwait(0,0);
     motion.goAwait(100,0);
 }
-
-
 
 void SystemApplication::recalagePrimaryBlue(){
 

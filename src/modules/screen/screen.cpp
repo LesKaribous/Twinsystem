@@ -368,11 +368,16 @@ void Screen::updatePosition(float Xpos, float Ypos, float Tpos) {
     screen.setTextColor(ILI9341_WHITE);
     screen.setTextSize(2);
     screen.setCursor(100, 30);
-    screen.println(Xpos < 0 ? '?' : Xpos);
+    if(Xpos < -0.00001 || probing.getState()) screen.println("?");
+    else screen.println(int(Xpos));
+
     screen.setCursor(100, 50);
-    screen.println(Ypos< 0 ? '?' : Ypos);
+
+    if(Ypos < -0.00001 || probing.getState()) screen.println("?");
+    else screen.println(int(Ypos));
+
     screen.setCursor(100, 70);
-    screen.println(Tpos);
+    screen.println(int(Tpos));
 }
 
 void Screen::updateMatchTime(int tMatch) {

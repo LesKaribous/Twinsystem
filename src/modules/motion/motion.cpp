@@ -38,11 +38,12 @@ void Motion::cancel() {
     _currentJob.cancel();
     steppers.pause();
     
-    updatePosition();
+    Vec3 newPos = estimatePosition();
+
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
-    Console::info("Motion") << "Final position : " << _position << Console::endl;
+    Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
-    _startPosition = _position;
+    _startPosition = _position = newPos;
 
     steppers.cancel();
 }
@@ -50,19 +51,22 @@ void Motion::cancel() {
 void Motion::forceCancel() {
     _currentJob.cancel();
     steppers.emergencyStop();
+    Vec3 newPos = estimatePosition();
 
-    updatePosition();
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
-    Console::info("Motion") << "Final position : " << _position << Console::endl;
+    Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
-    _startPosition = _position;
+    _startPosition = _position = newPos;
     steppers.forceCancel();
 }
 
 void Motion::complete() {
     _currentJob.complete();
-    updatePosition();
+
+    Vec3 newPos = estimatePosition();
+
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
     Console::info("Motion") << "Final position : " << _position << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
     //Need to take actual rotation when adding relative target
@@ -97,7 +101,6 @@ void Motion::setFeedrate(int p){
 void Motion::update(){
     Console::trace("Motion") << _currentJob.toString() << Console::endl;
     steppers.update();
-    updatePosition();
     if(_currentJob.isPending()){
         if(!steppers.getCurrentJob().isPending()){
             complete();
@@ -263,7 +266,8 @@ Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
 }
 
 
-void  Motion::updatePosition(){
+Vec3  Motion::estimatePosition() const{
+    if(steppers.getPosition().a == 0 && steppers.getPosition().b == 0 && steppers.getPosition().c == 0) return _position;
     Vec3 currentStepperPos = steppers.getPosition();
     Vec3 relativePosition = fk(currentStepperPos);
     
@@ -275,12 +279,13 @@ void  Motion::updatePosition(){
     relativePosition.b /= _calibration.b;
     relativePosition.c /= _calibration.c;
 
-
-    _position = _startPosition.copy().add(relativePosition.rotateZ(-_position.c));
-    //Console::trace("Motion") << "Current position" << _position << Console::endl;
+    return _startPosition.copy().add(relativePosition.rotateZ(-_position.c));
 }
 
 
+Vec3 Motion::getEstimatedAbsPosition() const{
+    return estimatePosition();
+}
 
 
 // -------------------------------
