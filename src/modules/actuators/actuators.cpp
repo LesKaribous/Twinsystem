@@ -179,6 +179,16 @@ void Actuators::dropBall(){
     trap.open();
 }
 
+void Actuators::openTrap(){
+    trap.open();
+}
+
+
+void Actuators::closeTrap(){
+    trap.close();
+}
+
+
 void Actuators::ungrab(RobotCompass rc){
     open(rc);
 }

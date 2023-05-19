@@ -8,6 +8,7 @@
 #define motion (*_motionPtr)
 #define planner (*_plannerPtr)
 #define neopixel (*_neopixelPtr)
+//#define terminal (*_terminalPtr)
 #define actuators (*_actuatorsPtr)
 #define localisation (*_localisationPtr)
 
@@ -44,6 +45,9 @@ void SystemApplication::connectModules(){
             //localisation.estimateDrift(motion.getAbsPosition());
         //}
 
+        //if(terminal.commandAvailable())
+        //    processCommand(terminal.dequeCommand());
+
         screen.probing.SetValue(_probing);
         screen.probed.SetValue(_probed);
         screen.armed.SetValue(_state == RobotState::ARMED);
@@ -77,100 +81,139 @@ void SystemApplication::connectModules(){
 
 }
 
+/*
 void SystemApplication::processCommand(Command c){  
-    if(c.commandName.startsWith("go")){
-            
-    }else if(c.commandName.startsWith("turn")){
-        
-    }else if(c.commandName.startsWith("align")){
-        
-    }else if(c.commandName.startsWith("goPolar")){
-        
-    }else if(c.commandName.startsWith("align")){
-        
-    }else if(c.commandName.startsWith("close")){
-        
-    }else if(c.commandName.startsWith("open")){
-        
-    }else if(c.commandName.startsWith("grab")){
-        
-    }else if(c.commandName.startsWith("ungrab")){
-        
-    }else if(c.commandName.startsWith("openTrap")){
-        
-    }else if(c.commandName.startsWith("closeTrap")){
-        
-    }else if(c.commandName.startsWith("recalage")){
-        
-    }else if(c.commandName.startsWith("start")){
-        
-    }else if(c.commandName.startsWith("pause")){
-        
-    }else if(c.commandName.startsWith("resume")){
-        
-    }else if(c.commandName.startsWith("stop")){
-        
-    }else if(c.commandName.startsWith("testMotion")){
-        
-    }else if(c.commandName.startsWith("testSteppers")){
-        
-    }else if(c.commandName.startsWith("testDetection")){
-        
-    }else if(c.commandName.startsWith("testOrientation")){
-        
+
+    if(!terminal.isEnabled())return;
+    if(c.isValidFormat("go(x,y)")){
+        go(c.getVec2());
+    }else if(c.isValidFormat("turn(angle)")){
+        turn(c.getFloat());
+    }else if(c.isValidFormat("align(side, absAngle)")){
+
+        String side = c.getString();
+        float orientation = c.getFloat(1);
+
+        if(side.equals("A"))         align(RobotCompass::A, orientation);
+        else if(side.equals("AB"))   align(RobotCompass::AB, orientation);
+        else if(side.equals("B"))    align(RobotCompass::B, orientation);
+        else if(side.equals("BC"))   align(RobotCompass::BC, orientation);
+        else if(side.equals("C"))    align(RobotCompass::C, orientation);
+        else if(side.equals("CA"))   align(RobotCompass::CA, orientation);
+
+    }else if(c.isValidFormat("goPolar(heading, lenght)")){
+        goPolar(c.getFloat(0), c.getFloat(1));
+    }else if(c.isValidFormat("close(side)")){
+        String side = c.getString();
+        if(side.equals("AB")) actuators.close(RobotCompass::AB);
+        else if(side.equals("BC")) actuators.close(RobotCompass::BC);
+        else if(side.equals("CA")) actuators.close(RobotCompass::CA);
+    }else if(c.isValidFormat("open(side)")){
+        String side = c.getString();
+        THROW(side)
+        if(side.equals("AB")) actuators.open(RobotCompass::AB);
+        else if(side.equals("BC")) actuators.open(RobotCompass::BC);
+        else if(side.equals("CA")) actuators.open(RobotCompass::CA);
+    }else if(c.isValidFormat("grab(side)")){
+        String side = c.getString();
+        if(side.equals("AB")) actuators.grab(RobotCompass::AB);
+        else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+        else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
+    }else if(c.isValidFormat("ungrab(side)")){
+        String side = c.getString();
+        if(side.equals("AB")) actuators.ungrab(RobotCompass::AB);
+        else if(side.equals("BC")) actuators.ungrab(RobotCompass::BC);
+        else if(side.equals("CA")) actuators.ungrab(RobotCompass::CA);
+    }else if(c.isValidFormat("openTrap()")){
+        actuators.openTrap();
+    }else if(c.isValidFormat("closeTrap()")){
+        actuators.closeTrap();
+    }else if(c.isValidFormat("recalage()")){
+        handleRecalage();
+        return;
+    }else if(c.isValidFormat("start()")){
+        _state = RobotState::STARTING;
+    }else if(c.isValidFormat("pause()")){
+        motion.pause();
+    }else if(c.isValidFormat("resume()")){
+        motion.resume();
+    }else if(c.isValidFormat("cancel()")){
+        motion.cancel();
+    }else if(c.isValidFormat("setRelative()")){
+        motion.setRelative();
+    }else if(c.isValidFormat("setAbsolute()")){
+        motion.setAbsolute();
+    }else if(c.isValidFormat("testMotion()")){
+        testMotion();
+    }else if(c.isValidFormat("testSteppers()")){
+        testSteppers();
+    }else if(c.isValidFormat("testDetection()")){
+        testDetection();
+    }else if(c.isValidFormat("testOrientation()")){
+        testOrientation();
+    }else if(c.isValidFormat("enableMotion()")){
+        system.enable(MOTION);
+    }else if(c.isValidFormat("disableMotion()")){
+        system.disable(MOTION);
+    }else if(c.isValidFormat("setAbsolute()")){
+        motion.setAbsolute();
+    }else if(c.isValidFormat("setRelative()")){
+        motion.setRelative();
     }else{
-        Console::println("Unknown command");
+        Console::error("Terminal") << "Unknown command" << Console::endl;
     }
 }
-
+*/
 
 SystemApplication::SystemApplication(){
     _state = RobotState::IDLE;
     _score = 0;
 
     //Standalone modules
-    //_cliPtr = std::make_unique<CommandLine>();
     _screenPtr = std::make_unique<Screen>();
 
     screen.drawBootProgress(10, "Loading Actuators...");
     _actuatorsPtr = std::make_unique<Actuators>();
 
-    screen.drawBootProgress(30, "Loading Lidar...");
+    screen.drawBootProgress(20, "Loading Lidar...");
     _lidarPtr = std::make_unique<Lidar>();
 
-    screen.drawBootProgress(40, "Loading Inputs...");
+    screen.drawBootProgress(30, "Loading Inputs...");
     _inputsPtr = std::make_unique<Inputs>();
 
-    screen.drawBootProgress(50, "Loading Motion...");
+    screen.drawBootProgress(40, "Loading Motion...");
     _motionPtr = std::make_unique<Motion>();
 
-    //screen.drawBootProgress(40, "Loading Planner...");
+    //screen.drawBootProgress(50, "Loading Planner...");
     //_plannerPtr = std::make_unique<Planner>();
 
     screen.drawBootProgress(60, "Loading Neopixel...");
     _neopixelPtr = std::make_unique<NeoPixel>();
 
-    //screen.drawBootProgress(70, "Loading Localisation...");
+    //screen.drawBootProgress(70, "Loading Terminal...");
+    //_terminalPtr = std::make_unique<Terminal>();
+
+    //screen.drawBootProgress(80, "Loading Localisation...");
     //_localisationPtr = std::make_unique<Localisation>();
 
-    screen.drawBootProgress(85, "Linking modules...");
+    screen.drawBootProgress(90, "Linking modules...");
 
-    //system.registerModule(_cliPtr.get());
     system.registerModule(_lidarPtr.get());
     system.registerModule(_screenPtr.get());
     system.registerModule(_inputsPtr.get());
     system.registerModule(_motionPtr.get());
     //system.registerModule(_plannerPtr.get());
     system.registerModule(_neopixelPtr.get());
+    //system.registerModule(_terminalPtr.get());
     system.registerModule(_actuatorsPtr.get());
     //system.registerModule(_localisationPtr.get());
 
-    //system.enable(CLI);
     system.enable(LIDAR);
     system.enable(INPUTS);
     system.enable(SCREEN);
 	//system.enable(MOTION);
     system.enable(NEOPIXEL);
+    //system.enable(TERMINAL);
 	system.enable(ACTUATORS);
     //system.enable(LOCALISATION);
 
@@ -225,19 +268,12 @@ void SystemApplication::waitLaunch(){
                 system.enable(MOTION);
                 lidar.ignoreObstacles(true);
                 
-                //testMotion(); break;
-
-				if	   (inputs.isBlue()  && inputs.isPrimary() )                        recalagePrimaryBlue();
-				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  recalageSecondaryBlue();
-				else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeBlue();
-				else if(inputs.isGreen() && inputs.isPrimary() ) 					    recalagePrimaryGreen();
-				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry()) 	recalageSecondaryGreen();
-				else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeGreen();
+                //testMotion(); break;              
                 
+                handleRecalage();
 
 				//TestSteppers();
                 lidar.ignoreObstacles(false);
-                system.disable(MOTION);
 			}
 			break;
 
@@ -262,10 +298,14 @@ void SystemApplication::waitLaunch(){
 }
 
 void SystemApplication::startMatch(){
+    system.disable(TERMINAL);
 	chrono.start();
     system.enable(MOTION);
+
     system.disable(INPUTS);
     system.disable(NEOPIXEL);
+    
+
     lidar.displayRadar(true);
 
 	screen.setPage(Page::MATCH);
@@ -291,11 +331,21 @@ void SystemApplication::endMatch(){
     motion.cancel();
     system.disable(LIDAR);
     system.disable(MOTION);
+
     system.disable(ACTUATORS);
     system.disable(INPUTS);
-    system.disable(SCREEN);
+    //system.disable(SCREEN);
 }
 
+
+void SystemApplication::handleRecalage(){
+        if	   (inputs.isBlue()  && inputs.isPrimary() )                    recalagePrimaryBlue();
+    else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCherry())  recalageSecondaryBlue();
+    else if(inputs.isBlue()  && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeBlue();
+    else if(inputs.isGreen() && inputs.isPrimary() ) 					    recalagePrimaryGreen();
+    else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCherry()) 	recalageSecondaryGreen();
+    else if(inputs.isGreen() && inputs.isSecondary() && inputs.isCake()) 	recalageSecondaryCakeGreen();
+}
 
 void SystemApplication::handleFinishedMatch(){ 
     if(_state != RobotState::FINISHED){

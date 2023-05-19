@@ -42,6 +42,9 @@ public:
     void suckBall();
     void dropBall();
 
+    void openTrap();
+    void closeTrap();
+
     void sleep();
     void engage();
     void disengage();

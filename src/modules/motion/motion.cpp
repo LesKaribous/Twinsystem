@@ -42,8 +42,6 @@ void Motion::cancel() {
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
     Console::info("Motion") << "Final position : " << _position << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
-    //Need to take actual rotation when adding relative target
-    //_position = _startPosition.add(_target.rotateZ(-_position.c));
     _startPosition = _position;
 
     steppers.cancel();
@@ -57,11 +55,7 @@ void Motion::forceCancel() {
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
     Console::info("Motion") << "Final position : " << _position << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
-    //Need to take actual rotation when adding relative target
-    //_position = _startPosition.add(_target.rotateZ(-_position.c));
     _startPosition = _position;
-
-
     steppers.forceCancel();
 }
 

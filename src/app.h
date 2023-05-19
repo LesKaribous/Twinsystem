@@ -10,13 +10,13 @@
 #include "match/score.h"
 #include "math/geometry.h"
 
-#include "modules/cli/cli.h"
 #include "modules/lidar/lidar.h"
 #include "modules/inputs/inputs.h"
 #include "modules/motion/motion.h"
 #include "modules/screen/screen.h"
 //#include "modules/planner/planner.h"
 #include "modules/neopixel/neopixel.h"
+#include "modules/terminal/terminal.h"
 #include "modules/actuators/actuators.h"
 #include "modules/localisation/localisation.h"
 
@@ -87,6 +87,7 @@ public:
     void finishSecondaryBlue();
     void finishSecondaryGreen();
 
+    void handleRecalage();
     void handleFinishedMatch();
     void handleNearlyFinishedMatch();
 
@@ -117,12 +118,12 @@ private:
     std::unique_ptr<Screen> _screenPtr = nullptr;
     std::unique_ptr<Inputs> _inputsPtr = nullptr;
     std::unique_ptr<Motion> _motionPtr = nullptr;
-    //std::unique_ptr<CommandLine> _cliPtr = nullptr;
     //std::unique_ptr<Planner> _plannerPtr = nullptr;
     std::unique_ptr<NeoPixel> _neopixelPtr = nullptr;
+    //std::unique_ptr<Terminal> _terminalPtr = nullptr;
     std::unique_ptr<Actuators> _actuatorsPtr = nullptr;
+
     //std::unique_ptr<Localisation> _localisationPtr = nullptr;
-    
 
     RobotState _state;
 

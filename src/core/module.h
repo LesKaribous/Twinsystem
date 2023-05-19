@@ -1,13 +1,13 @@
 #pragma once
 
 enum SystemModule{
-    CLI,
     LIDAR,
     SCREEN,
     INPUTS,
     MOTION,
     PLANNER,
     NEOPIXEL,
+    TERMINAL,
     ACTUATORS,
     LOCALISATION
 };

@@ -86,6 +86,7 @@ Screen::Screen() : Module(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::
 
     clear();
     needDraw = true;
+    lastDraw = 0;
     drawBootProgress(0, "SystemBoot");
 }
 
@@ -170,12 +171,22 @@ void Screen::draw(){
 }
 
 void Screen::updateAllStartVar() {
-    if(strategySwitch.hasChanged()) updateStrategyState(strategySwitch.getState());
-    if(teamSwitch.hasChanged()) updateTeamColor(teamSwitch.getState());
-    if(starter.hasChanged()) updateTiretteState(starter.getState());
-    if(intercom.hasChanged()) updateLidarState(intercom.getState());
-    if(probed.hasChanged() || probing.hasChanged()) updateInitState();
-    if(x.hasChanged() || y.hasChanged() || z.hasChanged()){
+    bool forceDraw = millis() - lastDraw > 800;
+    if(forceDraw) lastDraw = millis();
+
+    bool drawStrategy = strategySwitch.hasChanged() || forceDraw;
+    bool drawTeam = teamSwitch.hasChanged() || forceDraw;
+    bool drawStarter = starter.hasChanged() || forceDraw;
+    bool drawIntercom = intercom.hasChanged() || forceDraw;
+    bool drawProbing = probed.hasChanged() || probing.hasChanged() || forceDraw;
+    bool drawPosition = x.hasChanged() || y.hasChanged() || z.hasChanged() || forceDraw;
+
+    if(drawStrategy) updateStrategyState(strategySwitch.getState());
+    if(drawTeam) updateTeamColor(teamSwitch.getState());
+    if(drawStarter) updateTiretteState(starter.getState());
+    if(drawIntercom) updateLidarState(intercom.getState());
+    if(drawProbing) updateInitState();
+    if(drawPosition){
         if( millis() - lastPosDraw >= 50){
             updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
             lastPosDraw = millis();
@@ -184,17 +195,26 @@ void Screen::updateAllStartVar() {
 }
 
 void Screen::updateAllMatchVar() {
-    if(time.hasChanged()) updateMatchTime(time.getValue());
-    if(score.hasChanged()) updateScore(score.getValue());
+    bool forceDraw = millis() - lastDraw > 800;
+    if(forceDraw) lastDraw = millis();
+
+    bool drawTime = time.hasChanged() || forceDraw;
+    bool drawScore = score.hasChanged() || forceDraw;
+    bool drawIntercom = intercom.hasChanged() || forceDraw;
+    bool drawPos = x.hasChanged() || y.hasChanged() || z.hasChanged() || forceDraw;
+
+    if(drawTime) updateMatchTime(time.getValue());
+    if(drawScore) updateScore(score.getValue());
     
-    if(x.hasChanged() || y.hasChanged() || z.hasChanged()){
+    if(drawPos){
         if( millis() - lastPosDraw >= 50){
             updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
             lastPosDraw = millis();
         }
     } 
-    if(strategySwitch.hasChanged()) updateStrategyState(strategySwitch.getState());
-    if(intercom.hasChanged()) updateLidarState(intercom.getState());
+
+    if(forceDraw) updateStrategyState(strategySwitch.getState());
+    if(drawIntercom) updateLidarState(intercom.getState());
 }
 
 
