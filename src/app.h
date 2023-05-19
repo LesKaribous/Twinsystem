@@ -109,6 +109,8 @@ public:
     void wait(unsigned long temps);
     void waitUntil(Job& obj);
 
+    void optimizeScore(float k);
+
 private:
     int score();
 	void addScore(int points, int multiplicateur = 1.0);

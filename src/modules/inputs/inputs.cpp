@@ -138,6 +138,14 @@ bool Inputs::isCherry() const{
 	return strategySwitch.getState() == Settings::Match::CHERRY;
 }
 
+bool Inputs::isBrown() const{
+    return strategySwitch.getState() == Settings::Match::BROWN;
+}
+
+bool Inputs::isNoBrown() const{
+    return strategySwitch.getState() == Settings::Match::NOBROWN;
+}
+
 bool Inputs::getStrategyState() const{
 	return strategySwitch.getState();
 }
@@ -161,6 +169,7 @@ bool Inputs::getLowTurbineState() const{
 bool Inputs::getHighTurbineState() const{
     return highTurbineSwitch.getState();
 }
+
 
 float Inputs::getDistanceSensorC() const{
     return localisationSensorC.getDistance();

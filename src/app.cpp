@@ -19,6 +19,10 @@ void SystemApplication::addScore(int points, int multiplicateur){
     _score += (points * multiplicateur);
 }
 
+void SystemApplication::optimizeScore(float k){
+    _score *= k;
+}
+
 int SystemApplication::score(){
     return _score;
 }
@@ -709,10 +713,15 @@ void SystemApplication::matchPrimaryBlue(){
     actuators.grab(RobotCompass::BC);
     align(RobotCompass::CA, 45);
     
-    //Cake Marron
-    actuators.ungrab(RobotCompass::CA);
-    go(cakeBrownSE);
-    actuators.grab(RobotCompass::CA);
+    if(inputs.isBrown()){
+        //Cake Marron
+        actuators.ungrab(RobotCompass::CA);
+        go(cakeBrownSE);
+        actuators.grab(RobotCompass::CA);
+    }
+    else
+        actuators.close(RobotCompass::CA);
+
 
     //----ATTENTION----
     lidar.ignoreObstacles(true); //Ignore obstacles while going home
@@ -735,15 +744,17 @@ void SystemApplication::matchPrimaryBlue(){
     actuators.close(RobotCompass::AB);
     addScore(cakeWithCherry);
 
-    //Dépose du troisieme Gateau
-    align(RobotCompass::CA, -120);
-    actuators.unlock(RobotCompass::CA);
-    go(dropBlue3);
-    actuators.ungrab(RobotCompass::CA);
-    go(retreatBlue3);
-    actuators.close(RobotCompass::CA);
-    addScore(cakeWithCherry);
-    
+    if(inputs.isBrown()){
+        //Dépose du troisieme Gateau
+        align(RobotCompass::CA, -120);
+        actuators.unlock(RobotCompass::CA);
+        go(dropBlue3);
+        actuators.ungrab(RobotCompass::CA);
+        go(retreatBlue3);
+        actuators.close(RobotCompass::CA);
+        addScore(cakeWithCherry);
+    }
+
     //recalage
     go(retreatBlue1);
     probeBorder(TableCompass::SOUTH, RobotCompass::C);
@@ -800,10 +811,13 @@ void SystemApplication::matchPrimaryGreen(){
     align(RobotCompass::CA, -45);
 
     //Cake marron
-    actuators.ungrab(RobotCompass::CA);
-    go(cakeBrownSW);
-    actuators.grab(RobotCompass::CA);
-    
+    if(inputs.isBrown()){
+        actuators.ungrab(RobotCompass::CA);
+        go(cakeBrownSW);
+        actuators.grab(RobotCompass::CA);
+    }
+    else
+        actuators.close(RobotCompass::CA);
 
     //----ATTENTION----
     lidar.ignoreObstacles(true);
@@ -827,15 +841,17 @@ void SystemApplication::matchPrimaryGreen(){
     actuators.close(RobotCompass::AB);
     addScore(cakeWithCherry);
 
-    //Dépose du troisieme Gateau
-    align(RobotCompass::CA, 120);
-    actuators.unlock(RobotCompass::CA);
-    go(dropGreen3);
-    actuators.ungrab(RobotCompass::CA);
-    go(retreatGreen3);
-    actuators.close(RobotCompass::CA);
-    addScore(cakeWithCherry);
-    
+    if(inputs.isBrown()){
+        //Dépose du troisieme Gateau
+        align(RobotCompass::CA, 120);
+        actuators.unlock(RobotCompass::CA);
+        go(dropGreen3);
+        actuators.ungrab(RobotCompass::CA);
+        go(retreatGreen3);
+        actuators.close(RobotCompass::CA);
+        addScore(cakeWithCherry);
+    }
+
     //recalage
     go(retreatGreen1);
     probeBorder(TableCompass::SOUTH, RobotCompass::C);
@@ -1328,24 +1344,28 @@ void SystemApplication::nearlyFinishPrimaryBlue(){
     // go to End Position
     go(blueEndPrimary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishPrimaryGreen(){
     // go to End Position
     go(greenEndPrimary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryBlue(){
     // go to End Position
     go(blueEndSecondary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::nearlyFinishSecondaryGreen(){
     // go to End Position
     go(greenEndSecondary);
     addScore(wheelsOnPlate/2);
+    optimizeScore(0.8);
 }
 
 void SystemApplication::finishPrimaryBlue(){

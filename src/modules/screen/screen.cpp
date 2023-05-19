@@ -323,8 +323,16 @@ void Screen::updateStrategyState(bool stratState) {
     screen.setTextColor(ILI9341_WHITE);
     screen.setTextSize(2);
     screen.setCursor(100, 10);
-    if(stratState==Settings::Match::CAKE) screen.println("CAKE");
-    else screen.println("CHERRY");
+    if(!twinSwitch.getState()){
+        if(stratState==Settings::Match::CAKE) screen.println("CAKE");
+        else screen.println("CHERRY");
+    }
+    else{
+        if(stratState==Settings::Match::BROWN) screen.println("BROWN");
+        else screen.println("NOBROWN"); 
+    }
+
+    
 }
 
 void Screen::updateLidarState(bool lidarState) {

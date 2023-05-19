@@ -22,6 +22,8 @@ namespace Settings{
 
         CHERRY = false,
         CAKE = true,
+        BROWN = true,
+        NOBROWN = false,
 
         BLUE   = false,
         GREEN  = true;

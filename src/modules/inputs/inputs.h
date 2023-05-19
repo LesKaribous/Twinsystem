@@ -40,6 +40,8 @@ public:
     bool isCake() const;
     bool isGreen() const;
     bool isCherry() const;
+    bool isBrown() const;
+    bool isNoBrown() const;
     bool isPrimary() const;
     bool isSecondary() const;
     bool getRobotType() const;
