@@ -171,6 +171,10 @@ void  Motion::alignAsync(RobotCompass rc, float orientation){
 
 //Raw relative move request
 void  Motion::moveAwait(Vec3 target){
+    if(!m_enabled) {
+        Console::error("Motion") << "Motion not enabled" << Console::endl;
+        return;
+    }
     _currentJob.reset();
     //Set new target
     target.c *= DEG_TO_RAD;
@@ -207,6 +211,10 @@ void  Motion::moveAwait(Vec3 target){
 
 //Raw relative move request
 void  Motion::moveAsync(Vec3 target){
+    if(!m_enabled) {
+        Console::error("Motion") << "Motion not enabled" << Console::endl;
+        return;
+    }
     _currentJob.reset();
     //Set new target
     target.c *= DEG_TO_RAD;

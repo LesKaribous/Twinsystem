@@ -6,6 +6,7 @@ void setup(){
 	Console::initialize(ConsoleLevel::_INFO);
 	app = std::make_unique<SystemApplication>();
 	THROW("Boot completed successfully")
+	delay(800);
 }
 
 void loop(){

@@ -24,9 +24,8 @@ bool Chronometer::isFinished(){
 
 bool Chronometer::isNearlyFinished(){
     updateTime();
-    return _timeLeft <= 5000; // <= 5s
+    return _timeLeft <= Settings::Match::NEARLY_FINISH; // <= 5s
 }
-
 
 void Chronometer::updateTime(){
     if(_state == State::STARTED){

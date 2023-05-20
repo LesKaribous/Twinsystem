@@ -503,10 +503,14 @@ void SystemApplication::probeObstacle(Vec2 obstaclePosition,TableCompass tc, Rob
 	float _offset = getOffsets(rc);
 
 	Vec3 position = motion.getAbsPosition();
+    //position.c = getCompassOrientation(tc);
 
 	if(tc == TableCompass::NORTH){
 		position.a = obstaclePosition.a - _offset; //We hit Xmax
 		motion.setAbsPosition(position);
+        Console::info("probeObstacle") << position << Console::endl;
+        Console::info("offset") << _offset << Console::endl;
+        Console::info("obstacle position") << obstaclePosition << Console::endl;
 	}
 	if(tc == TableCompass::SOUTH){
 		position.a = obstaclePosition.a + _offset; //We hit Xmin
@@ -731,6 +735,7 @@ void SystemApplication::matchPrimaryBlue(){
     align(RobotCompass::BC, -120);
     go(retreatBlue1);
     actuators.unlock(RobotCompass::BC);
+    wait(500);
     go(dropBlue1);
     actuators.ungrab(RobotCompass::BC);
     go(retreatBlue2);
@@ -740,6 +745,7 @@ void SystemApplication::matchPrimaryBlue(){
     //Dépose du second Gateau
     align(RobotCompass::AB, -120);
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropBlue2);
     actuators.ungrab(RobotCompass::AB);
     go(retreatBlue3);
@@ -750,6 +756,7 @@ void SystemApplication::matchPrimaryBlue(){
         //Dépose du troisieme Gateau
         align(RobotCompass::CA, -120);
         actuators.unlock(RobotCompass::CA);
+        wait(500);
         go(dropBlue3);
         actuators.ungrab(RobotCompass::CA);
         go(retreatBlue3);
@@ -773,7 +780,7 @@ void SystemApplication::matchPrimaryBlue(){
     go(ballBlueBasketPlus);
     // Dépose
     actuators.trap.open();
-    wait(2000);
+    wait(4000);
     actuators.trap.close();
     addScore(exactCherryCounting);
     addScore(cherryInBasket, 5);
@@ -828,6 +835,7 @@ void SystemApplication::matchPrimaryGreen(){
     align(RobotCompass::BC, 120);
     go(retreatGreen1);
     actuators.unlock(RobotCompass::BC);
+    wait(500);
     go(dropGreen1);
     actuators.ungrab(RobotCompass::BC);
     go(retreatGreen2);
@@ -837,6 +845,7 @@ void SystemApplication::matchPrimaryGreen(){
     //Dépose du second Gateau
     align(RobotCompass::AB, 120);
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropGreen2);
     actuators.ungrab(RobotCompass::AB);
     go(retreatGreen3);
@@ -847,6 +856,7 @@ void SystemApplication::matchPrimaryGreen(){
         //Dépose du troisieme Gateau
         align(RobotCompass::CA, 120);
         actuators.unlock(RobotCompass::CA);
+        wait(500);
         go(dropGreen3);
         actuators.ungrab(RobotCompass::CA);
         go(retreatGreen3);
@@ -873,7 +883,7 @@ void SystemApplication::matchPrimaryGreen(){
     go(ballGreenBasketPlus);
     // Dépose
     actuators.trap.open();
-    wait(2000);
+    wait(4000);
     actuators.trap.close();
     addScore(exactCherryCounting);
     addScore(cherryInBasket, 5);
@@ -935,12 +945,14 @@ void SystemApplication::matchSecondaryBlue(){
     // Depose les gateaux
     align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropB2_01);
     actuators.ungrab(RobotCompass::AB);
     addScore(cakeWithCherry);
 
     actuators.unlock(RobotCompass::BC);
     actuators.unlock(RobotCompass::CA);
+    wait(1000);
 
     go(dropB2_02);
     align(RobotCompass::BC, getCompassOrientation(TableCompass::EAST));
@@ -1011,12 +1023,14 @@ void SystemApplication::matchSecondaryGreen(){
     // Depose les gateaux
     align(RobotCompass::AB, getCompassOrientation(TableCompass::WEST));
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropV2_01);
     actuators.ungrab(RobotCompass::AB);
     addScore(cakeWithCherry);
 
     actuators.unlock(RobotCompass::BC);
     actuators.unlock(RobotCompass::CA);
+    wait(1000);
 
     go(dropV2_02);
     align(RobotCompass::BC, getCompassOrientation(TableCompass::WEST));
@@ -1070,15 +1084,19 @@ void SystemApplication::matchSecondaryCakeBlue(){
     align(RobotCompass::BC, -120);
     go(retreatB2_04);
     actuators.unlock(RobotCompass::BC);
+    wait(500);
     go(dropB2_04);
     actuators.ungrab(RobotCompass::BC);
+    wait(500);
     go(retreatB2_05);
     actuators.close(RobotCompass::BC);
+    wait(500);
     addScore(cakeWithCherry);
 
     //Dépose du second Gateau
     align(RobotCompass::AB, -120);
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropB2_05);
     actuators.ungrab(RobotCompass::AB);
     go(retreatB2_06);
@@ -1088,6 +1106,7 @@ void SystemApplication::matchSecondaryCakeBlue(){
     //Dépose du troisieme Gateau
     align(RobotCompass::CA, -120);
     actuators.unlock(RobotCompass::CA);
+    wait(500);
     go(dropB2_06);
     actuators.ungrab(RobotCompass::CA);
     go(retreatB2_06);
@@ -1101,6 +1120,7 @@ void SystemApplication::matchSecondaryCakeBlue(){
 
     //Securise
     go(dropB2_03);
+    /*
     while(chrono.getTimeLeftSeconds() >= 10)
     {
         go(protectB2_01);
@@ -1108,7 +1128,7 @@ void SystemApplication::matchSecondaryCakeBlue(){
         go(protectB2_02);
         //wait(2000);
     }
-
+    */
     //Fin du match
     go(blueEndSecondary);
 
@@ -1146,6 +1166,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
     align(RobotCompass::BC, 120);
     go(retreatV2_04);
     actuators.unlock(RobotCompass::BC);
+    wait(500);
     go(dropV2_04);
     actuators.ungrab(RobotCompass::BC);
     go(retreatV2_05);
@@ -1155,6 +1176,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
     //Dépose du second Gateau
     align(RobotCompass::AB, 120);
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropV2_05);
     actuators.ungrab(RobotCompass::AB);
     go(retreatV2_06);
@@ -1164,6 +1186,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
     //Dépose du troisieme Gateau
     align(RobotCompass::CA, 120);
     actuators.unlock(RobotCompass::CA);
+    wait(500);
     go(dropV2_06);
     actuators.ungrab(RobotCompass::CA);
     go(retreatV2_06);
@@ -1177,6 +1200,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
 
     //Securise
     go(dropV2_03);
+    /*
     while(chrono.getTimeLeftSeconds() >= 10)
     {
         go(protectV2_01);
@@ -1184,6 +1208,7 @@ void SystemApplication::matchSecondaryCakeGreen(){
         go(protectV2_02);
         //wait(2000);
     }
+    */
 
     //Fin du match
     go(greenEndSecondary);
@@ -1217,12 +1242,14 @@ void SystemApplication::matchSecondaryCakeBlueOld(){
     // Depose les gateaux
     align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropB2_01);
     actuators.ungrab(RobotCompass::AB);
     addScore(cakeWithCherry);
 
     actuators.unlock(RobotCompass::BC);
     actuators.unlock(RobotCompass::CA);
+    wait(500);
 
     go(dropB2_02);
     align(RobotCompass::BC, getCompassOrientation(TableCompass::EAST));
@@ -1274,12 +1301,14 @@ void SystemApplication::matchSecondaryCakeGreenOld(){
     // ----------------------------------------
     align(RobotCompass::AB, getCompassOrientation(TableCompass::WEST));
     actuators.unlock(RobotCompass::AB);
+    wait(500);
     go(dropV2_01);
     actuators.ungrab(RobotCompass::AB);
     addScore(cakeWithCherry);
 
     actuators.unlock(RobotCompass::BC);
     actuators.unlock(RobotCompass::CA);
+    wait(500);
 
     go(dropV2_02);
     align(RobotCompass::BC, getCompassOrientation(TableCompass::WEST));
