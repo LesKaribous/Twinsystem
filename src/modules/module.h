@@ -1,7 +1,9 @@
 #pragma once
+#include "system/core/lib.h"
 
 enum SystemModule{
     LIDAR,
+    CHRONO,
     SCREEN,
     INPUTS,
     MOTION,
@@ -11,6 +13,8 @@ enum SystemModule{
     ACTUATORS,
     LOCALISATION
 };
+
+
 
 // Base class for subsystems
 class Module {
@@ -24,6 +28,7 @@ public:
     bool isEnabled() const;
 
     SystemModule getModule() const;
+    String toString() const;
 
 protected:
     const SystemModule m_module;

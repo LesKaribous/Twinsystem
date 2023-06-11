@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pin.h"
-#include "math/geometry.h"
+#include "system/math/geometry.h"
 
 // Struct definition
 struct  CalibrationProfile{
@@ -13,7 +13,7 @@ struct  CalibrationProfile{
 namespace Settings{
 
     namespace Match{
-        const bool 
+        constexpr bool 
         AVOIDANCE = 1,
         NO_AVOIDANCE = 0,
 
@@ -28,25 +28,25 @@ namespace Settings{
         BLUE   = false,
         GREEN  = true;
 
-        const unsigned long 
-        DURATION = 100*1000,        //100s
+        constexpr unsigned long 
+        DURATION = 20*1000,        //100s
         NEARLY_FINISH = 8000,       //8s before the end
         ENDMATCH = 200;             //200ms before the end
         
-        const float 
+        constexpr float 
         FEEDRATE = 100; //%
     }
 
     namespace Inputs{
         namespace Turbine{
-            const bool
+            constexpr bool
             LOW_MODE = true,
             HIGH_MODE = true,
             STANDBY = false;
         }
 
         namespace Trap{
-            const bool
+            constexpr bool
             UP = true,
             DOWN = true;
         }
@@ -55,7 +55,7 @@ namespace Settings{
     namespace Actuators{
         namespace Gripper{
             namespace AB{
-                const int 
+                constexpr int 
                 right_Close = 30,
                 left_Close = 160,
                 cherry_Close = 100,
@@ -67,7 +67,7 @@ namespace Settings{
             }
             
             namespace BC{
-                const int 
+                constexpr int 
                 right_Close = 30,
                 left_Close = 160,
                 cherry_Close = 100,
@@ -79,7 +79,7 @@ namespace Settings{
             }
 
             namespace CA{
-                const int 
+                constexpr int 
                 right_Close = 30,
                 left_Close = 160,
                 cherry_Close = 100,
@@ -92,7 +92,7 @@ namespace Settings{
         }
         
         namespace cherryPicker{
-            const int
+            constexpr int
             trap_Close = 50,
             trap_Open = 140,
             trap_Grab = 50;
@@ -100,24 +100,29 @@ namespace Settings{
     }
 
     namespace Geometry{
-        const float 
+        constexpr float 
         RADIUS = 125.98f,
         WHEEL_RADIUS = 30;
     }
     
     namespace Motion{
-        const bool
+        constexpr bool
         RELATIVE = false,
         ABSOLUTE = true;
 
+        constexpr float kP = 0.005;            // (P)roportional constant of the regulator needs to be adjusted
+        constexpr float kI = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
+        constexpr float kD = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
 
         const uint32_t 
             ACCEL = 3000, // Old : 4000
-            SPEED = 4000; // Old : 5000
+            SPEED = 4000, // Old : 5000
+            PULLIN = 800,
+            PID_PERIOD = 10;//ms
     }
 
     namespace Stepper{
-        const bool 
+        constexpr bool 
         ENABLE_POLARITY = false,
         
         STEP_A_POLARITY = true,
@@ -128,13 +133,13 @@ namespace Settings{
         DIR_B_POLARITY = false,
         DIR_C_POLARITY = false;
 
-        const u_int8_t 
+        constexpr u_int8_t 
         STEP_MODE = 8;
             
     }
 
     namespace Lidar{
-        const unsigned long persitency = 1000;//ms
+        constexpr unsigned long persitency = 1000;//ms
     } // namespace Lidar
     
 

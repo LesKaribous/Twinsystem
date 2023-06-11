@@ -1,6 +1,7 @@
 #pragma once
+#include "modules/module.h"
 
-class Chronometer{
+class Chronometer : public Module{
 public:
 
     enum class State{
@@ -10,10 +11,11 @@ public:
     };
 
     Chronometer();
+
+    void update() override;
     void start();
     bool isFinished();
     bool isNearlyFinished();
-
 
     int getTimeLeftSeconds();
     unsigned long getTimeLeft();

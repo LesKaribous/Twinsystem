@@ -1,6 +1,6 @@
 #include "modules/lidar/lidar.h"
 #include "settings.h"
-#include "debug/console.h"
+#include "system/debug/console.h"
 
 Lidar::Lidar() : Module(LIDAR){
 	intercom.initialize();

@@ -1,6 +1,6 @@
 #include "stepperController.h"
 #include "settings.h"
-#include "debug/console.h"
+#include "system/debug/console.h"
 
 
 StepperController::StepperController() :         
@@ -25,16 +25,16 @@ StepperController::StepperController() :
 }
 
 void StepperController::pause(){
-    _currentJob.pause();
-    if(_currentJob.isPaused()){
+    Job::pause();
+    if( Job::isPaused()){
         _controller.stop();
         
     }
 }
 
 void StepperController::resume(){
-    _currentJob.resume();
-    if(!_currentJob.isPaused()){
+     Job::resume();
+    if(! Job::isPaused()){
         _sA.setTargetAbs(int32_t(_sA_target));
         _sB.setTargetAbs(int32_t(_sB_target));
         _sC.setTargetAbs(int32_t(_sC_target));
@@ -45,7 +45,7 @@ void StepperController::resume(){
 }
 
 void StepperController::cancel() {
-    _currentJob.cancel();
+     Job::cancel();
     if(_controller.isRunning()){
         _controller.stop(); //Blocking
     }
@@ -58,7 +58,7 @@ void StepperController::cancel() {
 }
 
 void StepperController::forceCancel() {
-    _currentJob.cancel();
+    Job::cancel();
     if(_controller.isRunning()){
         _controller.emergencyStop();
     }
@@ -76,7 +76,7 @@ bool StepperController::hasFinished() {
 }
 
 void StepperController::complete() {
-    _currentJob.complete();
+     Job::complete();
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
@@ -85,7 +85,7 @@ void StepperController::complete() {
     _sC.setTargetAbs(0);
 }
 
-void  StepperController::update(){
+void  StepperController::run(){
 
     Console::trace("StepperController") << "_sA.getPosition() ->" << _sA.getPosition() << Console::endl;
     Console::trace("StepperController") << "_sA_target ->" << _sA_target << Console::endl;
@@ -97,7 +97,7 @@ void  StepperController::update(){
     Console::trace("StepperController") << "HasFinished -> " << (_sA.getPosition() == _sA_target && _sB.getPosition() == _sB_target && _sC.getPosition() == _sC_target) << Console::endl;
     
 
-    if(_currentJob.isPending()){
+    if( Job::isPending()){
         if(hasFinished()){
             complete();
         }
@@ -112,10 +112,6 @@ bool StepperController::isSleeping(){
 
 bool StepperController::isAsync(){
     return _async;
-}
-
-Job& StepperController::getCurrentJob(){
-    return _currentJob;
 }
 
 void StepperController::enableAsync(){
@@ -182,8 +178,8 @@ void StepperController::wakeUp(){
 }
 
 void StepperController::move(Vec3 target){
-    _currentJob.reset();
-    _currentJob.start();
+     Job::reset();
+     Job::start();
     target *=_calibration;
 
     _sA.setPosition(0);

@@ -1,6 +1,6 @@
 #pragma once
-#include "core/module.h"
-#include "math/geometry.h"
+#include "modules/module.h"
+#include "system/math/geometry.h"
 #include "modules/actuators/bistableServo.h"
 
 struct GripperGroup{
@@ -27,6 +27,8 @@ public:
     ~Actuators();
 
     void update() override;
+    void disable()override;
+    void enable()override;
 
     void lock   (RobotCompass rc); //Lock Cherry locker
     void unlock (RobotCompass rc); //Unlock Cherry locker
@@ -46,7 +48,5 @@ public:
     void closeTrap();
 
     void sleep();
-    void engage();
-    void disengage();
 };
 

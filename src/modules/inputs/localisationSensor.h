@@ -1,7 +1,6 @@
 #pragma once
-#include "core/module.h"
 #include "modules/inputs/button.h"
-#include "core/lib.h"
+#include "system/core/lib.h"
 
 class LocalisationSensor : public AbstractInput<int>
 {

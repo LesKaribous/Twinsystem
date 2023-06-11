@@ -1,13 +1,13 @@
 #pragma once
 #include "pin.h"
-#include "core/lib.h"
-#include "core/job.h"
-#include "math/geometry.h"
+#include "system/core/lib.h"
+#include "system/core/job.h"
+#include "system/math/geometry.h"
 
 #define SLOW 30
 #define FAST 100
 
-class StepperController{
+class StepperController : public Job{
 private:
     bool _engaged, _sleeping;
     StepControl _controller;
@@ -27,13 +27,9 @@ private:
     float _feedrate;
     bool _async = true;
 
-    Job _currentJob;
-
 public:
     StepperController();
     ~StepperController(){};
-
-    Job& getCurrentJob();
 
     void enableAsync();
     void disableAsync();
@@ -69,12 +65,12 @@ public:
     void sleep();
 
     //Inherited
-    void update();
-    void pause();
-    void resume();
-    void cancel();
+    void run()override;
+    void pause() override;
+    void resume()override;
+    void cancel()override;
     void forceCancel();
-    void complete();
+    void complete()override;
 };
 
 

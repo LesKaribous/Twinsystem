@@ -1,8 +1,8 @@
 #pragma once
-#include "core/lib.h"
-#include "consoleLevel.h"
+#include "system/core/lib.h"
+#include "system/debug/consoleLevel.h"
 
-#include "math/geometry.h"
+#include "system/math/geometry.h"
 
 class ConsoleStream {
 public:

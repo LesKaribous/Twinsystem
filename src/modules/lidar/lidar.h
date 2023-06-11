@@ -1,7 +1,7 @@
 #pragma once
-#include "core/module.h"
-#include "com/intercom.h"
-#include "math/geometry.h"
+#include "modules/module.h"
+#include "system/com/intercom.h"
+#include "system/math/geometry.h"
 
 class Lidar : public Module{
 private:

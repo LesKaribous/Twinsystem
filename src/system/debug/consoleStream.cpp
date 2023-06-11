@@ -17,23 +17,20 @@ String ConsoleStream::header() {
 	String str;
 
 	switch (_level) {
-	case ConsoleLevel::_TRACE:
+	case ConsoleLevel::VERBOSE:
 		str = "[Trace]";
 		break;
-	case ConsoleLevel::_INFO:
+	case ConsoleLevel::INFO:
 		str = "[Info]";
 		break;
-	case ConsoleLevel::_WARNING:
+	case ConsoleLevel::WARNING:
 		str = "[Warning]";
 		break;
-	case ConsoleLevel::_ERROR:
+	case ConsoleLevel::CRITICAL:
 		str = "[Error]";
 		break;
-	case ConsoleLevel::_SUCCESS:
+	case ConsoleLevel::SUCCESS:
 		str = "[OK]";
-		break;
-	case ConsoleLevel::_CRITICAL:
-		str = "[Fatal]";
 		break;
 	default:
 		str = "";

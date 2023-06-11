@@ -1,5 +1,5 @@
 #pragma once
-#include "core/lib.h"
+#include "system/core/lib.h"
 
 
 enum class JobState{
@@ -22,15 +22,13 @@ public:
     bool isCancelled() const ;
     bool isCompleted() const ;
 
-    
-    void update(); 
-
-    void reset();   //Set to IDLE
-    void start();   //Set to PENDING
-    void pause();   //Set to PAUSED
-    void resume();  //Set to PENDING
-    void cancel();  //Set to CANCELLED
-    void complete();//Set to COMPLETED
+    virtual void run() = 0; 
+    virtual void reset();   //Set to IDLE
+    virtual void start();   //Set to PENDING
+    virtual void pause();   //Set to PAUSED
+    virtual void resume();  //Set to PENDING
+    virtual void cancel();  //Set to CANCELLED
+    virtual void complete();//Set to COMPLETED
 
 protected:
     JobState m_state = JobState::IDLE;

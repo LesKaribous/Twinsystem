@@ -1,5 +1,5 @@
 #pragma once
-#include "core/module.h"
+#include "modules/module.h"
 #include <Adafruit_NeoPixel.h>
 
 class NeoPixel : public Module{

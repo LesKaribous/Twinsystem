@@ -1,6 +1,6 @@
 #pragma once
-#include "core/module.h"
-#include "debug/console.h"
+#include "modules/module.h"
+#include "system/debug/console.h"
 #include "modules/inputs/button.h"
 #include "modules/inputs/localisationSensor.h"
 

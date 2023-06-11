@@ -59,6 +59,8 @@ struct Vec2 {
     Vec2& operator/=(float u);
 };
 
+
+
 //PolarVec
 // | heading |
 // |   mag   |

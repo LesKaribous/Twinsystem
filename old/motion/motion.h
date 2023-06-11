@@ -1,17 +1,15 @@
 #pragma once
 #include "settings.h"
-#include "modules/module.h"
-#include "system/core/lib.h"
 #include "system/core/job.h"
-
-
-
+#include "system/core/module.h"
+#include "system/math/geometry.h"
+#include "modules/motion/stepperController.h"
 
 class Motion : public Module, public Job{
 public:
 
     Motion();
-    ~Motion ();
+    ~Motion();
 
     void enable() override;
     void disable() override;
@@ -27,6 +25,7 @@ public:
     void complete() override;
     void forceCancel();
 
+
     Vec3 estimatePosition() const;
     Vec3 getEstimatedAbsPosition() const;
 
@@ -37,16 +36,21 @@ public:
     void goAlign(Vec2 target, RobotCompass rc, float orientation);
 
     //Setters
+    //Absolute mm, mm, rad
     void setAbsTarget(Vec3);    //mm, mm, rad
+    //Absolute mm, mm, rad
     void setAbsPosition(Vec3);  //mm, mm, rad
 
     void setAbsolute();
     void setRelative();
 
     //Getters
-    Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
-    Vec3 getRelTarget() const;  //Absolute mm, mm, rad
-    Vec3 getAbsPosition() const;//Absolute mm, mm, rad
+    //Absolute mm, mm, rad
+    Vec3 getAbsPosition() const;
+    //Absolute mm, mm, rad
+    Vec3 getAbsTarget() const;
+    //Absolute mm, mm, rad
+    Vec3 getRelTarget() const;
 
     Vec3 getCurrentSpeed() const; // Get the current speed in mm/s, mm/s, rad/s
 
@@ -55,25 +59,15 @@ public:
 
     bool isAbsolute() const;
     bool isRelative() const;
+
     bool isRotating() const;
-    bool isSleeping() const;
     bool isMoving() const;
 
 
-    void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
-    void disengage();// Disengaging motors turn them off. They cannot move at all.
-
-    //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
-    //Note : A move request will exit sleep mode and turn them on.
-    void wakeUp();
-    void sleep();
-
-    void move(Vec3 target);
 private:
-    void pid();
-    Vec3 getCurrentStepsPosition();
-
-    
+    void move(Vec3 target);
+    void setSpeed(Vec3 speed); // Set the desired speed in mm/s, mm/s, rad/s
+    void updateSpeed(); // Update the current speed towards the desired speed
 
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
@@ -92,19 +86,6 @@ private:
     Vec2 _controlPoint   = { 0, 0};
 
     bool _absolute = true;
-    bool _engaged, _sleeping;
 
-    //Stepper control
-    Stepper _sA, _sB, _sC;
-    RotateControl _sAController,
-                  _sBController,
-                  _sCController;
-
-    Vec3 _stepPos;
-    Vec3 _stepTarget;
-
-    elapsedMillis _targetTimer;
-    elapsedMillis _outputTimer;
-
-
+    StepperController _steppers;
 };

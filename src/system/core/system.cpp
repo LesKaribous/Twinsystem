@@ -3,14 +3,11 @@
 
 System::System(){
     m_currentState = BOOT;
+    Console::initialize();
 }
 
 System::~System(){
     //Smart pointers destroyed
-}
-
-void System::registerModule(Module* m){
-    m_modules.push_back(m);
 }
 
 void System::enable(SystemModule module) {
@@ -29,6 +26,11 @@ void System::disable(SystemModule module) {
     }
 }
 
+void System::loadModule(Module* m){
+    Console::info("System") << m->toString() << " loaded." << Console::endl;
+    m_modules.push_back(m);
+}
+
 void System::update() {
     // Update each enabled subsystem
     for(auto& module : m_modules) {
@@ -43,19 +45,19 @@ void System::update() {
         handleBootState();
         break;
     case IDLE:
-        //Wait for launch
+        //Wait for program
         handleIdleState();
         break;
     case ARMED:
-        //Wait for launch
+        //Ready to start program
         handleArmedState();
         break;
     case RUNNING:
-        //Match
+        //Run the program
         handleRunningState();
         break;
     case STOPPED:
-        //Do nothing and display score
+        //Program stopped
         handleStoppedState();
         break;
     default:

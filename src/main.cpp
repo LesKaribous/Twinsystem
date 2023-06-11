@@ -1,18 +1,11 @@
 #include "app.h"
 
-std::unique_ptr<SystemApplication> app;
+SystemApplication app;
 
 void setup(){
-	Console::initialize(ConsoleLevel::_INFO);
-	app = std::make_unique<SystemApplication>();
-	THROW("Boot completed successfully")
-	delay(800);
+	Console::setLevel(INFO);
 }
 
 void loop(){
-	app->waitLaunch();
-	app->startMatch();
-	app->endMatch();
-	
-    while(true);//Safe
+	app.update();
 }

@@ -21,9 +21,15 @@ trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_
 
 {
     _pinTurbine = Pin::CherryPicker::pinTurbine;
-    pinMode(_pinTurbine, OUTPUT);
-    stopTurbine();
+}
 
+Actuators::~Actuators(){
+}
+
+void Actuators::update(){
+}
+
+void Actuators::enable(){
     gripperAB.cherryLocker.enable();
     gripperAB.leftGripper.enable();
     gripperAB.rightGripper.enable();
@@ -34,7 +40,9 @@ trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_
     gripperCA.leftGripper.enable();
     gripperCA.rightGripper.enable();
     trap.enable();
-    
+    pinMode(_pinTurbine, OUTPUT);
+    digitalWrite(_pinTurbine, LOW);
+
     trap.close();
     close(RobotCompass::AB);
     close(RobotCompass::BC);
@@ -45,10 +53,18 @@ trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_
     sleep();
 }
 
-Actuators::~Actuators(){
-}
-
-void Actuators::update(){
+void Actuators::disable(){
+    gripperAB.cherryLocker.disable();
+    gripperAB.leftGripper.disable();
+    gripperAB.rightGripper.disable();
+    gripperBC.cherryLocker.disable();
+    gripperBC.leftGripper.disable();
+    gripperBC.rightGripper.disable();
+    gripperCA.cherryLocker.disable();
+    gripperCA.leftGripper.disable();
+    gripperCA.rightGripper.disable();
+    trap.disable();
+    digitalWrite(_pinTurbine, LOW);
 }
 
 void Actuators::lock(RobotCompass rc){
@@ -216,32 +232,3 @@ void Actuators::sleep(){
     gripperCA.leftGripper.sleep();
     gripperCA.rightGripper.sleep();
 }
-
-
-void Actuators::engage(){
-    gripperAB.cherryLocker.enable();
-    gripperAB.leftGripper.enable();
-    gripperAB.rightGripper.enable();
-    gripperBC.cherryLocker.enable();
-    gripperBC.leftGripper.enable();
-    gripperBC.rightGripper.enable();
-    gripperCA.cherryLocker.enable();
-    gripperCA.leftGripper.enable();
-    gripperCA.rightGripper.enable();
-    digitalWrite(_pinTurbine, LOW);
-}
-
-void Actuators::disengage(){
-    gripperAB.cherryLocker.disable();
-    gripperAB.leftGripper.disable();
-    gripperAB.rightGripper.disable();
-    gripperBC.cherryLocker.disable();
-    gripperBC.leftGripper.disable();
-    gripperBC.rightGripper.disable();
-    gripperCA.cherryLocker.disable();
-    gripperCA.leftGripper.disable();
-    gripperCA.rightGripper.disable();
-    trap.disable();
-    digitalWrite(_pinTurbine, LOW);
-}
-

@@ -1,17 +1,16 @@
-#include "settings.h"
 #include "modules/motion/motion.h"
+#include "system/math/geometry.h"
 #include "system/math/kinematics.h"
+#include "settings.h"
 #include "system/debug/console.h"
 
 
-Motion::Motion() : Module(MOTION),         
-    _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
-    _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)
-{
-    _calibration = Settings::Calibration::Primary.Cartesian; //set to primary by default
+Motion::Motion() : Module(MOTION){
+    _calibration = Settings::Match::PRIMARY ?  
+    Settings::Calibration::Primary.Cartesian : Settings::Calibration::Secondary.Cartesian;
     
     _absolute = Settings::Motion::ABSOLUTE;
+    _steppers.setFeedrate(100);
 
     Job::reset();
     _startPosition  = {0,0,0};
@@ -21,31 +20,6 @@ Motion::Motion() : Module(MOTION),
     _calibration 	= Settings::Calibration::Primary.Cartesian;
     _controlPoint   = {0,0};
 	_absolute = true;
-
-    pinMode(Pin::Stepper::enable, OUTPUT);
-    disengage();
-
-    _stepPos = _stepTarget = Vec3(0);
-
-    _sA.setPosition(0);
-    _sB.setMaxSpeed(0);
-    _sC.setMaxSpeed(0);
-
-    _sA.setMaxSpeed(Settings::Motion::SPEED);
-    _sB.setMaxSpeed(Settings::Motion::SPEED);
-    _sC.setMaxSpeed(Settings::Motion::SPEED);
-
-    _sA.setAcceleration(Settings::Motion::ACCEL);
-    _sB.setAcceleration(Settings::Motion::ACCEL);
-    _sC.setAcceleration(Settings::Motion::ACCEL);
-
-    _sAController.rotateAsync(_sA);
-    _sBController.rotateAsync(_sB);
-    _sCController.rotateAsync(_sC);
-
-    _sAController.overrideSpeed(0);
-    _sBController.overrideSpeed(0);
-    _sCController.overrideSpeed(0);
 }
 
 Motion::~Motion(){}
@@ -54,126 +28,46 @@ void Motion::run(){
     update();
 }
 
-bool Motion::isSleeping() const{
-    return _sleeping;
-}
-
-void Motion::engage(){
-    _engaged = true;
-    _sleeping = false;
-    digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
-
-}
-
-void Motion::disengage(){
-    _engaged = false;
-    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
-}
-
-void Motion::sleep(){
-    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
-    _sleeping = true;
-}
-
-void Motion::wakeUp(){
-    if(_sleeping){
-        digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
-        _sleeping = false;
-    }
-}
-
-Vec3 Motion::getCurrentStepsPosition(){
-    return _stepPos;
-}
-
-void Motion::pid(){
-    static unsigned lastTick = 0;
-    _stepPos = Vec3(_sA.getPosition(), _sB.getPosition(), _sC.getPosition());
-    if (millis() - lastTick > Settings::Motion::PID_PERIOD)
-    {
-        
-        float dt = Settings::Motion::PID_PERIOD;
-        float kP = Settings::Motion::kP;
-        Vec3 cPos = _stepPos;
-
-        Vec3 delta = (_stepTarget - cPos) * (kP / dt); // This implements a simple P regulator (can be extended to a PID if necessary)
-        Vec3 factor = { std::max(-1.0f, std::min(1.0f, delta.a)),// limit to -1.0..1.0
-                        std::max(-1.0f, std::min(1.0f, delta.b)),
-                        std::max(-1.0f, std::min(1.0f, delta.c))};
-
-        _sAController.overrideSpeed(factor.a); // set new speed
-        _sBController.overrideSpeed(factor.b); // set new speed
-        _sCController.overrideSpeed(factor.c); // set new speed
-
-        lastTick = 0;
-    }
-}
-
 void Motion::pause(){
     Job::pause();
-    _sAController.overrideSpeed(0); // set new speed
-    _sBController.overrideSpeed(0); // set new speed
-    _sCController.overrideSpeed(0); // set new speed
+    _steppers.pause();
 }
 
 void Motion::resume(){
     Job::resume();
-    
-    Vec3 newPos = estimatePosition();
+    _steppers.resume();
 }
 
 void Motion::cancel() {
     Job::cancel();
-    _sAController.overrideSpeed(0); // set new speed
-    _sBController.overrideSpeed(0); // set new speed
-    _sCController.overrideSpeed(0); // set new speed
+    _steppers.pause();
     
     Vec3 newPos = estimatePosition();
-
-    _stepTarget = 0;
-    _stepPos = 0;
 
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
     Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
     _startPosition = _position = newPos;
+
+    _steppers.cancel();
 }
 
 void Motion::forceCancel() {
     Job::cancel();
-    _sAController.emergencyStop(); // set new speed
-    _sBController.emergencyStop(); // set new speed
-    _sCController.emergencyStop(); // set new speed
-
-    _sAController.overrideSpeed(0); // set new speed
-    _sBController.overrideSpeed(0); // set new speed
-    _sCController.overrideSpeed(0); // set new speed
-
-    _sAController.rotateAsync(_sA); //recover from emmergency stop
-    _sBController.rotateAsync(_sB);
-    _sCController.rotateAsync(_sC);
-
+    _steppers.emergencyStop();
     Vec3 newPos = estimatePosition();
-
-    _stepTarget = 0;
-    _stepPos = 0;
 
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
     Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
     Console::info("Motion") << "Target was : " << _target << Console::endl;
     _startPosition = _position = newPos;
+    _steppers.forceCancel();
 }
 
 void Motion::complete() {
     Job::complete();
+
     Vec3 newPos = estimatePosition();
-
-    _sAController.overrideSpeed(0); // set new speed
-    _sBController.overrideSpeed(0); // set new speed
-    _sCController.overrideSpeed(0); // set new speed
-
-    _stepTarget = 0;
-    _stepPos = 0;
 
     Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
     Console::info("Motion") << "Estimate position : " << newPos << Console::endl;
@@ -187,13 +81,12 @@ void Motion::complete() {
 
 void Motion::enable(){
     Module::enable();
-    engage();
-    sleep();
+    _steppers.engage();
 }
 
 void Motion::disable(){
     Module::disable();
-    disengage();
+    _steppers.disengage();
 }
 
 void Motion::setCalibration(CalibrationProfile c){
@@ -202,17 +95,18 @@ void Motion::setCalibration(CalibrationProfile c){
 
 
 void Motion::setFeedrate(int p){
-
+    _steppers.setFeedrate(constrain(p, 0, 100));
 }
 
 void Motion::update(){
-    if(m_enabled && !_sleeping && !isPaused()){
-        if(isMoving()) pid();
-        if(isMoving() && (_stepPos - _stepTarget).mag() < 5){
-            _stepPos = _stepTarget;
+    Console::trace("Motion") << Job::toString() << Console::endl;
+    _steppers.run();
+    if(Job::isPending()){
+        if(!_steppers.isPending()){
             complete();
         }
     }
+    Console::trace("Motion") << Job::toString() << Console::endl;
 }
 
 void  Motion::go(float x, float y){
@@ -223,11 +117,13 @@ void  Motion::go(float x, float y){
 void  Motion::turn(float angle){
     Console::info("Motion") << "Turn :" << angle << Console::endl;
 
+    _steppers.setFeedrate(60);
     if (_absolute) move({_position.a, _position.b, angle });
     else move({0, 0, angle});
 }
 
 void  Motion::go(Vec2 target){
+    _steppers.setFeedrate(100);
     Console::info("Motion") << "Go :" << target << Console::endl;
     if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
     else move({target.a, target.b, 0});
@@ -235,6 +131,7 @@ void  Motion::go(Vec2 target){
 
 void Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
     float rotation = (orientation - getCompassOrientation(rc));
+    _steppers.setFeedrate(100);
     Console::info("Motion") << "GoAlign :" << target << Console::endl;
 
     if (_absolute) move({target.a, target.b, rotation});
@@ -281,13 +178,8 @@ void  Motion::move(Vec3 target){
     
     Job::start(); //robot is moving from now
 
-    wakeUp();
-    _sA.setPosition(0);
-    _sB.setPosition(0);
-    _sC.setPosition(0);
-    _stepPos = Vec3(0);
-    _stepTarget = targetToSteps(_relTarget); //Set new target
-    Console::info("Step target") << _stepTarget << Console::endl;
+    _steppers.enableAsync();
+    _steppers.move(targetToSteps(_relTarget)); //Execute move await
 }
 
 Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
@@ -317,7 +209,9 @@ Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
 
 
 Vec3  Motion::estimatePosition() const{
-    Vec3 relativePosition = fk(_stepPos);
+    if(_steppers.getPosition().a == 0 && _steppers.getPosition().b == 0 && _steppers.getPosition().c == 0) return _position;
+    Vec3 currentStepperPos = _steppers.getPosition();
+    Vec3 relativePosition = fk(currentStepperPos);
     
     relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
     relativePosition.b /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;

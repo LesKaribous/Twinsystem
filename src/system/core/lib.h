@@ -8,6 +8,7 @@
 #include <deque>
 #include <memory>
 #include <vector>
+#include <cstdint>
 #include <stdint.h>
 #include <algorithm>
 

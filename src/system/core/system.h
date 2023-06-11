@@ -1,9 +1,9 @@
 #pragma once
-#include "core/lib.h"
-#include "core/job.h"
-#include "core/event.h"
-#include "core/module.h"
-#include "debug/console.h"
+#include "system/core/lib.h"
+#include "system/core/job.h"
+#include "system/core/event.h"
+#include "system/debug/console.h"
+#include "modules/module.h"
 
 enum SystemState{
     BOOT,
@@ -22,7 +22,7 @@ public :
     void enable(SystemModule module);
     void disable(SystemModule module);
 
-    void registerModule(Module*);
+    void loadModule(Module* m);
 
     void pollModules();
     void dispatchEvent(std::shared_ptr<Event> e);

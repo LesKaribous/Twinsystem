@@ -2,33 +2,29 @@
 
 #include <Arduino.h>
 
-
 String Console::endl = "\n";
-ConsoleLevel Console::_level = ConsoleLevel::_INFO;
+ConsoleLevel Console::_level = ConsoleLevel::INFO;
 
 ConsoleStream Console::trace(String origin) {
-	return ConsoleStream(ConsoleLevel::_TRACE, origin);
+	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
 }
 
 ConsoleStream Console::info(String origin) {
-	return ConsoleStream(ConsoleLevel::_INFO, origin);
+	return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(String origin) {
-	return ConsoleStream(ConsoleLevel::_WARNING, origin);
+	return ConsoleStream(ConsoleLevel::WARNING, origin);
 }
 
 ConsoleStream Console::error(String origin) {
-	return ConsoleStream(ConsoleLevel::_ERROR, origin);
+	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
 }
 
 ConsoleStream Console::success(String origin) {
-	return ConsoleStream(ConsoleLevel::_SUCCESS, origin);
+	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
 }
 
-ConsoleStream Console::critical(String origin) {
-	return ConsoleStream(ConsoleLevel::_CRITICAL, origin);
-}
 
 void header(){
 	Serial.println("  _______       _                     _"                        );

@@ -1,5 +1,5 @@
-#include "core/job.h"
-#include "debug/console.h"
+#include "system/core/job.h"
+#include "system/debug/console.h"
 
 Job::Job(){
 	m_state = JobState::IDLE;
@@ -7,10 +7,6 @@ Job::Job(){
 
 Job::~Job(){
 
-}
-
-void  Job::update(){
-	//Dummy
 }
 
 String  Job::toString() const {

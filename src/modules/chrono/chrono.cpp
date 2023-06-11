@@ -1,13 +1,17 @@
-#include "core/chrono.h"
+#include "modules/chrono/chrono.h"
 #include "settings.h"
 
 
-Chronometer::Chronometer(){
+Chronometer::Chronometer() : Module(CHRONO){
     _elapsed = 0;
     _timeLeft = Settings::Match::DURATION;
     _startTime = 0;
     _score = 0;
     _state = State::IDLE;
+}
+
+void Chronometer::update(){
+    updateTime();
 }
 
 void Chronometer::start(){

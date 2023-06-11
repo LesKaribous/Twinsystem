@@ -1,7 +1,7 @@
 #pragma once
 
 #include "settings.h"
-#include "math/geometry.h"
+#include "system/math/geometry.h"
 
 //Kinematics
 Vec3 ik(Vec3 target){

@@ -1,5 +1,5 @@
-#include "core/module.h"
-#include "core/lib.h"
+#include "modules/module.h"
+#include "system/core/lib.h"
 
 
 
