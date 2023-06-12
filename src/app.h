@@ -4,12 +4,13 @@
 
 #include "system/core/system.h"
 
-#include "system/match/poi.h"
-#include "system/match/score.h"
+#include "match/poi.h"
+#include "match/score.h"
 #include "system/math/geometry.h"
 
-#include "modules/chrono/chrono.h"
+
 #include "modules/lidar/lidar.h"
+#include "modules/chrono/chrono.h"
 #include "modules/inputs/inputs.h"
 #include "modules/motion/motion.h"
 #include "modules/screen/screen.h"
@@ -31,7 +32,6 @@ enum class RobotState{
 class SystemApplication{
     System system;
 
-
 public:
     SystemApplication();
     ~SystemApplication();
@@ -52,7 +52,7 @@ private:
     void loadModule(Module*);
 
     //Standalone modules
-    Chronometer chrono;
+
     Lidar lidar;
     Screen screen;
     Inputs inputs;
@@ -60,6 +60,8 @@ private:
     //Planner planner;
     NeoPixel neopixel;
     Terminal terminal;
+    Intercom intercom;
+    Chronometer chrono;
     Actuators actuators;
     Localisation localisation;
 

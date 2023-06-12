@@ -14,19 +14,24 @@ SystemApplication::SystemApplication(){
     loadModule(&chrono);
     //Planner planner;
     loadModule(&neopixel);
+    loadModule(&intercom);
     loadModule(&terminal);
     loadModule(&actuators);
     loadModule(&localisation);
 
-
     motion.setCalibration(Settings::Calibration::Primary);
 
     system.enable(LIDAR);
-    system.enable(INPUTS);
     system.enable(SCREEN);
+    system.enable(INPUTS);
 	system.enable(MOTION);
+    system.enable(CHRONO);
+    //system.enable(PLANNER);
     system.enable(NEOPIXEL);
+    system.enable(INTERCOM);
     system.enable(TERMINAL);
+    system.enable(ACTUATORS);
+    system.enable(LOCALISATION);
 }
 
 SystemApplication::~SystemApplication(){}

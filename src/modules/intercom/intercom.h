@@ -1,5 +1,6 @@
 #pragma once
 #include "system/core/lib.h"
+#include "modules/module.h"
 
 class Intercom;
 
@@ -46,18 +47,20 @@ private:
     static uint32_t _uidCounter;
 };
 
-class Intercom {
+class Intercom : public Module{
 public:
     Intercom();
 
     void initialize();
 
+    void update() override;
+    void enable() override;
+    void disable() override;
+
     void sendMessage(const char* message);
     void sendMessage(const String& message);
 
     uint32_t sendRequest(const String& payload, long timeout = 200);
-
-    void update();
     bool closeRequest(const uint32_t&);
     String getRequestResponse(const uint32_t&);
 

@@ -1,6 +1,6 @@
 #pragma once
-#include "core/job.h"
-#include "core/module.h"
+#include "system/core/job.h"
+#include "modules/module.h"
 
 
 
@@ -14,3 +14,16 @@ private:
 };
 
 Task::Task(SystemModule module) : m_module(module){}
+
+
+class Go : public Task{
+
+};
+
+class Turn : public Task{
+
+};
+
+class Turn : public Task{
+
+};

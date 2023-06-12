@@ -9,6 +9,7 @@ enum SystemModule{
     MOTION,
     PLANNER,
     NEOPIXEL,
+    INTERCOM,
     TERMINAL,
     ACTUATORS,
     LOCALISATION

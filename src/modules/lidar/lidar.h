@@ -1,6 +1,6 @@
 #pragma once
 #include "modules/module.h"
-#include "system/com/intercom.h"
+#include "modules/intercom/intercom.h"
 #include "system/math/geometry.h"
 
 class Lidar : public Module{

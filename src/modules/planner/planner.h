@@ -1,6 +1,6 @@
 #pragma once
-#include "core/lib.h"
-#include "core/module.h"
+#include "system/core/lib.h"
+#include "modules/module.h"
 #include "modules/planner/task.h"
 #include "modules/planner/objective.h"
 

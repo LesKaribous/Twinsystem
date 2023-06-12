@@ -1,13 +1,18 @@
-#include "system/com/intercom.h"
+#include "modules/intercom/intercom.h"
 #include "system/debug/console.h"
 
 #define LIDAR_SERIAL Serial1
 
-Intercom::Intercom() : _stream(LIDAR_SERIAL) {}
+Intercom::Intercom() : Module(INTERCOM),  _stream(LIDAR_SERIAL) {}
 
-void Intercom::initialize(){
+void Intercom::enable(){
+    Module::enable();
     LIDAR_SERIAL.begin(115200);
     sendMessage("ping");
+}
+
+void Intercom::disable(){
+    Module::disable();
 }
 
 void Intercom::sendMessage(const char* message) {
@@ -32,7 +37,8 @@ uint32_t Intercom::sendRequest(const String& payload, long timeout){
 }
 
 void Intercom::update() {
-    
+    if(!m_enabled) return;
+
     if (_stream.available()) {
         _lastStream = millis();
         _processIncomingData();         
