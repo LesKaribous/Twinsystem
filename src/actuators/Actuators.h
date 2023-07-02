@@ -46,6 +46,17 @@ namespace TwinSystem{
                 left_Grab = 90;
             }
         }
+
+        namespace arm{
+            const int
+            elevator_up = 100,
+            elevator_down = 180,
+            arm_up = 180,
+            arm_down = 90,
+            tool_up = 90,
+            tool_down = 180;
+        }
+
         namespace cherryPicker{
             const int
             trap_Close = 50,
@@ -66,7 +77,7 @@ namespace TwinSystem{
 
     class Actuators : public JobExecutor {
     private:
-        GripperGroup gripperAB; //Right group when facing screen
+        //GripperGroup gripperAB; //Right group when facing screen
         GripperGroup gripperBC; //Opposed to the screen
         GripperGroup gripperCA; //Left group when facing screen
 
@@ -74,6 +85,9 @@ namespace TwinSystem{
 
     public:
         BistableServo trap;
+        Servo elevator;
+        Servo arm;
+        Servo tool;
 
     public:
         Actuators();
@@ -94,6 +108,8 @@ namespace TwinSystem{
         void StopTurbine();
         void SuckBall();
         void DropBall();
+
+        void moveArm(int elevator_pos, int arm_pos, int tool_pos);
 
         void Sleep();
         void Engage();

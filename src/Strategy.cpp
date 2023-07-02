@@ -628,6 +628,58 @@ void Robot::MatchSecondaryCakeGreen(){
     motion.steppers.Disengage();
 }
 
+void Robot::ScopeDemoSecondary(){
+    motion.steppers.Engage();
+	motion.SetAbsolute();
+
+    DisableAvoidance();
+
+    actuators.moveArm(0, 0, 0);
+	actuators.Ungrab(RobotCompass::BC);
+	actuators.Ungrab(RobotCompass::CA);
+    actuators.moveArm(0, 50, 50);
+
+    actuators.Ungrab(RobotCompass::AB);
+
+
+    while(1){
+        Go(100,0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Go(0,0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Turn(90.0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Turn(0.0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Go(100,100);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Go(0,0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        Go(100,0);
+        Go(100,100);
+        Go(0,100);
+        Go(0,0);
+        while(digitalRead(Pin::Inputs::resetButton))delay(250);
+        // Square dance
+        for(int i = 0; i <= 3 ; i++){
+            Turn(i*90.0);
+            Go(100,0);
+            Go(100,100);
+            Go(0,100);
+            Go(0,0);
+            if (i == 0) actuators.Grab(RobotCompass::BC);
+            else if (i == 1 ) actuators.Grab(RobotCompass::CA);
+            else if (i == 2 ) actuators.moveArm(50, 100, 100);
+            else {
+                actuators.Ungrab(RobotCompass::BC);
+                actuators.Ungrab(RobotCompass::CA);
+                actuators.moveArm(0, 50, 50);
+            } 
+        }
+    }
+}
+
+
 
 void Robot::NearlyFinishPrimaryBlue(){
     // Go to End Position

@@ -2,9 +2,9 @@
 
 namespace TwinSystem{
 
-    Actuators::Actuators() : gripperAB( {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
-                                        {Pin::Servo::ServoA3, _GS_::AB::left_Open,  _GS_::AB::left_Close, _GS_::AB::left_Grab}, 
-                                        {Pin::Servo::ServoA2, _GS_::AB::cherry_Open, _GS_::AB::cherry_Close}),
+    Actuators::Actuators() : //gripperAB( {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
+                                        //{Pin::Servo::ServoA3, _GS_::AB::left_Open,  _GS_::AB::left_Close, _GS_::AB::left_Grab}, 
+                                        //{Pin::Servo::ServoA2, _GS_::AB::cherry_Open, _GS_::AB::cherry_Close}),
 
                              gripperBC( {Pin::Servo::ServoB1, _GS_::BC::right_Open, _GS_::BC::right_Close, _GS_::BC::right_Grab}, 
                                         {Pin::Servo::ServoB3, _GS_::BC::left_Open,  _GS_::BC::left_Close, _GS_::BC::left_Grab}, 
@@ -16,9 +16,9 @@ namespace TwinSystem{
 
                             trap(Pin::CherryPicker::pinServoTrap, ActuatorsPresets::cherryPicker::trap_Open, ActuatorsPresets::cherryPicker::trap_Close, ActuatorsPresets::cherryPicker::trap_Grab)
         {
-            gripperAB.rightGripper.close();
-            gripperAB.leftGripper.close();
-            gripperAB.cherryLocker.close();
+            //gripperAB.rightGripper.close();
+            //gripperAB.leftGripper.close();
+            //gripperAB.cherryLocker.close();
 
             gripperBC.rightGripper.close();
             gripperBC.leftGripper.close();
@@ -31,15 +31,24 @@ namespace TwinSystem{
             _pinTurbine = Pin::CherryPicker::pinTurbine;
 
             trap.close();
+
+            elevator.attach(Pin::Servo::ServoA1);
+            arm.attach(Pin::Servo::ServoA2);
+            tool.attach(Pin::Servo::ServoA3);
+            elevator.write(ActuatorsPresets::arm::elevator_down);
+            arm.write(ActuatorsPresets::arm::arm_up);
+            tool.write(ActuatorsPresets::arm::tool_up);
+
+            delay(2000);
         }
 
     Actuators::~Actuators(){
     }
 
     void Actuators::Initialize(){
-        gripperAB.cherryLocker.enable();
-        gripperAB.leftGripper.enable();
-        gripperAB.rightGripper.enable();
+        //gripperAB.cherryLocker.enable();
+        //gripperAB.leftGripper.enable();
+        //gripperAB.rightGripper.enable();
         gripperBC.cherryLocker.enable();
         gripperBC.leftGripper.enable();
         gripperBC.rightGripper.enable();
@@ -49,12 +58,13 @@ namespace TwinSystem{
         trap.enable();
         pinMode(_pinTurbine, OUTPUT);
 
-        Close(RobotCompass::AB);
+        //Close(RobotCompass::AB);
         Close(RobotCompass::BC);
         Close(RobotCompass::CA);
 
+        moveArm(0, 0, 0);
+        
         delay(2000);
-
         Sleep();
 
     }
@@ -80,11 +90,27 @@ namespace TwinSystem{
         JobExecutor::Finish();
     }
 
+    void Actuators::moveArm(int elevator_pos, int arm_pos, int tool_pos){
+
+        int elevator_pos_c = constrain(elevator_pos,0,100);
+        int arm_pos_c= constrain(arm_pos,0,100);
+        int tool_pos_c = constrain(tool_pos,0,100);
+
+        int elevator_angle = map(elevator_pos_c, 0, 100, ActuatorsPresets::arm::elevator_down, ActuatorsPresets::arm::elevator_up);
+        int arm_angle = map(arm_pos_c, 0, 100, ActuatorsPresets::arm::arm_up, ActuatorsPresets::arm::arm_down);
+        int tool_angle = map(tool_pos_c, 0, 100, ActuatorsPresets::arm::tool_up, ActuatorsPresets::arm::tool_down);
+
+        elevator.write(elevator_angle);
+        arm.write(arm_angle);
+        tool.write(tool_angle);
+
+    }
+
     void Actuators::Lock(RobotCompass rc){
         switch (rc)
         {
         case RobotCompass::AB :
-            gripperAB.cherryLocker.close();
+            //gripperAB.cherryLocker.close();
             break;
 
         case RobotCompass::BC :
@@ -104,7 +130,7 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            gripperAB.cherryLocker.open();
+            //gripperAB.cherryLocker.open();
             break;
 
         case RobotCompass::BC :
@@ -124,8 +150,8 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            gripperAB.rightGripper.close();
-            gripperAB.leftGripper.close();
+            //gripperAB.rightGripper.close();
+            //gripperAB.leftGripper.close();
             break;
 
         case RobotCompass::BC :
@@ -148,8 +174,8 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            gripperAB.rightGripper.open();
-            gripperAB.leftGripper.open();
+            //gripperAB.rightGripper.open();
+            //gripperAB.leftGripper.open();
             break;
 
         case RobotCompass::BC :
@@ -171,8 +197,8 @@ namespace TwinSystem{
         switch (rc)
         {
         case RobotCompass::AB :
-            gripperAB.rightGripper.grab();
-            gripperAB.leftGripper.grab();
+            //gripperAB.rightGripper.grab();
+            //gripperAB.leftGripper.grab();
             break;
 
         case RobotCompass::BC :
@@ -225,9 +251,9 @@ namespace TwinSystem{
     }
     
     void Actuators::Sleep(){
-        gripperAB.cherryLocker.sleep();
-        gripperAB.leftGripper.sleep();
-        gripperAB.rightGripper.sleep();
+        //gripperAB.cherryLocker.sleep();
+        //gripperAB.leftGripper.sleep();
+        //gripperAB.rightGripper.sleep();
         gripperBC.cherryLocker.sleep();
         gripperBC.leftGripper.sleep();
         gripperBC.rightGripper.sleep();
@@ -238,9 +264,9 @@ namespace TwinSystem{
 
 
     void Actuators::Engage(){
-        gripperAB.cherryLocker.enable();
-        gripperAB.leftGripper.enable();
-        gripperAB.rightGripper.enable();
+        //gripperAB.cherryLocker.enable();
+        //gripperAB.leftGripper.enable();
+        //gripperAB.rightGripper.enable();
         gripperBC.cherryLocker.enable();
         gripperBC.leftGripper.enable();
         gripperBC.rightGripper.enable();
@@ -251,9 +277,9 @@ namespace TwinSystem{
     }
 
     void Actuators::Disengage(){
-        gripperAB.cherryLocker.disable();
-        gripperAB.leftGripper.disable();
-        gripperAB.rightGripper.disable();
+        //gripperAB.cherryLocker.disable();
+        //gripperAB.leftGripper.disable();
+        //gripperAB.rightGripper.disable();
         gripperBC.cherryLocker.disable();
         gripperBC.leftGripper.disable();
         gripperBC.rightGripper.disable();

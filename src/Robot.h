@@ -73,6 +73,8 @@ public :
     void MatchSecondaryCakeBlue();
     void MatchSecondaryCakeGreen();
 
+    void ScopeDemoSecondary();
+
     void NearlyFinishPrimaryBlue();
     void NearlyFinishPrimaryGreen();
     void NearlyFinishSecondaryBlue();
