@@ -58,6 +58,14 @@ bool Motion::isSleeping() const{
     return _sleeping;
 }
 
+void Motion::enableOptimization(){// Use rotation optimization (see optmizeRelTarget)
+    _optimizeRotation = true;
+} 
+void Motion::disableOptimization(){
+    // disable rotation optimization (see optmizeRelTarget)
+    _optimizeRotation = false;
+}
+
 void Motion::engage(){
     _engaged = true;
     _sleeping = false;
@@ -210,6 +218,7 @@ void Motion::update(){
         if(isMoving()) pid();
         if(isMoving() && (_stepPos - _stepTarget).mag() < 5){
             _stepPos = _stepTarget;
+            _position = _target;
             complete();
         }
     }
@@ -254,14 +263,14 @@ void  Motion::move(Vec3 target){
     }
     Job::reset();
     //Set new target
-    target.c *= DEG_TO_RAD;
-    if(!_absolute){
-        if(target.magSq() == 0){ //magSq is faster thatn mag
+    target.c *= DEG_TO_RAD; //Convert to radian
+    if(isRelative()){
+        if(target.magSq() == 0){ //Test if move is 0 length
             os.console.error("Motion") << "Move is null" << os.console.endl;
             Job::cancel();
             return;
         }
-        _target = toAbsoluteTarget(target);
+        _target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
             os.console.error("Motion") << "Move is null" << os.console.endl;
@@ -273,7 +282,7 @@ void  Motion::move(Vec3 target){
 
     //Optimize target rotation while taking actual pos into acount
     _relTarget  = toRelativeTarget(_target);
-    _relTarget = optmizeRelTarget(_relTarget);
+    if(_optimizeRotation )_relTarget = optmizeRelTarget(_relTarget); //Optimize rotation (% 2*k*PI)
 
     os.console.info("Motion") << "Current position : " << getAbsPosition() << os.console.endl;
     os.console.info("Motion") << "Current target   : " << getAbsTarget() << os.console.endl;

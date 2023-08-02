@@ -109,16 +109,21 @@ void OperatingSystem::processCommand(Command c){
         }else  console.error("Service") << "unknown service : " << service << console.endl;
              
 
-    }else if(c.isValidFormat("pause()")){
+    }else if(c.isValidFormat("pause")){
         motion.pause();
-    }else if(c.isValidFormat("resume()")){
+        console.info("Motion") << "motion paused" << console.endl;
+    }else if(c.isValidFormat("resume")){
         motion.resume();
-    }else if(c.isValidFormat("cancel()")){
+        console.info("Motion") << "motion resumed" << console.endl;
+    }else if(c.isValidFormat("cancel")){
         motion.cancel();
-    }else if(c.isValidFormat("setAbsolute()")){
+        console.info("Motion") << "motion canceled" << console.endl;
+    }else if(c.isValidFormat("setAbsolute")){
         motion.setAbsolute();
-    }else if(c.isValidFormat("setRelative()")){
+        console.info("Motion") << "motion set to absolute mode" << console.endl;
+    }else if(c.isValidFormat("setRelative")){
         motion.setRelative();
+        console.info("Motion") << "motion set to relative mode" << console.endl;
     }else{
         console.error("Terminal") << "Unknown command : " << c.toString() << console.endl;
     }

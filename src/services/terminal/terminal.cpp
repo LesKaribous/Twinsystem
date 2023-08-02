@@ -150,7 +150,7 @@ bool Command::isValidFormat(String commandFormat){
 
     parseCommand(commandFormat, exp_command, exp_argc, exp_args);
 
-    if(commandName != exp_command){
+    if(!commandName.equalsIgnoreCase(exp_command)){
         os.console.trace("Terminal") << "Command name mismatch : " << raw << " | " << commandFormat << os.console.endl;
         return false;
     }

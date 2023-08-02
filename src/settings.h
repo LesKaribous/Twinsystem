@@ -110,7 +110,7 @@ namespace Settings{
         RELATIVE = false,
         ABSOLUTE = true;
 
-        constexpr float kP = 0.005;            // (P)roportional constant of the regulator needs to be adjusted
+        constexpr float kP = 0.004;            // (P)roportional constant of the regulator needs to be adjusted
         constexpr float kI = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
         constexpr float kD = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
 

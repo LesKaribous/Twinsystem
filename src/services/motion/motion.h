@@ -60,6 +60,9 @@ public:
     bool isMoving() const;
 
 
+    void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
+    void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
+
     void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
     void disengage();// Disengaging motors turn them off. They cannot move at all.
 
@@ -92,6 +95,7 @@ private:
     Vec2 _controlPoint   = { 0, 0};
 
     bool _absolute = true;
+    bool _optimizeRotation = true;
     bool _engaged, _sleeping;
 
     //Stepper control

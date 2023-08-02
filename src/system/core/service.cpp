@@ -20,37 +20,37 @@ ServiceID Service::getID() const {
 }
 
 ServiceID Service::toID(String str){
-    if(str == "LIDAR")
+    if(str.equalsIgnoreCase("LIDAR"))
         return LIDAR;
 
-    if(str == "CHRONO")
+    if(str.equalsIgnoreCase("CHRONO"))
         return CHRONO;
 
-    if(str == "SCREEN")
+    if(str.equalsIgnoreCase("SCREEN"))
         return SCREEN;
 
-    if(str ==  "INPUTS")
+    if(str.equalsIgnoreCase("INPUTS"))
         return INPUTS;
 
-    if(str ==  "MOTION")
+    if(str.equalsIgnoreCase("MOTION"))
         return MOTION;
 
-    if(str ==  "PLANNER")
+    if(str.equalsIgnoreCase("PLANNER"))
         return PLANNER;
 
-    if(str ==  "NEOPIXEL")
+    if(str.equalsIgnoreCase("NEOPIXEL"))
         return NEOPIXEL;
 
-    if(str ==  "INTERCOM")
+    if(str.equalsIgnoreCase("INTERCOM"))
         return INTERCOM;
 
-    if(str ==  "TERMINAL")
+    if(str.equalsIgnoreCase("TERMINAL"))
         return TERMINAL;
   
-    if(str ==  "ACTUATORS")
+    if(str.equalsIgnoreCase("ACTUATORS"))
         return ACTUATORS;
 
-    if(str ==  "LOCALISATION")
+    if(str.equalsIgnoreCase("LOCALISATION"))
         return LOCALISATION;
     
     return NOT_A_SERVICE;
