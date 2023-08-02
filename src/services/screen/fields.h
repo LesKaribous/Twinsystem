@@ -3,6 +3,9 @@
 template <class T>
 class AbstractField{
 public:
+    friend class OperatingSystem;
+    friend class Screen;
+    
     AbstractField(){};
 
     virtual void init() = 0;
@@ -15,10 +18,10 @@ public:
         return value;
     }
 
+protected:
     inline void enable(){enabled = true;}
     inline void disable(){enabled = false;}
 
-protected:
     bool enabled = true;
     T value = 0;
     T lastValue = 0;
@@ -64,6 +67,9 @@ private:
 
 class BooleanField : public AbstractField<bool>{
 public:
+    friend class OperatingSystem;
+    friend class Screen;
+
     BooleanField() {};
     void init() override{ _hasChanged = true;}
     void read() override{
@@ -78,6 +84,8 @@ public:
     virtual bool getState() const{
         return _inverted ? !value : value;
     }
+
+protected:
     inline void setInverted(bool s = true){_inverted = s;}
 private:
     bool _inverted = false;

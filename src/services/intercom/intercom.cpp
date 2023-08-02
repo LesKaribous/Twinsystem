@@ -3,7 +3,10 @@
 
 #define LIDAR_SERIAL Serial1
 
-Intercom::Intercom() : Service(INTERCOM),  _stream(LIDAR_SERIAL) {}
+Intercom::Intercom() : Service(INTERCOM),  _stream(LIDAR_SERIAL) {
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Intercom");
+}
 
 void Intercom::enable(){
     Service::enable();
@@ -12,6 +15,7 @@ void Intercom::enable(){
 }
 
 void Intercom::disable(){
+    //LIDAR_SERIAL.end();
     Service::disable();
 }
 
@@ -81,11 +85,13 @@ String Intercom::getRequestResponse(const uint32_t& uid) {
 void Intercom::onConnectionLost() {
    os.console.warn("Intercom") << "Connection lost." << os.console.endl;
     _connected = false;
+    os.screen.intercom.SetValue(false);
 }
 
 void Intercom::onConnectionSuccess(){
     os.console.info("Intercom") << "Connection successful." << os.console.endl;
     _connected = true;
+    os.screen.intercom.SetValue(true);
 }
 
 

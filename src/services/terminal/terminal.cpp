@@ -98,7 +98,6 @@ float Command::getFloat(int argIndex) {
     if (argCount >= argIndex) {
         // Parse argument for int type
         String arg = getArgument(argIndex);
-        THROW(arg)
         return arg.toFloat();
     }
     return 0;
@@ -171,7 +170,10 @@ bool Command::isValidFormat(String commandFormat){
 
 
 
-Terminal::Terminal() : Service(TERMINAL){}
+Terminal::Terminal() : Service(TERMINAL){
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Terminal...");
+}
 
 void Terminal::update(){
     if(!m_enabled) return;

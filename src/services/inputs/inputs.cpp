@@ -1,5 +1,6 @@
 #include "inputs.h"
 #include "settings.h"
+#include "os.h"
 
 
 Inputs::Inputs() : 
@@ -17,6 +18,8 @@ Inputs::Inputs() :
     localisationSensorA(Pin::LocalisationSensors::SensorA),
     localisationSensorB(Pin::LocalisationSensors::SensorB)
 {
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Inputs...");
     starter.setInverted(true);
     teamSwitch.setInverted(true);
     twinSwitch.setInverted(true);

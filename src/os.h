@@ -32,6 +32,7 @@ class OperatingSystem : public SystemBase{
 public:
 
     Console console;
+    Screen screen;
 
     OperatingSystem();
     ~OperatingSystem();
@@ -54,7 +55,6 @@ protected :
 
     //Standalone services
     Lidar lidar;
-    Screen screen;
     Inputs inputs;
     Motion motion;
     //Planner planner;

@@ -32,6 +32,7 @@ public:
 
     void go(Vec2);
     void go(float x, float y);
+    void goTurn(float x, float y, float theta);
     void turn(float w);
     void align(RobotCompass, float orientation);
     void goAlign(Vec2 target, RobotCompass rc, float orientation);
@@ -77,7 +78,6 @@ private:
     Vec3 getCurrentStepsPosition();
 
     
-
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);

@@ -1,5 +1,6 @@
 #include "actuators.h"
 #include "settings.h"
+#include "os.h"
 
 #define _GS_ Settings::Actuators::Gripper
 #define _CPS_ Settings::Actuators::cherryPicker
@@ -20,6 +21,8 @@ gripperCA(  {Pin::Servo::ServoC1, _GS_::CA::right_Open, _GS_::CA::right_Close, _
 trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_::trap_Grab)
 
 {
+    os.screen.addBootProgress(10);
+    os.screen.drawBootProgress("Loading Actuators...");
     _pinTurbine = Pin::CherryPicker::pinTurbine;
 }
 

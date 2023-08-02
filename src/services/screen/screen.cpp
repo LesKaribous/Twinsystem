@@ -1,5 +1,6 @@
 #include "pin.h"
 #include "settings.h"
+#include "os.h"
 #include "screen.h"
 
 Screen::Screen() : Service(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::RST, Pin::TFT::MOSI, Pin::TFT::SCK, Pin::TFT::MISO) {
@@ -19,7 +20,8 @@ Screen::Screen() : Service(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT:
     clear();
     needDraw = true;
     lastDraw = 0;
-    drawBootProgress(0, "SystemBoot");
+    bootProgress = 0;
+    drawBootProgress("SystemBoot");
 }
 
 Screen::~Screen(){
@@ -55,7 +57,13 @@ void Screen::setPage(Page p){
     needDraw = true;
 }
 
-void Screen::drawBootProgress(int p, String msg){
+void Screen::addBootProgress(int v){
+    if (currentPage == Page::BOOT){
+        bootProgress += v;
+    }
+}
+
+void Screen::drawBootProgress(String msg){
     if (currentPage == Page::BOOT){
         if(needDraw){
             needDraw = false;
@@ -67,17 +75,25 @@ void Screen::drawBootProgress(int p, String msg){
             //screen.drawBitmap(60,50, logo, 32, 32, ILI9341_WHITE);
         }
         
-        screen.fillRect(9, 219, 231, 11, ILI9341_WHITE);
+        //screen.fillRect(9, 219, 231, 11, ILI9341_WHITE);
         screen.fillRect(10, 200, 230, 118, ILI9341_BLACK);
-
 
         screen.setTextSize(2);
         screen.setCursor(30,200);
 
         screen.setTextColor(ILI9341_WHITE);
         screen.println(msg.c_str());
-        int xmax = constrain(int(map(p, 0,100, 10,220)), 10, 220);
-        screen.fillRect(10, 220, xmax, 10 , ILI9341_WHITE);
+
+        
+        int xmax = constrain(int(map(bootProgress, 0,100, 10,220)), 10, 220);
+        screen.fillRect(10, 220, xmax, 10 , ILI9341_GREEN);
+
+        if(bootProgress > 100){
+            xmax = constrain(int(map(bootProgress-100, 0,100, 10,220)), 10, 220);
+            screen.fillRect(10, 240, xmax, 10 , ILI9341_GREEN);
+        }
+
+        
     }
 }
 
@@ -127,7 +143,7 @@ void Screen::updateAllStartVar() {
 }
 
 void Screen::updateAllMatchVar() {
-    bool forceDraw = millis() - lastDraw > 800;
+    bool forceDraw = millis() - lastDraw > 500;
     if(forceDraw) lastDraw = millis();
 
     bool drawTime = time.hasChanged() || forceDraw;
@@ -143,7 +159,7 @@ void Screen::updateAllMatchVar() {
             updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
             lastPosDraw = millis();
         }
-    } 
+    }
 
     if(forceDraw) updateStrategyState(strategySwitch.getState());
     if(drawIntercom) updateLidarState(intercom.getState());

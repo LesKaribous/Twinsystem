@@ -1,8 +1,11 @@
 #include "chrono.h"
 #include "settings.h"
+#include "os.h"
 
 
 Chronometer::Chronometer() : Service(CHRONO){
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Chronometer");
     _elapsed = 0;
     _timeLeft = Settings::Match::DURATION;
     _startTime = 0;

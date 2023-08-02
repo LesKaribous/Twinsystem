@@ -9,6 +9,8 @@ Motion::Motion() : Service(MOTION),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
     _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)
 {
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Motion...");
     _calibration = Settings::Calibration::Primary.Cartesian; //set to primary by default
     
     _absolute = Settings::Motion::ABSOLUTE;
@@ -46,6 +48,10 @@ Motion::Motion() : Service(MOTION),
     _sAController.overrideSpeed(0);
     _sBController.overrideSpeed(0);
     _sCController.overrideSpeed(0);
+
+    os.screen.x.SetValue(_position.x);
+    os.screen.y.SetValue(_position.y);
+    os.screen.z.SetValue(_position.z);
 }
 
 Motion::~Motion(){}
@@ -221,6 +227,11 @@ void Motion::update(){
             _position = _target;
             complete();
         }
+        
+        os.screen.x.SetValue(_position.x);
+        os.screen.y.SetValue(_position.y);
+        os.screen.z.SetValue(_position.z);
+    
     }
 }
 
@@ -230,28 +241,28 @@ void  Motion::go(float x, float y){
 }
 
 void  Motion::turn(float angle){
-    os.console.info("Motion") << "Turn :" << angle << os.console.endl;
-
-    if (_absolute) move({_position.a, _position.b, angle });
+    if (_absolute) move({_position.a, _position.b, _position.c*RAD_TO_DEG + angle });
     else move({0, 0, angle});
 }
 
+void  Motion::goTurn(float x, float y, float angle){
+    go({x, y});
+    turn(angle);
+}
+  
 void  Motion::go(Vec2 target){
-    os.console.info("Motion") << "Go :" << target << os.console.endl;
     if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
     else move({target.a, target.b, 0});
 }
 
 void Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
     float rotation = (orientation - getCompassOrientation(rc));
-    os.console.info("Motion") << "GoAlign :" << target << os.console.endl;
 
     if (_absolute) move({target.a, target.b, rotation});
     else move({target.a, target.b, rotation - _position.c*RAD_TO_DEG});
 }
 
 void  Motion::align(RobotCompass rc, float orientation){
-    os.console.info("Motion") << "Align :" << os.console.endl;
     turn((orientation - getCompassOrientation(rc)));
 }
 

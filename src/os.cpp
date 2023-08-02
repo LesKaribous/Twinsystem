@@ -10,19 +10,27 @@ void OperatingSystem::loadService(Service *service){
 OperatingSystem::OperatingSystem() : SystemBase(){
     _state = RobotState::IDLE;
     
+
+    motion.setCalibration(inputs.isPrimary() ? Settings::Calibration::Primary : Settings::Calibration::Secondary);
+    
+    screen.drawBootProgress("Linking modules...");
+    screen.addBootProgress(10);
+
     //loadService(&lidar);
-    loadService(&screen);
-    loadService(&inputs);
-    loadService(&motion);
+    loadService(&screen);       screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
+    loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
+    loadService(&motion);       screen.addBootProgress(10); screen.drawBootProgress("Linking motion...");
     //loadService(&chrono);
-    //loadService(&planner);
-    loadService(&neopixel);
-    loadService(&intercom);
-    loadService(&terminal);
-    loadService(&actuators);
+    //loadService(&planner); screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
+    loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
+    loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
+    loadService(&terminal);     screen.addBootProgress(10); screen.drawBootProgress("Linking terminal...");
+    loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
     //loadService(&localisation);
 
-    motion.setCalibration(Settings::Calibration::Primary);
+    screen.addBootProgress(30);
+    screen.drawBootProgress("Boot complete...");
+    screen.setPage(Page::INIT);
 }
 
 OperatingSystem::~OperatingSystem(){}
@@ -51,20 +59,11 @@ void OperatingSystem::processCommand(Command c){
     }else if(c.isValidFormat("goTurn(x,y,angle)")){
         motion.move(c.getVec3());
     }else if(c.isValidFormat("turn(angle)")){
-        motion.turn(c.getFloat());
+        motion.turn(c.getFloat());motion.sleep();
     }else if(c.isValidFormat("setAbsPosition(x,y)")){
         motion.setAbsPosition(Vec3(c.getFloat(0), c.getFloat(1), motion.getAbsPosition().c));
-
-        THROW(c.getFloat(0));
-        THROW(c.getFloat(1));
-
     }else if(c.isValidFormat("setAbsPosition(x,y,t)")){
         motion.setAbsPosition(Vec3(c.getFloat(0), c.getFloat(1), c.getFloat(2)));
-
-        THROW(c.getFloat(0));
-        THROW(c.getFloat(1));
-        THROW(c.getFloat(2));
-
     }else if(c.isValidFormat("align(side, absAngle)")){
 
         String side = c.getString();
@@ -109,6 +108,8 @@ void OperatingSystem::processCommand(Command c){
         }else  console.error("Service") << "unknown service : " << service << console.endl;
              
 
+    }else if(c.isValidFormat("sleep")){
+        motion.sleep();
     }else if(c.isValidFormat("pause")){
         motion.pause();
         console.info("Motion") << "motion paused" << console.endl;

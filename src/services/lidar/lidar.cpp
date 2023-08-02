@@ -3,6 +3,8 @@
 #include "os.h"
 
 Lidar::Lidar() : Service(LIDAR){
+	os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Lidar...");
 }
 
 Lidar::~Lidar(){}

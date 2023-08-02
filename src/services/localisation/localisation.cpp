@@ -4,6 +4,8 @@
 #include "pin.h"
 
 Localisation::Localisation() : Service(LOCALISATION){
+    os.screen.addBootProgress(10);
+	os.screen.drawBootProgress("Loading Localisation...");
 }
 
 void Localisation::update(){
