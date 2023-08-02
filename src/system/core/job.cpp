@@ -1,5 +1,5 @@
 #include "system/core/job.h"
-#include "system/debug/console.h"
+#include "os.h"
 
 Job::Job(){
 	m_state = JobState::IDLE;
@@ -30,7 +30,7 @@ String  Job::toString() const {
 			return "NONE";
 		break;
 	}
-	//Console::log("Collision :", Intercom::collision(), INFO);
+	//os.console.log("Collision :", Intercom::collision(), INFO);
 }
 
 bool Job::isPaused() const {

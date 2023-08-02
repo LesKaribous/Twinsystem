@@ -1,44 +1,57 @@
 #include "system.h"
 #include "settings.h"
 
-System::System(){
+SystemBase::SystemBase(){
     m_currentState = BOOT;
-    Console::initialize();
 }
 
-System::~System(){
+SystemBase::~SystemBase(){
     //Smart pointers destroyed
 }
 
-void System::enable(SystemModule module) {
-    for(auto& mod : m_modules){
-        if(mod->getModule() == module){
+void SystemBase::enable(ServiceID id) {
+    for(auto& mod : m_services){
+        if(mod->getID() == id){
             mod->enable();
         }
     }
 }
 
-void System::disable(SystemModule module) {
-    for(auto& mod : m_modules){
-        if(mod->getModule() == module){
+void SystemBase::disable(ServiceID id) {
+    for(auto& mod : m_services){
+        if(mod->getID() == id){
             mod->disable();
         }
     }
 }
 
-void System::loadModule(Module* m){
-    Console::info("System") << m->toString() << " loaded." << Console::endl;
-    m_modules.push_back(m);
+void SystemBase::loadService(Service* s){
+    //Console::info("System") << m->toString() << " loaded." << Console::endl;
+    m_services.push_back(s);
 }
 
-void System::update() {
-    // Update each enabled subsystem
-    for(auto& module : m_modules) {
-        if(module->isEnabled()) {
-            module->update();
+bool SystemBase::statusService(ServiceID serviceID){
+    for(auto& mod : m_services){
+        if(mod->getID() == serviceID){
+            return mod->isEnabled();
         }
     }
+}
 
+
+void SystemBase::updateProgram(){
+    //TODO: update program
+}
+
+void SystemBase::updateServices(){
+    for(auto& service : m_services) {
+        if(service->isEnabled()) {
+            service->update();
+        }
+    }
+}
+
+void SystemBase::update() {
     switch (m_currentState){
     case BOOT:
         //Boot finished
@@ -47,10 +60,6 @@ void System::update() {
     case IDLE:
         //Wait for program
         handleIdleState();
-        break;
-    case ARMED:
-        //Ready to start program
-        handleArmedState();
         break;
     case RUNNING:
         //Run the program
@@ -65,26 +74,29 @@ void System::update() {
     }
 }
 
-void System::handleBootState(){
+void SystemBase::handleBootState(){
     m_currentState = IDLE;
 }
 
 
-void System::handleIdleState(){
+void SystemBase::handleIdleState(){
+    // Update each enabled subsystem
+    updateServices();
 
 }
 
-void System::handleArmedState(){
-
+void SystemBase::handleRunningState(){
+    // Update each enabled subsystem
+    updateServices();
+    updateProgram();
+    //Run the program
 }
 
-void System::handleRunningState(){
-
+void SystemBase::handleStoppedState(){
+    //Do nothing.
 }
 
-void System::handleStoppedState(){
-
+SystemState SystemBase::getState(){
+    return m_currentState;
 }
-
-
 

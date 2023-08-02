@@ -1,11 +1,9 @@
-#include "app.h"
-
-SystemApplication app;
+#include "os.h"
 
 void setup(){
-	Console::setLevel(INFO);
+	os.setConsoleLevel(INFO);
 }
-
+ 
 void loop(){
-	app.update();
+	os.update();
 }

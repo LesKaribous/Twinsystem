@@ -2,46 +2,41 @@
 #include "system/core/lib.h"
 #include "system/core/job.h"
 #include "system/core/event.h"
-#include "system/debug/console.h"
-#include "modules/module.h"
+
+#include "system/core/service.h"
 
 enum SystemState{
-    BOOT,
-    IDLE,
-    ARMED,
-    RUNNING,
-    STOPPED,
+    BOOT,    // booting
+    IDLE,    // running services but no programs running
+    RUNNING, // running services and a program is running
+    STOPPED, // stopped services and programs are stopped
 };
 
-class System{
+class SystemBase{
 public :
-    System();
-    ~System();
-    void update();
+    SystemBase();
+    ~SystemBase();
 
-    void enable(SystemModule module);
-    void disable(SystemModule module);
-
-    void loadModule(Module* m);
-
-    void pollModules();
-    void dispatchEvent(std::shared_ptr<Event> e);
-
-    friend class SystemApplication;
+    void enable(ServiceID serviceID);
+    void disable(ServiceID serviceID);
+    bool statusService(ServiceID serviceID);
 
 protected:
-
-    SystemState state();
+    SystemState getState();
+    void loadService(Service* m);
+    void update();
+    void updateProgram();
+    void updateServices();    
 
 private:
 
     //Async rountines
     void handleBootState();
     void handleIdleState();
-    void handleArmedState();
     void handleRunningState();
     void handleStoppedState();
 
-    std::vector<Module*> m_modules;
+    //Program* program;
+    std::vector<Service*> m_services;
     SystemState m_currentState;
 };
