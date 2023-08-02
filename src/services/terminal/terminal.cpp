@@ -16,7 +16,7 @@ void parseCommand(String& command, String& cmd, int& argc, String& args){
            return;
         };
 
-        args = raw.substring(raw.indexOf('(') + 1, raw.indexOf(')') - 1);  // also exclude the last parenthesis
+        args = raw.substring(raw.indexOf('(') + 1, raw.indexOf(')'));  // also exclude the last parenthesis
 
         
         // Add 1 to argCount if any args exist

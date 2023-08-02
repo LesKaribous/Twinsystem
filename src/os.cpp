@@ -106,7 +106,7 @@ void OperatingSystem::processCommand(Command c){
         if(serviceID != NOT_A_SERVICE){
             disable(serviceID);
             console.info("Service") << service <<  " disabled" << console.endl;
-        }else  console.error("Service") << "unknown service" << console.endl;
+        }else  console.error("Service") << "unknown service : " << service << console.endl;
              
 
     }else if(c.isValidFormat("pause()")){
