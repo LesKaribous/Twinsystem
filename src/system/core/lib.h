@@ -15,3 +15,8 @@
 #include <ILI9341_t3n.h> // Hardware-specific library for TFT Screen
 #include <TeensyStep.h>
 
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+#include <SPI.h>

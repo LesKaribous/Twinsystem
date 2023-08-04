@@ -9,7 +9,6 @@ void OperatingSystem::loadService(Service *service){
 
 OperatingSystem::OperatingSystem() : SystemBase(){
     _state = RobotState::IDLE;
-    
 
     motion.setCalibration(inputs.isPrimary() ? Settings::Calibration::Primary : Settings::Calibration::Secondary);
     
@@ -59,7 +58,7 @@ void OperatingSystem::processCommand(Command c){
     }else if(c.isValidFormat("goTurn(x,y,angle)")){
         motion.move(c.getVec3());
     }else if(c.isValidFormat("turn(angle)")){
-        motion.turn(c.getFloat());motion.sleep();
+        motion.turn(c.getFloat());
     }else if(c.isValidFormat("setAbsPosition(x,y)")){
         motion.setAbsPosition(Vec3(c.getFloat(0), c.getFloat(1), motion.getAbsPosition().c));
     }else if(c.isValidFormat("setAbsPosition(x,y,t)")){
@@ -119,6 +118,8 @@ void OperatingSystem::processCommand(Command c){
     }else if(c.isValidFormat("cancel")){
         motion.cancel();
         console.info("Motion") << "motion canceled" << console.endl;
+        motion.sleep();
+        console.info("Motion") << "Entering sleep mode" << console.endl;
     }else if(c.isValidFormat("setAbsolute")){
         motion.setAbsolute();
         console.info("Motion") << "motion set to absolute mode" << console.endl;

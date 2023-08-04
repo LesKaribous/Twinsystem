@@ -47,6 +47,9 @@ struct Vec3 {
 
     // Operators overload
     operator Vec2() const;
+
+    float& operator[](int);// Overloading [] operator to access elements in array style
+
     Vec3& operator= (const Vec3&);
     Vec3& operator+=(const Vec3&);
     Vec3& operator-=(const Vec3&);

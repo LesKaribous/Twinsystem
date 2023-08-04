@@ -27,8 +27,8 @@ public:
     void complete() override;
     void forceCancel();
 
-    Vec3 estimatePosition() const;
-    Vec3 getEstimatedAbsPosition() const;
+
+    Vec3 estimatePosition(Vec3 start, Vec3 steps) const;
 
     void go(Vec2);
     void go(float x, float y);
@@ -89,7 +89,9 @@ private:
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _relTarget      = { 0, 0, 0}; //Relative mm, mm, rad
+    //PID
+    Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm, rad 
+    Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm, rad
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
@@ -104,11 +106,10 @@ private:
                   _sBController,
                   _sCController;
 
-    Vec3 _stepPos;
-    Vec3 _stepTarget;
-
     elapsedMillis _targetTimer;
     elapsedMillis _outputTimer;
 
-
+    // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
+    //                                   id, address
+    Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire2);
 };

@@ -50,6 +50,7 @@ struct Vec2 {
     static float det( const Vec2&, const Vec2&);
 
     // Operators overload
+    float& operator[](int i);
     Vec2& operator= (const Vec2&);
     Vec2& operator+=(const Vec2& u);
     Vec2& operator-=(const Vec2& u);

@@ -1,5 +1,5 @@
 #include "geometry3D.h"
-
+#include "os.h"
 //---------- Vector3 ------------
 //Methods
 
@@ -121,6 +121,18 @@ Vec3::operator Vec2() const{
     Vec2 v = Vec2(a, b);
     return v;
 }
+
+float& Vec3::operator[](int i){
+    if( i > 3 ) {
+        os.console.error("Vec3") << "Index out of bounds" << os.console.endl; 
+        return x;
+    }
+    
+    if(i == 0) return x;
+    if(i == 1) return y;
+    if(i == 2) return z;
+}
+
 Vec3& Vec3::operator= (const Vec3& u){
     a=u.a;
     b=u.b;

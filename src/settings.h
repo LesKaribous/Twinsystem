@@ -110,15 +110,23 @@ namespace Settings{
         RELATIVE = false,
         ABSOLUTE = true;
 
-        constexpr float kP = 0.004;            // (P)roportional constant of the regulator needs to be adjusted
-        constexpr float kI = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
-        constexpr float kD = 0.000;            // (P)roportional constant of the regulator needs to be adjusted
 
+        // Kp is used to improve the transient response rise time and settling time of course.
+        // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
+        // will occur in the future. 
+
+        //https://en.wikipedia.org/wiki/PID_controller
+        constexpr float kP = 2.0 /10000.0;            // (P)roportional constant of the regulator needs to be adjusted
+        constexpr float kI = 0.2 /10000.0;            // 0.0
+        constexpr float kD = 0.0 /10000.0;            // 0.2
+
+        //0.28 ok
+        //old values 0.0004
         const uint32_t 
-            ACCEL = 3000, // Old : 4000
-            SPEED = 4000, // Old : 5000
-            PULLIN = 800,
-            PID_PERIOD = 10;//ms
+            ACCEL = 5000, // Old : 4000
+            SPEED = 10000, // Old : 5000
+            PULLIN = 1000,
+            PID_PERIOD = 5;//ms
     }
 
     namespace Stepper{
