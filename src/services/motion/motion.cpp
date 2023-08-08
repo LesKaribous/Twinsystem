@@ -82,7 +82,7 @@ void Motion::update(){
 
     if(m_enabled && !_sleeping && !isPaused()){
         if(isMoving()) pid();
-        if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.05 && false){
+        if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.05){
             //os.console.info("update") << "_position : "<< _position << os.console.endl;
             //os.console.info("update") << "_target : "<< _target << os.console.endl;
             _position = _target;
@@ -120,10 +120,10 @@ void Motion::pid(){
         /* Display the floating point data */
 
         _position.c = -DEG_TO_RAD * event.orientation.x;
-        os.console.info("Motion") << "BNO: " << event.orientation.x  << os.console.endl;
+        //os.console.info("Motion") << "BNO: " << event.orientation.x  << os.console.endl;
         while(_position.c > PI) _position.c -= 2.0f*PI;
         while(_position.c <= -PI) _position.c += 2.0f*PI;
-        os.console.info("Motion") << "TTheta: " << _position.c * RAD_TO_DEG << os.console.endl;
+        //os.console.info("Motion") << "TTheta: " << _position.c * RAD_TO_DEG << os.console.endl;
 
 
         Vec3 error = _target - (_position); //relative target

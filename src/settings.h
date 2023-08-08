@@ -126,7 +126,7 @@ namespace Settings{
             ACCEL = 5000, // Old : 4000
             SPEED = 10000, // Old : 5000
             PULLIN = 1000,
-            PID_PERIOD = 5;//ms
+            PID_PERIOD = 10;//ms
     }
 
     namespace Stepper{

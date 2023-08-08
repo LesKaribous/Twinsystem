@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "system/core/system.h"
+#include "system/core/interpreter.h"
 
 #include "services/lidar/lidar.h"
 #include "services/chrono/chrono.h"
@@ -15,7 +16,6 @@
 #include "services/actuators/actuators.h"
 #include "services/localisation/localisation.h"
 
-
 #define THROW(x) os.console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
 
 enum class RobotState{
@@ -28,15 +28,19 @@ enum class RobotState{
 };
 
 class OperatingSystem : public SystemBase{
-
 public:
+
+    friend class Interpreter;
 
     Console console;
     Screen screen;
+    
 
     OperatingSystem();
     ~OperatingSystem();
 
+    void enable(ServiceID id);
+    void disable(ServiceID id);
 	void update();
     
     //wait blocking function
@@ -47,8 +51,6 @@ public:
     void setConsoleLevel(ConsoleLevel level);
 
 protected :
-    void processCommand(Command c);
-
     //State
     void setState(RobotState);
     void printState(RobotState) const;
@@ -68,6 +70,11 @@ protected :
 private:
     void loadService(Service*);
     
+    //TEST
+    Interpreter interpreter;
+    bool _waiting = false;
+    Job* _currentJob = nullptr;
+
     RobotState _state;
     unsigned long _lastDrift = 0;
 };

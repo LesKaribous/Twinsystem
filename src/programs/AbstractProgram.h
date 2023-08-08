@@ -4,7 +4,7 @@ enum class ProgramStatus {
 
 };
 
-class AbstractProgram{
+class Program{
 
     virtual void execute() = 0;
 

@@ -316,12 +316,12 @@ void Screen::updatePosition(float Xpos, float Ypos, float Tpos) {
     screen.setTextColor(ILI9341_WHITE);
     screen.setTextSize(2);
     screen.setCursor(100, 30);
-    if(Xpos < -0.00001 || probing.getState()) screen.println("?");
+    if(Xpos < -0.1 || probing.getState()) screen.println("?");
     else screen.println(int(Xpos));
 
     screen.setCursor(100, 50);
 
-    if(Ypos < -0.00001 || probing.getState()) screen.println("?");
+    if(Ypos < -0.1 || probing.getState()) screen.println("?");
     else screen.println(int(Ypos));
 
     screen.setCursor(100, 70);
