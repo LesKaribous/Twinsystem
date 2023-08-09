@@ -128,12 +128,13 @@ void Condition::solve(){
                 if(test == cur){
                     int ia = i;
                     int ib = i+1;
-                    THROW("ia : " + String(ia));
-                    THROW("ib : " + String(ib));
                     outputs[ia] = outputs[ib] = String(evaluate( outputs[ia], outputs[ib], cur));
                 }
             }else{
-                outputs[i] =  String(!bool(outputs[i].toInt())); // TODO : The problem is here
+                String test = fix[i];
+                if(test == cur){
+                    outputs[i] =  String(!bool(outputs[i].toInt())); // TODO : The problem is here
+                }
                 i++;
             }
         }
