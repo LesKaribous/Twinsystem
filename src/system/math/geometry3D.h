@@ -1,4 +1,5 @@
 #pragma once
+#include "system/core/lib.h"
 #include "geometry2D.h"
 
 struct Matrix3x3;
@@ -47,6 +48,7 @@ struct Vec3 {
 
     // Operators overload
     operator Vec2() const;
+    operator String() const;
 
     float& operator[](int);// Overloading [] operator to access elements in array style
 

@@ -25,6 +25,7 @@ public:
     bool getBool(int argIndex = 0)const;
     char getChar(int argIndex = 0)const;
     float getFloat(int argIndex = 0)const;
+    int getInt(int argIndex = 0)const;
     String getString(int argIndex = 0)const;
     bool isValidFormat(String commandFormat) const;
     

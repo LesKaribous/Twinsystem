@@ -122,6 +122,12 @@ Vec3::operator Vec2() const{
     return v;
 }
 
+Vec3::operator String() const{
+    String v = "Vec3(" + String(a)  + "," + String(b) + "," + String(c) + ")";
+    return v;
+}
+
+
 float& Vec3::operator[](int i){
     if( i > 3 ) {
         os.console.error("Vec3") << "Index out of bounds" << os.console.endl; 
@@ -320,6 +326,7 @@ Matrix3x3& Matrix3x3::sub(Matrix3x3& m){
     i -= m.i;
     return *this;
 }
+
 
 float Matrix3x3::trace(){
     return a+e+i;

@@ -58,6 +58,8 @@ struct Vec2 {
     Vec2& operator-=(float u);
     Vec2& operator*=(float u);
     Vec2& operator/=(float u);
+    //conversion operator
+    operator String() const;
 };
 
 
@@ -96,6 +98,8 @@ struct Matrix2x2 {
     Matrix2x2& sub(float);
     Matrix2x2& sub(Matrix2x2&);
     float trace();
+
+
 
 };
 

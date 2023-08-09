@@ -267,6 +267,12 @@ Matrix2x2 Matrix2x2::GetIdentity(){
 
 // Operators overload
 
+
+Vec2::operator String() const{
+    String v = "Vec2(" + String(a)  + "," + String(b) + ")";
+    return v;
+}
+
 float& Vec2::operator[](int i){
     if( i > 2 ) {
         os.console.error("Vec2") << "Index out of bounds" << os.console.endl; 

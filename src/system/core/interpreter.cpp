@@ -8,14 +8,18 @@ void parseCommand(String& command, String& cmd, int& argc, String& args){
     cmd = "";  // initialize argCount
     argc = 0;  // initialize argCount
     args = "";  // initialize argCount
-    if (raw.indexOf('(') != -1 && raw.lastIndexOf(')') != -1) {
+
+    int firstPar = raw.indexOf('(');
+    int lastPar = raw.lastIndexOf(')');
+
+    if (firstPar != -1 && lastPar != -1) {
         cmd = raw.substring(0, raw.indexOf('('));
 
-        if (raw.lastIndexOf(')') - raw.indexOf('(') - 1 <= 0){
+        if (lastPar - firstPar - 1 <= 0){
            return;
         };
 
-        args = raw.substring(raw.indexOf('(') + 1, raw.lastIndexOf(')'));  // also exclude the last parenthesis
+        args = raw.substring(firstPar + 1, lastPar);  // also exclude the last parenthesis
 
         
         // Add 1 to argCount if any args exist
@@ -24,14 +28,19 @@ void parseCommand(String& command, String& cmd, int& argc, String& args){
             // Count the commas in commandArgs
             int i = 0;
             while(true){
-                i = args.indexOf(",", i);
-                if(i != -1) {
-                    argc++;
-                    i++;
-                }else break;
+                int ti = i;
+                i = args.indexOf("(", i);
+                if(i != -1){
+                    i = args.indexOf(")", ti) + 1;
+                }else{
+                    i = args.indexOf(",", ti);
+                    if(i != -1) {
+                        argc++;
+                        i++;
+                    }else break;
+                }
             };
         }
-
     } else {
         cmd = raw;
     }
@@ -104,6 +113,15 @@ float Command::getFloat(int argIndex) const{
         // Parse argument for int type
         String arg = getArgument(argIndex);
         return arg.toFloat();
+    }
+    return 0;
+}
+
+int Command::getInt(int argIndex) const{
+    if (argCount >= argIndex) {
+        // Parse argument for int type
+        String arg = getArgument(argIndex);
+        return arg.toInt();
     }
     return 0;
 }
@@ -190,6 +208,7 @@ Interpreter::~Interpreter(){
 
 void Interpreter::processCondition(Condition c){ 
     for(Command& a : c.commands){
+        THROW(a.toString())
         if(a.isValidFormat("motion")){
             c.addCommandOuput(String(true));
             os.console.print(c.outputs[c.outputs.size()-1]);
@@ -199,19 +218,18 @@ void Interpreter::processCondition(Condition c){
         }else if(a.isValidFormat("lidar")){
             c.addCommandOuput(String(false));
              os.console.print(c.outputs[c.outputs.size()-1]);
+        }else if(a.isValidFormat("int(v)")){
+            c.addCommandOuput(String(a.getInt()));
+        }else if(a.isValidFormat("float(v)")){
+            c.addCommandOuput(String(a.getFloat()));
+        }else if(a.isValidFormat("Vec2(x, y)")){
+            c.addCommandOuput(String(a.getVec2()));
+        }else if(a.isValidFormat("Vec3(x, y, z)")){
+            c.addCommandOuput(String(a.getVec3()));
         }
     }
-    os.console.println("");
 
-    os.console.print("Commands : {");
-    for(Command& d:  c.commands) os.console.print(d.toString() + ",");
-    os.console.println("}");
-
-    os.console.print("Operators : {");
-    for(String& d:  c.operators) os.console.print(d + ",");
-    os.console.println("}");
-
-
+    
     c.solve();
 }
 

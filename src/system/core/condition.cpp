@@ -49,9 +49,7 @@ void parseCondition(String& raw, std::vector<Command>& args, std::vector<String>
     String operatorBuf;
     while(true){
         i = findClosestOperator(raw, i, operatorBuf);
-        //THROW(i)
         if(i != -1){
-            //THROW(operatorBuf)
             operators.push_back(operatorBuf);
             if(operatorBuf != "!") argc++;
             i++;
@@ -62,19 +60,19 @@ void parseCondition(String& raw, std::vector<Command>& args, std::vector<String>
     String subC = raw;
     for(String test : symbols){
         if(test == "!") subC.replace(test, "");
-        else subC.replace(test, ",");
+        else subC.replace(test, "/");
     }
     subC.replace(" ", "");
 
     int start = 0;
-    int end = subC.indexOf(',', start);
-    THROW(subC)
+    int end = subC.indexOf('/', start);
+    
     // Find the start and end position of the argument at the specified index
     for (int i = 0; i < argc; i++) {
         if (end != -1){
             args.emplace_back(subC.substring(start, end).trim());
             start = end + 1;
-            end = subC.indexOf(',', start);
+            end = subC.indexOf('/', start);
         }
 
     }
@@ -83,6 +81,9 @@ void parseCondition(String& raw, std::vector<Command>& args, std::vector<String>
 
 
 bool evaluate(String&  a, String& b, String op){
+
+    THROW(a + op + b);
+
     if(op == "=="){
         return a.equalsIgnoreCase(b);
     }else if(op == "!="){
@@ -121,7 +122,7 @@ void Condition::solve(){
 
 
     for(String& cur : solveOrder){
-        THROW("Solving : " + cur);
+        //THROW("Solving : " + cur);
         for(int i = 0; i < fix.size(); i++){
             if( cur != "!"){
                 String test = fix[i];
