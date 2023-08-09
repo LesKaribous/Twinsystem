@@ -1,6 +1,9 @@
 #pragma once
 #include "system/core/lib.h"
+#include "system/core/condition.h"
 #include "system/math/geometry.h"
+
+class Condition;
 
 class Command{
     String commandName;
@@ -12,17 +15,18 @@ class Command{
 public:
 
     Command(String& raw);
-    const String& toString();
+    const String& toString()const;
 
-    String getArgument(int argIndex);
+    String getArgument(int argIndex)const;
+    Condition getCondition()const;
 
-    Vec3 getVec3(int argIndex = 0);
-    Vec2 getVec2(int argIndex = 0);
-    bool getBool(int argIndex = 0);
-    char getChar(int argIndex = 0);
-    float getFloat(int argIndex = 0);
-    String getString(int argIndex = 0);
-    bool isValidFormat(String commandFormat);
+    Vec3 getVec3(int argIndex = 0)const;
+    Vec2 getVec2(int argIndex = 0)const;
+    bool getBool(int argIndex = 0)const;
+    char getChar(int argIndex = 0)const;
+    float getFloat(int argIndex = 0)const;
+    String getString(int argIndex = 0)const;
+    bool isValidFormat(String commandFormat) const;
     
 };
 
@@ -35,6 +39,6 @@ public:
     ~Interpreter();
 
     void processCommand(Command c);
-
+    void processCondition(Condition c);
 };
 
