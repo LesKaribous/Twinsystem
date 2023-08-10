@@ -1,6 +1,7 @@
 #pragma once 
 #include "system/core/lib.h"
 #include "commandHandler.h"
+#include "program.h"
 
 // Token types
 enum TokenType { COMMAND, LPAREN, RPAREN, COMMA, NUMBER, IDENTIFIER, IF, ELSE, END, COMMENT, EOL, END_OF_SCRIPT };
@@ -12,31 +13,11 @@ struct Token {
 };
 
 
-enum StatementType { COMMAND_STATEMENT, IF_STATEMENT };
-// Base class for statements
-struct Statement {
-    StatementType type;
-    virtual ~Statement() = default;
-};
-
-struct CommandStatement : Statement {
-    CommandStatement() { type = COMMAND_STATEMENT; }
-    String name;
-    std::vector<String> arguments;
-};
-
-struct IfStatement : Statement {
-    IfStatement() { type = IF_STATEMENT; }
-    String condition;
-    std::vector<std::unique_ptr<Statement>> trueBranch;
-    std::vector<std::unique_ptr<Statement>> falseBranch;
-};
-
 class Interpreter {
 public:
     Interpreter();
-    void processScript(const String& script);
-
+    Program processScript(const String& script);
+    void registerCommand(const String& syntax, const String& description);
 private:
     // Lexer functions
     Token nextToken();
@@ -45,18 +26,16 @@ private:
     void skipWhitespace();
 
     // Parser functions
-    std::unique_ptr<Statement> parseStatement();
-    std::unique_ptr<CommandStatement> parseCommandStatement();
-    std::unique_ptr<IfStatement> parseIfStatement();
+    std::shared_ptr<Statement> parseStatement();
+    std::shared_ptr<CommandStatement> parseCommandStatement();
+    std::shared_ptr<IfStatement> parseIfStatement();
 
-    // Execution functions
-    void executeStatement(const std::unique_ptr<Statement>& statement);
-    void executeCommand(const CommandStatement& command);
-    void executeIfStatement(const IfStatement& ifStmt);
+    //Syntax error
+    String currentPos();
+    void displaySyntaxError(const String& commandName);
 
-    // Evaluation functions
-    bool evaluateCondition(const String& condition);
-    float evaluateExpression(const String& expression);
+
+    std::vector<CommandInfo> commands;
 
     // Lexer state
     String input;

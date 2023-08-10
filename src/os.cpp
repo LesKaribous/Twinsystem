@@ -20,6 +20,19 @@ void OperatingSystem::disable(ServiceID id) {
 }
 
 
+void OperatingSystem::execute(String& script){
+    os.console.println("----");
+    os.console.prettyPrint(script);
+    os.console.println("----");
+    Program p = interpreter.processScript(script);
+
+    if(p.isValid()){
+        currentProgram = p;
+        p.start();
+    }
+
+}
+
 OperatingSystem::OperatingSystem() : SystemBase(){
     _state = RobotState::IDLE;
 

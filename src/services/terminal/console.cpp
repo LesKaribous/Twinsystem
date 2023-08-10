@@ -64,4 +64,19 @@ void Console::println(String s){
 	Serial.println(s);
 }
 
-
+void Console::prettyPrint(String s){
+	int l = 0;
+	Serial.print(l);
+	Serial.print(":\t");
+	for (size_t i = 0; i <= s.length(); i++){
+		if(s[i] == '\n'){
+			Serial.println();
+			Serial.print(++l);
+			Serial.print(":\t");
+		}else{
+			Serial.print(s[i]);
+		}
+	}
+	Serial.print(s[s.length() - 1]);
+	
+}

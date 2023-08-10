@@ -1,68 +1,76 @@
 #include "interpreter.h"
+#include "os.h"
 
 // Constructor
 Interpreter::Interpreter() : pos(0) {
+    // Service commands
+
+    // Registering commands with their syntax and description
+    registerCommand("enable(service)", "Enable a specific service");
+    registerCommand("disable(service)", "Disable a specific service");
+    registerCommand("status", "Display all status");
+    registerCommand("status(service)", "Display single status");
+    registerCommand("go(x,y)", "Move to a specific position");
+    registerCommand("turn(angle)", "Turn to a specific angle");
+    registerCommand("pause", "Pause motion");
+    registerCommand("resume", "Resume motion");
+    registerCommand("cancel", "Cancel motion");
+    registerCommand("sleep", "Put motion to sleep");
+    registerCommand("align(side,angle)", "Align to a specific side and angle");
+    registerCommand("setAbsolute", "Set motion to absolute mode");
+    registerCommand("setRelative", "Set motion to relative mode");
+    registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
+    registerCommand("grab(side)", "Grab object using actuator");
+    registerCommand("ungrab(side)", "Ungrab object using actuator");
+    registerCommand("open(side)", "Open actuator on a specific side");
+    registerCommand("close(side)", "Close actuator on a specific side");
+    registerCommand("openTrap(side)", "Open trap on a specific side");
+    registerCommand("closeTrap(side)", "Close trap on a specific side");
+    registerCommand("help", "Display help");
+    // ... Other command registrations ...
+
 }
 
 // Process a script
-void Interpreter::processScript(const String& script) {
+Program Interpreter::processScript(const String& script) {
     input = script;
     pos = 0;
     currentToken = nextToken();
 
+    Program prgm;
+
     // Parse and execute statements until the end of the script
     while (currentToken.type != END_OF_SCRIPT) {
-        std::unique_ptr<Statement> statement = parseStatement();
-        executeStatement(statement);
+        prgm.addStatement(parseStatement());
     }
 }
 
-void Interpreter::executeCommand(const CommandStatement& command) {
-    CommandHandler handler;
-
-    if (command.name == "enable") {
-        handler.execute_enable(command.arguments[0]);
-    } else if (command.name == "setAbsPosition") {
-        handler.execute_setAbsPosition(command.arguments[0].toFloat(), command.arguments[1].toFloat(), command.arguments[2].toFloat());
-    } else if (command.name == "go") {
-        handler.execute_go(command.arguments[0].toFloat(), command.arguments[1].toFloat());
-    } // ... Handle other commands ...
-
-    // Handle error if command name is not recognized
+void Interpreter::registerCommand(const String& syntax, const String& description) {
+    int numberOfArguments = std::count(syntax.begin(), syntax.end(), ',') + 1;
+    commands.push_back({syntax, description, numberOfArguments});
 }
 
-void Interpreter::executeIfStatement(const IfStatement& ifStmt) {
-    bool conditionResult = evaluateCondition(ifStmt.condition);
+String Interpreter::currentPos(){
+    int c = 0;
+    int line = 0;
+    for (size_t i = 0; i < pos; ++i) {
+        if (input.charAt(i) == '\n') {
+            line++;
+            c = 0;
+        }else c++;
+    }
+    return "[" + String(line) + ":" +  String(c) + "] ";
+}
 
-    const auto& branch = conditionResult ? ifStmt.trueBranch : ifStmt.falseBranch;
-
-    for (const auto& statement : branch) {
-        executeStatement(statement);
+void Interpreter::displaySyntaxError(const String& commandName) {
+    for (const auto& info : commands) {
+        if (info.syntax.startsWith(commandName)) {
+            os.console.error("Interpreter") <<  currentPos() << "Invalid syntax for " << commandName << ". Expected: " << info.syntax << os.console.endl;
+            return;
+        }
     }
 }
 
-bool Interpreter::evaluateCondition(const String& condition) {
-    CommandHandler handler;
-
-    if (condition == "hasObject") {
-        return handler.execute_testTRUE();
-    } // ... Handle other conditions ...
-
-    // Handle error if condition is not recognized
-    return false;
-}
-
-void Interpreter::executeStatement(const std::unique_ptr<Statement>& statement) {
-    switch (statement->type) {
-        case COMMAND_STATEMENT:
-            executeCommand(*static_cast<CommandStatement*>(statement.get()));
-            break;
-        case IF_STATEMENT:
-            executeIfStatement(*static_cast<IfStatement*>(statement.get()));
-            break;
-        // Handle error: unexpected statement type
-    }
-}
 
 
 
@@ -78,6 +86,8 @@ Token Interpreter::nextToken() {
 
     // Get the next character
     char ch = input.charAt(pos);
+
+    os.console.info("Interpreter") << "Reading : \"" << ch << "\" at " << currentPos() << os.console.endl;
 
     // Handle different token types
     if (isDigit(ch)) {
@@ -95,8 +105,13 @@ Token Interpreter::nextToken() {
                 }
                 return nextToken(); // Recursively call to get the next token
             // ... Handle other special characters or operators as needed ...
+            case '\n' : 
+                pos++; // Skip the unexpected character
+
+                return nextToken(); // Recursively call to get the next token
             default:
                 // Handle error: unexpected character
+                os.console.error("Lexer") << currentPos() << "Unexpected character: " << ch << HERE << os.console.endl;
                 pos++; // Skip the unexpected character
                 return nextToken(); // Recursively call to get the next token
         }
@@ -148,43 +163,45 @@ Token Interpreter::parseIdentifier() {
     return {IDENTIFIER, value};
 }
 
-std::unique_ptr<CommandStatement> Interpreter::parseCommandStatement() {
-    auto command = std::make_unique<CommandStatement>();
+std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
+    auto command = std::make_shared<CommandStatement>();
     command->name = currentToken.value;
     currentToken = nextToken(); // Consume the command name
 
     // Expect an opening parenthesis
     if (currentToken.type != LPAREN) {
-        // Handle error
-    }
-    currentToken = nextToken(); // Consume the '('
 
-    // Parse the arguments
-    while (currentToken.type != RPAREN) {
-        if (currentToken.type == NUMBER || currentToken.type == IDENTIFIER) {
-            command->arguments.push_back(currentToken.value);
-            currentToken = nextToken(); // Consume the argument
+    }else{
+        currentToken = nextToken(); // Consume the '('
+
+        // Parse the arguments
+        while (currentToken.type != RPAREN) {
+            if (currentToken.type == NUMBER || currentToken.type == IDENTIFIER) {
+                command->arguments.push_back(currentToken.value);
+                currentToken = nextToken(); // Consume the argument
+            }
+
+            // Handle commas between arguments
+            if (currentToken.type == COMMA) {
+                currentToken = nextToken(); // Consume the ','
+            }
         }
 
-        // Handle commas between arguments
-        if (currentToken.type == COMMA) {
-            currentToken = nextToken(); // Consume the ','
-        }
+        currentToken = nextToken(); // Consume the ')'
     }
-
-    currentToken = nextToken(); // Consume the ')'
 
     return command;
 }
 
-std::unique_ptr<IfStatement> Interpreter::parseIfStatement() {
-    auto ifStmt = std::make_unique<IfStatement>();
+std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
+    auto ifStmt = std::make_shared<IfStatement>();
 
     currentToken = nextToken(); // Consume the 'if' keyword
 
     // Parse the condition (for simplicity, we'll assume it's an identifier)
     if (currentToken.type != IDENTIFIER) {
         // Handle error
+        os.console.error("Interpreter") << currentPos() << "Expected identifier, found : " << currentToken.value << HERE << os.console.endl;
     }
     ifStmt->condition = currentToken.value;
     currentToken = nextToken(); // Consume the condition
@@ -210,13 +227,14 @@ std::unique_ptr<IfStatement> Interpreter::parseIfStatement() {
     return ifStmt;
 }
 
-std::unique_ptr<Statement> Interpreter::parseStatement() {
+std::shared_ptr<Statement> Interpreter::parseStatement() {
     if (currentToken.type == IDENTIFIER) {
         return parseCommandStatement();
     } else if (currentToken.type == IF) {
         return parseIfStatement();
     } else {
         // Handle error: unexpected token
+        os.console.error("Parser") << currentPos() << "Unexpected token: " << currentToken.value << HERE << os.console.endl;
     }
 
     return nullptr; // Should never reach here

@@ -1,9 +1,14 @@
 #pragma once
 #include "system/core/lib.h"
+#include "commandHandler.h"
 
 class CommandHandler {
+
+    std::vector<String> extractArguments(const String& args);
 public:
     CommandHandler(){};
+
+    void execute(const String& command, const String& args);
 
     //Service
     void execute_enable(const String& service);
@@ -38,4 +43,10 @@ public:
     void execute_help(); //Display help
     
     // ... Other command execution methods ...
+};
+
+struct CommandInfo {
+    String syntax;
+    String description;
+    int numberOfArguments;
 };

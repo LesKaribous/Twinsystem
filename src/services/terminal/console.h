@@ -24,6 +24,7 @@ public:
 	
 	void print(String s);
 	void println(String s);
+	void prettyPrint(String s);
 
 private:
 	void write(const char* str);

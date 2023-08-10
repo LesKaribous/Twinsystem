@@ -17,6 +17,7 @@
 
 #include "system/interpreter/interpreter.h"
 
+#define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
 #define THROW(x) os.console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
 #define os OperatingSystem::getInstance()
 
@@ -42,6 +43,8 @@ public:
     void disable(ServiceID id);
 	void update();
     
+    void execute(String& script);
+
     //wait blocking function
     void wait(unsigned long temps);
     void waitUntil(Job& obj);
@@ -79,6 +82,8 @@ private:
     //Singleton
     OperatingSystem();
     OperatingSystem(OperatingSystem &other); //Singletons should not be cloneable.
+
+    Program currentProgram;
 
     static OperatingSystem instance;
 };
