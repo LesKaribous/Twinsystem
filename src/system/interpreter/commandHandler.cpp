@@ -20,6 +20,7 @@ void CommandHandler::execute(const String& command, const String& args) {
         float x = arguments[0].toFloat();
         float y = arguments[1].toFloat();
         execute_go(x, y);
+        os.console.println(x);
     } else if (command == "turn") {
         execute_turn(args.toFloat());
     } else if (command == "pause") {

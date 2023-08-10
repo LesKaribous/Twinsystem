@@ -66,7 +66,7 @@ void OperatingSystem::update(){
             _currentJob->run();
         }else _busy = false;
     }else {
-        if( terminal.commandAvailable()){
+        if( terminal.commandAvailable() > 0){
             Program p = interpreter.processScript(terminal.dequeCommand());
             if(p.isValid()){
                 console.info("OS") << "Command is valid" << console.endl;

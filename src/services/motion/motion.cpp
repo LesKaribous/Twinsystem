@@ -75,19 +75,19 @@ Motion::~Motion(){}
 
 
 void Motion::run(){
-    //update(); //Should be updated by service manager now.
+    update();
 }
 
 void Motion::update(){
 
     if(m_enabled && !_sleeping && !isPaused()){
-        if(isMoving()) pid();
+        
         if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.05){
             //os.console.info("update") << "_position : "<< _position << os.console.endl;
             //os.console.info("update") << "_target : "<< _target << os.console.endl;
             _position = _target;
             complete();
-        }
+        }else if(isMoving()) pid();
         
         os.screen.x.SetValue(_position.x);
         os.screen.y.SetValue(_position.y);

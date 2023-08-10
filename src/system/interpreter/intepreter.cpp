@@ -43,6 +43,7 @@ Program Interpreter::processScript(const String& script) {
     while (currentToken.type != END_OF_SCRIPT) {
         prgm.addStatement(parseStatement());
     }
+    return prgm;
 }
 
 void Interpreter::registerCommand(const String& syntax, const String& description) {

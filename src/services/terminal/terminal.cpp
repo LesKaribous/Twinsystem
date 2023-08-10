@@ -12,9 +12,8 @@ void Terminal::update(){
     
     if (Serial.available() > 0) {
         String command = Serial.readString();
-        os.console.trace("Terminal") << "Command received at " << int(millis()) << "ms" << os.console.endl;
-        _pendingCommands.push_back(command);  // Assuming _pendingCommands holds a struct or class that can take these 3 parameters
-        if(_pendingCommands.size() > 50) _pendingCommands.pop_front();
+        _pendingCommands.push_back(command);
+        if(_pendingCommands.size() > 10) _pendingCommands.pop_front();
         
     }
 }   

@@ -50,8 +50,10 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 }
 
 void Program::run(){
-    if(isPending() && !os.isBusy()){
+    if(isPending()){
         step();
+    }else{
+        THROW("OS Busy")
     }
 }
 
@@ -63,6 +65,7 @@ void Program::start(){
     if(_statements.size() > 0){
         Job::start();
         _currentTask = 0;
+        executeStatement(_statements[_currentTask]);
     }
 
 }
@@ -96,7 +99,7 @@ void Program::stop(){
 
 void Program::step(){
     _currentTask++;
-    if(_currentTask > _statements.size() - 1){
+    if(_currentTask >= _statements.size()){
         complete();
         _currentTask = 0; //for safety
     }else{
