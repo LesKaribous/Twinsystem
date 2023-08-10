@@ -1,6 +1,10 @@
 #include "os.h"
 
-OperatingSystem os; //OS instance singloton
+OperatingSystem OperatingSystem::instance;
+
+OperatingSystem& OperatingSystem::getInstance(){
+    return instance;
+}
 
 void OperatingSystem::loadService(Service *service){
     SystemBase::loadService(service);
@@ -41,16 +45,14 @@ OperatingSystem::OperatingSystem() : SystemBase(){
     screen.setPage(Page::INIT);
 }
 
-OperatingSystem::~OperatingSystem(){}
-
 void OperatingSystem::update(){
 	SystemBase::update();
 
-    if(_waiting){
+    if(_waiting){ //TODO handle that properly
         if(_currentJob->isPending() || _currentJob->isPaused()){
         }else _waiting = false;
     }else if(terminal.commandAvailable()){
-        interpreter.processCommand(terminal.dequeCommand());
+        interpreter.processScript(terminal.dequeCommand());
     }
 }
 
@@ -58,7 +60,7 @@ void OperatingSystem::setConsoleLevel(ConsoleLevel level){
 	console.setLevel(level);
 }
 
-void OperatingSystem::waitUntil(Job& obj){ //TODO : Remove this shit
+void OperatingSystem::waitUntil(Job& obj){
     _waiting = true;
     _currentJob = &obj;
 }

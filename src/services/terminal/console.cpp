@@ -1,6 +1,9 @@
 #include "console.h"
 #include <Arduino.h>
 
+
+const String Console::endl = "\n";
+
 ConsoleStream Console::trace(String origin) {
 	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
 }

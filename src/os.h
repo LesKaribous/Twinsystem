@@ -2,7 +2,6 @@
 
 #include "settings.h"
 #include "system/core/system.h"
-#include "system/core/interpreter.h"
 
 #include "services/lidar/lidar.h"
 #include "services/chrono/chrono.h"
@@ -16,7 +15,10 @@
 #include "services/actuators/actuators.h"
 #include "services/localisation/localisation.h"
 
+#include "system/interpreter/interpreter.h"
+
 #define THROW(x) os.console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+#define os OperatingSystem::getInstance()
 
 enum class RobotState{
     IDLE,
@@ -29,15 +31,12 @@ enum class RobotState{
 
 class OperatingSystem : public SystemBase{
 public:
-
-    friend class Interpreter;
-
+    friend class CommandHandler;
     Console console;
     Screen screen;
-    
 
-    OperatingSystem();
-    ~OperatingSystem();
+    //Singleton
+    static OperatingSystem& getInstance();
 
     void enable(ServiceID id);
     void disable(ServiceID id);
@@ -49,6 +48,7 @@ public:
     
     //Terminal
     void setConsoleLevel(ConsoleLevel level);
+
 
 protected :
     //State
@@ -69,15 +69,16 @@ protected :
 
 private:
     void loadService(Service*);
-    
-    //TEST
-    Interpreter interpreter;
+
     bool _waiting = false;
     Job* _currentJob = nullptr;
-
+    Interpreter interpreter;
     RobotState _state;
     unsigned long _lastDrift = 0;
+
+    //Singleton
+    OperatingSystem();
+    OperatingSystem(OperatingSystem &other); //Singletons should not be cloneable.
+
+    static OperatingSystem instance;
 };
-
-
-extern OperatingSystem os; //OS instance

@@ -5,6 +5,7 @@
 
 #include "system/core/service.h"
 
+
 enum SystemState{
     BOOT,    // booting
     IDLE,    // running services but no programs running
@@ -26,10 +27,9 @@ protected:
     void loadService(Service* m);
     void update();
     void updateProgram();
-    void updateServices();    
+    void updateServices();
 
 private:
-
     //Async rountines
     void handleBootState();
     void handleIdleState();
@@ -39,4 +39,5 @@ private:
     //Program* program;
     std::vector<Service*> m_services;
     SystemState m_currentState;
+    
 };

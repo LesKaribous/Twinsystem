@@ -56,9 +56,9 @@ Motion::Motion() : Service(MOTION),
     _sBController.overrideSpeed(0);
     _sCController.overrideSpeed(0);
 
-    os.screen.x.SetValue(_position.x);
-    os.screen.y.SetValue(_position.y);
-    os.screen.z.SetValue(_position.z);
+    //os.screen.x.SetValue(_position.x);
+    //os.screen.y.SetValue(_position.y);
+    //os.screen.z.SetValue(_position.z);
 
 
 

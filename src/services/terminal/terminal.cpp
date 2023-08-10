@@ -13,13 +13,13 @@ void Terminal::update(){
     if (Serial.available() > 0) {
         String command = Serial.readStringUntil('\n');  // Read the serial command
         os.console.trace("Terminal") << "Command received at " << int(millis()) << "ms" << os.console.endl;
-        _pendingCommands.emplace_back(command);  // Assuming _pendingCommands holds a struct or class that can take these 3 parameters
-        if(_pendingCommands.size() > 20) _pendingCommands.pop_front();
+        _pendingCommands.push_back(command);  // Assuming _pendingCommands holds a struct or class that can take these 3 parameters
+        if(_pendingCommands.size() > 50) _pendingCommands.pop_front();
     }
 }   
 
-Command Terminal::dequeCommand(){
-    Command command = _pendingCommands.front();
+String Terminal::dequeCommand(){
+    String command = _pendingCommands.front();
     _pendingCommands.pop_front();
     return command;
 }

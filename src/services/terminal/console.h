@@ -7,7 +7,7 @@ class ConsoleStream;
 class Console{
 public: 
 	friend class ConsoleStream;
-	const String endl = "\n";
+	static const String endl;
 
 	Console(ConsoleLevel lvl = ConsoleLevel::INFO);
 	~Console(){};

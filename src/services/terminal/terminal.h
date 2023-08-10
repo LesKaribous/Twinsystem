@@ -1,6 +1,6 @@
 #pragma once
+#include "system/core/lib.h"
 #include "system/core/service.h"
-#include "system/core/interpreter.h"
 #include "console.h"
 
 
@@ -12,9 +12,9 @@ public :
 
     void update() override;
 
-    Command dequeCommand();
+    String dequeCommand();
     int commandAvailable();
 
 private:
-    std::deque<Command> _pendingCommands;
+    std::deque<String> _pendingCommands;
 };
