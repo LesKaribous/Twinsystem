@@ -33,20 +33,24 @@ String  Job::toString() const {
 	//os.console.log("Collision :", Intercom::collision(), INFO);
 }
 
-bool Job::isPaused() const {
+bool Job::isPaused() {
 	return m_state == JobState::PAUSED;
 }
 
-bool Job::isPending() const{
+bool Job::isIdle() {
+	return m_state == JobState::IDLE;
+}
+
+bool Job::isPending(){
 	return m_state == JobState::PENDING;
 }
 
-bool Job::isCancelled() const {
+bool Job::isCancelled(){
 	return m_state == JobState::CANCELLED;
 }
 
 
-bool Job::isCompleted() const{
+bool Job::isCompleted(){
 	return m_state == JobState::COMPLETED;
 }
 

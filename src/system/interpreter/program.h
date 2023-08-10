@@ -5,34 +5,19 @@
 
 enum StatementType { IGNORED_STATEMENT, COMMAND_STATEMENT, IF_STATEMENT };
 // Base class for statements
-class Statement : public Job{
-protected :
+struct Statement{
     StatementType type = IGNORED_STATEMENT;
-
-public :
-    friend class Program;
     Statement(){};
-
-    void run()      override; 
-    void reset()    override;  
-    void start()    override; 
-    void pause()    override;
-    void resume()   override;
-    void cancel()   override;
-    void complete() override;
-
     virtual ~Statement() = default;
 };
 
-class CommandStatement : public Statement {
-public:
+struct CommandStatement : public Statement {
     CommandStatement() { type = COMMAND_STATEMENT; }
     String name;
     std::vector<String> arguments;
 };
 
-class IfStatement : public Statement {
-public:
+struct IfStatement : public Statement {
     IfStatement() { type = IF_STATEMENT; }
     String condition;
     std::vector<std::shared_ptr<Statement>> trueBranch;
@@ -42,7 +27,8 @@ public:
 
 class Program : public Job {
     std::vector<std::shared_ptr<Statement>> _statements;
-    std::shared_ptr<Statement> _currentTask;
+
+    size_t _currentTask = 0;
 
     CommandHandler commandHandler;
 

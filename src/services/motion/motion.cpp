@@ -75,7 +75,7 @@ Motion::~Motion(){}
 
 
 void Motion::run(){
-    update();
+    //update(); //Should be updated by service manager now.
 }
 
 void Motion::update(){

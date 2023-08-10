@@ -17,10 +17,11 @@ public:
     ~Job();// make the class polymorphic by providing a virtual destructor
 
     String toString() const ;
-    bool isPending() const ;
-    bool isPaused() const ;
-    bool isCancelled() const ;
-    bool isCompleted() const ;
+    virtual bool isPending();
+    virtual bool isIdle();
+    virtual bool isPaused();
+    virtual bool isCancelled();
+    virtual bool isCompleted();
 
     virtual void run() = 0; 
     virtual void reset();   //Set to IDLE

@@ -4,6 +4,7 @@
 #include "system/core/system.h"
 
 #include "services/lidar/lidar.h"
+#include "services/timer/timer.h"
 #include "services/chrono/chrono.h"
 #include "services/inputs/inputs.h"
 #include "services/motion/motion.h"
@@ -46,7 +47,8 @@ public:
     void execute(String& script);
 
     //wait blocking function
-    void wait(unsigned long temps);
+    bool isBusy() const;
+    void wait(unsigned long time);
     void waitUntil(Job& obj);
     
     //Terminal
@@ -60,20 +62,25 @@ protected :
 
     //Standalone services
     Lidar lidar;
+    
     Inputs inputs;
     Motion motion;
+    Chronometer match; //for match time
     //Planner planner;
     NeoPixel neopixel;
     Terminal terminal;
     Intercom intercom;
-    Chronometer chrono;
     Actuators actuators;
     Localisation localisation;
+
+    //Utils
+    Timer timer;
+    
 
 private:
     void loadService(Service*);
 
-    bool _waiting = false;
+    bool _busy = false;
     Job* _currentJob = nullptr;
     Interpreter interpreter;
     RobotState _state;
@@ -84,6 +91,5 @@ private:
     OperatingSystem(OperatingSystem &other); //Singletons should not be cloneable.
 
     Program currentProgram;
-
     static OperatingSystem instance;
 };

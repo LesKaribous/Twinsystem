@@ -1,38 +1,6 @@
 #include "program.h"
 #include "os.h"
 
-void Statement::run(){
-
-}
-
-void Statement::reset(){
-
-}
-
-void Statement::start(){
-
-}
-
-void Statement::pause(){
-
-}
-
-void Statement::resume(){
-
-}
-
-void Statement::cancel(){
-
-}
-
-void Statement::complete(){
-
-}
-
-
-
-
-
 
 void Program::executeCommand(const CommandStatement& command) {
     // Construct the arguments string
@@ -82,17 +50,12 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 }
 
 void Program::run(){
-    if(_currentTask && isPending()){
-        if(_currentTask->isCompleted()){
-            step();
-        }else if(_currentTask->isCancelled()){
-            os.console.error("Program") << "Current task has been cancelled. Stopping program" << os.console.endl;
-        }
+    if(isPending() && !os.isBusy()){
+        step();
     }
 }
 
 void Program::reset(){
-    for(std::shared_ptr<Statement>& st : _statements) st->reset();
     Job::reset();
 }
 
@@ -105,30 +68,38 @@ void Program::start(){
 }
 
 void Program::pause(){
-
+    Job::pause();
 }
 
 void Program::resume(){
-
+    Job::resume();
 }
 
 void Program::cancel(){
-
+    Job::cancel();
 }
 
 void Program::complete(){
-
+    Job::complete();
 }
 
 
 void Program::restart(){
-
+    stop();
+    start();
 }
 
 void Program::stop(){
-
+    cancel();
+    reset();
 }
 
 void Program::step(){
-
+    _currentTask++;
+    if(_currentTask > _statements.size() - 1){
+        complete();
+        _currentTask = 0; //for safety
+    }else{
+        executeStatement(_statements[_currentTask]);
+    }
 }

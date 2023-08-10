@@ -29,6 +29,8 @@ protected:
     void updateProgram();
     void updateServices();
 
+    inline SystemState systemState() const {return m_currentState;}
+
 private:
     //Async rountines
     void handleBootState();

@@ -45,7 +45,6 @@ OperatingSystem::OperatingSystem() : SystemBase(){
     loadService(&screen);       screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
     loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
     loadService(&motion);       screen.addBootProgress(10); screen.drawBootProgress("Linking motion...");
-    //loadService(&chrono);
     //loadService(&planner); screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
     loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
     loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
@@ -61,20 +60,36 @@ OperatingSystem::OperatingSystem() : SystemBase(){
 void OperatingSystem::update(){
 	SystemBase::update();
 
-    if(_waiting){ //TODO handle that properly
+    if(_busy){ 
         if(_currentJob->isPending() || _currentJob->isPaused()){
-        }else _waiting = false;
-    }else if(terminal.commandAvailable()){
-        interpreter.processScript(terminal.dequeCommand());
+            _currentJob->run();
+        }else _busy = false;
+    }else {
+        if( terminal.commandAvailable()){
+            interpreter.processScript(terminal.dequeCommand());
+        }
     }
+
+    currentProgram.run();
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
 	console.setLevel(level);
 }
 
+bool OperatingSystem::isBusy() const {
+    return _busy;
+}
+
+void OperatingSystem::wait(unsigned long time){
+    _busy = true;
+    timer.setDuration(time);
+    timer.start();
+    _currentJob = &timer;
+}
+
 void OperatingSystem::waitUntil(Job& obj){
-    _waiting = true;
+    _busy = true;
     _currentJob = &obj;
 }
 
