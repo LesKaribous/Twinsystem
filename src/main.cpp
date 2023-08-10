@@ -20,16 +20,8 @@ sleep
 
 void setup(){
 	os.setConsoleLevel(INFO);
-	os.update();
-	os.update();
-	os.update();
-	os.update();
-
-
-	delay(1000);
-	os.execute(script);
-
-
+	//delay(1000);
+	//os.execute(script); //async
 }
  
 void loop(){

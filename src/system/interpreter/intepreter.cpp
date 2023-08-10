@@ -87,7 +87,7 @@ Token Interpreter::nextToken() {
     // Get the next character
     char ch = input.charAt(pos);
 
-    os.console.info("Interpreter") << "Reading : \"" << ch << "\" at " << currentPos() << os.console.endl;
+    //os.console.info("Interpreter") << "Reading : \"" << ch << "\" at " << currentPos() << os.console.endl;
 
     // Handle different token types
     if (isDigit(ch)) {

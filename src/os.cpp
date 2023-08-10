@@ -27,6 +27,7 @@ void OperatingSystem::execute(String& script){
     Program p = interpreter.processScript(script);
 
     if(p.isValid()){
+        console.info("OS") << "Program is valid" << console.endl;
         currentProgram = p;
         p.start();
     }
@@ -66,11 +67,20 @@ void OperatingSystem::update(){
         }else _busy = false;
     }else {
         if( terminal.commandAvailable()){
-            interpreter.processScript(terminal.dequeCommand());
+            Program p = interpreter.processScript(terminal.dequeCommand());
+            if(p.isValid()){
+                console.info("OS") << "Command is valid" << console.endl;
+                p.start();
+                while (p.isPending()){
+                    p.run();
+                }
+            }else{
+                console.info("OS") << "Command is invalid" << console.endl;
+            }
         }
     }
 
-    currentProgram.run();
+    //currentProgram.run();
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
