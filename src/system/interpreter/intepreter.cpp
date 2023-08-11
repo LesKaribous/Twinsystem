@@ -11,6 +11,7 @@ Interpreter::Interpreter() : pos(0) {
     registerCommand("status", "Display all status");
     registerCommand("status(service)", "Display single status");
     registerCommand("go(x,y)", "Move to a specific position");
+    registerCommand("move(x,y,angle)", "Move to a specific position");
     registerCommand("turn(angle)", "Turn to a specific angle");
     registerCommand("pause", "Pause motion");
     registerCommand("resume", "Resume motion");
@@ -199,32 +200,34 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
 
     currentToken = nextToken(); // Consume the 'if' keyword
 
-    // Parse the condition (for simplicity, we'll assume it's an identifier)
-    if (currentToken.type != IDENTIFIER) {
-        // Handle error
-        os.console.error("Interpreter") << currentPos() << "Expected identifier, found : " << currentToken.value << HERE << os.console.endl;
+    // Parse the condition
+    String condition;
+    while (currentToken.type != EOL && currentToken.type != END_OF_SCRIPT) {
+        condition += currentToken.value;
+        currentToken = nextToken();
     }
-    ifStmt->condition = currentToken.value;
+    ifStmt->condition = condition;
     currentToken = nextToken(); // Consume the condition
 
     // Parse the true branch
-    while (currentToken.type != ELSE && currentToken.type != END) {
+    while (currentToken.type != ELSE && currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
         ifStmt->trueBranch.push_back(parseStatement());
     }
 
     // Parse the false branch (if present)
     if (currentToken.type == ELSE) {
         currentToken = nextToken(); // Consume the 'else' keyword
-        while (currentToken.type != END) {
+        while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
             ifStmt->falseBranch.push_back(parseStatement());
         }
     }
 
     if (currentToken.type != END) {
         // Handle error
+        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the 'end' keyword
-
     return ifStmt;
 }
 

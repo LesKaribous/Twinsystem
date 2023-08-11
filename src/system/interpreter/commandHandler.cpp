@@ -20,8 +20,12 @@ void CommandHandler::execute(const String& command, const String& args) {
         float x = arguments[0].toFloat();
         float y = arguments[1].toFloat();
         execute_go(x, y);
-        os.console.println(x);
-    } else if (command == "turn") {
+    } else if (command == "move") {
+        float x = arguments[0].toFloat();
+        float y = arguments[1].toFloat();
+        float a = arguments[2].toFloat();
+        execute_move(x, y, a);
+    }  else if (command == "turn") {
         execute_turn(args.toFloat());
     } else if (command == "pause") {
         execute_pause();
@@ -68,12 +72,15 @@ std::vector<String> CommandHandler::extractArguments(const String& args) {
     std::vector<String> arguments;
     size_t start = 0;
     size_t end = args.indexOf(',');
-    while (end != args.length()-1 && end != -1) {
-        arguments.push_back(args.substring(start, end));
-        start = end + 1;
-        end = args.indexOf(',', start);
+
+    if(end != -1){
+        while (end != args.length()-1 && end != -1) {
+            arguments.push_back(args.substring(start, end));
+            start = end + 1;
+            end = args.indexOf(',', start);
+        }
+        arguments.push_back(args.substring(start));
     }
-    arguments.push_back(args.substring(start));
     return arguments;
 }
 
@@ -123,6 +130,11 @@ void CommandHandler::execute_go(float x, float y){
 
 void CommandHandler::execute_turn(float angle){
     os.motion.turn(angle);
+    os.waitUntil(os.motion);
+}
+
+void CommandHandler::execute_move(float x, float y, float angle){
+    os.motion.move(Vec3(x, y, angle));
     os.waitUntil(os.motion);
 }
 

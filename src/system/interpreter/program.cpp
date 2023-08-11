@@ -4,6 +4,7 @@
 
 void Program::executeCommand(const CommandStatement& command) {
     // Construct the arguments string
+    os.console.info("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << os.console.endl;
     String args;
     for (size_t i = 0; i < command.arguments.size(); ++i) {
         args += command.arguments[i];
@@ -26,7 +27,80 @@ void Program::executeIfStatement(const IfStatement& ifStmt) {
     }
 }
 
+
+String symbols[9]{
+    "&&",
+    "||",
+    "==",
+    "!=",
+    "!",
+    "<=",
+    ">=",
+    "<",
+    ">"
+};
+
+int findClosestOperator(const String& str, int index, String& buf){
+    int min = str.length();
+    //THROW(str)
+    for(String test : symbols){
+        int r = str.indexOf(test, index);
+        if(r < min && r != -1){
+            min = r;
+            buf = test;
+        }
+    }
+
+    if(min == str.length()) return -1;
+    else return min;
+}
+
+void parseCondition(const String& raw, std::vector<String>& args, std::vector<String>& operators){
+    // Count the operators in condition
+    int i = 0;
+    int argc = 1;
+
+    String operatorBuf;
+    while(true){
+        i = findClosestOperator(raw, i, operatorBuf);
+        if(i != -1){
+            operators.push_back(operatorBuf);
+            if(operatorBuf != "!") argc++;
+            i++;
+        }else break;
+        
+    }; 
+
+    String subC = raw;
+    for(String test : symbols){
+        if(test == "!") subC.replace(test, "");
+        else subC.replace(test, "/");
+    }
+    subC.replace(" ", "");
+
+    int start = 0;
+    int end = subC.indexOf('/', start);
+    
+    // Find the start and end position of the argument at the specified index
+    for (int i = 0; i < argc; i++) {
+        if (end != -1){
+            args.push_back(subC.substring(start, end).trim());
+            start = end + 1;
+            end = subC.indexOf('/', start);
+        }
+
+    }
+    args.push_back(subC.substring(start, end).trim());
+}
+
 bool Program::evaluateCondition(const String& condition) {
+
+    std::vector<String> args;
+    std::vector<String> operators;
+
+    // Parse the condition into args and operators
+    parseCondition(condition, args, operators);
+
     if (condition == "hasObject") {
         return commandHandler.execute_testTRUE();
     } // ... Handle other conditions ...
@@ -52,8 +126,6 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 void Program::run(){
     if(isPending()){
         step();
-    }else{
-        THROW("OS Busy")
     }
 }
 

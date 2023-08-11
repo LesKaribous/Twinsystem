@@ -29,7 +29,7 @@ void OperatingSystem::execute(String& script){
     if(p.isValid()){
         console.info("OS") << "Program is valid" << console.endl;
         currentProgram = p;
-        p.start();
+        currentProgram.start();
     }
 
 }
@@ -77,10 +77,8 @@ void OperatingSystem::update(){
             }else{
                 console.info("OS") << "Command is invalid" << console.endl;
             }
-        }
+        }else currentProgram.run();
     }
-
-    //currentProgram.run();
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
@@ -99,7 +97,7 @@ void OperatingSystem::wait(unsigned long time){
 }
 
 void OperatingSystem::waitUntil(Job& obj){
-    _busy = true;
+    _busy = true; 
     _currentJob = &obj;
 }
 

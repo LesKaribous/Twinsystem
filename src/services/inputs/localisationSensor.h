@@ -17,12 +17,10 @@ public:
     }
 
     void read() override{
-        getDitance();
+        getDistance();
     }
 
-    float getDistance() const{return _distance;}
-
-    virtual float getDitance(){
+    float getDistance(){
         int16_t t = pulseIn(_pin, HIGH);
         
         if (t == 0)
@@ -39,6 +37,7 @@ public:
             // Limit minimum distance to 0.
             if (_distance < 0) { _distance = 0; } 
         }
+        return _distance;
     }
 
 

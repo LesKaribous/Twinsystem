@@ -18,6 +18,7 @@ public:
 
     //Motion
     void execute_go(float x, float y);
+    void execute_move(float x, float y, float angle);
     void execute_turn(float angle);
     void execute_pause();
     void execute_resume();
