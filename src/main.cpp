@@ -1,6 +1,6 @@
 #include "os.h"
 
-/*
+
 String script = R"(
 #Test Script
 disable(neopixel)
@@ -17,8 +17,9 @@ go(500,0)
 end
 sleep
 )";
-*/
 
+
+/*
 String script = R"(
 
 disable(neopixel)
@@ -31,10 +32,11 @@ enable(neopixel)
 
 )";
 
-
+*/
 
 void setup(){
 	os.setConsoleLevel(INFO);
+	os.console.prettyPrint(script);
 	//delay(1000);
 	//os.execute(script); //async
 }

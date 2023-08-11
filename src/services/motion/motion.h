@@ -27,7 +27,6 @@ public:
     void complete() override;
     void forceCancel();
 
-
     Vec3 estimatePosition(Vec3 start, Vec3 steps) const;
 
     void go(Vec2);
@@ -45,11 +44,9 @@ public:
     void setRelative();
 
     //Getters
+    Vec2 getAccelData() const;
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
-    Vec3 getRelTarget() const;  //Absolute mm, mm, rad
     Vec3 getAbsPosition() const;//Absolute mm, mm, rad
-
-    Vec3 getCurrentSpeed() const; // Get the current speed in mm/s, mm/s, rad/s
 
     float getTargetDirection() const;
     float getAbsoluteTargetDirection() const;
@@ -59,7 +56,6 @@ public:
     bool isRotating() const;
     bool isSleeping() const;
     bool isMoving() const;
-
 
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
     void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
@@ -75,9 +71,7 @@ public:
     void move(Vec3 target);
 private:
     void pid();
-    Vec3 getCurrentStepsPosition();
 
-    
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
@@ -89,9 +83,12 @@ private:
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
+
+    Vec2 accelCorr; //Correct acceleration bias
+
     //PID
-    Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm, rad 
-    Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm, rad
+    Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm
+    Vec3 _integral 	  = { 0, 0, 0}; //Absolute mm, mm
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};

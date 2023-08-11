@@ -58,6 +58,12 @@ ConsoleStream& ConsoleStream::operator<<(long i) {
 	return *this;
 }
 
+ConsoleStream& ConsoleStream::operator<<(size_t i) {
+	if (_ignored) return *this;
+	os.console.print(i);
+	return *this;
+}
+
 ConsoleStream& ConsoleStream::operator<<(float i) {
 	if (_ignored) return *this;
 	os.console.print(i);

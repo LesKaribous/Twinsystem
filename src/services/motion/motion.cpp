@@ -34,7 +34,7 @@ Motion::Motion() : Service(MOTION),
 	_absolute = true;
 
     pinMode(Pin::Stepper::enable, OUTPUT);
-    disengage();
+    
 
     _sA.setPosition(0);
     _sB.setMaxSpeed(0);
@@ -60,15 +60,15 @@ Motion::Motion() : Service(MOTION),
     //os.screen.y.SetValue(_position.y);
     //os.screen.z.SetValue(_position.z);
 
+    /* Initialise the sensor */
+    while(!bno.begin()){
+        /* There was a problem detecting the BNO055 ... check your connections */
+        os.console.error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << os.console.endl;
+    }
+    bno.setExtCrystalUse(true);
 
-
-      /* Initialise the sensor */
-  while(!bno.begin())
-  {
-    /* There was a problem detecting the BNO055 ... check your connections */
-    os.console.error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << os.console.endl;
-  }
-  bno.setExtCrystalUse(true);
+    disengage();
+    os.console.info("Motion") << "Calibration settings : " << accelCorr << "\n";
 }
 
 Motion::~Motion(){}
@@ -78,16 +78,16 @@ void Motion::run(){
     update();
 }
 
+
 void Motion::update(){
 
     if(m_enabled && !_sleeping && !isPaused()){
-        
-        if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.05){
-            //os.console.info("update") << "_position : "<< _position << os.console.endl;
-            //os.console.info("update") << "_target : "<< _target << os.console.endl;
+        pid();
+
+        if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.01){
             _position = _target;
             complete();
-        }else if(isMoving()) pid();
+        }
         
         os.screen.x.SetValue(_position.x);
         os.screen.y.SetValue(_position.y);
@@ -96,53 +96,59 @@ void Motion::update(){
     }
 }
 
+
 void Motion::pid(){
     static unsigned lastTick = 0;
     if (millis() - lastTick > Settings::Motion::PID_PERIOD){
+        if(lastTick == 0) lastTick = millis() - Settings::Motion::PID_PERIOD;
+
+        float dt = (millis() - lastTick)/1000.0;
 
         //os.console.info("Motion") << "PID period : "<< int(millis() - lastTick) << "ms" << os.console.endl;
+        Vec3 kP = {3.0, 3.0, 3.0};//Settings::Motion::kP;
+        Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
+        Vec3 kD = {0.0, 0.0, 0.0};//Settings::Motion::kD;
 
-        float dt = float(Settings::Motion::PID_PERIOD)/1000.0; //seconds
-        float kP = Settings::Motion::kP;
-        float kI = Settings::Motion::kI;
-        float kD = Settings::Motion::kD;
+        //Stable
+        //Vec3 kP = {2.0, 2.0, 2.0};//Settings::Motion::kP;
+        //Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
+        //Vec3 kD = {0.4, 0.4, 0.0};//Settings::Motion::kD;
+
+        kP /= 10000.0;
+        kI /= 10000.0;
+        kD /= 10000.0;
+        
 
         Vec3 lastSteps = Vec3(_sA.getPosition(), _sB.getPosition(), _sC.getPosition());
         _sA.setPosition(0); _sB.setPosition(0); _sC.setPosition(0);//reset steps history
-
         _position = estimatePosition(_position, lastSteps); //in world frame of reference
-        //os.console.print(">p:"); os.console.println(_position.mag());
-        //os.console.print(">t:"); os.console.println(_target.mag());
-        
-        sensors_event_t event;
-        bno.getEvent(&event);
 
-        /* Display the floating point data */
-
-        _position.c = -DEG_TO_RAD * event.orientation.x;
-        //os.console.info("Motion") << "BNO: " << event.orientation.x  << os.console.endl;
+        sensors_event_t eventAngular;
+        bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+        _position.c = -DEG_TO_RAD * eventAngular.orientation.x;
         while(_position.c > PI) _position.c -= 2.0f*PI;
         while(_position.c <= -PI) _position.c += 2.0f*PI;
-        //os.console.info("Motion") << "TTheta: " << _position.c * RAD_TO_DEG << os.console.endl;
 
+        {
+        os.console.print(">px:"); os.console.println(_position.x);
+        os.console.print(">tx:"); os.console.println(_target.x);
+        os.console.print(">py:"); os.console.println(_position.y);
+        os.console.print(">ty:"); os.console.println(_target.y);
+        os.console.print(">pa:"); os.console.println(_position.c);
+        os.console.print(">ta:"); os.console.println(_target.c);
+        }
 
-        Vec3 error = _target - (_position); //relative target
-       
+        Vec3 error = Vec3(_target) - Vec3(_position);
         _integral  += error * dt; //Absolute mm, mm, rad
         Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-        _lastError = error; //Absolute mm, mm, rad
-
+        _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
 
         corr.rotateZ(_position.c); //to robot frame of reference
         corr = targetToSteps(corr);
 
-        Vec3 factor = { std::max(-1.0f, std::min(1.0f, corr.a)),// limit to -1.0..1.0
-                        std::max(-1.0f, std::min(1.0f, corr.b)),
-                        std::max(-1.0f, std::min(1.0f, corr.c))};
-
-        _sAController.overrideSpeed(factor.a); // set new speed
-        _sBController.overrideSpeed(factor.b); // set new speed
-        _sCController.overrideSpeed(factor.c); // set new speed
+        _sAController.overrideSpeed(corr.a); // set new speed
+        _sBController.overrideSpeed(corr.b); // set new speed
+        _sCController.overrideSpeed(corr.c); // set new speed
 
         lastTick = millis();
     }
@@ -266,7 +272,7 @@ void  Motion::move(Vec3 target){ //target is in world frame of reference
 
     //os.console.info("Motion") << "Current position : " << getAbsPosition() << os.console.endl;
     //os.console.info("Motion") << "Current target   : " << getAbsTarget() << os.console.endl;
-    
+     
 
     _lastError = _integral = Vec3(0); //Absolute mm, mm, rad
 
@@ -312,7 +318,7 @@ Vec3  Motion::estimatePosition(Vec3 start, Vec3 steps) const{
     relativePosition.c /= _calibration.c;
 
     //os.console.info("Motion") << relativePosition << os.console.endl;
-    return start.add(relativePosition.rotateZ(-relativePosition.c)); //To world frame of reference
+    return start.add(relativePosition.rotateZ(-_position.c)); //To world frame of reference
 }
 
 
@@ -380,6 +386,10 @@ void Motion::setFeedrate(int p){
 
 Vec3 Motion::getAbsPosition() const{
     return _position;
+}
+
+Vec2 Motion::getAccelData() const{
+    
 }
 
 Vec3  Motion::getAbsTarget() const{

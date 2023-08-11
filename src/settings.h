@@ -29,7 +29,7 @@ namespace Settings{
         GREEN  = true;
 
         constexpr unsigned long 
-        DURATION = 20*1000,        //100s
+        DURATION = 100*1000,        //100s
         NEARLY_FINISH = 8000,       //8s before the end
         ENDMATCH = 200;             //200ms before the end
         
@@ -123,10 +123,10 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 5000, // Old : 4000
-            SPEED = 10000, // Old : 5000
+            ACCEL = 20000, // Old : 5000
+            SPEED = 5000, // Old : 5000
             PULLIN = 1000,
-            PID_PERIOD = 10;//ms
+            PID_PERIOD = 30;//ms
     }
 
     namespace Stepper{
@@ -143,7 +143,6 @@ namespace Settings{
 
         constexpr u_int8_t 
         STEP_MODE = 8;
-            
     }
 
     namespace Lidar{
