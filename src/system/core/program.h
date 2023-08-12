@@ -39,7 +39,7 @@ class Program : public Job {
 
     // Evaluation functions
     bool evaluateCondition(const String& condition);
-    float evaluateExpression(const String& expression);
+    String evaluateExpression(const String& expression);
     
 public:
 

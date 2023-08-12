@@ -274,13 +274,10 @@ Vec2::operator String() const{
 }
 
 float& Vec2::operator[](int i){
-    if( i > 2 ) {
-        os.console.error("Vec2") << "Index out of bounds" << os.console.endl; 
-        return x;
-    }
-    
     if(i == 0) return x;
     if(i == 1) return y;
+    os.console.error("Vec2") << "Index out of bounds" << os.console.endl; 
+    return x;
 }
 
 Vec2 operator+(const Vec2& a, const Vec2& b){

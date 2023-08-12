@@ -35,8 +35,7 @@ public:
     static String toString(ServiceID);
 
     inline bool debug() const {return m_debug;}
-    inline void enableDebug(){m_debug = true;}
-    inline void disableDebug(){m_debug = false;}
+    inline void toggleDebug(){m_debug = !m_debug;}
 
 protected:
     const ServiceID m_ID;

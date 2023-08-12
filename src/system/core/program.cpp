@@ -4,7 +4,7 @@
 
 void Program::executeCommand(const CommandStatement& command) {
     // Construct the arguments string
-    os.console.info("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << os.console.endl;
+    os.console.trace("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << os.console.endl;
     String args;
     for (size_t i = 0; i < command.arguments.size(); ++i) {
         args += command.arguments[i];
@@ -51,7 +51,7 @@ int findClosestOperator(const String& str, int index, String& buf){
         }
     }
 
-    if(min == str.length()) return -1;
+    if((unsigned int) min == str.length()) return -1;
     else return min;
 }
 

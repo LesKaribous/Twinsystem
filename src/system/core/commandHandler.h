@@ -33,6 +33,10 @@ public:
     void execute_status(); //Display all status
     void execute_status(const String& service); //Display single status
 
+    void execute_debug(); //Display all status
+    void execute_debug(const String& service); //Display single status
+
+
     //Motion
     void execute_go(float x, float y);
     void execute_move(float x, float y, float angle);

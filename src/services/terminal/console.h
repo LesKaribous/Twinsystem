@@ -12,10 +12,8 @@ public:
 	Console(ConsoleLevel lvl = ConsoleLevel::INFO);
 	~Console(){};
 
-	bool isIgnored(ServiceID);
 	inline ConsoleLevel getLevel() { return m_level; };
 	inline void setLevel(ConsoleLevel l) { m_level = l; };
-
 
 	//Use the current log level
 	ConsoleStream info(const String& origin);
@@ -31,9 +29,6 @@ public:
 	ConsoleStream trace(const ServiceID& origin = NOT_A_SERVICE);
 	ConsoleStream success(const ServiceID& origin = NOT_A_SERVICE);
 
-
-
-
 	void plot(const String& name, String s);
 
 	void print(const String& s);
@@ -43,5 +38,4 @@ public:
 private:
 	void write(const char* str);
  	ConsoleLevel m_level;
-	std::vector<ServiceID> m_activeServices;
 };

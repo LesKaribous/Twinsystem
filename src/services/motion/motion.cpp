@@ -3,16 +3,6 @@
 #include "system/math/kinematics.h"
 #include "os.h"
 
-
-
-
-/* Set the delay between fresh samples */
-#define BNO055_SAMPLERATE_DELAY_MS (100)
-
-
-
-
-
 Motion::Motion() : Service(MOTION),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
@@ -102,37 +92,26 @@ void Motion::pid(){
         if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
         lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
     }
-    
 
     float dt = (millis() - lastPIDTick)/1000.0;
 
-    //os.console.info("Motion") << "PID period : "<< int(millis() - lastTick) << "ms" << os.console.endl;
-    Vec3 kP = {3.0, 3.0, 3.5};//Settings::Motion::kP;
-    Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
-    Vec3 kD = {0.0, 0.0, 0.0};//Settings::Motion::kD;
+    Vec3 kP = Settings::Motion::kP;
+    Vec3 kI = Settings::Motion::kI;
+    Vec3 kD = Settings::Motion::kD;
 
-    //Stable
-    //Vec3 kP = {2.0, 2.0, 2.0};//Settings::Motion::kP;
-    //Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
-    //Vec3 kD = {0.4, 0.4, 0.0};//Settings::Motion::kD;
-
-    kP /= 10000.0;
-    kI /= 10000.0;
-    kD /= 10000.0;
-    
     Vec3 lastSteps = getLastSteps();
     resetSteps();
 
-    _position = estimatePosition(_position, lastSteps); //in world frame of reference
     _position.c = getOrientation();
+    _position = estimatePosition(_position, lastSteps); //in world frame of reference
 
     if(debug()){
-        os.console.plot("px:",_position.x);
-        os.console.plot("tx:",_target.x);
-        os.console.plot("py:",_position.y);
-        os.console.plot("ty:",_target.y);
-        os.console.plot("pa:",_position.c);
-        os.console.plot("ta:",_target.c);
+        os.console.plot("px",_position.x);
+        os.console.plot("tx",_target.x);
+        os.console.plot("py",_position.y);
+        os.console.plot("ty",_target.y);
+        os.console.plot("pa",_position.c);
+        os.console.plot("ta",_target.c);
     }
 
     Vec3 error = Vec3(_target) - Vec3(_position);
@@ -141,7 +120,6 @@ void Motion::pid(){
     _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
 
     corr.rotateZ(_position.c); //to robot frame of reference
-    corr += _controlPoint;
     corr = targetToSteps(corr);
 
     _sAController.overrideSpeed(corr.a); // set new speed
@@ -304,19 +282,16 @@ Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
     return relTarget;
 }
 
-Vec3  Motion::estimatePosition(Vec3 start, Vec3 steps) const{
-    Vec3 relativePosition = fk(steps);
+Vec2  Motion::estimatePosition(Vec3 start, Vec3 steps) const{
+    Vec2 relativePosition = fk(steps);
     
     relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
     relativePosition.b /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
-    relativePosition.c /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
-
     relativePosition.a /= _calibration.a;
     relativePosition.b /= _calibration.b;
-    relativePosition.c /= _calibration.c;
 
     //os.console.info("Motion") << relativePosition << os.console.endl;
-    return start.add(relativePosition.rotateZ(-_position.c)); //To world frame of reference
+    return start + relativePosition.rotate(-_position.c); //To world frame of reference
 }
 
 

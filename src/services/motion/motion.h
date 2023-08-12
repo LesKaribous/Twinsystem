@@ -35,7 +35,7 @@ public:
     void complete() override;
     void forceCancel();
 
-    Vec3 estimatePosition(Vec3 start, Vec3 steps) const;
+    Vec2 estimatePosition(Vec3 start, Vec3 steps) const;
 
     void resetCompass(); //zero orientation
     float getOrientation(); //rad

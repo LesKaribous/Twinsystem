@@ -139,6 +139,13 @@ float& Vec3::operator[](int i){
     return x;
 }
 
+
+Vec3& Vec3::operator= (const Vec2& u){
+    a=u.a;
+    b=u.b;
+    return *this;
+}
+
 Vec3& Vec3::operator= (const Vec3& u){
     a=u.a;
     b=u.b;

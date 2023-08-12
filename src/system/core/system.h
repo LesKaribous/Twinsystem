@@ -33,6 +33,8 @@ public :
 
     bool hasService(ServiceID) const;
     bool debug(ServiceID);
+    void toggleDebug(ServiceID s);
+
 
 protected:
     Interpreter interpreter;

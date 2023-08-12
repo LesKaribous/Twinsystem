@@ -116,9 +116,9 @@ namespace Settings{
         // will occur in the future. 
 
         //https://en.wikipedia.org/wiki/PID_controller
-        constexpr float kP = 2.0 /10000.0;            // (P)roportional constant of the regulator needs to be adjusted
-        constexpr float kI = 0.2 /10000.0;            // 0.0
-        constexpr float kD = 0.0 /10000.0;            // 0.2
+        const Vec3 kP = Vec3(3.0, 3.0, 3.5) / 10000.0;
+        const Vec3 kI = Vec3(0.0, 0.0, 0.0) / 10000.0;
+        const Vec3 kD = Vec3(0.0, 0.0, 0.0) / 10000.0;
 
         //0.28 ok
         //old values 0.0004

@@ -46,14 +46,6 @@ ConsoleStream Console::success(const String& origin) {
 }
 
 
-
-bool Console::isIgnored(ServiceID id){
-	for(ServiceID s : m_activeServices){
-		if(s == id) return true;
-	}
-	return false;
-}
-
 void header(){
 	Serial.println("");
 	Serial.println("  _______       _                     _"                        );
@@ -74,7 +66,6 @@ void header(){
 
 }
 
-
 Console::Console(ConsoleLevel lvl){
 	Serial.begin(115200);
 	setLevel(lvl);
@@ -85,9 +76,8 @@ void Console::write(const char* str) {
 	Serial.write(str);
 }
 
-
 void Console::plot(const String& n, String s){
-	os.console.print(n); os.console.println(s);
+	os.console.print(">" + n + ":"); os.console.println(s);
 }
 
 void Console::print(const String& s){

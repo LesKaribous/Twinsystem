@@ -62,6 +62,11 @@ bool SystemBase::debug(ServiceID s){
         return false;
 }
 
+void SystemBase::toggleDebug(ServiceID s){
+    if(hasService(s))
+        m_services[s]->toggleDebug();
+}
+
 void SystemBase::execute(String& script){
     m_program = interpreter.processScript(script);
     if(m_program.isValid()){

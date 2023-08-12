@@ -39,9 +39,38 @@ OperatingSystem::OperatingSystem() : SystemBase(){
     loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
     //loadService(&localisation);
 
+    registerCommands();
+
     screen.addBootProgress(30);
     screen.drawBootProgress("Boot complete...");
     screen.setPage(Page::INIT);
+}
+
+void OperatingSystem::registerCommands(){
+
+    // Registering commands with their syntax and description
+    CommandHandler::registerCommand("enable(service)", "Enable a specific service");
+    CommandHandler::registerCommand("disable(service)", "Disable a specific service");
+    CommandHandler::registerCommand("status", "Display all status");
+    CommandHandler::registerCommand("status(service)", "Display single status");
+    CommandHandler::registerCommand("go(x,y)", "Move to a specific position");
+    CommandHandler::registerCommand("move(x,y,angle)", "Move to a specific position");
+    CommandHandler::registerCommand("turn(angle)", "Turn to a specific angle");
+    CommandHandler::registerCommand("pause", "Pause motion");
+    CommandHandler::registerCommand("resume", "Resume motion");
+    CommandHandler::registerCommand("cancel", "Cancel motion");
+    CommandHandler::registerCommand("sleep", "Put motion to sleep");
+    CommandHandler::registerCommand("align(side,angle)", "Align to a specific side and angle");
+    CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode");
+    CommandHandler::registerCommand("setRelative", "Set motion to relative mode");
+    CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
+    CommandHandler::registerCommand("grab(side)", "Grab object using actuator");
+    CommandHandler::registerCommand("ungrab(side)", "Ungrab object using actuator");
+    CommandHandler::registerCommand("open(side)", "Open actuator on a specific side");
+    CommandHandler::registerCommand("close(side)", "Close actuator on a specific side");
+    CommandHandler::registerCommand("openTrap(side)", "Open trap on a specific side");
+    CommandHandler::registerCommand("closeTrap(side)", "Close trap on a specific side");
+    CommandHandler::registerCommand("help", "Display help");
 }
 
 void OperatingSystem::update(){
