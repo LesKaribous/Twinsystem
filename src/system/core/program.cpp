@@ -17,11 +17,30 @@ void Program::executeCommand(const CommandStatement& command) {
     commandHandler.execute(command.name, args);
 }
 
-void Program::executeIfStatement(const IfStatement& ifStmt) {
-    bool conditionResult = evaluateCondition(ifStmt.condition);
+String Program::evaluateExpression(const String& e){
+    Expression exp(e);
+    return exp.evaluate();
+}
+
+String Program::evaluateExpression(Expression& e){
+    return e.evaluate();
+}
+
+void Program::executeIfStatement(IfStatement& ifStmt) {
+    
+    String r = evaluateExpression(ifStmt.condition);
+    bool conditionResult = false;
+
+    if(r.trim().equalsIgnoreCase("true")){
+        conditionResult = true;
+    }else if(r.trim().equalsIgnoreCase("false")){
+        conditionResult = false;
+    }else{
+         os.console.error("Program") << "Error fired during if statement expression evaluation" << os.console.endl;
+         return;
+    }
 
     const auto& branch = conditionResult ? ifStmt.trueBranch : ifStmt.falseBranch;
-
     for (const auto& statement : branch) {
         executeStatement(statement);
     }
@@ -93,21 +112,6 @@ void parseCondition(const String& raw, std::vector<String>& args, std::vector<St
     args.push_back(subC.substring(start, end).trim());
 }
 
-bool Program::evaluateCondition(const String& condition) {
-
-    std::vector<String> args;
-    std::vector<String> operators;
-
-    // Parse the condition into args and operators
-    parseCondition(condition, args, operators);
-
-    if (condition == "hasObject") {
-        return commandHandler.execute_testTRUE();
-    } // ... Handle other conditions ...
-
-    // Handle error if condition is not recognized
-    return false;
-}
 
 void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
     switch (statement->type) {

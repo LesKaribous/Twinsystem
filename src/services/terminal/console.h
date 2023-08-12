@@ -34,6 +34,7 @@ public:
 	void print(const String& s);
 	void println(const String& s);
 	void prettyPrint(const String& s);
+	void line();
 
 private:
 	void write(const char* str);

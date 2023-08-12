@@ -18,14 +18,13 @@ private :
 
 protected :
     void execute(const String& command, const String& args);
-    static std::vector<CommandInfo> _commands;
 
 public:
     friend class Program;
     CommandHandler();
 
     static void registerCommand(const String& syntax, const String& description);
-    static const std::vector<CommandInfo>& commands();
+    static std::map<String, CommandInfo>& getCommands();
 
     //Service
     void execute_enable(const String& service);

@@ -1,17 +1,21 @@
 #include "commandHandler.h"
 #include "os.h"
 
-std::vector<CommandInfo> CommandHandler::_commands;
- 
 CommandHandler::CommandHandler(){}
-
 void CommandHandler::registerCommand(const String& syntax, const String& description) {
     int numberOfArguments = std::count(syntax.begin(), syntax.end(), ',') + 1;
-    _commands.push_back({syntax, description, numberOfArguments});
+    int i = syntax.indexOf("(");
+    String name = syntax;
+    if(i != -1)
+        name = syntax.substring(0,i);
+    
+    
+    getCommands()[name] = { syntax, description, numberOfArguments};
 }
 
-const std::vector<CommandInfo>& CommandHandler::commands() {
-    return _commands;
+std::map<String, CommandInfo>& CommandHandler::getCommands() {
+    static std::map<String, CommandInfo> commands;
+    return commands;
 }
 
 void CommandHandler::execute(const String& command, const String& args) {
@@ -245,8 +249,8 @@ void CommandHandler::execute_closeTrap(const String& side){
 void CommandHandler::execute_help(){
     os.console.println("_________________________________________");
     os.console.println("Available commands : ");
-    for(const CommandInfo& c : commands()){
-        os.console.println(c.syntax + " : " + c.description);
+    for(const auto& c : getCommands()){
+        os.console.println(c.second.syntax + " : " + c.second.description);
     }
     os.console.println("_________________________________________");
 }

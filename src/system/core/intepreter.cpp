@@ -35,9 +35,9 @@ String Interpreter::currentPos(){
 }
 
 void Interpreter::displaySyntaxError(const String& commandName) {
-    for (const auto& info : CommandHandler::commands()) {
-        if (info.syntax.startsWith(commandName)) {
-            os.console.error("Interpreter") << "Invalid syntax for " << commandName << ". Expected: " << info.syntax << os.console.endl;
+    for (const auto& info : CommandHandler::getCommands()) {
+        if (info.second.syntax.startsWith(commandName)) {
+            os.console.error("Interpreter") << "Invalid syntax for " << commandName << ". Expected: " << info.second.syntax << os.console.endl;
             return;
         }
     }
@@ -165,7 +165,7 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
 }
 
 std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
-    auto ifStmt = std::make_shared<IfStatement>();
+    
 
     currentToken = nextToken(); // Consume the 'if' keyword
 
@@ -175,7 +175,9 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
         condition += currentToken.value;
         currentToken = nextToken();
     }
-    ifStmt->condition = condition;
+
+    os.console.println(condition);
+    auto ifStmt = std::make_shared<IfStatement>(condition);
     currentToken = nextToken(); // Consume the condition
 
     // Parse the true branch

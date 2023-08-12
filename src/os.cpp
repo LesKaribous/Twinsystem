@@ -77,10 +77,13 @@ void OperatingSystem::update(){
 	SystemBase::update();
 
     if( terminal.commandAvailable() > 0){
-        Program p = interpreter.processScript(terminal.dequeCommand());
-        if(p.isValid()){
-            execute(p);
-        }
+        //Program p = interpreter.processScript(terminal.dequeCommand());
+        //if(p.isValid()){
+        //    execute(p);
+        //}
+        String str = terminal.dequeCommand();
+        Expression e(str.trim());
+        console.print(e.evaluate());
     }
 }
 

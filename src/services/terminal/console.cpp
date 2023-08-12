@@ -90,6 +90,7 @@ void Console::println(const String& s){
 
 void Console::prettyPrint(const String& s){
 	int l = 0;
+	line();
 	Serial.print(l);
 	Serial.print(":\t");
 	for (size_t i = 0; i <= s.length(); i++){
@@ -101,5 +102,10 @@ void Console::prettyPrint(const String& s){
 			Serial.print(s[i]);
 		}
 	}
-	Serial.print(s[s.length() - 1]);
+	Serial.println(s[s.length() - 1]);
+	line();
+}
+
+void Console::line(){
+	println("_________________________________________");
 }

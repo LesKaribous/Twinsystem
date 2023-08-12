@@ -2,6 +2,7 @@
 #include "system/core/job.h"
 #include "system/core/lib.h"
 #include "commandHandler.h"
+#include "expression.h"
 
 enum StatementType { IGNORED_STATEMENT, COMMAND_STATEMENT, IF_STATEMENT };
 // Base class for statements
@@ -18,8 +19,8 @@ struct CommandStatement : public Statement {
 };
 
 struct IfStatement : public Statement {
-    IfStatement() { type = IF_STATEMENT; }
-    String condition;
+    IfStatement(const String& exp) : condition(exp){ type = IF_STATEMENT; }
+    Expression condition;
     std::vector<std::shared_ptr<Statement>> trueBranch;
     std::vector<std::shared_ptr<Statement>> falseBranch;
 };
@@ -35,11 +36,11 @@ class Program : public Job {
     // Execution functions
     void executeStatement(const std::shared_ptr<Statement>& statement);
     void executeCommand(const CommandStatement& command);
-    void executeIfStatement(const IfStatement& ifStmt);
+    void executeIfStatement(IfStatement& ifStmt);
 
     // Evaluation functions
-    bool evaluateCondition(const String& condition);
-    String evaluateExpression(const String& expression);
+    String evaluateExpression(const String& e);
+    String evaluateExpression(Expression& expression);
     
 public:
 

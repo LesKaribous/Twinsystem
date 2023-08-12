@@ -2,16 +2,7 @@
 #include "system/core/lib.h"
 #include "commandHandler.h"
 #include "program.h"
-
-// Token types
-enum TokenType { COMMAND, LPAREN, RPAREN, COMMA, NUMBER, IDENTIFIER, IF, ELSE, END, COMMENT, EOL, END_OF_SCRIPT };
-
-// Token structure
-struct Token {
-    TokenType type;
-    String value;
-};
-
+#include "token.h"
 
 class Interpreter {
 public:
