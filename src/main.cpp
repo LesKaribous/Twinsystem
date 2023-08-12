@@ -19,20 +19,7 @@ sleep
 )";
 
 
-/*
-String script = R"(
 
-disable(neopixel)
-setAbsPosition(0,0,0)
-go(100,0)
-turn(60)
-grab(AB)
-sleep
-enable(neopixel)
-
-)";
-
-*/
 
 void setup(){
 	os.setConsoleLevel(INFO);

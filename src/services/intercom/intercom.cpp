@@ -69,7 +69,7 @@ bool Intercom::closeRequest(const uint32_t& uid) {
         return true;
     }else{
         os.console.warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid) << " does not exist" << os.console.endl;
-        false;
+        return false;
     };
 }
 

@@ -1,5 +1,6 @@
 #include "system.h"
 #include "settings.h"
+#include "os.h"
 
 SystemBase::SystemBase(){
     m_currentState = BOOT;
@@ -10,43 +11,95 @@ SystemBase::~SystemBase(){
 }
 
 void SystemBase::enable(ServiceID id) {
-    for(auto& mod : m_services){
-        if(mod->getID() == id){
-            mod->enable();
-        }
-    }
+    if(hasService(id)) m_services[id]->enable();
+    else os.console.error("System") << "Service : " << Service::toString(id) << " not found." << os.console.endl;
 }
 
 void SystemBase::disable(ServiceID id) {
-    for(auto& mod : m_services){
-        if(mod->getID() == id){
-            mod->disable();
-        }
-    }
+    if(hasService(id)) m_services[id]->disable();
+    else os.console.error("System") << "Service : " << Service::toString(id) << " not found." << os.console.endl;
+}
+
+bool SystemBase::hasService(ServiceID s ) const {
+    return m_services.find(s) != m_services.end();
 }
 
 void SystemBase::loadService(Service* s){
-    //Console::info("System") << m->toString() << " loaded." << Console::endl;
-    m_services.push_back(s);
+    if(hasService(s->getID())){
+        os.console.error("System") << s->toString() << " loaded." << Console::endl;
+    }else m_services[s->getID()] = s;
 }
 
 bool SystemBase::statusService(ServiceID serviceID){
-    for(auto& mod : m_services){
-        if(mod->getID() == serviceID){
-            return mod->isEnabled();
-        }
+    if(hasService(serviceID))
+        return m_services[serviceID]->isEnabled();
+    else
+        return false;
+}
+
+
+bool SystemBase::isBusy() const {
+    return m_busy;
+}
+
+void SystemBase::wait(unsigned long time){
+    m_busy = true;
+    m_timer.setDuration(time);
+    m_timer.start();
+    m_currentJob = &m_timer;
+}
+
+void SystemBase::waitUntil(Job& obj){
+    m_busy = true; 
+    m_currentJob = &obj;
+}
+
+
+bool SystemBase::debug(ServiceID s){
+    if(hasService(s))
+        return m_services[s]->debug();
+    else
+        return false;
+}
+
+void SystemBase::execute(String& script){
+    m_program = interpreter.processScript(script);
+    if(m_program.isValid()){
+        m_currentState = RUNNING;
+        m_program.start();
+    }else{
+        m_currentState = IDLE;
     }
 }
 
+void SystemBase::execute(Program& prgm){
+    m_program = prgm;
+    if(m_program.isValid()){
+        m_currentState = RUNNING;
+        m_program.start();
+    }else{
+        m_currentState = IDLE;
+    }
+}
 
 void SystemBase::updateProgram(){
-    //TODO: update program
+    if(m_busy){ 
+        if(m_currentJob->isPending() || m_currentJob->isPaused()){
+            m_currentJob->run(); //System is busy
+        }else{
+            m_busy = false;
+        }
+    }
+    
+    if(!m_busy){
+        if(m_program.isValid() && m_program.isPending()) m_program.step(); //Last statement finished step the program
+    }
 }
 
 void SystemBase::updateServices(){
-    for(auto& service : m_services) {
-        if(service->isEnabled()) {
-            service->update();
+    for(const auto& service : m_services) {
+        if(service.second->isEnabled()) {
+            service.second->update();
         }
     }
 }

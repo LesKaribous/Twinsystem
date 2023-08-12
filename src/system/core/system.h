@@ -3,8 +3,9 @@
 #include "system/core/job.h"
 #include "system/core/event.h"
 
+#include "system/timer/timer.h"
 #include "system/core/service.h"
-
+#include "system/core/interpreter.h"
 
 enum SystemState{
     BOOT,    // booting
@@ -15,6 +16,7 @@ enum SystemState{
 
 class SystemBase{
 public :
+
     SystemBase();
     ~SystemBase();
 
@@ -22,7 +24,19 @@ public :
     void disable(ServiceID serviceID);
     bool statusService(ServiceID serviceID);
 
+    void execute(String& script);
+    void execute(Program& script);
+
+    bool isBusy() const;
+    void wait(unsigned long time);  //async
+    void waitUntil(Job& obj);       //async
+
+    bool hasService(ServiceID) const;
+    bool debug(ServiceID);
+
 protected:
+    Interpreter interpreter;
+
     SystemState getState();
     void loadService(Service* m);
     void update();
@@ -38,8 +52,13 @@ private:
     void handleRunningState();
     void handleStoppedState();
 
-    //Program* program;
-    std::vector<Service*> m_services;
+    std::map<ServiceID, Service*> m_services;
+    Program m_program;
     SystemState m_currentState;
+
+    //Utils
+    Timer m_timer;
     
+    bool m_busy = false;
+    Job* m_currentJob = nullptr;
 };

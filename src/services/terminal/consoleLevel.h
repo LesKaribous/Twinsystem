@@ -3,10 +3,9 @@
 enum ConsoleLevel {
     VERBOSE,
     INFO,
-    WARNING,
     SUCCESS,
+    WARNING,
     CRITICAL,
-    NO_HEADER,
 };
 
 

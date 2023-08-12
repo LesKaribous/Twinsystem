@@ -4,32 +4,6 @@
 // Constructor
 Interpreter::Interpreter() : pos(0) {
     // Service commands
-
-    // Registering commands with their syntax and description
-    registerCommand("enable(service)", "Enable a specific service");
-    registerCommand("disable(service)", "Disable a specific service");
-    registerCommand("status", "Display all status");
-    registerCommand("status(service)", "Display single status");
-    registerCommand("go(x,y)", "Move to a specific position");
-    registerCommand("move(x,y,angle)", "Move to a specific position");
-    registerCommand("turn(angle)", "Turn to a specific angle");
-    registerCommand("pause", "Pause motion");
-    registerCommand("resume", "Resume motion");
-    registerCommand("cancel", "Cancel motion");
-    registerCommand("sleep", "Put motion to sleep");
-    registerCommand("align(side,angle)", "Align to a specific side and angle");
-    registerCommand("setAbsolute", "Set motion to absolute mode");
-    registerCommand("setRelative", "Set motion to relative mode");
-    registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
-    registerCommand("grab(side)", "Grab object using actuator");
-    registerCommand("ungrab(side)", "Ungrab object using actuator");
-    registerCommand("open(side)", "Open actuator on a specific side");
-    registerCommand("close(side)", "Close actuator on a specific side");
-    registerCommand("openTrap(side)", "Open trap on a specific side");
-    registerCommand("closeTrap(side)", "Close trap on a specific side");
-    registerCommand("help", "Display help");
-    // ... Other command registrations ...
-
 }
 
 // Process a script
@@ -47,10 +21,6 @@ Program Interpreter::processScript(const String& script) {
     return prgm;
 }
 
-void Interpreter::registerCommand(const String& syntax, const String& description) {
-    int numberOfArguments = std::count(syntax.begin(), syntax.end(), ',') + 1;
-    commands.push_back({syntax, description, numberOfArguments});
-}
 
 String Interpreter::currentPos(){
     int c = 0;
@@ -65,14 +35,13 @@ String Interpreter::currentPos(){
 }
 
 void Interpreter::displaySyntaxError(const String& commandName) {
-    for (const auto& info : commands) {
+    for (const auto& info : CommandHandler::commands()) {
         if (info.syntax.startsWith(commandName)) {
-            os.console.error("Interpreter") <<  currentPos() << "Invalid syntax for " << commandName << ". Expected: " << info.syntax << os.console.endl;
+            os.console.error("Interpreter") << "Invalid syntax for " << commandName << ". Expected: " << info.syntax << os.console.endl;
             return;
         }
     }
 }
-
 
 
 

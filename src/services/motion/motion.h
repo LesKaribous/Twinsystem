@@ -16,6 +16,14 @@ public:
     void enable() override;
     void disable() override;
 
+    void go(Vec2);
+    void go(float x, float y);
+    void goTurn(float x, float y, float theta);
+    void turn(float w);
+    void align(RobotCompass, float orientation);
+    void goAlign(Vec2 target, RobotCompass rc, float orientation);
+
+
     void setFeedrate(int); //0-100%
     void setCalibration(CalibrationProfile c);
 
@@ -29,12 +37,11 @@ public:
 
     Vec3 estimatePosition(Vec3 start, Vec3 steps) const;
 
-    void go(Vec2);
-    void go(float x, float y);
-    void goTurn(float x, float y, float theta);
-    void turn(float w);
-    void align(RobotCompass, float orientation);
-    void goAlign(Vec2 target, RobotCompass rc, float orientation);
+    void resetCompass(); //zero orientation
+    float getOrientation(); //rad
+
+    void resetSteps();
+
 
     //Setters
     void setAbsTarget(Vec3);    //mm, mm, rad
@@ -44,10 +51,10 @@ public:
     void setRelative();
 
     //Getters
-    Vec2 getAccelData() const;
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
     Vec3 getAbsPosition() const;//Absolute mm, mm, rad
 
+    Vec3 getLastSteps() const;
     float getTargetDirection() const;
     float getAbsoluteTargetDirection() const;
 
@@ -88,14 +95,17 @@ private:
 
     //PID
     Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm
-    Vec3 _integral 	  = { 0, 0, 0}; //Absolute mm, mm
+    Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
 
+    unsigned lastPIDTick = 0;
     bool _absolute = true;
     bool _optimizeRotation = true;
     bool _engaged, _sleeping;
+
+    float compassOffset;
 
     //Stepper control
     Stepper _sA, _sB, _sC;

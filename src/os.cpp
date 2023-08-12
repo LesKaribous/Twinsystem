@@ -20,20 +20,6 @@ void OperatingSystem::disable(ServiceID id) {
 }
 
 
-void OperatingSystem::execute(String& script){
-    os.console.println("----");
-    os.console.prettyPrint(script);
-    os.console.println("----");
-    Program p = interpreter.processScript(script);
-
-    if(p.isValid()){
-        console.info("OS") << "Program is valid" << console.endl;
-        currentProgram = p;
-        currentProgram.start();
-    }
-
-}
-
 OperatingSystem::OperatingSystem() : SystemBase(){
     _state = RobotState::IDLE;
 
@@ -61,44 +47,16 @@ OperatingSystem::OperatingSystem() : SystemBase(){
 void OperatingSystem::update(){
 	SystemBase::update();
 
-    if(_busy){ 
-        if(_currentJob->isPending() || _currentJob->isPaused()){
-            _currentJob->run();
-        }else _busy = false;
-    }else {
-        if( terminal.commandAvailable() > 0){
-            Program p = interpreter.processScript(terminal.dequeCommand());
-            if(p.isValid()){
-                console.info("OS") << "Command is valid" << console.endl;
-                p.start();
-                while (p.isPending()){
-                    p.run();
-                }
-            }else{
-                console.info("OS") << "Command is invalid" << console.endl;
-            }
-        }else currentProgram.run();
+    if( terminal.commandAvailable() > 0){
+        Program p = interpreter.processScript(terminal.dequeCommand());
+        if(p.isValid()){
+            execute(p);
+        }
     }
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
 	console.setLevel(level);
-}
-
-bool OperatingSystem::isBusy() const {
-    return _busy;
-}
-
-void OperatingSystem::wait(unsigned long time){
-    _busy = true;
-    timer.setDuration(time);
-    timer.start();
-    _currentJob = &timer;
-}
-
-void OperatingSystem::waitUntil(Job& obj){
-    _busy = true; 
-    _currentJob = &obj;
 }
 
 

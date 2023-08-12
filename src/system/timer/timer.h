@@ -5,10 +5,6 @@ class Timer : public Job{
 public:
 
     Timer();
-
-    bool isPending() override;
-    bool isCompleted() override;
-
     
     void run()override;
     void reset()override;   

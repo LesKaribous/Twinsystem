@@ -34,7 +34,7 @@ Motion::Motion() : Service(MOTION),
 	_absolute = true;
 
     pinMode(Pin::Stepper::enable, OUTPUT);
-    
+    disengage();
 
     _sA.setPosition(0);
     _sB.setMaxSpeed(0);
@@ -56,9 +56,9 @@ Motion::Motion() : Service(MOTION),
     _sBController.overrideSpeed(0);
     _sCController.overrideSpeed(0);
 
-    //os.screen.x.SetValue(_position.x);
-    //os.screen.y.SetValue(_position.y);
-    //os.screen.z.SetValue(_position.z);
+    os.screen.x.SetValue(_position.x);
+    os.screen.y.SetValue(_position.y);
+    os.screen.z.SetValue(_position.z);
 
     /* Initialise the sensor */
     while(!bno.begin()){
@@ -67,7 +67,7 @@ Motion::Motion() : Service(MOTION),
     }
     bno.setExtCrystalUse(true);
 
-    disengage();
+    
     os.console.info("Motion") << "Calibration settings : " << accelCorr << "\n";
 }
 
@@ -84,8 +84,8 @@ void Motion::update(){
     if(m_enabled && !_sleeping && !isPaused()){
         pid();
 
-        if(isMoving() && Vec2(_target - _position).mag() < 1 && fabs(_target.c - _position.c) < 0.01){
-            _position = _target;
+        if(isMoving() && Vec2(_target - _position).mag() < 5 && fabs(_target.c - _position.c) < 0.1){
+            //_position = _target; //Is this required ?
             complete();
         }
         
@@ -96,62 +96,60 @@ void Motion::update(){
     }
 }
 
-
 void Motion::pid(){
-    static unsigned lastTick = 0;
-    if (millis() - lastTick > Settings::Motion::PID_PERIOD){
-        if(lastTick == 0) lastTick = millis() - Settings::Motion::PID_PERIOD;
-
-        float dt = (millis() - lastTick)/1000.0;
-
-        //os.console.info("Motion") << "PID period : "<< int(millis() - lastTick) << "ms" << os.console.endl;
-        Vec3 kP = {3.0, 3.0, 3.0};//Settings::Motion::kP;
-        Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
-        Vec3 kD = {0.0, 0.0, 0.0};//Settings::Motion::kD;
-
-        //Stable
-        //Vec3 kP = {2.0, 2.0, 2.0};//Settings::Motion::kP;
-        //Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
-        //Vec3 kD = {0.4, 0.4, 0.0};//Settings::Motion::kD;
-
-        kP /= 10000.0;
-        kI /= 10000.0;
-        kD /= 10000.0;
-        
-
-        Vec3 lastSteps = Vec3(_sA.getPosition(), _sB.getPosition(), _sC.getPosition());
-        _sA.setPosition(0); _sB.setPosition(0); _sC.setPosition(0);//reset steps history
-        _position = estimatePosition(_position, lastSteps); //in world frame of reference
-
-        sensors_event_t eventAngular;
-        bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-        _position.c = -DEG_TO_RAD * eventAngular.orientation.x;
-        while(_position.c > PI) _position.c -= 2.0f*PI;
-        while(_position.c <= -PI) _position.c += 2.0f*PI;
-
-        {
-        os.console.print(">px:"); os.console.println(_position.x);
-        os.console.print(">tx:"); os.console.println(_target.x);
-        os.console.print(">py:"); os.console.println(_position.y);
-        os.console.print(">ty:"); os.console.println(_target.y);
-        os.console.print(">pa:"); os.console.println(_position.c);
-        os.console.print(">ta:"); os.console.println(_target.c);
-        }
-
-        Vec3 error = Vec3(_target) - Vec3(_position);
-        _integral  += error * dt; //Absolute mm, mm, rad
-        Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-        _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
-
-        corr.rotateZ(_position.c); //to robot frame of reference
-        corr = targetToSteps(corr);
-
-        _sAController.overrideSpeed(corr.a); // set new speed
-        _sBController.overrideSpeed(corr.b); // set new speed
-        _sCController.overrideSpeed(corr.c); // set new speed
-
-        lastTick = millis();
+    if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
+    if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
+        if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
+        lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
     }
+    
+
+    float dt = (millis() - lastPIDTick)/1000.0;
+
+    //os.console.info("Motion") << "PID period : "<< int(millis() - lastTick) << "ms" << os.console.endl;
+    Vec3 kP = {3.0, 3.0, 3.5};//Settings::Motion::kP;
+    Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
+    Vec3 kD = {0.0, 0.0, 0.0};//Settings::Motion::kD;
+
+    //Stable
+    //Vec3 kP = {2.0, 2.0, 2.0};//Settings::Motion::kP;
+    //Vec3 kI = {0.0, 0.0, 0.0};//Settings::Motion::kI;
+    //Vec3 kD = {0.4, 0.4, 0.0};//Settings::Motion::kD;
+
+    kP /= 10000.0;
+    kI /= 10000.0;
+    kD /= 10000.0;
+    
+    Vec3 lastSteps = getLastSteps();
+    resetSteps();
+
+    _position = estimatePosition(_position, lastSteps); //in world frame of reference
+    _position.c = getOrientation();
+
+    if(debug()){
+        os.console.plot("px:",_position.x);
+        os.console.plot("tx:",_target.x);
+        os.console.plot("py:",_position.y);
+        os.console.plot("ty:",_target.y);
+        os.console.plot("pa:",_position.c);
+        os.console.plot("ta:",_target.c);
+    }
+
+    Vec3 error = Vec3(_target) - Vec3(_position);
+    _integral  += error * dt; //Absolute mm, mm, rad
+    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
+    _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
+
+    corr.rotateZ(_position.c); //to robot frame of reference
+    corr += _controlPoint;
+    corr = targetToSteps(corr);
+
+    _sAController.overrideSpeed(corr.a); // set new speed
+    _sBController.overrideSpeed(corr.b); // set new speed
+    _sCController.overrideSpeed(corr.c); // set new speed
+
+    lastPIDTick = millis();
+
 }
 
 void Motion::pause(){
@@ -334,6 +332,22 @@ void Motion::disableOptimization(){
     _optimizeRotation = false;
 }
 
+float Motion::getOrientation(){
+    sensors_event_t eventAngular;
+    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+    float orientation = compassOffset - DEG_TO_RAD * eventAngular.orientation.x;
+
+    while(orientation > PI) orientation-= 2.0f*PI;
+    while(orientation <= -PI) orientation += 2.0f*PI;
+    return  orientation;
+}
+
+void Motion::resetCompass(){
+    sensors_event_t eventAngular;
+    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+    compassOffset = -DEG_TO_RAD * eventAngular.orientation.x;
+}
+
 void Motion::engage(){
     _engaged = true;
     _sleeping = false;
@@ -388,12 +402,22 @@ Vec3 Motion::getAbsPosition() const{
     return _position;
 }
 
-Vec2 Motion::getAccelData() const{
-    
-}
-
 Vec3  Motion::getAbsTarget() const{
     return _target;
+}
+
+Vec3 Motion::getLastSteps() const{
+    Vec3 lastSteps = Vec3(  _sA.getPosition(), 
+                            _sB.getPosition(), 
+                            _sC.getPosition() );
+
+    return lastSteps;
+}
+
+void Motion::resetSteps(){
+    _sA.setPosition(0); 
+    _sB.setPosition(0); 
+    _sC.setPosition(0);//reset steps history
 }
 
 float Motion::getAbsoluteTargetDirection() const{

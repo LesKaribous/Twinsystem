@@ -55,6 +55,7 @@ Vec2 Localisation::estimateDrift(Vec3 estimateCartesian){
 
         return (cdA + cdB + cdC) / 3.0;
     }
+    return Vec2();
 }
 
 

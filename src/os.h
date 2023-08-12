@@ -4,7 +4,6 @@
 #include "system/core/system.h"
 
 #include "services/lidar/lidar.h"
-#include "services/timer/timer.h"
 #include "services/chrono/chrono.h"
 #include "services/inputs/inputs.h"
 #include "services/motion/motion.h"
@@ -16,7 +15,7 @@
 #include "services/actuators/actuators.h"
 #include "services/localisation/localisation.h"
 
-#include "system/interpreter/interpreter.h"
+
 
 #define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
 #define THROW(x) os.console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
@@ -44,16 +43,8 @@ public:
     void disable(ServiceID id);
 	void update();
     
-    void execute(String& script);
-
-    //wait blocking function
-    bool isBusy() const;
-    void wait(unsigned long time);
-    void waitUntil(Job& obj);
-    
     //Terminal
     void setConsoleLevel(ConsoleLevel level);
-
 
 protected :
     //State
@@ -73,23 +64,15 @@ protected :
     Actuators actuators;
     Localisation localisation;
 
-    //Utils
-    Timer timer;
-    
-
 private:
     void loadService(Service*);
 
-    bool _busy = false;
-    Job* _currentJob = nullptr;
-    Interpreter interpreter;
+
     RobotState _state;
-    unsigned long _lastDrift = 0;
 
     //Singleton
     OperatingSystem();
     OperatingSystem(OperatingSystem &other); //Singletons should not be cloneable.
 
-    Program currentProgram;
     static OperatingSystem instance;
 };

@@ -129,14 +129,14 @@ Vec3::operator String() const{
 
 
 float& Vec3::operator[](int i){
-    if( i > 3 ) {
-        os.console.error("Vec3") << "Index out of bounds" << os.console.endl; 
-        return x;
-    }
+
     
     if(i == 0) return x;
     if(i == 1) return y;
     if(i == 2) return z;
+
+    os.console.error("Vec3") << "Index out of bounds" << os.console.endl; 
+    return x;
 }
 
 Vec3& Vec3::operator= (const Vec3& u){

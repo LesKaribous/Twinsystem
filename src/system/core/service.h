@@ -34,9 +34,14 @@ public:
     static ServiceID toID(String);
     static String toString(ServiceID);
 
+    inline bool debug() const {return m_debug;}
+    inline void enableDebug(){m_debug = true;}
+    inline void disableDebug(){m_debug = false;}
+
 protected:
     const ServiceID m_ID;
     bool m_enabled = false;
+    bool m_debug = false;
 
 };
 

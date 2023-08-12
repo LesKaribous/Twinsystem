@@ -56,12 +56,7 @@ public:
     void cancel()   override;
     void complete() override;
 
+    bool step();
     void restart();
     void stop();
-
-private:
-
-    void step();
-
-    
 };

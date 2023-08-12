@@ -2,13 +2,30 @@
 #include "system/core/lib.h"
 #include "commandHandler.h"
 
+//To add a new command, please create a new function in the function handler.
+//Then register the function in the 
+
+
+struct CommandInfo {
+    String syntax;
+    String description;
+    int numberOfArguments;
+};
+
 class CommandHandler {
-
+private :
     std::vector<String> extractArguments(const String& args);
-public:
-    CommandHandler(){};
 
+protected :
     void execute(const String& command, const String& args);
+    static std::vector<CommandInfo> _commands;
+
+public:
+    friend class Program;
+    CommandHandler();
+
+    static void registerCommand(const String& syntax, const String& description);
+    static const std::vector<CommandInfo>& commands();
 
     //Service
     void execute_enable(const String& service);
@@ -46,8 +63,3 @@ public:
     // ... Other command execution methods ...
 };
 
-struct CommandInfo {
-    String syntax;
-    String description;
-    int numberOfArguments;
-};

@@ -124,9 +124,7 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 }
 
 void Program::run(){
-    if(isPending()){
-        step();
-    }
+    //Do nothing
 }
 
 void Program::reset(){
@@ -169,12 +167,14 @@ void Program::stop(){
     reset();
 }
 
-void Program::step(){
+bool Program::step(){
     _currentTask++;
     if(_currentTask >= _statements.size()){
         complete();
         _currentTask = 0; //for safety
+        return false;
     }else{
         executeStatement(_statements[_currentTask]);
     }
+    return true;
 }

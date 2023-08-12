@@ -28,16 +28,6 @@ void Timer::run(){
     updateTime();
 }
 
-bool Timer::isPending(){
-    updateTime();
-    return m_state == JobState::PENDING;
-}
-
-bool Timer::isCompleted(){
-    updateTime();
-    return m_state == JobState::COMPLETED;
-}
-
 void Timer::updateTime(){
     if(isPending()){
         _elapsed = millis() - _startTime;

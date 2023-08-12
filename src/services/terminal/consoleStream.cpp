@@ -2,21 +2,32 @@
 #include "os.h"
 
 
+ConsoleStream::ConsoleStream(ConsoleLevel lvl, ServiceID origin) {
+	_ignored = false;
+	if(lvl < os.console.getLevel()) _ignored = true;
+	if( lvl < ConsoleLevel::WARNING && os.console.isIgnored(origin)) _ignored = true;
+
+	if (!_ignored) {
+		if (origin == NOT_A_SERVICE) os.console.write(header(lvl).c_str());
+		else os.console.write((header(lvl) + "(" + Service::toString(origin) + "): ").c_str());
+	}
+}
+
 ConsoleStream::ConsoleStream(ConsoleLevel lvl, const String& origin) {
-	_level = lvl;
 	_ignored = false;
 	if(lvl < os.console.getLevel()) _ignored = true;
 
 	if (!_ignored) {
-		if (origin == "") os.console.write(header().c_str());
-		else os.console.write((header() + "(" + origin + "): ").c_str());
+		if (origin == NOT_A_SERVICE) os.console.write(header(lvl).c_str());
+		else os.console.write((header(lvl) + "(" + origin + "): ").c_str());
 	}
 }
 
-String ConsoleStream::header() {
+
+String ConsoleStream::header(ConsoleLevel lvl) {
 	String str;
 
-	switch (_level) {
+	switch (lvl) {
 	case ConsoleLevel::VERBOSE:
 		str = "[Trace]";
 		break;

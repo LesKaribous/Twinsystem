@@ -40,8 +40,9 @@ private:
     String _payload;
     String _response;
     unsigned long _lastSent;
-    unsigned long _timeout;
     unsigned long _responseTime;
+    unsigned long _timeout;
+
     Status _status;
 
     static uint32_t _uidCounter;

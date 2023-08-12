@@ -1,29 +1,58 @@
 #include "console.h"
+#include "os.h"
 #include <Arduino.h>
-
 
 const String Console::endl = "\n";
 
-ConsoleStream Console::trace(String origin) {
+ConsoleStream Console::trace(const ServiceID& origin) {
 	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
 }
 
-ConsoleStream Console::info(String origin) {
+ConsoleStream Console::info(const ServiceID& origin) {
 	return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
-ConsoleStream Console::warn(String origin) {
+ConsoleStream Console::warn(const ServiceID& origin) {
 	return ConsoleStream(ConsoleLevel::WARNING, origin);
 }
 
-ConsoleStream Console::error(String origin) {
+ConsoleStream Console::error(const ServiceID& origin) {
 	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
 }
 
-ConsoleStream Console::success(String origin) {
+ConsoleStream Console::success(const ServiceID& origin) {
 	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
 }
 
+
+ConsoleStream Console::info(const String& origin) {
+	return ConsoleStream(ConsoleLevel::INFO, origin);
+}
+
+ConsoleStream Console::warn(const String& origin) {
+	return ConsoleStream(ConsoleLevel::WARNING, origin);
+}
+
+ConsoleStream Console::error(const String& origin) {
+	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
+}
+
+ConsoleStream Console::trace(const String& origin) {
+	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
+}
+
+ConsoleStream Console::success(const String& origin) {
+	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
+}
+
+
+
+bool Console::isIgnored(ServiceID id){
+	for(ServiceID s : m_activeServices){
+		if(s == id) return true;
+	}
+	return false;
+}
 
 void header(){
 	Serial.println("");
@@ -56,15 +85,20 @@ void Console::write(const char* str) {
 	Serial.write(str);
 }
 
-void Console::print(String s){
+
+void Console::plot(const String& n, String s){
+	os.console.print(n); os.console.println(s);
+}
+
+void Console::print(const String& s){
 	Serial.print(s);
 }
 
-void Console::println(String s){
+void Console::println(const String& s){
 	Serial.println(s);
 }
 
-void Console::prettyPrint(String s){
+void Console::prettyPrint(const String& s){
 	int l = 0;
 	Serial.print(l);
 	Serial.print(":\t");
@@ -78,5 +112,4 @@ void Console::prettyPrint(String s){
 		}
 	}
 	Serial.print(s[s.length() - 1]);
-	
 }

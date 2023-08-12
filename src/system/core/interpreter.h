@@ -17,7 +17,7 @@ class Interpreter {
 public:
     Interpreter();
     Program processScript(const String& script);
-    void registerCommand(const String& syntax, const String& description);
+
 private:
     // Lexer functions
     Token nextToken();
@@ -33,9 +33,6 @@ private:
     //Syntax error
     String currentPos();
     void displaySyntaxError(const String& commandName);
-
-
-    std::vector<CommandInfo> commands;
 
     // Lexer state
     String input;

@@ -1,6 +1,44 @@
 #include "commandHandler.h"
 #include "os.h"
 
+std::vector<CommandInfo> CommandHandler::_commands;
+ 
+CommandHandler::CommandHandler(){
+        // Registering commands with their syntax and description
+    registerCommand("enable(service)", "Enable a specific service");
+    registerCommand("disable(service)", "Disable a specific service");
+    registerCommand("status", "Display all status");
+    registerCommand("status(service)", "Display single status");
+    registerCommand("go(x,y)", "Move to a specific position");
+    registerCommand("move(x,y,angle)", "Move to a specific position");
+    registerCommand("turn(angle)", "Turn to a specific angle");
+    registerCommand("pause", "Pause motion");
+    registerCommand("resume", "Resume motion");
+    registerCommand("cancel", "Cancel motion");
+    registerCommand("sleep", "Put motion to sleep");
+    registerCommand("align(side,angle)", "Align to a specific side and angle");
+    registerCommand("setAbsolute", "Set motion to absolute mode");
+    registerCommand("setRelative", "Set motion to relative mode");
+    registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
+    registerCommand("grab(side)", "Grab object using actuator");
+    registerCommand("ungrab(side)", "Ungrab object using actuator");
+    registerCommand("open(side)", "Open actuator on a specific side");
+    registerCommand("close(side)", "Close actuator on a specific side");
+    registerCommand("openTrap(side)", "Open trap on a specific side");
+    registerCommand("closeTrap(side)", "Close trap on a specific side");
+    registerCommand("help", "Display help");
+    // ... Other command registrations ...
+
+}
+
+void CommandHandler::registerCommand(const String& syntax, const String& description) {
+    int numberOfArguments = std::count(syntax.begin(), syntax.end(), ',') + 1;
+    _commands.push_back({syntax, description, numberOfArguments});
+}
+
+const std::vector<CommandInfo>& CommandHandler::commands() {
+    return _commands;
+}
 
 void CommandHandler::execute(const String& command, const String& args) {
 
@@ -70,11 +108,11 @@ void CommandHandler::execute(const String& command, const String& args) {
 
 std::vector<String> CommandHandler::extractArguments(const String& args) {
     std::vector<String> arguments;
-    size_t start = 0;
-    size_t end = args.indexOf(',');
+    int start = 0;
+    int end = args.indexOf(',');
 
     if(end != -1){
-        while (end != args.length()-1 && end != -1) {
+        while ((unsigned int)(end) != args.length()-1 && end != -1) {
             arguments.push_back(args.substring(start, end));
             start = end + 1;
             end = args.indexOf(',', start);
@@ -212,6 +250,11 @@ void CommandHandler::execute_closeTrap(const String& side){
 
 //Terminal
 void CommandHandler::execute_help(){
-    
+    os.console.println("_________________________________________");
+    os.console.println("Available commands : ");
+    for(const CommandInfo& c : commands()){
+        os.console.println(c.syntax + " : " + c.description);
+    }
+    os.console.println("_________________________________________");
 }
 

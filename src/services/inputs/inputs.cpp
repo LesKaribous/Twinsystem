@@ -14,9 +14,9 @@ Inputs::Inputs() :
     downTrapSwith(Pin::Inputs::downTrapSwitch),
     lowTurbineSwitch(Pin::Inputs::lowTurbineSwitch),
     highTurbineSwitch(Pin::Inputs::highTurbineSwitch),
-    localisationSensorC(Pin::LocalisationSensors::SensorC),
     localisationSensorA(Pin::LocalisationSensors::SensorA),
-    localisationSensorB(Pin::LocalisationSensors::SensorB)
+    localisationSensorB(Pin::LocalisationSensors::SensorB),
+    localisationSensorC(Pin::LocalisationSensors::SensorC)
 {
     os.screen.addBootProgress(10);
 	os.screen.drawBootProgress("Loading Inputs...");
@@ -174,14 +174,14 @@ bool Inputs::getHighTurbineState() const{
 }
 
 
-float Inputs::getDistanceSensorC() const{
-    return localisationSensorC.getDistance();
-}
-
-float Inputs::getDistanceSensorA() const{
+float Inputs::getDistanceSensorA(){
     return localisationSensorA.getDistance();
 }
 
-float Inputs::getDistanceSensorB() const{
+float Inputs::getDistanceSensorB(){
     return localisationSensorB.getDistance();
+}
+
+float Inputs::getDistanceSensorC(){
+    return localisationSensorC.getDistance();
 }

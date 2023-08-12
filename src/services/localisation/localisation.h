@@ -14,7 +14,7 @@ public:
     Vec2 estimateDrift(Vec3 estimateCartesian);
 
 private:
-    int _samples = 10;
+    size_t _samples = 10;
     Vec3 _measureRaw;
     std::deque<Vec3> _samplesMeasure;
 };

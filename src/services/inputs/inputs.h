@@ -54,9 +54,9 @@ public:
 
     void waitButtonRelease();
 
-    float getDistanceSensorA() const;
-    float getDistanceSensorB() const;
-    float getDistanceSensorC() const;
+    float getDistanceSensorA();
+    float getDistanceSensorB();
+    float getDistanceSensorC();
 
     bool hasChanged() const;
     void update() override;
