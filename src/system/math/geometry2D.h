@@ -21,6 +21,7 @@ struct Vec2 {
     Vec2();
     Vec2(float);
     Vec2(float, float);
+    static Vec2 fromString(const String& str);
 
     Vec2& add(const Vec2&);
     Vec2& sub(const Vec2&);
@@ -113,6 +114,8 @@ bool operator!= (const Matrix2x2&, const Matrix2x2&);
 
 Vec2 operator+(const Vec2& a, const Vec2& b);
 Vec2 operator-(const Vec2& a, const Vec2& b);
-//Vec2 operator-(const Vec2& a); TODO
-Vec2 operator*(const Vec2& a, float u);
-Vec2 operator/(const Vec2& a, float u );
+
+Vec2 operator*(const Vec2& a, const Vec2& u); //hamadard product
+Vec2 operator/(const Vec2& a, const Vec2& u); //hamadard division
+Vec2 operator*(const Vec2& a, float u); //scalar multiplication
+Vec2 operator/(const Vec2& a, float u); //scalar division

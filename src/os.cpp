@@ -83,7 +83,8 @@ void OperatingSystem::update(){
         //}
         String str = terminal.dequeCommand();
         Expression e(str.trim());
-        console.print(e.evaluate());
+        console.print(e.toString() + " = " );
+        console.println(e.evaluate());
     }
 }
 

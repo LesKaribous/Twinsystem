@@ -44,6 +44,45 @@ Vec2::Vec2(float _x, float _y){
     a = _x; b = _y;
 }
 
+
+Vec2 Vec2::fromString(const String& str){
+    bool error = false;
+    String v = str;
+    v = v.trim(); 
+    
+    String x_str = "";
+    String y_str = "";
+
+    if(v.startsWith("[") && v.endsWith("]")){
+        int i = 1; //skip the [
+        
+        while(v.charAt(i) != ','){
+            if(!isdigit(v.charAt(i))) error = true;
+            x_str += v.charAt(i++);
+        }
+
+        i++; //skip the ,
+        
+        while(v.charAt(i) != ']'){
+            if(!isdigit(v.charAt(i))) error = true;
+            y_str += v.charAt(i++);
+        }
+
+
+    }else error = true;
+    
+    if(error){
+        os.console.error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << os.console.endl;
+    }else{
+        float x = x_str.toFloat();
+        float y = y_str.toFloat();
+        return Vec2(x, y);
+    }
+    return Vec2(0,0);
+    
+}
+
+
 Vec2 Vec2::copy() const{
     Vec2 r;
     r.a = a;
@@ -269,7 +308,7 @@ Matrix2x2 Matrix2x2::GetIdentity(){
 
 
 Vec2::operator String() const{
-    String v = "Vec2(" + String(a)  + "," + String(b) + ")";
+    String v = "[" + String(a,4)  + "," + String(b,4) + "]";
     return v;
 }
 
@@ -290,18 +329,6 @@ Vec2 operator-(const Vec2& a, const Vec2& b){
     Vec2 r = a;
     r.a -= b.a;
     r.b -= b.b;
-    return r;
-}
-Vec2 operator*(const Vec2& a, float u){
-    Vec2 r = a;
-    r.a *= u;
-    r.b *= u;
-    return r;
-}
-Vec2 operator/(const Vec2& a, float u ){
-    Vec2 r = a;
-    r.a /= u;
-    r.b /= u;
     return r;
 }
 
@@ -342,6 +369,20 @@ Vec2& Vec2::operator=(const Vec2& copy){
     return *this;
 }
 
+
+Vec2 operator*(const Vec2& u, const Vec2& v){ //hamadard product
+    return Vec2(u.a * v.a, u.b * v.b);
+} 
+Vec2 operator/(const Vec2& u, const Vec2& v){ //hamadard division
+    return Vec2(u.a / v.a, u.b / v.b);
+} 
+Vec2 operator*(const Vec2& u, float v){ //scalar multiplication
+    return Vec2(u.a*v, u.b*v);
+} 
+Vec2 operator/(const Vec2& u, float v){ //scalar division
+    return Vec2(u.a/v, u.b/v);
+} 
+
 bool operator== (const Vec2& a, const Vec2& b){ 
     return (a.a == b.a && a.b == b.b);
 }
@@ -361,3 +402,4 @@ bool operator!= (const Matrix2x2& a, const Matrix2x2& b){
             a.c != b.c ||
             a.d != b.d  );
 }
+

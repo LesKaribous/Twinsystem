@@ -19,6 +19,52 @@ Vec3::Vec3(float x,float y,float z){
     a = x; b = y; c = z;
 }
 
+Vec3 Vec3::fromString(const String& str){
+    bool error = false;
+    String v = str;
+    v = v.trim(); 
+    
+    String x_str = "";
+    String y_str = "";
+    String z_str = "";
+
+    if(v.startsWith("[") && v.endsWith("]")){
+        int i = 1; //skip the [
+        
+        while(v.charAt(i) != ','){
+            if(!isdigit(v.charAt(i))) error = true;
+            x_str += v.charAt(i++);
+        }
+
+        i++; //skip the ,
+
+        while(v.charAt(i) != ','){
+            if(!isdigit(v.charAt(i))) error = true;
+            y_str += v.charAt(i++);
+        }
+
+        i++; //skip the ,
+        
+        while(v.charAt(i) != ']'){
+            if(!isdigit(v.charAt(i))) error = true;
+            z_str += v.charAt(i++);
+        }
+
+
+    }else error = true;
+    
+    if(error){
+        os.console.error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << os.console.endl;
+    }else{
+        float x = x_str.toFloat();
+        float y = y_str.toFloat();
+        float z = z_str.toFloat();
+        return Vec3(x, y,z);
+    }
+    return Vec3(0,0,0);
+    
+}
+
 Vec3 Vec3::copy() const{
     return *this;
 }
@@ -123,7 +169,7 @@ Vec3::operator Vec2() const{
 }
 
 Vec3::operator String() const{
-    String v = "Vec3(" + String(a)  + "," + String(b) + "," + String(c) + ")";
+    String v = "[" + String(a,4)  + "," + String(b,4) + "," + String(c,4) + "]";
     return v;
 }
 

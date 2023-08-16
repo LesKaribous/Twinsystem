@@ -20,6 +20,7 @@ struct Vec3 {
     Vec3(const Vec2&, float);
     Vec3(float);
     Vec3(float,float,float);
+    static Vec3 fromString(const String& str);
 
     //Operation
     Vec3& add(const Vec3&);
@@ -106,6 +107,6 @@ Vec3 operator+(const Vec3& a, const Vec2& b);
 Vec3 operator-(const Vec3& a, const Vec2& b);
 
 Vec3 operator*(const Vec3& a, const Vec3& u); //hamadard product
-Vec3 operator*(const Vec3& a, const Vec3& u); //hamadard division
+Vec3 operator/(const Vec3& a, const Vec3& u); //hamadard division
 Vec3 operator*(const Vec3& a, float u); //scalar multiplication
 Vec3 operator/(const Vec3& a, float u); //scalar division
