@@ -12,24 +12,21 @@ struct Node {
     Node(TokenType t, String s, std::shared_ptr<Node> leftPtr, std::shared_ptr<Node> rightPtr) : type(t), value(s), left(leftPtr), right(rightPtr){};
 };
 
-enum VectorType {
-    NOT_VECTOR,
-    VEC2,
-    VEC3
-};
-
 class Expression {
 public:
     Expression(const String& input);
     String evaluate();
-    
-    static void registerVariables(const String& varname, const String& description);
+    void printCompiled();
+
+    static void registerVariables(const String& varname, const String& value = "");
+    static void setVariable(const String& varname, const String& value);
 
     inline const String& toString(){return input;}
 private:
     String input;
     size_t pos;
     Token currentToken; // Current token in the input string
+    Token previousToken; // Current token in the input string
 
     // Parsing functions
     std::shared_ptr<Node> parseExpression();
@@ -43,7 +40,7 @@ private:
     String evaluateNode(std::shared_ptr<Node> node);
     String evaluateAdd(std::shared_ptr<Node> node);
     String evaluateSubtract(std::shared_ptr<Node> node);
-    
+    String evaluateAssign(std::shared_ptr<Node> node);
     String evaluateMultiply(std::shared_ptr<Node> node);
     String evaluateDivide(std::shared_ptr<Node> node);
     String evaluateAnd(std::shared_ptr<Node> node);
@@ -61,15 +58,18 @@ private:
     bool currentTokenIs(TokenType type);
     String currentTokenValue();
     void consumeToken();
-    bool Expression::isVector(const String& value);
-    VectorType getVectorType(const String& value);
 
-    String addVectorsOrScalar(const String& left, const String& right);
-    String subVectorsOrScalar(const String& left, const String& right);
-    String multVectorsOrScalar(const String& left, const String& right);
-    String divVectorsOrScalar(const String& left, const String& right);
+    bool isVector(const Node& node);
+    bool isValue(const Node& node);
+
+    String addVectorsOrScalar(const Node& left, const Node& right);
+    String subVectorsOrScalar(const Node& left, const Node& right);
+    String multVectorsOrScalar(const Node& left, const Node& right);
+    String divVectorsOrScalar(const Node& left, const Node& right);
+
+    void printCompiledNode(std::shared_ptr<Node> node);
 
     std::shared_ptr<Node> root;
-    static std::map<String, String> variables; // A mapping from variable names to values
     static String lookupVariableValue(const String& variableName);
+    static std::map<String, String>& getVariables();
 };

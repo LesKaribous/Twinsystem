@@ -71,6 +71,11 @@ void OperatingSystem::registerCommands(){
     CommandHandler::registerCommand("openTrap(side)", "Open trap on a specific side");
     CommandHandler::registerCommand("closeTrap(side)", "Close trap on a specific side");
     CommandHandler::registerCommand("help", "Display help");
+
+    //Variables
+    Expression::registerVariables("time");
+    Expression::registerVariables("posA", "[1,2]");
+    Expression::registerVariables("posB", "[3,4]");
 }
 
 void OperatingSystem::update(){
@@ -83,6 +88,7 @@ void OperatingSystem::update(){
         //}
         String str = terminal.dequeCommand();
         Expression e(str.trim());
+        e.printCompiled();
         console.print(e.toString() + " = " );
         console.println(e.evaluate());
     }

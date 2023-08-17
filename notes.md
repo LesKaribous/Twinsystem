@@ -21,6 +21,14 @@
                                                             
 </-->
 
+## Todo list
+    - [x] Modular architecture
+    - [x] Program with several actions
+    - [ ] Fix Lidar random crash
+    - [ ] Obstacle avoidance
+    - [ ] Advanced movement strategies
+
+
 ## Manual
 
 Setup the robot according to the team.
@@ -29,25 +37,27 @@ Pull the starter.
 
 Reminder : If you armed the robot and you forgot to set the team. Press reset while pulling the starter. The robot will go back in idle mode. Then Arm again the robot.
 
+## TwinScript
+
+The robot now support a newly born programming language names TwinScript. Here an example of what you can do with it at run time !
+
+``` ruby
+#This is a comment
+var posA = [100,300] #Variable declaration
+var posB = [300,300]
+var home = [0,0]
+go(posA) #Function call with arguments
+turn(30) 
+if(time > 10000) #if else statement
+go(posB)
+else
+go(home)
+end
+sleep() #Function call without arguments
+```
 
 
-TODO 
-clear intercom when too much request buffered
-fix obstacle border
-switch between cake brown,  no brown
-
-
-
-
-## Features
-    - [ ] Modular architecture
-    - [ ] Program with several actions
-    - [ ] Obstacle avoidance
-    - [ ] Advanced movement strategies
-    - [ ] 
-
-
-## Random advices : 
+## Random notes : 
 
 Break down the competition tasks into smaller, manageable sub-tasks. For example, if the task is to pick up and transport an object, you may need to develop separate functionality for object detection, grasping, and movement.
 
@@ -58,7 +68,6 @@ Use sensors to provide the robot with information about its environment and the 
 Test and refine your robot's performance in simulated environments before moving on to physical testing. This will allow you to quickly identify and fix any issues without risking damage to your robot.
 
 Finally, make sure you pay attention to the rules of the competition and that your robot is compliant with them
-
 
 
 System : 
