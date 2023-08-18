@@ -11,6 +11,9 @@ enum TokenType
     COMMENT,
     IF,
     ELSE,
+    FOR,
+    WHILE,
+    BLOCK,
     END,
     VAR,
     ASSIGN,
@@ -67,6 +70,12 @@ struct Token
             return "IF";
         case ELSE:
             return "ELSE";
+        case FOR:
+            return "FOR";
+        case WHILE:
+            return "WHILE";
+        case BLOCK:
+            return "BLOCK";
         case END:
             return "END";
         case VAR:
@@ -133,8 +142,7 @@ struct Token
 
     String toString()
     {
-        switch (type)
-        {
+        switch (type){
         case COMMAND:
             return "COMMAND(" + value + ")";
         case VARIABLE:
@@ -145,70 +153,14 @@ struct Token
             return "IDENTIFIER(" + value + ")";
         case COMMENT:
             return "COMMENT(" + value + ")";
-        case IF:
-            return "IF";
-        case ELSE:
-            return "ELSE";
-        case END:
-            return "END";
-        case VAR:
-            return "VAR";
-        case ASSIGN:
-            return "ASSIGN";
-        case ADD:
-            return "ADD";
         case LITERAL:
             return "LITERAL(" + value + ")";
-        case SUBTRACT:
-            return "SUBTRACT";
-        case MULTIPLY:
-            return "MULTIPLY";
-        case DIVIDE:
-            return "DIVIDE";
-        case AND:
-            return "AND";
-        case OR:
-            return "OR";
-        case EQUAL:
-            return "EQUAL";
-        case NOT_EQUAL:
-            return "NOT_EQUAL";
-        case NOT:
-            return "NOT";
-        case LESS_EQUAL:
-            return "LESS_EQUAL";
-        case GREATER_EQUAL:
-            return "GREATER_EQUAL";
-        case LESS:
-            return "LESS";
-        case GREATER:
-            return "GREATER";
-        case LPAREN:
-            return "LPAREN";
-        case RPAREN:
-            return "RPAREN";
-        case LBRACKET:
-            return "LBRACKET";
-        case RBRACKET:
-            return "RBRACKET";
-        case DOT:
-            return "DOT";
-        case COMMA:
-            return "COMMA";
         case VECTOR2:
             return "VECTOR2(" + value + ")";
         case VECTOR3:
             return "VECTOR3(" + value + ")";
-        case EOL:
-            return "EOL";
-        case END_OF_SCRIPT:
-            return "END_OF_SCRIPT";
-        case END_OF_EXPRESSION:
-            return "END_OF_EXPRESSION";
-        case NONE:
-            return "NONE";
         default:
-            return "UNKNOWN";
+            return tokenTypetoString(type);
         }
     }
 };

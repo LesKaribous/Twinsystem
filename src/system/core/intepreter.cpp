@@ -58,8 +58,6 @@ Token Interpreter::nextToken() {
     // Get the next character
     char ch = input.charAt(pos);
 
-    //os.console.info("Interpreter") << "Reading : \"" << ch << "\" at " << currentPos() << os.console.endl;
-
     // Handle different token types
     if (isDigit(ch)) {
         return parseNumber();
@@ -127,9 +125,13 @@ Token Interpreter::parseIdentifier() {
     }
 
     // Check for keywords
-    if (value == "if") return {IF, value};
-    if (value == "else") return {ELSE, value};
-    if (value == "end") return {END, value};
+    if (value.equalsIgnoreCase("if"))    return {IF, value};
+    if (value.equalsIgnoreCase("else"))  return {ELSE, value};
+    if (value.equalsIgnoreCase("for"))   return {FOR, value};
+    if (value.equalsIgnoreCase("while")) return {WHILE, value};
+    if (value.equalsIgnoreCase("block")) return {BLOCK, value};
+    if (value.equalsIgnoreCase("var")) return {VAR, value};
+    if (value.equalsIgnoreCase("end"))   return {END, value};
 
     return {IDENTIFIER, value};
 }
@@ -165,19 +167,17 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
 }
 
 std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
-    
-
     currentToken = nextToken(); // Consume the 'if' keyword
 
-    // Parse the condition
-    String condition;
-    while (currentToken.type != EOL && currentToken.type != END_OF_SCRIPT) {
-        condition += currentToken.value;
-        currentToken = nextToken();
+    // Parse the condition without parenthethis
+    String expression;
+    while (pos+1 < input.length()) {
+        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
+        else break;
     }
 
-    os.console.println(condition);
-    auto ifStmt = std::make_shared<IfStatement>(condition);
+    os.console.println(expression);
+    auto ifStmt = std::make_shared<IfStatement>(expression);
     currentToken = nextToken(); // Consume the condition
 
     // Parse the true branch
@@ -202,11 +202,140 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
     return ifStmt;
 }
 
+std::shared_ptr<VarStatement> Interpreter::parseVariableStatement() {
+    currentToken = nextToken(); // Consume the 'var' keyword
+    
+
+}
+
+std::shared_ptr<ForStatement> Interpreter::parseForStatement() {
+    currentToken = nextToken(); // Consume the 'for' keyword
+
+    String varExpression;
+    String conditionExpression;
+    String stepExpression;
+
+    if(currentToken.type != LPAREN){
+        os.console.error("Interpreter") << "Expected '()', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
+    }
+    currentToken = nextToken(); // Consume the parenthesis
+
+    if(currentToken.type != VAR){
+        os.console.error("Interpreter") << "Expected 'var', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
+    }
+    currentToken = nextToken(); // Consume the var
+    skipWhitespace();
+    while (pos < input.length()) {
+        if(input.charAt(pos)!=';')  varExpression += input.charAt(pos++);
+        else break;
+        skipWhitespace();
+    }
+
+    pos++; //skip the ;
+    skipWhitespace();
+    while (pos < input.length()) {
+        if(input.charAt(pos)!=';')  conditionExpression += input.charAt(pos++);
+        else break;
+        skipWhitespace();
+    }
+    pos++; //skip the ;
+    skipWhitespace();
+    while (pos < input.length()) {
+        if(input.charAt(pos)!=')')  stepExpression += input.charAt(pos++);
+        else break;
+        skipWhitespace();
+    }
+
+
+    auto forStmt = std::make_shared<ForStatement>(varExpression, conditionExpression, stepExpression);
+    currentToken = nextToken(); // Consume the line
+
+    // Parse the content
+    while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
+        forStmt->content.push_back(parseStatement());
+    }
+
+    if (currentToken.type != END) {
+        // Handle error
+        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
+    }
+    currentToken = nextToken(); // Consume the 'end' keyword
+    return forStmt;
+}
+
+std::shared_ptr<WhileStatement> Interpreter::parseWhileStatement() {
+    currentToken = nextToken(); // Consume the 'while' keyword
+
+    // Parse the condition without parenthethis
+    String expression;
+    while (pos+1 < input.length()) {
+        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
+        else break;
+    }
+
+    os.console.println(expression);
+    auto whileStmt = std::make_shared<WhileStatement>(expression);
+    currentToken = nextToken(); // Consume the condition
+
+    // Parse the true branch
+    while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
+        whileStmt->content.push_back(parseStatement());
+    }
+
+    if (currentToken.type != END) {
+        // Handle error
+        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
+    }
+    currentToken = nextToken(); // Consume the 'end' keyword
+    return whileStmt;
+}
+
+std::shared_ptr<BlockStatement> Interpreter::parseBlockStatement() {
+    currentToken = nextToken(); // Consume the 'block' keyword
+
+    // Parse the condition without parenthethis
+    String expression;
+    while (pos+1 < input.length()) {
+        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
+        else break;
+    }
+
+    os.console.println(expression);
+    auto blockStmt = std::make_shared<BlockStatement>(expression);
+    currentToken = nextToken(); // Consume the condition
+
+    // Parse the true branch
+    while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
+        blockStmt->content.push_back(parseStatement());
+    }
+
+    if (currentToken.type != END) {
+        // Handle error
+        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        return nullptr; // Return or handle the error as needed
+    }
+    currentToken = nextToken(); // Consume the 'end' keyword
+    return blockStmt;
+}
+
+
 std::shared_ptr<Statement> Interpreter::parseStatement() {
     if (currentToken.type == IDENTIFIER) {
         return parseCommandStatement();
+    } if (currentToken.type == VAR) {
+        return parseVariableStatement();
     } else if (currentToken.type == IF) {
         return parseIfStatement();
+    } else if (currentToken.type == FOR) {
+        return parseForStatement();
+    } else if (currentToken.type == FOR) {
+        return parseWhileStatement();
+    } else if (currentToken.type == FOR) {
+        return parseBlockStatement();
     } else {
         // Handle error: unexpected token
         os.console.error("Parser") << currentPos() << "Unexpected token: " << currentToken.value << HERE << os.console.endl;

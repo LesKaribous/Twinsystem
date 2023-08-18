@@ -4,7 +4,7 @@
 #include "commandHandler.h"
 #include "expression.h"
 
-enum StatementType { IGNORED_STATEMENT, COMMAND_STATEMENT, IF_STATEMENT };
+enum StatementType { IGNORED_STATEMENT, COMMAND_STATEMENT, IF_STATEMENT, VAR_STATEMENT, FOR_STATEMENT, WHILE_STATEMENT, BLOCK_STATEMENT };
 // Base class for statements
 struct Statement{
     StatementType type = IGNORED_STATEMENT;
@@ -23,6 +23,33 @@ struct IfStatement : public Statement {
     Expression condition;
     std::vector<std::shared_ptr<Statement>> trueBranch;
     std::vector<std::shared_ptr<Statement>> falseBranch;
+};
+
+struct VarStatement : public Statement{
+    VarStatement(const String& e) : exp(e){ type = VAR_STATEMENT; }
+    Expression exp;
+};
+
+struct ForStatement : public Statement{
+    ForStatement(const String& varExp, const String& condExp, const String& stepExp) : var(varExp), condition(condExp), step(stepExp){ type = FOR_STATEMENT; }
+
+    VarStatement var;
+    Expression condition;
+    Expression step;
+
+    std::vector<std::shared_ptr<Statement>> content;
+};
+
+struct WhileStatement : public Statement{
+    WhileStatement(const String& exp) : condition(exp){ type = WHILE_STATEMENT; }
+    Expression condition;
+    std::vector<std::shared_ptr<Statement>> content;
+};
+
+struct BlockStatement : public Statement{
+    BlockStatement(const String& exp) : condition(exp){ type = BLOCK_STATEMENT; }
+    Expression condition;
+    std::vector<std::shared_ptr<Statement>> content;
 };
 
 

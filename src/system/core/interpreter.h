@@ -20,6 +20,10 @@ private:
     std::shared_ptr<Statement> parseStatement();
     std::shared_ptr<CommandStatement> parseCommandStatement();
     std::shared_ptr<IfStatement> parseIfStatement();
+    std::shared_ptr<VarStatement> parseVariableStatement();
+    std::shared_ptr<ForStatement> parseForStatement();
+    std::shared_ptr<WhileStatement> parseWhileStatement();
+    std::shared_ptr<BlockStatement> parseBlockStatement();
 
     //Syntax error
     String currentPos();
