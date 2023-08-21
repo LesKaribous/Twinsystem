@@ -39,8 +39,8 @@ void CommandHandler::execute(const String& command, const String& args) {
             execute_debug(args);
         }
     } else if (command == "go") {
-        float x = arguments[0].toFloat();
-        float y = arguments[1].toFloat();
+        float x = Expression(arguments[0]).evaluate().toFloat();
+        float y = Expression(arguments[1]).evaluate().toFloat();
         execute_go(x, y);
     } else if (command == "move") {
         float x = arguments[0].toFloat();
@@ -70,6 +70,8 @@ void CommandHandler::execute(const String& command, const String& args) {
         float y = arguments[1].toFloat();
         float angle = arguments[2].toFloat();
         execute_setAbsPosition(x, y, angle);
+    } else if (command == "resetCompass") {
+        execute_resetCompass();
     } else if (command == "grab") {
         execute_grab(args);
     } else if (command == "ungrab") {
@@ -84,6 +86,8 @@ void CommandHandler::execute(const String& command, const String& args) {
         execute_closeTrap(args);
     } else if (command == "help") {
         execute_help();
+    } else if (command == "print") {
+        execute_print(args);
     } else {
         // Handle unknown command
         os.console.error("CommandHandler") << "Unknown command: " << command << os.console.endl;
@@ -210,6 +214,10 @@ void CommandHandler::execute_setAbsPosition(float x, float y, float angle){
     os.motion.setAbsPosition(Vec3(x, y, angle));
 }
 
+void CommandHandler::execute_resetCompass(){
+    os.motion.resetCompass();
+}
+
 
 //Actuators
 void CommandHandler::execute_grab(const String& side){
@@ -255,3 +263,6 @@ void CommandHandler::execute_help(){
     os.console.println("_________________________________________");
 }
 
+void CommandHandler::execute_print(const String& str){
+    os.console.println(str);
+}

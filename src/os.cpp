@@ -64,12 +64,14 @@ void OperatingSystem::registerCommands(){
     CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode");
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode");
     CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
+    CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0");
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator");
     CommandHandler::registerCommand("ungrab(side)", "Ungrab object using actuator");
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side");
     CommandHandler::registerCommand("close(side)", "Close actuator on a specific side");
     CommandHandler::registerCommand("openTrap(side)", "Open trap on a specific side");
     CommandHandler::registerCommand("closeTrap(side)", "Close trap on a specific side");
+    CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal");
     CommandHandler::registerCommand("help", "Display help");
 
     //Variables
@@ -82,15 +84,15 @@ void OperatingSystem::update(){
 	SystemBase::update();
 
     if( terminal.commandAvailable() > 0){
-        //Program p = interpreter.processScript(terminal.dequeCommand());
-        //if(p.isValid()){
-        //    execute(p);
-        //}
-        String str = terminal.dequeCommand();
-        Expression e(str.trim());
-        e.printCompiled();
-        console.print(e.toString() + " = " );
-        console.println(e.evaluate());
+        Program p = interpreter.processScript(terminal.dequeCommand());
+        if(p.isValid()){
+            execute(p);
+        }
+        //String str = terminal.dequeCommand();
+        //Expression e(str.trim());
+        //e.printCompiled();
+        //console.print(e.toString() + " = " );
+        //console.println(e.evaluate());
     }
 }
 

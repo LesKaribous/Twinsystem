@@ -365,11 +365,6 @@ void Expression::consumeToken()
         {
             currentToken = {OR, value};
         }
-        else if (value.equalsIgnoreCase("VAR"))
-        {
-            currentToken = {VAR, value};
-            pos++; //skip
-        }
         else if (getVariables().find(value) != getVariables().end())
         {
             currentToken = {VARIABLE, value};

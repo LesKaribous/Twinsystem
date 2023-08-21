@@ -23,9 +23,6 @@ sleep
 
 void setup(){
 	os.setConsoleLevel(INFO);
-	//os.console.prettyPrint(script);
-	//delay(1000);
-	//os.execute(script); //async
 }
  
 void loop(){

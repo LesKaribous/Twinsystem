@@ -48,6 +48,7 @@ public:
     void execute_setAbsolute();
     void execute_setRelative();
     void execute_setAbsPosition(float x, float y, float angle);
+    void execute_resetCompass();
 
     //Actuators
     void execute_grab(const String& side);
@@ -62,6 +63,7 @@ public:
 
     //Terminal
     void execute_help(); //Display help
+    void execute_print(const String& str);
     
     // ... Other command execution methods ...
 };

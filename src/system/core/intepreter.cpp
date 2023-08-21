@@ -90,6 +90,7 @@ Token Interpreter::nextToken() {
     return {END_OF_SCRIPT, ""};
 }
 
+
 // Skip whitespace in the input
 void Interpreter::skipWhitespace() {
     while (pos < input.length() && isWhitespace(input.charAt(pos))) {
@@ -143,10 +144,15 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
 
     // Expect an opening parenthesis
     if (currentToken.type != LPAREN) {
-
+        //error
+        os.console.error("Interpreter") << "Expecting '(' got " << currentToken.value << os.console.endl;
     }else{
-        currentToken = nextToken(); // Consume the '('
 
+        String arg;
+        while (pos+1 < input.length()) {
+            if(input.charAt(pos+1) != '\n' || input.charAt(pos) != ',') arg += input.charAt(pos++);
+            else break;
+        }
         // Parse the arguments
         while (currentToken.type != RPAREN) {
             if (currentToken.type == NUMBER || currentToken.type == IDENTIFIER) {
@@ -204,8 +210,14 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
 
 std::shared_ptr<VarStatement> Interpreter::parseVariableStatement() {
     currentToken = nextToken(); // Consume the 'var' keyword
-    
+    // Parse the condition without parenthethis
+    String expression;
+    while (pos+1 < input.length()) {
+        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
+        else break;
+    }
 
+    std::shared_ptr<VarStatement> varPtr = std::make_shared<VarStatement>(expression);
 }
 
 std::shared_ptr<ForStatement> Interpreter::parseForStatement() {
@@ -332,9 +344,9 @@ std::shared_ptr<Statement> Interpreter::parseStatement() {
         return parseIfStatement();
     } else if (currentToken.type == FOR) {
         return parseForStatement();
-    } else if (currentToken.type == FOR) {
+    } else if (currentToken.type == WHILE) {
         return parseWhileStatement();
-    } else if (currentToken.type == FOR) {
+    } else if (currentToken.type == BLOCK) {
         return parseBlockStatement();
     } else {
         // Handle error: unexpected token
