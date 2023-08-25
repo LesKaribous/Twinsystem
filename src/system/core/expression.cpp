@@ -5,10 +5,10 @@ Expression::Expression(const String &str) : pos(0)
 {
     input = "";
     for (char c : str) {
-        if(c == ' ' && !input.equalsIgnoreCase("VAR")); //remove useless spaces
+        if(isWhitespace(input.charAt(c)) && !input.equalsIgnoreCase("VAR")); //remove useless spaces
         else input += c; 
     }
-    os.console.println( ">" + input);
+
     consumeToken();           // Initialize the current token
     root = parseExpression(); // Parse the expression and store the AST in the root member variable
 }
@@ -187,25 +187,44 @@ std::shared_ptr<Node> Expression::parseFactor()
 }
 std::shared_ptr<Node> Expression::parseVector()
 {
-    consumeToken(); // Consume the '['
+    String x, y, z;
 
-    String x = currentTokenValue();
+    consumeToken(); // Consume the [ value
+    if(!currentTokenIs(LITERAL) && !currentTokenIs(SUBTRACT)){
+        os.console.error("Expression") << "Expected litteral while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
+        return nullptr;
+    }
+    
+    if(currentTokenIs(SUBTRACT)){
+        x+="-";
+        consumeToken();
+    }
+    x += currentTokenValue();
     consumeToken(); // Consume the x value
 
     if (!currentTokenIs(COMMA))
     {
-        // Handle error: missing comma
+        os.console.error("Expression") << "Expected ',' while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
+        return nullptr;
     }
+
     consumeToken(); // Consume the ','
 
-    String y = currentTokenValue();
+    if(currentTokenIs(SUBTRACT)){
+        y+="-";
+        consumeToken();
+    }
+    y = currentTokenValue();
     consumeToken(); // Consume the y value
 
     if (currentTokenIs(COMMA))
     {
         consumeToken(); // Consume the ','
-
-        String z = currentTokenValue();
+        if(currentTokenIs(SUBTRACT)){
+            z+="-";
+            consumeToken();
+        }
+        z = currentTokenValue();
         consumeToken(); // Consume the z value
 
         if (!currentTokenIs(RBRACKET))
@@ -231,7 +250,7 @@ std::shared_ptr<Node> Expression::parseVector()
     else
     {
         // Handle error: unexpected token
-        os.console.error("Expression") << "Unexpected token while reading vector" << os.console.endl;
+        os.console.error("Expression") << "Unexpected token while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
         return nullptr;
     }
 }
@@ -262,14 +281,22 @@ String Expression::currentTokenValue()
 
 void Expression::consumeToken()
 {
-    // ... [rest of the function remains unchanged]
     previousToken = currentToken;
+    // Check for the end of the input
+    if (pos >= input.length() || input.charAt(pos) == '\n') {
+        currentToken = {END_OF_EXPRESSION, ""};
+        return;
+    }
     char ch = input.charAt(pos);
     // Recognize operators and keywords
     if (ch == '+')
     {
         currentToken = {ADD, "+"};
         pos++;
+    }
+    else if (ch == ' '){
+        pos++; 
+        return;
     }
     else if (ch == '-')
     {
@@ -411,7 +438,7 @@ void Expression::consumeToken()
     else
     {
         // Handle error: unexpected character
-        // ... error handling code ...
+        os.console.error("Expression") << "Unexpected character : " << ch << os.console.endl;
     }
     //os.console.println(currentToken.toString());
 }

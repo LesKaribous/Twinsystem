@@ -1,5 +1,6 @@
 #pragma once
 #include "system/core/lib.h"
+#include "system/math/geometry.h"
 #include "commandHandler.h"
 
 //To add a new command, please create a new function in the function handler.
@@ -37,6 +38,7 @@ public:
 
 
     //Motion
+    void execute_go(Vec2 v);
     void execute_go(float x, float y);
     void execute_move(float x, float y, float angle);
     void execute_turn(float angle);

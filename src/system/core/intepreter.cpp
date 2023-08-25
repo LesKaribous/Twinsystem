@@ -48,6 +48,7 @@ void Interpreter::displaySyntaxError(const String& commandName) {
 // Get the next token from the input
 Token Interpreter::nextToken() {
     // Skip any whitespace
+    
     skipWhitespace();
 
     // Check for the end of the input
@@ -73,7 +74,6 @@ Token Interpreter::nextToken() {
                     pos++;
                 }
                 return nextToken(); // Recursively call to get the next token
-            // ... Handle other special characters or operators as needed ...
             case '\n' : 
                 pos++; // Skip the unexpected character
 
@@ -131,44 +131,61 @@ Token Interpreter::parseIdentifier() {
     if (value.equalsIgnoreCase("for"))   return {FOR, value};
     if (value.equalsIgnoreCase("while")) return {WHILE, value};
     if (value.equalsIgnoreCase("block")) return {BLOCK, value};
-    if (value.equalsIgnoreCase("var")) return {VAR, value};
+    if (value.equalsIgnoreCase("var"))   return {VAR, value};
     if (value.equalsIgnoreCase("end"))   return {END, value};
 
     return {IDENTIFIER, value};
 }
 
+String Interpreter::untilLineEnd(){
+    String line = "";
+    while (pos < input.length() && input.charAt(pos) != '\n') {
+        skipWhitespace();
+        line += input.charAt(pos++);
+    }
+    return line;
+}   
+
 std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
     auto command = std::make_shared<CommandStatement>();
     command->name = currentToken.value;
-    currentToken = nextToken(); // Consume the command name
-
+    
+    currentToken = nextToken(); // Consume the command (
     // Expect an opening parenthesis
     if (currentToken.type != LPAREN) {
         //error
         os.console.error("Interpreter") << "Expecting '(' got " << currentToken.value << os.console.endl;
     }else{
 
-        String arg;
-        while (pos+1 < input.length()) {
-            if(input.charAt(pos+1) != '\n' || input.charAt(pos) != ',') arg += input.charAt(pos++);
-            else break;
+        String arg = untilLineEnd();
+        int lastParenthesis = arg.lastIndexOf(")");
+        if(lastParenthesis == -1){
+            os.console.error("Interpreter") << "missing right parenthesis in command statement"  << os.console.endl;
         }
+
+        arg = arg.substring(0, lastParenthesis); //remove last parenthesis
+
         // Parse the arguments
-        while (currentToken.type != RPAREN) {
-            if (currentToken.type == NUMBER || currentToken.type == IDENTIFIER) {
-                command->arguments.push_back(currentToken.value);
-                currentToken = nextToken(); // Consume the argument
+        String argBuf = "";
+        uint index = 0;
+        bool ignoreVectorComma = false;
+        while (index != arg.length() && arg.charAt(index) != '\n') {
+            if (arg.charAt(index) == '['){
+                ignoreVectorComma = true;
             }
-
-            // Handle commas between arguments
-            if (currentToken.type == COMMA) {
-                currentToken = nextToken(); // Consume the ','
+            if (arg.charAt(index) == ']'){
+                ignoreVectorComma = false;
             }
+            if (arg.charAt(index) == ',' && !ignoreVectorComma) {
+                command->arguments.push_back(argBuf);
+                argBuf = "";
+            }else argBuf += arg.charAt(index);
+            index++;
         }
-
-        currentToken = nextToken(); // Consume the ')'
+        if(argBuf.length() > 0) command->arguments.push_back(argBuf);
+        //for(const String& str : command->arguments) THROW(str);
     }
-
+    currentToken = nextToken();
     return command;
 }
 

@@ -85,9 +85,11 @@ void OperatingSystem::update(){
 
     if( terminal.commandAvailable() > 0){
         Program p = interpreter.processScript(terminal.dequeCommand());
+        
         if(p.isValid()){
             execute(p);
         }
+        
         //String str = terminal.dequeCommand();
         //Expression e(str.trim());
         //e.printCompiled();

@@ -39,9 +39,17 @@ void CommandHandler::execute(const String& command, const String& args) {
             execute_debug(args);
         }
     } else if (command == "go") {
-        float x = Expression(arguments[0]).evaluate().toFloat();
-        float y = Expression(arguments[1]).evaluate().toFloat();
-        execute_go(x, y);
+        execute_print(args);
+        if(arguments.size() == 1){
+            Expression e(arguments[0]);
+            Vec2 v = Vec2::fromString(e.evaluate());
+            execute_go(v);
+        }else if(arguments.size() == 2){
+            float x = Expression(arguments[0]).evaluate().toFloat();
+            float y = Expression(arguments[1]).evaluate().toFloat();
+            execute_go(x, y);
+        }
+
     } else if (command == "move") {
         float x = arguments[0].toFloat();
         float y = arguments[1].toFloat();
@@ -98,14 +106,25 @@ std::vector<String> CommandHandler::extractArguments(const String& args) {
     std::vector<String> arguments;
     int start = 0;
     int end = args.indexOf(',');
-
+    bool ignoreVectorComma = false;
     if(end != -1){
-        while ((unsigned int)(end) != args.length()-1 && end != -1) {
-            arguments.push_back(args.substring(start, end));
-            start = end + 1;
-            end = args.indexOf(',', start);
+        String argBuf = "";
+        uint index = 0;
+        bool ignoreVectorComma = false;
+        while (index != args.length()) {
+            if (args.charAt(index) == '['){
+                ignoreVectorComma = true;
+            }
+            if (args.charAt(index) == ']'){
+                ignoreVectorComma = false;
+            }
+            if (args.charAt(index) == ',' && !ignoreVectorComma) {
+                arguments.push_back(argBuf);
+                argBuf = "";
+            }else argBuf += args.charAt(index);
+            index++;
         }
-        arguments.push_back(args.substring(start));
+        if(argBuf.length() > 0) arguments.push_back(argBuf);
     }
     return arguments;
 }
@@ -164,6 +183,11 @@ void CommandHandler::execute_debug(const String& service){
 //Motion
 void CommandHandler::execute_go(float x, float y){
     os.motion.go(x, y);
+    os.waitUntil(os.motion);
+}
+
+void CommandHandler::execute_go(Vec2 v){
+    os.motion.go(v);
     os.waitUntil(os.motion);
 }
 
@@ -264,5 +288,8 @@ void CommandHandler::execute_help(){
 }
 
 void CommandHandler::execute_print(const String& str){
-    os.console.println(str);
+    Expression e(str);
+    String result = e.evaluate();
+
+    os.console.println(result);
 }

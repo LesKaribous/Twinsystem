@@ -14,6 +14,9 @@ private:
     Token nextToken();
     Token parseNumber();
     Token parseIdentifier();
+
+    String untilLineEnd();
+
     void skipWhitespace();
 
     // Parser functions

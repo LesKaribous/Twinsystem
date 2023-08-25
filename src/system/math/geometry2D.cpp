@@ -57,14 +57,14 @@ Vec2 Vec2::fromString(const String& str){
         int i = 1; //skip the [
         
         while(v.charAt(i) != ','){
-            if(!isdigit(v.charAt(i))) error = true;
+            if(!isdigit(v.charAt(i)) && v.charAt(i) != '.' && v.charAt(i) != '-') error = true;
             x_str += v.charAt(i++);
         }
 
         i++; //skip the ,
         
         while(v.charAt(i) != ']'){
-            if(!isdigit(v.charAt(i))) error = true;
+            if(!isdigit(v.charAt(i)) && v.charAt(i) != '.' && v.charAt(i) != '-') error = true;
             y_str += v.charAt(i++);
         }
 
