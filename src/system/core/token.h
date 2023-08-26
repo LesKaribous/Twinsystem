@@ -17,7 +17,7 @@ enum TokenType
     END,
     VAR,
     ASSIGN,
-    ADD,
+    ADD, INCREMENT, DECREMENT,
     LITERAL,
     SUBTRACT,
     MULTIPLY,

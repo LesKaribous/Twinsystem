@@ -62,8 +62,12 @@ class Program : public Job {
 
     // Execution functions
     void executeStatement(const std::shared_ptr<Statement>& statement);
-    void executeCommand(const CommandStatement& command);
-    void executeIfStatement(IfStatement& ifStmt);
+    void executeCommand(const CommandStatement&);
+    void executeIfStatement(IfStatement&);
+    void executeForStatement(ForStatement&);
+    void executeWhileStatement(WhileStatement&);
+    void executeBlockStatement(BlockStatement&);
+    void executeVarStatement(VarStatement&);
 
     // Evaluation functions
     String evaluateExpression(const String& e);

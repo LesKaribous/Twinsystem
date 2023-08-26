@@ -46,6 +46,36 @@ void Program::executeIfStatement(IfStatement& ifStmt) {
     }
 }
 
+void Program::executeForStatement(ForStatement&){
+    
+}
+void Program::executeWhileStatement(WhileStatement&){
+    
+}
+void Program::executeBlockStatement(BlockStatement&){
+    
+}
+void Program::executeVarStatement(VarStatement& v){
+    
+    Expression::registerVariables(v.exp.);
+
+        String r = evaluateExpression(ifStmt.condition);
+    bool conditionResult = false;
+
+    if(r.trim().equalsIgnoreCase("true")){
+        conditionResult = true;
+    }else if(r.trim().equalsIgnoreCase("false")){
+        conditionResult = false;
+    }else{
+         os.console.error("Program") << "Error fired during if statement expression evaluation" << os.console.endl;
+         return;
+    }
+
+    const auto& branch = conditionResult ? ifStmt.trueBranch : ifStmt.falseBranch;
+    for (const auto& statement : branch) {
+        executeStatement(statement);
+    }
+}
 
 String symbols[9]{
     "&&",
@@ -120,6 +150,22 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
             break;
         case IF_STATEMENT:
             executeIfStatement(*static_cast<IfStatement*>(statement.get()));
+            break;
+
+        case FOR_STATEMENT:
+            executeForStatement(*static_cast<ForStatement*>(statement.get()));
+            break;
+
+        case WHILE_STATEMENT:
+            executeWhileStatement(*static_cast<WhileStatement*>(statement.get()));
+            break;
+
+        case BLOCK_STATEMENT:
+            executeBlockStatement(*static_cast<BlockStatement*>(statement.get()));
+            break;
+
+         case VAR_STATEMENT:
+            executeVarStatement(*static_cast<VarStatement*>(statement.get()));
             break;
         // Handle error: unexpected statement type
         default:

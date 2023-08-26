@@ -89,7 +89,7 @@ std::shared_ptr<Node> Expression::parseExpression()
     {
         std::shared_ptr<Node> left = parseTerm();
 
-        while (currentTokenIs(ASSIGN) || currentTokenIs(ADD) || currentTokenIs(SUBTRACT) || currentTokenIs(GREATER) || currentTokenIs(LESS) || currentTokenIs(EQUAL) || currentTokenIs(NOT_EQUAL) || currentTokenIs(GREATER_EQUAL) || currentTokenIs(LESS_EQUAL))
+        while (currentTokenIs(ASSIGN) || currentTokenIs(ADD) || currentTokenIs(SUBTRACT) || currentTokenIs(INCREMENT) || currentTokenIs(DECREMENT) || currentTokenIs(GREATER) || currentTokenIs(LESS) || currentTokenIs(EQUAL) || currentTokenIs(NOT_EQUAL) || currentTokenIs(GREATER_EQUAL) || currentTokenIs(LESS_EQUAL))
         {
             TokenType op;
             if (currentTokenIs(ASSIGN))
@@ -128,9 +128,21 @@ std::shared_ptr<Node> Expression::parseExpression()
             {
                 op = SUBTRACT;
             }
-            consumeToken(); // Move to the next token
-            std::shared_ptr<Node> right = op == ASSIGN ? parseExpression() : parseTerm();
+            else if (currentTokenIs(INCREMENT))
+            {
+                op = INCREMENT;
+            }
+            else if (currentTokenIs(DECREMENT))
+            {
+                op = DECREMENT;
+            }
+
+            std::shared_ptr<Node> right;
+            consumeToken(); // Move to the next token   
+            if(op == DECREMENT || op == INCREMENT) right = nullptr;
+            else right = op == ASSIGN ? parseExpression() : parseTerm();
             left = std::make_shared<Node>(op, "", left, right);
+
         }
         return left;
     }
@@ -180,7 +192,7 @@ std::shared_ptr<Node> Expression::parseFactor()
     else
     {
         // Handle error: unexpected token
-        os.console.error("Expression") << "Unexpected token while reading expression factor" << os.console.endl;
+        os.console.error("Expression") << "Unexpected token while reading expression factor : "  << currentToken.toString() << os.console.endl;
     }
 
     return node;
@@ -283,7 +295,7 @@ void Expression::consumeToken()
 {
     previousToken = currentToken;
     // Check for the end of the input
-    if (pos >= input.length() || input.charAt(pos) == '\n') {
+    if (pos >= input.length() || input.charAt(pos) == '\n' || input.charAt(pos) == 13) {
         currentToken = {END_OF_EXPRESSION, ""};
         return;
     }
@@ -291,8 +303,14 @@ void Expression::consumeToken()
     // Recognize operators and keywords
     if (ch == '+')
     {
-        currentToken = {ADD, "+"};
-        pos++;
+        if (input.charAt(pos + 1) == '+')
+        {
+            currentToken = {INCREMENT, "+"};
+            pos += 2;
+        }else{
+            currentToken = {ADD, "+"};
+            pos++;
+        }
     }
     else if (ch == ' '){
         pos++; 
@@ -317,8 +335,14 @@ void Expression::consumeToken()
         }
         else
         {
-            currentToken = {SUBTRACT, "-"};
-            pos++;
+            if (input.charAt(pos + 1) == '-')
+            {
+                currentToken = {DECREMENT, "-"};
+                pos += 2;
+            }else{
+                currentToken = {SUBTRACT, "-"};
+                pos++;
+            }
         }
     }
     else if (ch == '*')
@@ -459,6 +483,10 @@ String Expression::evaluateNode(std::shared_ptr<Node> node)
         return evaluateAdd(node);
     case SUBTRACT:
         return evaluateSubtract(node);
+    case INCREMENT:
+        return evaluateIncrement(node);
+    case DECREMENT:
+        return evaluateDecrement(node);
     case MULTIPLY:
         return evaluateMultiply(node);
     case DIVIDE:
@@ -805,6 +833,30 @@ String Expression::evaluateAssign(std::shared_ptr<Node> node)
     }
     return value;
 }
+
+String Expression::evaluateIncrement(std::shared_ptr<Node> node)
+{
+    
+    if(node->left->type == VARIABLE){
+        String oldValue = lookupVariableValue(node->left->value);
+        Expression e(node->left->value + "+1");
+        Expression::setVariable(node->left->value, e.evaluate());
+        return oldValue;
+    }
+    return "error";
+}
+
+String Expression::evaluateDecrement(std::shared_ptr<Node> node)
+{
+    if(node->left->type == VARIABLE){
+        String oldValue = lookupVariableValue(node->left->value);
+        Expression e(node->left->value + "-1");
+        Expression::setVariable(node->left->value, e.evaluate());
+        return oldValue;
+    }
+    return "error";
+}
+
 
 String Expression::lookupVariableValue(const String &variableName)
 {

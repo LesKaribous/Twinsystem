@@ -53,6 +53,8 @@ private:
     String evaluateLess(std::shared_ptr<Node> node);
     String evaluateGreater(std::shared_ptr<Node> node);
     String evaluateVariable(std::shared_ptr<Node> node); // Handle variables
+    String evaluateIncrement(std::shared_ptr<Node> node);
+    String evaluateDecrement(std::shared_ptr<Node> node);
 
     // Tokenization functions
     bool currentTokenIs(TokenType type);

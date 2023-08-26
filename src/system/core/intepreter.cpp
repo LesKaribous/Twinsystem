@@ -76,6 +76,8 @@ Token Interpreter::nextToken() {
                 return nextToken(); // Recursively call to get the next token
             case '\n' : 
                 pos++; // Skip the unexpected character
+            case 13 : 
+                pos++; // Skip the unexpected character
 
                 return nextToken(); // Recursively call to get the next token
             default:
@@ -139,10 +141,11 @@ Token Interpreter::parseIdentifier() {
 
 String Interpreter::untilLineEnd(){
     String line = "";
-    while (pos < input.length() && input.charAt(pos) != '\n') {
-        skipWhitespace();
-        line += input.charAt(pos++);
+    while (pos < input.length() && input.charAt(pos) != '\n' && input.charAt(pos) != 13) {
+        line += input.charAt(pos);
+        pos++;
     }
+    while(input.charAt(pos) == '\n' || input.charAt(pos) == 13) pos++;
     return line;
 }   
 
@@ -226,15 +229,9 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
 }
 
 std::shared_ptr<VarStatement> Interpreter::parseVariableStatement() {
-    currentToken = nextToken(); // Consume the 'var' keyword
-    // Parse the condition without parenthethis
-    String expression;
-    while (pos+1 < input.length()) {
-        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
-        else break;
-    }
-
-    std::shared_ptr<VarStatement> varPtr = std::make_shared<VarStatement>(expression);
+    String expression = untilLineEnd();
+    currentToken = nextToken();
+    return std::make_shared<VarStatement>(expression);
 }
 
 std::shared_ptr<ForStatement> Interpreter::parseForStatement() {
