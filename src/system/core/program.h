@@ -26,8 +26,18 @@ struct IfStatement : public Statement {
 };
 
 struct VarStatement : public Statement{
-    VarStatement(const String& e) : exp(e){ type = VAR_STATEMENT; }
+    VarStatement(const String& e) : exp(e){ 
+        String input = e;
+        String varName;
+        uint index = 0;
+        while (index < input.length() && (isAlpha(input.charAt(index)) || isDigit(input.charAt(index)))) {
+            varName += input.charAt(index++);
+        }
+        name = varName;
+        type = VAR_STATEMENT; 
+    }
     Expression exp;
+    String name;
 };
 
 struct ForStatement : public Statement{

@@ -58,6 +58,7 @@ Token Interpreter::nextToken() {
 
     // Get the next character
     char ch = input.charAt(pos);
+    THROW(ch)
 
     // Handle different token types
     if (isDigit(ch)) {
@@ -95,7 +96,7 @@ Token Interpreter::nextToken() {
 
 // Skip whitespace in the input
 void Interpreter::skipWhitespace() {
-    while (pos < input.length() && isWhitespace(input.charAt(pos))) {
+    while (pos < input.length() && (isWhitespace(input.charAt(pos)) || input.charAt(pos) == 0 ||  input.charAt(pos) != 13)) {
         pos++;
     }
 }
@@ -196,16 +197,18 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
     currentToken = nextToken(); // Consume the 'if' keyword
 
     // Parse the condition without parenthethis
-    String expression;
-    while (pos+1 < input.length()) {
-        if(input.charAt(pos+1) != '\n') expression += input.charAt(pos++);
-        else break;
+    String expression = untilLineEnd();
+
+    if(expression.lastIndexOf(")") == -1){
+        os.console.error("Interpreter") << "Expected ')' in if statement expression " <<  os.console.endl;
+        return nullptr;
     }
 
-    os.console.println(expression);
-    auto ifStmt = std::make_shared<IfStatement>(expression);
-    currentToken = nextToken(); // Consume the condition
+    expression = expression.substring(0, expression.lastIndexOf(")"));
 
+    auto ifStmt = std::make_shared<IfStatement>(expression);
+
+    currentToken = nextToken(); // Consume the 'if' keyword
     // Parse the true branch
     while (currentToken.type != ELSE && currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
         ifStmt->trueBranch.push_back(parseStatement());
@@ -214,6 +217,7 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
     // Parse the false branch (if present)
     if (currentToken.type == ELSE) {
         currentToken = nextToken(); // Consume the 'else' keyword
+        THROW(currentToken.toString())
         while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
             ifStmt->falseBranch.push_back(parseStatement());
         }
@@ -229,7 +233,9 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
 }
 
 std::shared_ptr<VarStatement> Interpreter::parseVariableStatement() {
+
     String expression = untilLineEnd();
+
     currentToken = nextToken();
     return std::make_shared<VarStatement>(expression);
 }
@@ -364,7 +370,7 @@ std::shared_ptr<Statement> Interpreter::parseStatement() {
         return parseBlockStatement();
     } else {
         // Handle error: unexpected token
-        os.console.error("Parser") << currentPos() << "Unexpected token: " << currentToken.value << HERE << os.console.endl;
+        os.console.error("Parser") << currentPos() << "Unexpected token: " << currentToken.toString() << HERE << os.console.endl;
     }
 
     return nullptr; // Should never reach here

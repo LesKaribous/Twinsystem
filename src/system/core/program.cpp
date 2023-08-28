@@ -56,25 +56,8 @@ void Program::executeBlockStatement(BlockStatement&){
     
 }
 void Program::executeVarStatement(VarStatement& v){
-    
-    Expression::registerVariables(v.exp.);
-
-        String r = evaluateExpression(ifStmt.condition);
-    bool conditionResult = false;
-
-    if(r.trim().equalsIgnoreCase("true")){
-        conditionResult = true;
-    }else if(r.trim().equalsIgnoreCase("false")){
-        conditionResult = false;
-    }else{
-         os.console.error("Program") << "Error fired during if statement expression evaluation" << os.console.endl;
-         return;
-    }
-
-    const auto& branch = conditionResult ? ifStmt.trueBranch : ifStmt.falseBranch;
-    for (const auto& statement : branch) {
-        executeStatement(statement);
-    }
+    Expression::registerVariables(v.name);
+    String r = evaluateExpression(v.exp);
 }
 
 String symbols[9]{

@@ -3,12 +3,13 @@
 
 Expression::Expression(const String &str) : pos(0)
 {
+    String raw = str;
+    raw = raw.trim();
     input = "";
-    for (char c : str) {
-        if(isWhitespace(input.charAt(c)) && !input.equalsIgnoreCase("VAR")); //remove useless spaces
+    for (char c : raw) {
+        if(isWhitespace(c) && !input.equalsIgnoreCase("VAR")); //remove useless spaces
         else input += c; 
     }
-
     consumeToken();           // Initialize the current token
     root = parseExpression(); // Parse the expression and store the AST in the root member variable
 }
@@ -66,86 +67,65 @@ std::map<String, String> &Expression::getVariables()
 
 std::shared_ptr<Node> Expression::parseExpression()
 {
-    if (currentTokenIs(VAR))
-    {   
-        consumeToken(); // Consume the 'var' keyword
-        if (!currentTokenIs(VARIABLE))
-        {
-            os.console.error("Expression")  << "expected variable name after 'var'" << os.console.endl;
-        }
-        String varName = currentTokenValue();
-        consumeToken(); // Consume the variable name
-        if (!currentTokenIs(ASSIGN))
-        {
-            // Handle error: expected '=' after variable name
-            os.console.warn("Expression")  << "variable " << varName <<  "is undefined" << os.console.endl;
-        }
-        consumeToken(); // Consume the '='
-        std::shared_ptr<Node> variable = std::make_shared<Node>(VARIABLE, varName, nullptr, nullptr);
-        std::shared_ptr<Node> valueNode = parseExpression();
-        return std::make_shared<Node>(ASSIGN, varName, variable, valueNode);
-    }
-    else
+    std::shared_ptr<Node> left = parseTerm();
+
+    while (currentTokenIs(ASSIGN) || currentTokenIs(ADD) || currentTokenIs(SUBTRACT) || currentTokenIs(INCREMENT) || currentTokenIs(DECREMENT) || currentTokenIs(GREATER) || currentTokenIs(LESS) || currentTokenIs(EQUAL) || currentTokenIs(NOT_EQUAL) || currentTokenIs(GREATER_EQUAL) || currentTokenIs(LESS_EQUAL))
     {
-        std::shared_ptr<Node> left = parseTerm();
-
-        while (currentTokenIs(ASSIGN) || currentTokenIs(ADD) || currentTokenIs(SUBTRACT) || currentTokenIs(INCREMENT) || currentTokenIs(DECREMENT) || currentTokenIs(GREATER) || currentTokenIs(LESS) || currentTokenIs(EQUAL) || currentTokenIs(NOT_EQUAL) || currentTokenIs(GREATER_EQUAL) || currentTokenIs(LESS_EQUAL))
+        TokenType op;
+        if (currentTokenIs(ASSIGN))
         {
-            TokenType op;
-            if (currentTokenIs(ASSIGN))
-            {
-                op = ASSIGN;
-            }
-            else if (currentTokenIs(GREATER))
-            {
-                op = GREATER;
-            }
-            else if (currentTokenIs(LESS))
-            {
-                op = LESS;
-            }
-            else if (currentTokenIs(EQUAL))
-            {
-                op = EQUAL;
-            }
-            else if (currentTokenIs(NOT_EQUAL))
-            {
-                op = NOT_EQUAL;
-            }
-            else if (currentTokenIs(GREATER_EQUAL))
-            {
-                op = GREATER_EQUAL;
-            }
-            else if (currentTokenIs(LESS_EQUAL))
-            {
-                op = LESS_EQUAL;
-            }
-            else if (currentTokenIs(ADD))
-            {
-                op = ADD;
-            }
-            else if (currentTokenIs(SUBTRACT))
-            {
-                op = SUBTRACT;
-            }
-            else if (currentTokenIs(INCREMENT))
-            {
-                op = INCREMENT;
-            }
-            else if (currentTokenIs(DECREMENT))
-            {
-                op = DECREMENT;
-            }
-
-            std::shared_ptr<Node> right;
-            consumeToken(); // Move to the next token   
-            if(op == DECREMENT || op == INCREMENT) right = nullptr;
-            else right = op == ASSIGN ? parseExpression() : parseTerm();
-            left = std::make_shared<Node>(op, "", left, right);
-
+            op = ASSIGN;
         }
-        return left;
+        else if (currentTokenIs(GREATER))
+        {
+            op = GREATER;
+        }
+        else if (currentTokenIs(LESS))
+        {
+            op = LESS;
+        }
+        else if (currentTokenIs(EQUAL))
+        {
+            op = EQUAL;
+        }
+        else if (currentTokenIs(NOT_EQUAL))
+        {
+            op = NOT_EQUAL;
+        }
+        else if (currentTokenIs(GREATER_EQUAL))
+        {
+            op = GREATER_EQUAL;
+        }
+        else if (currentTokenIs(LESS_EQUAL))
+        {
+            op = LESS_EQUAL;
+        }
+        else if (currentTokenIs(ADD))
+        {
+            op = ADD;
+        }
+        else if (currentTokenIs(SUBTRACT))
+        {
+            op = SUBTRACT;
+        }
+        else if (currentTokenIs(INCREMENT))
+        {
+            op = INCREMENT;
+        }
+        else if (currentTokenIs(DECREMENT))
+        {
+            op = DECREMENT;
+        }
+
+        std::shared_ptr<Node> right;
+        consumeToken(); // Move to the next token   
+        if(op == DECREMENT || op == INCREMENT) right = nullptr;
+        else right = op == ASSIGN ? parseExpression() : parseTerm();
+        left = std::make_shared<Node>(op, "", left, right);
+
     }
+    return left;
+
 }
 
 std::shared_ptr<Node> Expression::parseTerm()
@@ -416,11 +396,14 @@ void Expression::consumeToken()
         {
             currentToken = {OR, value};
         }
-        else if (getVariables().find(value) != getVariables().end())
+        else if (value.equalsIgnoreCase("TRUE") || value.equalsIgnoreCase("FALSE"))
+        {
+            currentToken = {LITERAL, value};
+        }else if (getVariables().find(value) != getVariables().end())
         {
             currentToken = {VARIABLE, value};
         }else{
-            if(previousToken.type != VAR) os.console.warn("Expression") << "Unknown variable or identifier " << value << " used in program" << os.console.endl;
+            //if(previousToken.type != VAR) os.console.warn("Expression") << "Unknown variable or identifier " << value << " used in program. make sure to use var to make a proper" << os.console.endl;
             currentToken = {VARIABLE, value};
         }
     }
