@@ -30,13 +30,13 @@ OperatingSystem::OperatingSystem() : SystemBase(){
 
     //loadService(&lidar);
     loadService(&screen);       screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
-    loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
+    //loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
     loadService(&motion);       screen.addBootProgress(10); screen.drawBootProgress("Linking motion...");
     //loadService(&planner); screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
-    loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
-    loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
+    //loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
+    //loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
     loadService(&terminal);     screen.addBootProgress(10); screen.drawBootProgress("Linking terminal...");
-    loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
+    //loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
     //loadService(&localisation);
 
     registerCommands();
@@ -75,26 +75,21 @@ void OperatingSystem::registerCommands(){
     CommandHandler::registerCommand("help", "Display help");
 
     //Variables
-    Expression::registerVariables("time");
-    Expression::registerVariables("posA", "[1,2]");
-    Expression::registerVariables("posB", "[3,4]");
+    // Expression::registerVariables("time");
+    // Expression::registerVariables("posA", "[1,2]");
+    // Expression::registerVariables("posB", "[3,4]");
 }
 
 void OperatingSystem::update(){
 	SystemBase::update();
-
+    
     if( terminal.commandAvailable() > 0){
+        console.println("Received command. parsing...");
         Program p = interpreter.processScript(terminal.dequeCommand());
         
         if(p.isValid()){
             execute(p);
-        }
-        
-        //String str = terminal.dequeCommand();
-        //Expression e(str.trim());
-        //e.printCompiled();
-        //console.print(e.toString() + " = " );
-        //console.println(e.evaluate());
+        }    
     }
 }
 

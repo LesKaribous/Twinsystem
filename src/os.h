@@ -51,6 +51,7 @@ protected :
     void setState(RobotState);
     void printState(RobotState) const;
 
+public:
     //Standalone services
     Lidar lidar;
     

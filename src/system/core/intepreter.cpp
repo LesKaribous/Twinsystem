@@ -8,7 +8,7 @@ Interpreter::Interpreter() : pos(0) {
 
 // Process a script
 Program Interpreter::processScript(const String& script) {
-    input = script;
+    input = script.trim();
     pos = 0;
     currentToken = nextToken();
 
@@ -47,10 +47,6 @@ void Interpreter::displaySyntaxError(const String& commandName) {
 
 // Get the next token from the input
 Token Interpreter::nextToken() {
-    // Skip any whitespace
-    
-    skipWhitespace();
-
     // Check for the end of the input
     if (pos >= input.length()) {
         return {END_OF_SCRIPT, ""};
@@ -58,7 +54,7 @@ Token Interpreter::nextToken() {
 
     // Get the next character
     char ch = input.charAt(pos);
-    THROW(ch)
+    //THROW(ch)
 
     // Handle different token types
     if (isDigit(ch)) {
@@ -96,7 +92,7 @@ Token Interpreter::nextToken() {
 
 // Skip whitespace in the input
 void Interpreter::skipWhitespace() {
-    while (pos < input.length() && (isWhitespace(input.charAt(pos)) || input.charAt(pos) == 0 ||  input.charAt(pos) != 13)) {
+    while (pos < input.length() && (isWhitespace(input.charAt(pos))/* || input.charAt(pos) == 0 ||  input.charAt(pos) != 13*/)) {
         pos++;
     }
 }

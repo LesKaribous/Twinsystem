@@ -23,15 +23,25 @@ class Polyline {
   popStyle();
  }
  
+ 
+ 
  String toGCode() {
-   
+   int pts = 0;
    String gcodePolyline = "";
     for(Point p : points) {
-      String pointStr = "go(";
+      pts++;
+      String pointStr = "";
       // x, y, z
-      pointStr += str(p.x-width/2) + ",";
-      pointStr += str(p.y-height/2)+ ");\n";
       
+      pointStr += "PR[" + str(pts) + ":1]=";
+      pointStr += str(p.x   -width/2) + "\n";
+      pointStr += "PR[" + str(pts) + ":2]=";
+      pointStr += str(p.y   -height/2)+ "\n";
+      pointStr += "PR[" + str(pts) + ":3]=";
+      pointStr += str(50)+ "\n"; 
+      
+      pointStr +="L PR[" + str(pts) + "] 500mm/sec FINE\n";
+       
       // add Point to Polyline
       gcodePolyline += pointStr;
     }

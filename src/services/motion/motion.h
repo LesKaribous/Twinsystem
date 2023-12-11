@@ -23,7 +23,6 @@ public:
     void align(RobotCompass, float orientation);
     void goAlign(Vec2 target, RobotCompass rc, float orientation);
 
-
     void setFeedrate(int); //0-100%
     void setCalibration(CalibrationProfile c);
 
@@ -41,7 +40,6 @@ public:
     float getOrientation(); //rad
 
     void resetSteps();
-
 
     //Setters
     void setAbsTarget(Vec3);    //mm, mm, rad
@@ -77,19 +75,20 @@ public:
 
     void move(Vec3 target);
 private:
-    void pid();
+    void positionControl(float dt);
+    void speedControl(float dt);
 
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
-    Vec3 _desiredSpeed = { 0, 0, 0}; // Desired speed in mm/s, mm/s, rad/s
-    Vec3 _currentSpeed = { 0, 0, 0}; // Current speed in mm/s, mm/s, rad/s
-
+    Vec3 _lastSteps      = { 0, 0, 0}; //Steps
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
+    Vec3 _velocity       = { 0, 0, 0}; //Absolute mm, mm, rad / s
+    Vec3 _targetVelocity = { 0, 0, 0}; //Absolute mm, mm, rad / s
 
     Vec2 accelCorr; //Correct acceleration bias
 

@@ -4,7 +4,7 @@
 
 ConsoleStream::ConsoleStream(ConsoleLevel lvl, ServiceID origin) {
 	_ignored = false;
-	if((lvl < ConsoleLevel::WARNING && !os.debug(origin))) _ignored = true;
+	if((lvl < os.console.getLevel() && !os.debug(origin))) _ignored = true;
 
 	if (!_ignored) {
 		if (origin == NOT_A_SERVICE) os.console.write(header(lvl).c_str());
@@ -14,7 +14,7 @@ ConsoleStream::ConsoleStream(ConsoleLevel lvl, ServiceID origin) {
 
 ConsoleStream::ConsoleStream(ConsoleLevel lvl, const String& origin) {
 	_ignored = false;
-	if((lvl < ConsoleLevel::WARNING && !os.debug(Service::toID(origin)))) _ignored = true;
+	if((lvl < os.console.getLevel() && !os.debug(Service::toID(origin)))) _ignored = true;
 
 	if (!_ignored) {
 		if (origin == NOT_A_SERVICE) os.console.write(header(lvl).c_str());

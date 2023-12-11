@@ -72,38 +72,51 @@ void Motion::run(){
 void Motion::update(){
 
     if(m_enabled && !_sleeping && !isPaused()){
-        pid();
 
-        if(isMoving() && Vec2(_target - _position).mag() < 5 && fabs(_target.c - _position.c) < 0.1){
-            //_position = _target; //Is this required ?
+        if(isPending()){
+            if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
+            if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
+                if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
+                lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
+            }
+            
+            float dt = (millis() - lastPIDTick)/1000.0;
+
+            //Speed estimation based on last steps
+            _lastSteps = getLastSteps();
+            resetSteps();
+            _currentSpeed = _lastSteps/dt;
+
+            //Position estimation and rotation measure
+            _position.c = getOrientation();
+            _position = estimatePosition(_position, _lastSteps); //in world frame of reference
+
+            positionControl(dt);
+            speedControl(dt);
+        }
+
+        if(isMoving() && Vec2(_target - _position).mag() < 2 && _target.c - _position.c < 0.05 && _currentSpeed.mag() < 100){
             complete();
         }
         
-        os.screen.x.SetValue(_position.x);
-        os.screen.y.SetValue(_position.y);
-        os.screen.z.SetValue(_position.z);
-    
+        os.screen.x.SetValue(_lastError.x);
+        os.screen.y.SetValue(_lastError.y);
+        os.screen.z.SetValue(_lastError.z);
     }
 }
 
-void Motion::pid(){
-    if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
-    if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
-        if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
-        lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
-    }
+void Motion::speedControl(float dt){
 
-    float dt = (millis() - lastPIDTick)/1000.0;
 
+    /*
     Vec3 kP = Settings::Motion::kP;
     Vec3 kI = Settings::Motion::kI;
     Vec3 kD = Settings::Motion::kD;
+    */
 
-    Vec3 lastSteps = getLastSteps();
-    resetSteps();
-
-    _position.c = getOrientation();
-    _position = estimatePosition(_position, lastSteps); //in world frame of reference
+    Vec3 kP = Vec3(3.0, 3.0, 3.5) / 10000.0;;
+    Vec3 kI = Settings::Motion::kI;
+    Vec3 kD = Settings::Motion::kD;
 
     if(debug()){
         os.console.plot("px",_position.x);
@@ -117,7 +130,7 @@ void Motion::pid(){
     Vec3 error = Vec3(_target) - Vec3(_position);
     _integral  += error * dt; //Absolute mm, mm, rad
     Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
+    _lastError = Vec3(error); //Absolute mm, mm, rad
 
     corr.rotateZ(_position.c); //to robot frame of reference
     corr = targetToSteps(corr);
@@ -128,6 +141,27 @@ void Motion::pid(){
 
     lastPIDTick = millis();
 
+}
+
+void Motion::positionControl(float dt){
+    if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
+    if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
+        if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
+        lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
+    }
+    float dt = (millis() - lastPIDTick)/1000.0;
+
+    Vec3 kP = Settings::Motion::kP;
+    Vec3 kI = Settings::Motion::kI;
+    Vec3 kD = Settings::Motion::kD;
+
+    //correction
+    Vec3 error = Vec3(_target) - Vec3(_position);
+    _integral  += error * dt; //Absolute mm, mm, rad
+    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
+    _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
+
+    corr = targetToSteps(corr);
 }
 
 void Motion::pause(){
@@ -266,6 +300,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 }
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
+    relTarget.rotateZ(position.c);
     relTarget *= _calibration; 					                //Apply cartesian calibration
     relTarget = ik(relTarget);				  					//Apply inverse kinematics result in steps
     relTarget.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); 	//Apply stepping multiplier
