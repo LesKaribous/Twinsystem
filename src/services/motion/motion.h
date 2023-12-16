@@ -34,7 +34,7 @@ public:
     void complete() override;
     void forceCancel();
 
-    Vec2 estimatePosition(Vec3 start, Vec3 steps) const;
+    Vec2 estimatePosition(Vec3 start, Vec3 steps, float dt) const;
 
     void resetCompass(); //zero orientation
     float getOrientation(); //rad
@@ -78,6 +78,7 @@ private:
     void positionControl(float dt);
     void speedControl(float dt);
 
+    Vec3 computeSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
@@ -87,14 +88,17 @@ private:
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _velocity       = { 0, 0, 0}; //Absolute mm, mm, rad / s
-    Vec3 _targetVelocity = { 0, 0, 0}; //Absolute mm, mm, rad / s
+    Vec3 _velocity       = { 0, 0, 0}; //Absolute steps / s
+    Vec3 _targetVelocity = { 0, 0, 0}; //Absolute steps / s
 
     Vec2 accelCorr; //Correct acceleration bias
 
     //PID
     Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm
     Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm
+
+    Vec3 _velLastError 	  = { 0, 0, 0}; //Absolute mm, mm
+    Vec3 _velIntegral 	  = { 0, 0, 0}; //Absolute mm, mm
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};

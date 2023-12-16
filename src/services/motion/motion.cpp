@@ -76,27 +76,30 @@ void Motion::update(){
         if(isPending()){
             if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
             if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
-                if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
+                if(lastPIDTick != 0) os.console.info(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
                 lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
             }
             
-            float dt = (millis() - lastPIDTick)/1000.0;
+            float dt = float(millis() - lastPIDTick)/1000.0;
 
             //Speed estimation based on last steps
             _lastSteps = getLastSteps();
             resetSteps();
-            _currentSpeed = _lastSteps/dt;
+            _velocity = _lastSteps/dt;
 
             //Position estimation and rotation measure
             _position.c = getOrientation();
-            _position = estimatePosition(_position, _lastSteps); //in world frame of reference
+            
+
+            _position = estimatePosition(_position, _velocity, dt); //in world frame of reference
 
             positionControl(dt);
             speedControl(dt);
         }
 
-        if(isMoving() && Vec2(_target - _position).mag() < 2 && _target.c - _position.c < 0.05 && _currentSpeed.mag() < 100){
+        if(Vec2(_target - _position).mag() < 0.5 && abs(_target.c - _position.c) < 0.025 && _velocity.mag() < 50){
             complete();
+            sleep();
         }
         
         os.screen.x.SetValue(_lastError.x);
@@ -108,17 +111,71 @@ void Motion::update(){
 void Motion::speedControl(float dt){
 
 
-    /*
-    Vec3 kP = Settings::Motion::kP;
+    Vec3 kP = Vec3(0.001,0.001,0.001); //Settings::Motion::kP;
     Vec3 kI = Settings::Motion::kI;
     Vec3 kD = Settings::Motion::kD;
+    
+    Vec3 error = Vec3(_targetVelocity) - Vec3(_velocity);
+    _velIntegral  += error * dt; //steps / s
+    Vec3 corr = (error * kP) + (_velIntegral * kI) + (((error - _velLastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
+    _velLastError = Vec3(error); //steps / s
+
+    //os.console.println("velocity : " + String(_velocity));
+
+    _sAController.overrideSpeed(corr.a); // set new speed
+    _sBController.overrideSpeed(corr.b); // set new speed
+    _sCController.overrideSpeed(corr.c); // set new speed
+
+    lastPIDTick = millis();
+    
+
+   /*
+    // Apply speeds to motors
+    _sAController.overrideSpeed(speedA/wheelRadius);
+    _sBController.overrideSpeed(speedB/wheelRadius);
+    _sCController.overrideSpeed(speedC/wheelRadius);
     */
 
-    Vec3 kP = Vec3(3.0, 3.0, 3.5) / 10000.0;;
-    Vec3 kI = Settings::Motion::kI;
-    Vec3 kD = Settings::Motion::kD;
+}
 
-    if(debug()){
+void Motion::positionControl(float dt){
+    Vec3 kP = Vec3(0.1,0.1,0.05); //Settings::Motion::kP;
+    Vec3 kI = Vec3(0.0,0.0,0.0);//Settings::Motion::kI;
+    Vec3 kD = Vec3(0.008,0.008,0.01);//Settings::Motion::kD;
+
+    //correction
+    Vec3 error = _target - _position;
+    //os.console.println("error : " + String(error));
+
+
+    _integral  += error * dt; //Absolute mm, mm, rad
+    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
+    _lastError = Vec3(error); //Absolute mm, mm, rad
+
+
+    //os.console.println("corr : " + String(corr));
+    //os.console.println("pos error : " + String(corr));
+    _targetVelocity = corr * 1000.0;//+computeSpeed(Vec3(0,0,targetToSteps(Vec3(0,0,corr.c)).c));
+    //_targetVelocity = Vec3(1000);
+    //os.console.println("velocity : " + String(_targetVelocity));
+
+       // Constants
+    const float wheelSpacing = -Settings::Geometry::RADIUS; // Distance from the center of the robot to the wheel
+    const float wheelRadius = Settings::Geometry::WHEEL_RADIUS; // Distance from the center of the robot to the wheel
+
+    // Linear velocity components
+    float Vy = 1000;// _targetVelocity.x;
+    float Vx = 0;//_targetVelocity.y;
+    float Vtheta = 0.5;// _targetVelocity.z;
+
+    // Calculate wheel speeds
+    float speedA = ( Vx - (Vy/sqrt(3)) + Vtheta * wheelSpacing)/wheelRadius;
+    float speedB = (-Vx + (Vy/sqrt(3)) + Vtheta * wheelSpacing)/wheelRadius;
+    float speedC = ((2*Vy/sqrt(3)) + Vtheta * wheelSpacing)/wheelRadius;
+
+    _targetVelocity = Vec3(speedA, speedB, speedC);
+
+   if(true){
         os.console.plot("px",_position.x);
         os.console.plot("tx",_target.x);
         os.console.plot("py",_position.y);
@@ -127,41 +184,21 @@ void Motion::speedControl(float dt){
         os.console.plot("ta",_target.c);
     }
 
-    Vec3 error = Vec3(_target) - Vec3(_position);
-    _integral  += error * dt; //Absolute mm, mm, rad
-    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = Vec3(error); //Absolute mm, mm, rad
-
-    corr.rotateZ(_position.c); //to robot frame of reference
-    corr = targetToSteps(corr);
-
-    _sAController.overrideSpeed(corr.a); // set new speed
-    _sBController.overrideSpeed(corr.b); // set new speed
-    _sCController.overrideSpeed(corr.c); // set new speed
-
-    lastPIDTick = millis();
-
 }
 
-void Motion::positionControl(float dt){
-    if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
-    if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
-        if(lastPIDTick != 0) os.console.trace(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
-        lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
-    }
-    float dt = (millis() - lastPIDTick)/1000.0;
 
-    Vec3 kP = Settings::Motion::kP;
-    Vec3 kI = Settings::Motion::kI;
-    Vec3 kD = Settings::Motion::kD;
+Vec3 Motion::computeSpeed(Vec3 target){
+    // Maximum speed constraints (in mm/s or similar units)
+    float maxSpeed = Settings::Motion::SPEED;
+    float scaleFactor = 1000.0; // This scales the rotational error to an angular speed
 
-    //correction
-    Vec3 error = Vec3(_target) - Vec3(_position);
-    _integral  += error * dt; //Absolute mm, mm, rad
-    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = Vec3(error, _position.c); //Absolute mm, mm, rad
-
-    corr = targetToSteps(corr);
+    // Compute target speeds while respecting the maximum speed constraints
+    Vec3 targetSpeed = target * scaleFactor;/*
+    targetSpeed.x = std::min(std::max(target.x * scaleFactor, -maxSpeed), maxSpeed);
+    targetSpeed.y = std::min(std::max(target.y * scaleFactor, -maxSpeed), maxSpeed);
+    targetSpeed.z = std::min(std::max(target.z * scaleFactor, -maxSpeed), maxSpeed);
+    */
+    return targetSpeed;
 }
 
 void Motion::pause(){
@@ -300,7 +337,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 }
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
-    relTarget.rotateZ(position.c);
+    relTarget.rotateZ(_position.c);
     relTarget *= _calibration; 					                //Apply cartesian calibration
     relTarget = ik(relTarget);				  					//Apply inverse kinematics result in steps
     relTarget.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); 	//Apply stepping multiplier
@@ -317,16 +354,32 @@ Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
     return relTarget;
 }
 
-Vec2  Motion::estimatePosition(Vec3 start, Vec3 steps) const{
-    Vec2 relativePosition = fk(steps);
-    
-    relativePosition.a /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
-    relativePosition.b /= Settings::Stepper::STEP_MODE * RAD_TO_DEG;
-    relativePosition.a /= _calibration.a;
-    relativePosition.b /= _calibration.b;
+Vec2  Motion::estimatePosition(Vec3 start, Vec3 steps, float dt) const{
+       // Constants
+    const float wheelSpacing = -Settings::Geometry::RADIUS; // Distance from the center of the robot to the wheel
+    const float wheelRadius = Settings::Geometry::WHEEL_RADIUS; // Distance from the center of the robot to the wheel
+    const float wheelAngleA = 0.0; // in radians
+    const float wheelAngleB = 2.0 * M_PI / 3.0; // 120 degrees in radians
+    const float wheelAngleC = 4.0 * M_PI / 3.0; // 240 degrees in radians
+    float pi = PI;
+    float Va = steps.a;
+    float Vb = steps.b;
+    float Vc = steps.c;
+    float theta = _position.c;
 
-    //os.console.info("Motion") << relativePosition << os.console.endl;
-    return start + relativePosition.rotate(-_position.c); //To world frame of reference
+    // Calculate wheel speeds
+ // Assuming SpeedA, SpeedB, SpeedC are the speeds of wheels A, B, C
+    float SpeedA = steps.x;
+    float SpeedB = steps.y;
+    float SpeedC = steps.z;
+    float Vx = (wheelRadius / 3.0) * (2 * SpeedA - SpeedB - SpeedC);
+    float Vy = (wheelRadius / sqrt(3.0)) * (SpeedB - SpeedC);
+    float Vtheta = (wheelRadius / (3.0 * wheelSpacing)) * (SpeedA + SpeedB + SpeedC);
+
+
+    Vec3 relativeVelocity = Vec3(Vx, Vy, Vtheta);
+
+    return start + relativeVelocity*dt; //To world frame of reference
 }
 
 
@@ -371,8 +424,10 @@ void Motion::disengage(){
 }
 
 void Motion::sleep(){
+    if(isPending()) cancel();
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
     _sleeping = true;
+    
 }
 
 void Motion::wakeUp(){

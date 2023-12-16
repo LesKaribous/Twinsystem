@@ -31,7 +31,7 @@ Vec3 ik(Vec3 target){
 
 Vec3 fk(Vec3 target){
     float   f1sq3 = 1.0f / sqrt(3.0f),		  
-            fsq3s3 = sqrt(3.0f)/3.0,		  
+            //fsq3s3 = sqrt(3.0f)/3.0,		  
             f1s3 = 1.0f/3.0f,
             f2s3 = 2.0f/3.0f,
             L = Settings::Geometry::RADIUS,

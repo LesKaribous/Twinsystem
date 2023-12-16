@@ -116,18 +116,20 @@ namespace Settings{
         // will occur in the future. 
 
         //https://en.wikipedia.org/wiki/PID_controller
-        const Vec3 kP = Vec3(3.0, 3.0, 3.5) / 10000.0;
-        const Vec3 kI = Vec3(0.0, 0.0, 0.0) / 10000.0;
-        const Vec3 kD = Vec3(0.0, 0.0, 0.0) / 10000.0;
+        //const Vec3 kP = Vec3(3.0, 3.0, 3.5);
+        const Vec3 vkP = Vec3(1.0, 1.0, 1.5);
+        const Vec3 kP = Vec3(1.0, 1.0, 1.5);
+        const Vec3 kI = Vec3(0.0, 0.0, 0.0);
+        const Vec3 kD = Vec3(0.0, 0.0, 0.0);
 
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 20000, // Old : 5000
-            SPEED = 5000, // Old : 5000
+            ACCEL = 5000, // Old : 5000
+            SPEED = 10000, // Old : 5000
             PULLIN = 1000,
-            PID_MAX_PERIOD = 10,//ms
-            PID_MIN_PERIOD = 50;//ms
+            PID_MAX_PERIOD = 50,//ms
+            PID_MIN_PERIOD = 10;//ms
     }
 
     namespace Stepper{

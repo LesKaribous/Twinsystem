@@ -119,7 +119,7 @@ void Screen::draw(){
 }
 
 void Screen::updateAllStartVar() {
-    bool forceDraw = millis() - lastDraw > 800;
+    bool forceDraw = millis() - lastDraw > 2000;
     if(forceDraw) lastDraw = millis();
 
     bool drawStrategy = strategySwitch.hasChanged() || forceDraw;
@@ -143,7 +143,7 @@ void Screen::updateAllStartVar() {
 }
 
 void Screen::updateAllMatchVar() {
-    bool forceDraw = millis() - lastDraw > 500;
+    bool forceDraw = millis() - lastDraw > 2000;
     if(forceDraw) lastDraw = millis();
 
     bool drawTime = time.hasChanged() || forceDraw;
@@ -193,7 +193,7 @@ void Screen::drawBackScreenStart() {
     screen.setTextSize(1);
     screen.setCursor(10,300);
     screen.print("Upload : ");
-    screen.println(__TIMESTAMP__);
+    screen.println(String(__DATE__) + String(" ") + String(__TIME__));
 }
 
 void Screen::updateTeamColor(bool team){
