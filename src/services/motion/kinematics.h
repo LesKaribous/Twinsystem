@@ -9,22 +9,15 @@ Vec3 ik(Vec3 target){
             L = Settings::Geometry::RADIUS,
             R = Settings::Geometry::WHEEL_RADIUS;  
         		  
-    Vec3 transform(-1,1,1);
+    Vec3 transform(1,1,1);
     target *= transform;
 
     
     Matrix3x3 P = {
-        0,   1 , L,
-     -fsq3s2, -0.5, L,
-      fsq3s2, -0.5, L
+        0,   -1 , L,
+       fsq3s2, 0.5, L,
+      -fsq3s2, 0.5, L
     };
-
-    /*
-    Matrix3x3 P = { 
-        0.5, -fsq3s2, L,
-        0.5, fsq3s2 , L,
-        1.0,       0, L
-    };*/
 
     return target.mult(P).mult(1/R);
 }
@@ -37,24 +30,16 @@ Vec3 fk(Vec3 target){
             L = Settings::Geometry::RADIUS,
             R = Settings::Geometry::WHEEL_RADIUS;
     
-    
     Matrix3x3 P = {
             0, -f1sq3, f1sq3,
         -f2s3,   f1s3 , f1s3,
         f1s3/L, f1s3/L, f1s3/L
     };
     
-    /*
-    Matrix3x3 P = { 
-            f1s3, f1s3, -f2s3,
-        -fsq3s3,   fsq3s3 , 0,
-        -f1s3/L, -f1s3/L, -f1s3/L
-    };
-    */
     target.mult(P);
     target.mult(R);
 
-    Vec3 transform(-1,-1,1);
+    Vec3 transform(1,1,1);
     target *= transform;
 
     return target;

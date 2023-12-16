@@ -4,6 +4,7 @@
 #include "system/core/lib.h"
 #include "system/core/job.h"
 
+#include <queue>
 
 
 
@@ -35,6 +36,7 @@ public:
     void forceCancel();
 
     Vec2 estimatePosition(Vec3 start, Vec3 steps, float dt) const;
+    
 
     void resetCompass(); //zero orientation
     float getOrientation(); //rad
@@ -78,18 +80,24 @@ private:
     void positionControl(float dt);
     void speedControl(float dt);
 
-    Vec3 computeSpeed(Vec3 target);
+    void estimateVelocity(float dt);
+
+    Vec3 computeStaturedSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
-    Vec3 _lastSteps      = { 0, 0, 0}; //Steps
+    float _lastStepsCount    = 0;
+    Vec3 _lastStepsSum      = { 0, 0, 0}; //Steps
+    std::queue<Vec3> _lastStepsHistory; //Steps
+
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _velocity       = { 0, 0, 0}; //Absolute steps / s
-    Vec3 _targetVelocity = { 0, 0, 0}; //Absolute steps / s
+    Vec3 _velocity 	     = { 0, 0, 0}; //Absolute mm, mm, rad /s
+    Vec3 _wheelVelocity       = { 0, 0, 0}; //Absolute steps / s
+    Vec3 _targetWheelVelocity = { 0, 0, 0}; //Absolute steps / s
 
     Vec2 accelCorr; //Correct acceleration bias
 

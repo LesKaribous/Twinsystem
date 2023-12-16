@@ -110,6 +110,7 @@ namespace Settings{
         RELATIVE = false,
         ABSOLUTE = true;
 
+        constexpr int VELOCITY_SAMPLES = 5;
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
