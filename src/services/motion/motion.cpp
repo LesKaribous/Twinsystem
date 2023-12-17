@@ -30,6 +30,10 @@ Motion::Motion() : Service(MOTION),
     _sB.setMaxSpeed(0);
     _sC.setMaxSpeed(0);
 
+    _sA.setInverseRotation(Settings::Stepper::DIR_A_POLARITY);
+    _sB.setInverseRotation(Settings::Stepper::DIR_B_POLARITY);
+    _sC.setInverseRotation(Settings::Stepper::DIR_C_POLARITY);
+
     _sA.setMaxSpeed(Settings::Motion::SPEED);
     _sB.setMaxSpeed(Settings::Motion::SPEED);
     _sC.setMaxSpeed(Settings::Motion::SPEED);
@@ -84,15 +88,21 @@ void Motion::update(){
 
             //Speed estimation based on last steps
             estimateVelocity(dt);
+
+            //os.console.info() << _velocity << os.console.endl;
+
             //Position estimation and rotation measure
+            
+            estimatePosition(); //in world frame of reference
             _position.c = getOrientation();
-            _position = estimatePosition(_position, _velocity, dt); //in world frame of reference
+            //os.console.info() << _velocity << os.console.endl;
 
             positionControl(dt);
             speedControl(dt);
         }
 
-        if(Vec2(_target - _position).mag() < 0.5 && abs(_target.c - _position.c) < 0.025 && _velocity.mag() < 50){
+        THROW(abs(_target.c - _position.c));
+        if(Vec2(_target - _position).mag() < 0.5 && std::fabs(_target.c - _position.c) < 0.01 && _wheelVelocity.mag() < 300){
             complete();
             sleep();
         }
@@ -104,9 +114,9 @@ void Motion::update(){
 }
 
 void Motion::speedControl(float dt){
-    Vec3 kP = Vec3(0.001,0.001,0.001); //Settings::Motion::kP;
-    Vec3 kI = Settings::Motion::kI;
-    Vec3 kD = Settings::Motion::kD;
+    Vec3 kP = Vec3(0.002,0.002,0.002); //Settings::Motion::kP;
+    Vec3 kI = Vec3(0.0,0.0,0.0);//Settings::Motion::kI;
+    Vec3 kD = Vec3(0.0,0.0,0.0);//Settings::Motion::kD;
     
     Vec3 error = Vec3(_targetWheelVelocity) - Vec3(_wheelVelocity);
     _velIntegral  += error * dt; //steps / s
@@ -132,23 +142,24 @@ void Motion::speedControl(float dt){
 
 //https://link.springer.com/article/10.1007/s40313-019-00439-0
 void Motion::positionControl(float dt){
-    Vec3 kP = Vec3(0.1,0.1,0.05); //Settings::Motion::kP;
+    Vec3 kP = Vec3(0.1,0.1,0.1); //Settings::Motion::kP;
     Vec3 kI = Vec3(0.0,0.0,0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3(0.008,0.008,0.01);//Settings::Motion::kD;
+    Vec3 kD = Vec3(0.01,0.01,0.01);//Settings::Motion::kD;
 
     //correction
     Vec3 error = _target - _position;
 
-    _integral  += error * dt; //Absolute mm, mm, rad
+    _integral  += error * dt; //mm, mm, rad
     Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = Vec3(error); //Absolute mm, mm, rad
+    _lastError = Vec3(error); //mm, mm, rad
 
     float beta = atan2f(error.y, error.x) - _position.c;
 
-    _targetWheelVelocity = Vec3(1000,0,0);//corr * Vec3(cos(beta), sin(beta),1.0);
+    _targetWheelVelocity = Vec2(corr).mag() * Vec3(cos(beta), sin(beta),corr.c);
+
     _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
 
-    _targetWheelVelocity = ik(_targetWheelVelocity);
+    _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
 
    if(true){
         os.console.plot("px",_position.x);
@@ -161,50 +172,44 @@ void Motion::positionControl(float dt){
 }
 
 
-Vec3 Motion::computeStaturedSpeed(Vec3 targetV){
+Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
     // Maximum speed constraints (in mm/s or similar units)
     float maxSpeed = Settings::Motion::SPEED;
-    float scaleFactor = 1000.0; // This scales the rotational error to an angular speed
-
-    // Compute target speeds while respecting the maximum speed constraints
-    Vec3 targetSpeed = targetV * scaleFactor;
 
     //staturation
-    
     float M = std::max(std::max(targetSpeed.x, targetSpeed.y), targetSpeed.z);
     if(M > maxSpeed){
         targetSpeed *= maxSpeed/M;
     }
-
-    //limit
-    /*
-    targetSpeed.x = std::min(std::max(target.x * scaleFactor, -maxSpeed), maxSpeed);
-    targetSpeed.y = std::min(std::max(target.y * scaleFactor, -maxSpeed), maxSpeed);
-    targetSpeed.z = std::min(std::max(target.z * scaleFactor, -maxSpeed), maxSpeed);
-    */
     return targetSpeed;
 }
 
 
-Vec2  Motion::estimatePosition(Vec3 start, Vec3 steps, float dt) const{
-    // Calculate wheel speeds
-    // Assuming SpeedA, SpeedB, SpeedC are the speeds of wheels A, B, C
-
-    Vec3 relativeVelocity = fk(steps);
-    return start + relativeVelocity*dt; //To world frame of reference
+void  Motion::estimatePosition(){
+    Vec3 del = fk(_lastStepsSum/(float(_lastStepsHistory.size()))/(Settings::Stepper::STEP_MODE * RAD_TO_DEG));
+    _position += del;
 }
 
 void  Motion::estimateVelocity(float dt){
-    _lastStepsHistory.push(getLastSteps());
+    _lastStepsHistory.push_back(getLastSteps());
     resetSteps();
 
-    if(_lastStepsHistory.size() > Settings::Motion::VELOCITY_SAMPLES){
-        _lastStepsSum -= _lastStepsHistory.front();
-        _lastStepsHistory.pop();
-    }
-    _lastStepsSum += _lastStepsHistory.back();
-    _wheelVelocity = _lastStepsSum/(dt*_lastStepsHistory.size());
-    _velocity = fk(_wheelVelocity);
+    if(_lastStepsHistory.size() > Settings::Motion::VELOCITY_SAMPLES)
+        _lastStepsHistory.pop_front();
+    
+    _lastStepsSum = Vec3(0);
+    for(Vec3& v : _lastStepsHistory)
+        _lastStepsSum += v;
+
+
+    _wheelVelocity = _lastStepsSum/(dt*float(_lastStepsHistory.size()));
+    _wheelVelocity.div(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
+
+    os.console.plot("va",_wheelVelocity.a);
+    os.console.plot("vb",_wheelVelocity.b);
+    os.console.plot("vc",_wheelVelocity.c);
+
+    _velocity = fk(_wheelVelocity)/_calibration;
 }
 
 
@@ -215,7 +220,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 }
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
-    relTarget.rotateZ(_position.c);
+    //relTarget.rotateZ(_position.c);
     relTarget *= _calibration; 					                //Apply cartesian calibration
     relTarget = ik(relTarget);				  					//Apply inverse kinematics result in steps
     relTarget.mult(Settings::Stepper::STEP_MODE * RAD_TO_DEG); 	//Apply stepping multiplier

@@ -110,7 +110,7 @@ namespace Settings{
         RELATIVE = false,
         ABSOLUTE = true;
 
-        constexpr int VELOCITY_SAMPLES = 5;
+        constexpr int VELOCITY_SAMPLES = 1;
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
@@ -141,9 +141,9 @@ namespace Settings{
         STEP_B_POLARITY = true,
         STEP_C_POLARITY = true,
 
-        DIR_A_POLARITY = false,
-        DIR_B_POLARITY = false,
-        DIR_C_POLARITY = false;
+        DIR_A_POLARITY = true,
+        DIR_B_POLARITY = true,
+        DIR_C_POLARITY = true;
 
         constexpr u_int8_t 
         STEP_MODE = 8;
@@ -157,12 +157,12 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, 1.165f, -0.747} //Cartesian : XYROT
+            { 1.165f, 1.165f, 0.747} //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, 1.165f, -0.747} //Cartesian : XYROT
+            { 1.165f, 1.165f, 0.747} //Cartesian : XYROT
         };
     }
 }

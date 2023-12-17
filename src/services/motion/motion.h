@@ -4,7 +4,7 @@
 #include "system/core/lib.h"
 #include "system/core/job.h"
 
-#include <queue>
+#include <deque>
 
 
 
@@ -35,7 +35,7 @@ public:
     void complete() override;
     void forceCancel();
 
-    Vec2 estimatePosition(Vec3 start, Vec3 steps, float dt) const;
+    
     
 
     void resetCompass(); //zero orientation
@@ -79,7 +79,7 @@ public:
 private:
     void positionControl(float dt);
     void speedControl(float dt);
-
+    void estimatePosition();
     void estimateVelocity(float dt);
 
     Vec3 computeStaturedSpeed(Vec3 target);
@@ -90,7 +90,7 @@ private:
 
     float _lastStepsCount    = 0;
     Vec3 _lastStepsSum      = { 0, 0, 0}; //Steps
-    std::queue<Vec3> _lastStepsHistory; //Steps
+    std::deque<Vec3> _lastStepsHistory; //Steps
 
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
