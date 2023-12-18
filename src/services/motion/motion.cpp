@@ -91,7 +91,7 @@ void Motion::control(){
         if(isPending()){            
             float dt = float(millis() - lastPIDTick)/1000.0;
             estimatePosition(dt);
-            //_position.c = getOrientation();
+            _position.c = getOrientation();
             positionControl(dt);
         }
     }
