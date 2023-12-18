@@ -30,6 +30,12 @@ void SystemBase::loadService(Service* s){
     }else m_services[s->getID()] = s;
 }
 
+void SystemBase::loadServiceInterrupt(Service* s, double interuptInterval){
+    if(hasService(s->getID())){
+        os.console.error("System") << s->toString() << " loaded." << Console::endl;
+    }else m_services[s->getID()] = s;
+}
+
 bool SystemBase::statusService(ServiceID serviceID){
     if(hasService(serviceID))
         return m_services[serviceID]->isEnabled();

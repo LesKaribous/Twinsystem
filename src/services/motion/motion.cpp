@@ -74,29 +74,8 @@ void Motion::run(){
 }
 
 void Motion::update(){
-
     if(m_enabled && !_sleeping && !isPaused()){
-
-        if(isPending()){
-            if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
-            if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
-                if(lastPIDTick != 0) os.console.info(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
-                lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
-            }
-            
-            float dt = float(millis() - lastPIDTick)/1000.0;
-
-            //Speed estimation based on last steps
-            estimateVelocityPosition(dt);
-            //_position.c = getOrientation();
-            //os.console.info() << _velocity << os.console.endl;
-
-            positionControl(dt);
-            speedControl(dt);
-        }
-
-        //THROW(abs(_target.c - _position.c));
-        if(Vec2(_target - _position).mag() < 0.5 && std::fabs(_target.c - _position.c) < 0.01 && _wheelVelocity.mag() < 100){
+        if(Vec2(_target - _position).mag() < 0.5 && std::fabs(_target.c - _position.c) < 0.01 && _targetWheelVelocity.mag() < 100){
             complete();
             sleep();
         }
@@ -107,45 +86,25 @@ void Motion::update(){
     }
 }
 
-void Motion::speedControl(float dt){
-    Vec3 kP = Vec3(0.0001,0.0001,0.0001); //Settings::Motion::kP;
-    Vec3 kI = Vec3(0.0,0.0,0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3(0.0,0.0,0.0);//Settings::Motion::kD;
-    
-    Vec3 error = Vec3(_targetWheelVelocity) - Vec3(_wheelVelocity);
-    _velIntegral  += error * dt; //steps / s
-    Vec3 corr = (error * kP) + (_velIntegral * kI) + (((error - _velLastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _velLastError = Vec3(error); //steps / s
-
-    //os.console.println("velocity : " + String(_velocity));
-    corr = targetToSteps(corr);
-    _sAController.overrideSpeed(corr.a); // set new speed
-    _sBController.overrideSpeed(corr.b); // set new speed
-    _sCController.overrideSpeed(corr.c); // set new speed
-
-    lastPIDTick = millis();
-    
-
-   /*
-    // Apply speeds to motors
-    _sAController.overrideSpeed(speedA/wheelRadius);
-    _sBController.overrideSpeed(speedB/wheelRadius);
-    _sCController.overrideSpeed(speedC/wheelRadius);
-    */
+void Motion::control(){
+    if(m_enabled && !_sleeping && !isPaused()){
+        if(isPending()){            
+            float dt = float(millis() - lastPIDTick)/1000.0;
+            estimatePosition(dt);
+            //_position.c = getOrientation();
+            positionControl(dt);
+        }
+    }
 }
 
 //https://link.springer.com/article/10.1007/s40313-019-00439-0
 void Motion::positionControl(float dt){
-    Vec3 kP = Vec3(12.0,12.0, 8.0); //Settings::Motion::kP;
+    Vec3 kP = Vec3(0.00065,0.00065, 0.0003); //Settings::Motion::kP;
     Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3( 0.1, 0.1, 0.01);//Settings::Motion::kD;
+    Vec3 kD = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kD;
 
     //correction
     Vec3 error =  _target - _position;
-
-    // os.screen.x.SetValue(delta.x);
-    // os.screen.y.SetValue(delta.y);
-    // os.screen.z.SetValue(delta.z);
 
     _integral += error * dt; //mm, mm, rad
     Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
@@ -155,6 +114,11 @@ void Motion::positionControl(float dt){
     _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
     //_targetWheelVelocity = computeStaturedSpeed(Vec3(500,0,3).rotateZ(-_position.c));
     _targetWheelVelocity = ik(_targetWheelVelocity);
+
+    Vec3 speed = targetToSteps(_targetWheelVelocity);
+    _sAController.overrideSpeed(speed.a); // set new speed
+    _sBController.overrideSpeed(speed.b); // set new speed
+    _sCController.overrideSpeed(speed.c); // set new speed
 
    if(true){
         os.console.plot("px",_position.x);
@@ -180,35 +144,12 @@ Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
 }
 
 
-void  Motion::estimateVelocityPosition(float dt){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
+void  Motion::estimatePosition(float dt){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
     Vec3 steps = getLastSteps(); //Read steps counter
     resetSteps(); //Reset counter
 
     Vec3 angularDelta = (steps / Settings::Stepper::STEP_MODE) * (PI/100);
     Vec3 linearDelta = angularDelta * Settings::Geometry::WHEEL_RADIUS;
-
-    //Calculate smoothed wheel velocity (averaged) (if used)
-    if(Settings::Motion::VELOCITY_SAMPLES > 1){
-        _wheelVelocityHistory.push_back(linearDelta/dt);
-        if(_wheelVelocityHistory.size() > Settings::Motion::VELOCITY_SAMPLES)
-            _wheelVelocityHistory.pop_front();
-        
-        Vec3 wheelVelocitySum = Vec3(0);
-        for(Vec3& v : _wheelVelocityHistory)
-            wheelVelocitySum += v;
-
-        _wheelVelocity = (wheelVelocitySum / _wheelVelocityHistory.size())/dt;
-    }else{
-        _wheelVelocity = linearDelta / dt;
-    }
-
-    os.console.plot("va", _wheelVelocity.a);
-    os.console.plot("vb", _wheelVelocity.b);
-    os.console.plot("vc", _wheelVelocity.c);
-
-    os.console.plot("tva", _targetWheelVelocity.a);
-    os.console.plot("tvb", _targetWheelVelocity.b);
-    os.console.plot("tvc", _targetWheelVelocity.c);
 
     //Calculate XYZ delta
     Vec3 del = fk(linearDelta);

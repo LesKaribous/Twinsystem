@@ -41,9 +41,12 @@ protected:
 
     SystemState getState();
     void loadService(Service* m);
+    void loadServiceInterrupt(Service* m, double interuptInterval);
+
     void update();
     void updateProgram();
     void updateServices();
+    void updateInterupt();
 
     inline SystemState systemState() const {return m_currentState;}
 
@@ -55,6 +58,7 @@ private:
     void handleStoppedState();
 
     std::map<ServiceID, Service*> m_services;
+    Service* interrupt;
     Program m_program;
     SystemState m_currentState;
 

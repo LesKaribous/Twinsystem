@@ -126,11 +126,12 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 10000, // Old : 5000
-            SPEED = 10000, // Old : 5000
+            ACCEL = 6000, // Old : 5000
+            SPEED = 5000, // Old : 5000
             PULLIN = 1000,
-            PID_MAX_PERIOD = 50,//ms
-            PID_MIN_PERIOD = 10;//ms
+            PID_MAX_PERIOD = 10,//ms
+            PID_MIN_PERIOD = 4,//ms
+            PID_INTERVAL = 2000;//microseconds
     }
 
     namespace Stepper{
