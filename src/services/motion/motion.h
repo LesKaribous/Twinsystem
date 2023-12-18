@@ -35,9 +35,6 @@ public:
     void complete() override;
     void forceCancel();
 
-    
-    
-
     void resetCompass(); //zero orientation
     float getOrientation(); //rad
 
@@ -79,8 +76,7 @@ public:
 private:
     void positionControl(float dt);
     void speedControl(float dt);
-    void estimatePosition();
-    void estimateVelocity(float dt);
+    void estimateVelocityPosition(float dt);
 
     Vec3 computeStaturedSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
@@ -88,9 +84,7 @@ private:
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
-    float _lastStepsCount    = 0;
-    Vec3 _lastStepsSum      = { 0, 0, 0}; //Steps
-    std::deque<Vec3> _lastStepsHistory; //Steps
+    std::deque<Vec3> _wheelVelocityHistory; //Steps
 
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
@@ -102,8 +96,8 @@ private:
     Vec2 accelCorr; //Correct acceleration bias
 
     //PID
-    Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm
-    Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm
+    Vec3 _lastError 	  = { 0, 0, 0}; //XY, Theta
+    Vec3 _integral 	      = { 0, 0, 0}; //XY, Theta
 
     Vec3 _velLastError 	  = { 0, 0, 0}; //Absolute mm, mm
     Vec3 _velIntegral 	  = { 0, 0, 0}; //Absolute mm, mm
@@ -124,9 +118,7 @@ private:
                   _sBController,
                   _sCController;
 
-    elapsedMillis _targetTimer;
-    elapsedMillis _outputTimer;
-
+    IntervalTimer controlTimer;
     // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
     //                                   id, address
     Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire2);

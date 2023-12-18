@@ -69,7 +69,6 @@ private:
     void loadService(Service*);
     void registerCommands();
 
-
     RobotState _state;
 
     //Singleton
