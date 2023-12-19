@@ -108,7 +108,8 @@ namespace Settings{
     namespace Motion{
         constexpr bool
         RELATIVE = false,
-        ABSOLUTE = true;
+        ABSOLUTE = true,
+        USE_GYROSCOPE = true;
 
         constexpr int VELOCITY_SAMPLES = 0;
 
@@ -126,12 +127,12 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 10000, // Old : 5000
-            SPEED = 5000, // Old : 5000
-            PULLIN = 1000,
+            ACCEL = 20000, // Old : 5000
+            SPEED = 10000, // Old : 5000
+            PULLIN = 500,
             PID_MAX_PERIOD = 10,//ms
-            PID_MIN_PERIOD = 4,//ms
-            PID_INTERVAL = 4000;//microseconds
+            PID_MIN_PERIOD = 5,//ms
+            PID_INTERVAL = 10000;//microseconds
     }
 
     namespace Stepper{

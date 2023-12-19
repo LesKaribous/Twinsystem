@@ -32,6 +32,10 @@ Motion::Motion() : Service(MOTION),
     _sB.setMaxSpeed(0);
     _sC.setMaxSpeed(0);
 
+    _sA.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
+    _sB.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
+    _sC.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
+
     _sA.setInverseRotation(Settings::Stepper::DIR_A_POLARITY);
     _sB.setInverseRotation(Settings::Stepper::DIR_B_POLARITY);
     _sC.setInverseRotation(Settings::Stepper::DIR_C_POLARITY);
@@ -75,9 +79,11 @@ void Motion::run(){
 
 void Motion::update(){
     if(m_enabled && !_sleeping && !isPaused()){
-        if(Vec2(_target - _position).mag() < 0.5 && std::fabs(_target.c - _position.c) < 0.01 && _targetWheelVelocity.mag() < 100){
+
+        if(Settings::Motion::USE_GYROSCOPE) _position.c = getOrientation();
+        if(Vec2(_target - _position).mag() < 0.5 && std::fabs(_target.c - _position.c) < 0.01){
             complete();
-            sleep();
+            //sleep();
         }
         
         os.screen.x.SetValue(_position.x);
@@ -88,45 +94,54 @@ void Motion::update(){
 
 void Motion::control(){
     if(m_enabled && !_sleeping && !isPaused()){
-        if(isPending()){            
-            float dt = float(millis() - lastPIDTick)/1000.0;
-            estimatePosition(dt);
-            _position.c = getOrientation();
-            positionControl(dt);
+        if(isPending()){
+            estimatePosition();
+            positionControl();
         }
     }
 }
 
 //https://link.springer.com/article/10.1007/s40313-019-00439-0
-void Motion::positionControl(float dt){
-    Vec3 kP = Vec3(0.00065,0.00065, 0.0003); //Settings::Motion::kP;
+void Motion::positionControl(){
+    Vec3 kP = Vec3(4.0, 4.0, 5.5); //Settings::Motion::kP;
     Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kD;
+    Vec3 kD = Vec3( 40.0, 40.0, 4.5);//Settings::Motion::kD;
 
     //correction
     Vec3 error =  _target - _position;
 
-    _integral += error * dt; //mm, mm, rad
-    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
+    _integral += error; //mm, mm, rad
+    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
     _lastError = error; //mm, mm, rad
 
     _targetWheelVelocity = corr.rotateZ(-_position.c);
+    _targetWheelVelocity = ik(_targetWheelVelocity);
+    _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
     _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
     //_targetWheelVelocity = computeStaturedSpeed(Vec3(500,0,3).rotateZ(-_position.c));
-    _targetWheelVelocity = ik(_targetWheelVelocity);
 
-    Vec3 speed = targetToSteps(_targetWheelVelocity);
-    _sAController.overrideSpeed(speed.a); // set new speed
-    _sBController.overrideSpeed(speed.b); // set new speed
-    _sCController.overrideSpeed(speed.c); // set new speed
+    
+    _sAController.overrideSpeed(_targetWheelVelocity.a / float(Settings::Motion::SPEED)); // set new speed %
+    _sBController.overrideSpeed(_targetWheelVelocity.b / float(Settings::Motion::SPEED)); // set new speed %
+    _sCController.overrideSpeed(_targetWheelVelocity.c / float(Settings::Motion::SPEED)); // set new speed %
 
    if(true){
+    
         os.console.plot("px",_position.x);
         os.console.plot("tx",_target.x);
         os.console.plot("py",_position.y);
         os.console.plot("ty",_target.y);
-        os.console.plot("pa",_position.c);
-        os.console.plot("ta",_target.c);
+        //os.console.plot("pa",_position.c);
+        //os.console.plot("ta",_target.c);
+
+        /*
+        os.console.plot("tva",fabs(_targetWheelVelocity.a));
+        os.console.plot("tvb",fabs(_targetWheelVelocity.b));
+        os.console.plot("tvc",fabs(_targetWheelVelocity.c));
+        
+        os.console.plot("va",_sAController.getCurrentSpeed());
+        os.console.plot("vb",_sBController.getCurrentSpeed());
+        os.console.plot("vc",_sCController.getCurrentSpeed());*/
     }
 }
 
@@ -135,16 +150,23 @@ Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
     // Maximum speed constraints (in mm/s or similar units)
     float maxSpeed = Settings::Motion::SPEED;
 
+    
+    if(fabs(targetSpeed.a) < 100) targetSpeed.a = 0;
+    if(fabs(targetSpeed.b) < 100) targetSpeed.b = 0;
+    if(fabs(targetSpeed.c) < 100) targetSpeed.c = 0;
+    
+
     //staturation
     float M = std::max(std::max(targetSpeed.x, targetSpeed.y), targetSpeed.z);
     if(M > maxSpeed){
         targetSpeed *= maxSpeed/M;
     }
+
     return targetSpeed;
 }
 
 
-void  Motion::estimatePosition(float dt){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
+void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
     Vec3 steps = getLastSteps(); //Read steps counter
     resetSteps(); //Reset counter
 
@@ -157,7 +179,7 @@ void  Motion::estimatePosition(float dt){ //We are not using the estimated veloc
 
     Vec3 lastPosition = _position;
     _position += del*_calibration;
-    _velocity = (lastPosition - _position)/dt; //calculate velocity
+    _velocity = (lastPosition - _position)/Settings::Motion::PID_INTERVAL; //calculate velocity
 }
 
 
@@ -169,7 +191,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
     Vec3 angularSpeed = relTarget / Settings::Geometry::WHEEL_RADIUS;
-    Vec3 stepsSpeed = (angularSpeed / (PI/100) ) * Settings::Stepper::STEP_MODE;
+    Vec3 stepsSpeed = (angularSpeed / (PI/100.0) ) * float(Settings::Stepper::STEP_MODE);
     
     return stepsSpeed;
 }
@@ -181,6 +203,7 @@ void Motion::pause(){
     _sAController.overrideSpeed(0); // set new speed
     _sBController.overrideSpeed(0); // set new speed
     _sCController.overrideSpeed(0); // set new speed
+    _targetWheelVelocity = Vec3(0);
 }
 
 void Motion::resume(){
@@ -192,6 +215,14 @@ void Motion::cancel() {
     _sAController.overrideSpeed(0); // set new speed
     _sBController.overrideSpeed(0); // set new speed
     _sCController.overrideSpeed(0); // set new speed
+
+    _targetWheelVelocity = Vec3(0);
+
+    if(_debug){
+        os.console.plot("tva",fabs(_targetWheelVelocity.a));
+        os.console.plot("tvb",fabs(_targetWheelVelocity.b));
+        os.console.plot("tvc",fabs(_targetWheelVelocity.c));
+    }
         
     os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
     os.console.info("Motion") << "Position : " << _position << os.console.endl;
@@ -213,6 +244,14 @@ void Motion::forceCancel() {
     _sBController.rotateAsync(_sB);
     _sCController.rotateAsync(_sC);
 
+        _targetWheelVelocity = Vec3(0);
+
+    if(_debug){
+        os.console.plot("tva",fabs(_targetWheelVelocity.a));
+        os.console.plot("tvb",fabs(_targetWheelVelocity.b));
+        os.console.plot("tvc",fabs(_targetWheelVelocity.c));
+    }
+
     os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
     os.console.info("Motion") << "Position : " << _position << os.console.endl;
     os.console.info("Motion") << "Target was : " << _target << os.console.endl;
@@ -225,6 +264,13 @@ void Motion::complete() {
     _sAController.overrideSpeed(0); // set new speed
     _sBController.overrideSpeed(0); // set new speed
     _sCController.overrideSpeed(0); // set new speed
+    _targetWheelVelocity = Vec3(0);
+
+    if(_debug){
+        os.console.plot("tva",fabs(_targetWheelVelocity.a));
+        os.console.plot("tvb",fabs(_targetWheelVelocity.b));
+        os.console.plot("tvc",fabs(_targetWheelVelocity.c));
+    }
 
     //os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
     //os.console.info("Motion") << "Position : " << _position << os.console.endl;
@@ -282,14 +328,14 @@ void  Motion::move(Vec3 target){ //target is in world frame of reference
             Job::cancel();
             return;
         }
-        _target = toAbsoluteTarget(target); //convert to ABS target
+        target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
             os.console.error("Motion") << "Move is null" << os.console.endl;
             Job::cancel();
             return;
         }
-        _target = target;
+        //target = target;
     }
 
     //os.console.info("Motion") << "Current position : " << getAbsPosition() << os.console.endl;
@@ -303,6 +349,7 @@ void  Motion::move(Vec3 target){ //target is in world frame of reference
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
+    _target = target; //Start regulation
 }
 
 
@@ -370,6 +417,7 @@ void Motion::wakeUp(){
         digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
         _sleeping = false;
     }
+    delay(10);
 }
 
 

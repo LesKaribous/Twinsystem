@@ -76,8 +76,8 @@ public:
 
     void move(Vec3 target);
 private:
-    void positionControl(float dt);
-    void estimatePosition(float dt);
+    void positionControl();
+    void estimatePosition();
 
     Vec3 computeStaturedSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
@@ -107,6 +107,7 @@ private:
     bool _absolute = true;
     bool _optimizeRotation = true;
     bool _engaged, _sleeping;
+    bool _debug = true;
 
     float compassOffset;
 
