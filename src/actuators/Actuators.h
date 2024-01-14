@@ -111,6 +111,8 @@ namespace TwinSystem{
 
         void moveArm(int elevator_pos, int arm_pos, int tool_pos);
 
+        void EnableTraco();
+        void DisableTraco();
         void Sleep();
         void Engage();
         void Disengage();

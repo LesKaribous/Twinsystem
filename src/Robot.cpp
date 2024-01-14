@@ -278,11 +278,11 @@ void Robot::StartMatch(){
 	//TestDetection(); motion.steppers.Disengage(); return;
 	//CalibAngle(10); motion.steppers.Disengage(); return;
 
-	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
-	else if(IsBlue()  && IsSecondary() && IsCherry()) MatchSecondaryBlue();
+	if	   (IsBlue()  && IsPrimary()	) ScopeDemoSecondary(); //MatchPrimaryBlue	();
+	else if(IsBlue()  && IsSecondary() && IsCherry()) ScopeDemoSecondary();//MatchSecondaryBlue();
 	else if(IsBlue()  && IsSecondary() && IsCake()	) ScopeDemoSecondary();//MatchSecondaryCakeBlue();
-	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();
-	else if(IsGreen() && IsSecondary() && IsCherry()) MatchSecondaryGreen();
+	else if(IsGreen() && IsPrimary()	) ScopeDemoSecondary(); //MatchPrimaryGreen	();
+	else if(IsGreen() && IsSecondary() && IsCherry()) ScopeDemoSecondary(); //MatchSecondaryGreen();
 	else if(IsGreen() && IsSecondary() && IsCake()	) ScopeDemoSecondary();//MatchSecondaryCakeGreen();
 	motion.steppers.Disengage();
 }

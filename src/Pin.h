@@ -15,6 +15,10 @@ namespace Pin{
  
     }
 
+    namespace Outputs{
+        const int enTraco = 13; // Enable Traco regulator - Enable on true
+    }
+
     namespace Led{
         const int neopixel = 57;
     }

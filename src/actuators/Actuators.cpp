@@ -16,6 +16,7 @@ namespace TwinSystem{
 
                             trap(Pin::CherryPicker::pinServoTrap, ActuatorsPresets::cherryPicker::trap_Open, ActuatorsPresets::cherryPicker::trap_Close, ActuatorsPresets::cherryPicker::trap_Grab)
         {
+            EnableTraco();
             //gripperAB.rightGripper.close();
             //gripperAB.leftGripper.close();
             //gripperAB.cherryLocker.close();
@@ -46,6 +47,8 @@ namespace TwinSystem{
     }
 
     void Actuators::Initialize(){
+        pinMode(Pin::Outputs::enTraco,OUTPUT); //Enable Traco to enable Servo
+        EnableTraco();
         //gripperAB.cherryLocker.enable();
         //gripperAB.leftGripper.enable();
         //gripperAB.rightGripper.enable();
@@ -57,6 +60,7 @@ namespace TwinSystem{
         gripperCA.rightGripper.enable();
         trap.enable();
         pinMode(_pinTurbine, OUTPUT);
+        
 
         //Close(RobotCompass::AB);
         Close(RobotCompass::BC);
@@ -249,6 +253,14 @@ namespace TwinSystem{
         delay(500);
         Open(rc); Unlock(rc);
     }
+
+    void Actuators::EnableTraco(){
+        digitalWrite(Pin::Outputs::enTraco,HIGH);
+    }
+
+    void Actuators::DisableTraco(){
+        digitalWrite(Pin::Outputs::enTraco,LOW);
+    }
     
     void Actuators::Sleep(){
         //gripperAB.cherryLocker.sleep();
@@ -264,6 +276,7 @@ namespace TwinSystem{
 
 
     void Actuators::Engage(){
+        EnableTraco();
         //gripperAB.cherryLocker.enable();
         //gripperAB.leftGripper.enable();
         //gripperAB.rightGripper.enable();
@@ -277,6 +290,7 @@ namespace TwinSystem{
     }
 
     void Actuators::Disengage(){
+        DisableTraco();
         //gripperAB.cherryLocker.disable();
         //gripperAB.leftGripper.disable();
         //gripperAB.rightGripper.disable();
