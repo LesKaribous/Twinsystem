@@ -1,6 +1,9 @@
 #pragma once
 #include <Arduino.h>
 #include <memory>
+#include <functional>
+#include <string>
+#include <iostream>
 
 //Useful macros
 #define BIT(x) (1 << x)
