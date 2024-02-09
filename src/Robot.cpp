@@ -34,7 +34,6 @@ void Robot::Initialize(){
 	System::Initialize();
 	strip.begin();
 	motion.SetCalibration(IsPrimary()? Settings::Calibration::Primary : Settings::Calibration::Secondary);
-	EnableDisguisement();
 }
 
 void Robot::Update() {
@@ -233,12 +232,8 @@ void Robot::WaitLaunch(){
 				}
 			}
 			if(ButtonReleased()){ //Recalage
-				if	   (IsBlue()  && IsPrimary() ) 					RecalagePrimaryBlue(); 
-				else if(IsBlue()  && IsSecondary() && IsCherry() ) 	RecalageSecondaryBlue();
-				else if(IsBlue()  && IsSecondary() && IsCake() ) 	RecalageSecondaryCakeBlue();
-				else if(IsGreen() && IsPrimary() ) 					RecalagePrimaryGreen();
-				else if(IsGreen() && IsSecondary() && IsCherry() ) 	RecalageSecondaryGreen();
-				else if(IsGreen() && IsSecondary() && IsCake() ) 	RecalageSecondaryCakeGreen();
+				if	   (IsBlue()  && IsPrimary() ) 	RecalagePrimaryBlue(); 
+				else if(IsGreen() && IsPrimary() ) 	RecalagePrimaryGreen();
 				//TestOrientation();
 				//TestSteppers();
 			}
@@ -247,11 +242,9 @@ void Robot::WaitLaunch(){
 		case RobotState::ARMED :
 			if(StarterPulled()){ //Start match
 				_state = RobotState::STARTING;
-				DisableDisguisement();
 			}else if(StarterCancelled()){ //Unarm
 				_state = RobotState::IDLE;
 				UnfreezeSettings();
-				EnableDisguisement();
 				intercom.SendRequest("displayIntercom");
 				while(ButtonPressed()) Update(); //Wait for resetButton to be released
 			}
@@ -278,12 +271,8 @@ void Robot::StartMatch(){
 	//TestDetection(); motion.steppers.Disengage(); return;
 	//CalibAngle(10); motion.steppers.Disengage(); return;
 
-	if	   (IsBlue()  && IsPrimary()	) ScopeDemoSecondary(); //MatchPrimaryBlue	();
-	else if(IsBlue()  && IsSecondary() && IsCherry()) ScopeDemoSecondary();//MatchSecondaryBlue();
-	else if(IsBlue()  && IsSecondary() && IsCake()	) ScopeDemoSecondary();//MatchSecondaryCakeBlue();
-	else if(IsGreen() && IsPrimary()	) ScopeDemoSecondary(); //MatchPrimaryGreen	();
-	else if(IsGreen() && IsSecondary() && IsCherry()) ScopeDemoSecondary(); //MatchSecondaryGreen();
-	else if(IsGreen() && IsSecondary() && IsCake()	) ScopeDemoSecondary();//MatchSecondaryCakeGreen();
+	if	   (IsBlue()  && IsPrimary()	) MatchPrimaryBlue	();
+	else if(IsGreen() && IsPrimary()	) MatchPrimaryGreen	();
 	motion.steppers.Disengage();
 }
 
@@ -292,12 +281,9 @@ void Robot::FinishedMatch(){
 		_state = RobotState::FINISHED;
 		motion.Cancel();
 		if	   (IsBlue()  && IsPrimary()	) FinishPrimaryBlue();
-		else if(IsBlue()  && IsSecondary()	) FinishSecondaryBlue();
 		else if(IsGreen() && IsPrimary()	) FinishPrimaryGreen();
-		else if(IsGreen() && IsSecondary()	) FinishSecondaryGreen();
 		motion.steppers.Disengage();
 		actuators.Disengage();
-		EnableDisguisement();
 		ui.Update();
 		delay(1000);
 		//Suicide
@@ -310,25 +296,9 @@ void Robot::NearlyFinishedMatch(){
 		_state = RobotState::FINISHING;
 		motion.Cancel();
 		if	   (IsBlue()  && IsPrimary()	) NearlyFinishPrimaryBlue();
-		else if(IsBlue()  && IsSecondary()	) NearlyFinishSecondaryBlue();
 		else if(IsGreen() && IsPrimary()	) NearlyFinishPrimaryGreen();
-		else if(IsGreen() && IsSecondary()	) NearlyFinishSecondaryGreen();
 		motion.steppers.Disengage();
 	}
-}
-
-void Robot::EnableDisguisement(){
-  for(int i=0; i<NUM_LEDS; i++) {
-    strip.setPixelColor(i, 0, 0, 255);
-  }
-  strip.show();
-}
-
-void Robot::DisableDisguisement(){
-  for(int i=0; i<NUM_LEDS; i++) {
-    strip.setPixelColor(i, 0, 0, 0);
-  }
-  strip.show();
 }
 
 

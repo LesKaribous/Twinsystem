@@ -20,12 +20,12 @@ enum class TableCompass{
 };
 
 enum class RobotCompass{
-    A, //Turbine
-    AB,
-    B, //Battery
-    BC,
-    C, //Screen
-    CA
+    A,
+    AB, // Emergency Button
+    B,
+    BC, // Init button
+    C,  // Screen & Main PCB
+    CA  // Tirette
 };
 
 float GetCompassOrientation(TableCompass tc);

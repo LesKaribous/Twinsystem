@@ -37,9 +37,6 @@ public :
 
     float GetMaxLidarDist(Vec2 pos, float angle);
 
-    void EnableDisguisement();
-    void DisableDisguisement();
-
     //UI
     bool ButtonPressed();
     bool ButtonReleased();
@@ -61,29 +58,15 @@ public :
     //Strategy
     void RecalagePrimaryBlue();
     void RecalagePrimaryGreen();
-    void RecalageSecondaryBlue();
-    void RecalageSecondaryGreen();
-    void RecalageSecondaryCakeBlue();
-    void RecalageSecondaryCakeGreen();
 
     void MatchPrimaryBlue();
 	void MatchPrimaryGreen();
-    void MatchSecondaryBlue();
-    void MatchSecondaryGreen();
-    void MatchSecondaryCakeBlue();
-    void MatchSecondaryCakeGreen();
-
-    void ScopeDemoSecondary();
 
     void NearlyFinishPrimaryBlue();
     void NearlyFinishPrimaryGreen();
-    void NearlyFinishSecondaryBlue();
-    void NearlyFinishSecondaryGreen();
 
     void FinishPrimaryBlue();
     void FinishPrimaryGreen();
-    void FinishSecondaryBlue();
-    void FinishSecondaryGreen();
 	
     //Macro
     void ProbeBorder(TableCompass, RobotCompass);
