@@ -12,82 +12,64 @@ namespace TwinSystem{
         namespace Gripper{
             namespace AB{
                 const int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 100,
-                left_Grab = 90;
+                right_Close     = 120,
+                right_Open      = 10,
+                right_Grab      = 180,
+                left_Close      = 120,
+                left_Open       = 10,
+                left_Grab       = 180,
+                elevator_Down   = 15,
+                elevator_Up     = 160,
+                elevator_Grab   = 50;
+                
             }
             
             namespace BC{
                 const int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 100,
-                left_Grab = 90;
+                right_Close     = 100,
+                right_Open      = 10,
+                right_Grab      = 160,
+                left_Close      = 100,
+                left_Open       = 10,
+                left_Grab       = 120,
+                elevator_Down   = 0,
+                elevator_Up     = 130,
+                elevator_Grab   = 20;
             }
 
             namespace CA{
                 const int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 100,
-                left_Grab = 90;
+                right_Close     = 120,
+                right_Open      = 10,
+                right_Grab      = 180,
+                left_Close      = 120,
+                left_Open       = 10,
+                left_Grab       = 180,
+                elevator_Down   = 0,
+                elevator_Up     = 130,
+                elevator_Grab   = 25;
             }
         }
-
-        namespace arm{
-            const int
-            elevator_up = 100,
-            elevator_down = 180,
-            arm_up = 180,
-            arm_down = 90,
-            tool_up = 90,
-            tool_down = 180;
-        }
-
-        namespace cherryPicker{
-            const int
-            trap_Close = 50,
-            trap_Open = 140,
-            trap_Grab = 50;
-        }
-    } // namespace name
+    }
     
 
     struct GripperGroup{
         BistableServo rightGripper;
         BistableServo leftGripper;
-        BistableServo cherryLocker;
+        BistableServo elevator;
 
-        GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps cherryLockProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), cherryLocker(cherryLockProps){};
+        GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps elevatorProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), elevator(elevatorProps){};
     };
 
 
     class Actuators : public JobExecutor {
     private:
-        //GripperGroup gripperAB; //Right group when facing screen
+        GripperGroup gripperAB; //Right group when facing screen
         GripperGroup gripperBC; //Opposed to the screen
         GripperGroup gripperCA; //Left group when facing screen
 
-        int _pinTurbine;
-
     public:
-        BistableServo trap;
-        Servo elevator;
-        Servo arm;
-        Servo tool;
+        
 
     public:
         Actuators();
@@ -95,21 +77,14 @@ namespace TwinSystem{
 
         void Initialize();
 
-        void Lock   (RobotCompass rc); //Lock Cherry locker
-        void Unlock (RobotCompass rc); //Unlock Cherry locker
+        void GoUp   (RobotCompass rc);
+        void GoDown (RobotCompass rc);
+        void GoGrab (RobotCompass rc);
 
         void Close  (RobotCompass rc);
         void Open   (RobotCompass rc);
         void Grab   (RobotCompass rc);
         void Ungrab (RobotCompass rc);
-        void Applause(RobotCompass rc);
-
-        void SetTurbine(int speed); //in %
-        void StopTurbine();
-        void SuckBall();
-        void DropBall();
-
-        void moveArm(int elevator_pos, int arm_pos, int tool_pos);
 
         void EnableTraco();
         void DisableTraco();
