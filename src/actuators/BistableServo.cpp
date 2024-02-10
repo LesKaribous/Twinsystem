@@ -55,6 +55,20 @@ namespace TwinSystem
         }
     }
 
+    void BistableServo::goTo(int _pos){
+        if(_enabled){
+            if(_sleeping) wakeUp(); //Wake
+            // Limite _pos à l'intervalle [0, 180]
+            if(_pos < 0) _pos = 0;
+            else if(_pos > 180) _pos = 180;
+            _servo.write(_pos);
+        }
+    }
+
+    int BistableServo::getPosition(){
+        return _servo.read();
+    }
+
     void BistableServo::enable(){
         _servo.attach(_pin);
         _enabled = true;

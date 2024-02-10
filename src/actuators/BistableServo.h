@@ -16,11 +16,17 @@ namespace TwinSystem{
         void close();
         void toggle();
         void grab();
+        void goTo(int _pos);
+        int getPosition();
 
         void enable();
         void sleep();
         void wakeUp();
         void disable();
+
+        int getOpenPosition() const { return _openPos; }
+        int getClosePosition() const { return _closePos; }
+        int getGrabPosition() const { return _grabPos; }
 
     private:
         Servo _servo;
