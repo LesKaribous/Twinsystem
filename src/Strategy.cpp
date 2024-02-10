@@ -13,25 +13,8 @@ void Robot::RecalagePrimaryBlue(){
 
     motion.steppers.Engage();
 
-    actuators.Open(RobotCompass::BC);
-    Wait(500);
-    actuators.GoDown(RobotCompass::BC);
-    Wait(2000);
-    actuators.GoGrab(RobotCompass::BC);
-    Wait(1000);
-    actuators.Grab(RobotCompass::BC);
-    Wait(2000);
-    actuators.GoUp(RobotCompass::BC);
-    Wait(2000);
-    actuators.GoGrab(RobotCompass::BC);
-    Wait(2000);
-    actuators.Close(RobotCompass::BC);
-    Wait(500);
-    actuators.Open(RobotCompass::BC);
-    Wait(500);
-    actuators.GoUp(RobotCompass::BC);
-    Wait(1000);
-    actuators.GoDown(RobotCompass::BC);
+    TakePlant(RobotCompass::BC);
+    PlacePlant(RobotCompass::BC);
 
     /*
     actuators.GoUp(RobotCompass::AB);
@@ -134,4 +117,49 @@ void Robot::FinishPrimaryGreen(){
     // Fin de match
     actuators.Disengage();
     motion.steppers.Disengage();
+}
+
+void Robot::TakePlant(RobotCompass rc){
+    actuators.GoGrab(rc);
+    Wait(1000);
+    SlowClosing(rc);
+    for(int i=0;i<3;i++){
+        SlowGrabing(rc);
+        SlowClosing(rc);
+    }
+    SlowGrabing(rc);
+    actuators.GoUp(rc);
+    Wait(1000);
+}
+
+void Robot::PlacePlant(RobotCompass rc){
+    actuators.GoGrab(rc);
+    Wait(1000);
+    SlowOpening(rc);
+    SlowElevatorUp(rc);
+    Wait(1000);
+}
+
+void Robot::SlowGrabing(RobotCompass rc){
+    while(!actuators.runGrabbing(rc)) Wait(20);
+}
+
+void Robot::SlowOpening(RobotCompass rc){
+    while(!actuators.runOpening(rc)) Wait(20);
+}
+
+void Robot::SlowClosing(RobotCompass rc){
+    while(!actuators.runClosing(rc)) Wait(20);
+}
+
+void Robot::SlowElevatorUp(RobotCompass rc){
+    while(!actuators.runElevatorUp(rc)) Wait(30);
+}
+
+void Robot::SlowElevatorDown(RobotCompass rc){
+    while(!actuators.runElevatorDown(rc)) Wait(20);
+}
+
+void Robot::SlowElevatorGrab(RobotCompass rc){
+    while(!actuators.runElevatorGrab(rc)) Wait(20);
 }

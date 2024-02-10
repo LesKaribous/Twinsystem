@@ -31,7 +31,7 @@ namespace TwinSystem{
                 right_Grab      = 160,
                 left_Close      = 100,
                 left_Open       = 10,
-                left_Grab       = 120,
+                left_Grab       = 160,
                 elevator_Down   = 0,
                 elevator_Up     = 130,
                 elevator_Grab   = 20;
@@ -68,8 +68,7 @@ namespace TwinSystem{
         GripperGroup gripperBC; //Opposed to the screen
         GripperGroup gripperCA; //Left group when facing screen
 
-    public:
-        
+        GripperGroup& getGripperGroup(RobotCompass rc);
 
     public:
         Actuators();
@@ -85,6 +84,14 @@ namespace TwinSystem{
         void Open   (RobotCompass rc);
         void Grab   (RobotCompass rc);
         void Ungrab (RobotCompass rc);
+
+        bool moveGripper(BistableServo& gripper, int target);
+        bool runGrabbing(RobotCompass rc);
+        bool runOpening(RobotCompass rc);
+        bool runClosing(RobotCompass rc);
+        bool runElevatorUp(RobotCompass rc);
+        bool runElevatorDown(RobotCompass rc);
+        bool runElevatorGrab(RobotCompass rc);
 
         void EnableTraco();
         void DisableTraco();

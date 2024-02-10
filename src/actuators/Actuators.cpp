@@ -209,6 +209,63 @@ namespace TwinSystem{
         Open(rc);
     }
 
+    bool Actuators::moveGripper(BistableServo& gripper, int target){
+        int pos = gripper.getPosition();
+        if(pos < target - 2) {
+            gripper.goTo(pos + 2);
+            return false; // Not arrived
+        } else if(pos > target + 2) {
+            gripper.goTo(pos - 2);
+            return false; // Not arrived
+        }
+        return true; // Arrived
+    }
+
+    GripperGroup& Actuators::getGripperGroup(RobotCompass rc){
+        switch (rc) {
+            case RobotCompass::AB: return gripperAB;
+            case RobotCompass::BC: return gripperBC;
+            case RobotCompass::CA: return gripperCA;
+            default: break;
+        }
+    }
+
+    bool Actuators::runGrabbing(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        bool leftArrived  = moveGripper(group.leftGripper, group.leftGripper.getGrabPosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getGrabPosition());
+        return leftArrived && rightArrived;
+    }
+
+    bool Actuators::runOpening(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getOpenPosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getOpenPosition());
+        return leftArrived && rightArrived;
+    }
+
+    bool Actuators::runClosing(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getClosePosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getClosePosition());
+        return leftArrived && rightArrived;
+    }
+
+    bool Actuators::runElevatorUp(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        return moveGripper(group.elevator, group.elevator.getClosePosition());
+    }
+
+    bool Actuators::runElevatorDown(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        return moveGripper(group.elevator, group.elevator.getOpenPosition());
+    }
+
+    bool Actuators::runElevatorGrab(RobotCompass rc){
+        GripperGroup &group = getGripperGroup(rc);
+        return moveGripper(group.elevator, group.elevator.getGrabPosition());
+    }
+
     void Actuators::EnableTraco(){
         digitalWrite(Pin::Outputs::enTraco,HIGH);
     }

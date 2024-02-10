@@ -67,6 +67,16 @@ public :
 
     void FinishPrimaryBlue();
     void FinishPrimaryGreen();
+
+    //Macro actuators
+    void TakePlant(RobotCompass rc);
+    void PlacePlant(RobotCompass rc);
+    void SlowOpening(RobotCompass rc);
+    void SlowGrabing(RobotCompass rc);
+    void SlowClosing(RobotCompass rc);
+    void SlowElevatorUp(RobotCompass rc);
+    void SlowElevatorDown(RobotCompass rc);
+    void SlowElevatorGrab(RobotCompass rc);
 	
     //Macro
     void ProbeBorder(TableCompass, RobotCompass);
