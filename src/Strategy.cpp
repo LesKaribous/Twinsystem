@@ -16,50 +16,6 @@ void Robot::RecalagePrimaryBlue(){
     TakePlant(RobotCompass::BC);
     PlacePlant(RobotCompass::BC);
 
-    /*
-    actuators.GoUp(RobotCompass::AB);
-    actuators.GoUp(RobotCompass::BC);
-    actuators.GoUp(RobotCompass::CA);
-
-    delay(2000);
-
-    actuators.GoDown(RobotCompass::AB);
-    actuators.GoDown(RobotCompass::BC);
-    actuators.GoDown(RobotCompass::CA);
-
-    delay(2000);
-
-    actuators.GoGrab(RobotCompass::AB);
-    actuators.GoGrab(RobotCompass::BC);
-    actuators.GoGrab(RobotCompass::CA);
-
-    delay(2000);
-    
-    actuators.Open(RobotCompass::AB);
-    actuators.Open(RobotCompass::BC);
-    actuators.Open(RobotCompass::CA);
-
-    delay(2000);
-
-    actuators.Close(RobotCompass::AB);
-    actuators.Close(RobotCompass::BC);
-    actuators.Close(RobotCompass::CA);
-
-    delay(2000);
-
-    actuators.Grab(RobotCompass::AB);
-    actuators.Grab(RobotCompass::BC);
-    actuators.Grab(RobotCompass::CA);
-
-    delay(2000);
-
-    actuators.Open(RobotCompass::AB);
-    actuators.Open(RobotCompass::BC);
-    actuators.Open(RobotCompass::CA);
-
-    delay(2000);
-    */
-
     motion.SetAbsPosition(Vec3(-1,-1,0));
 
     motion.steppers.Sleep();
