@@ -51,6 +51,10 @@ namespace Settings{
             SPEED = 4000; // Old : 5000
     }
 
+    namespace Actuators{
+        const int speed = 20; // Time in ms between two degrees of servo movement
+    }
+
     namespace Stepper{
         const bool 
         ENABLE_POLARITY = false,

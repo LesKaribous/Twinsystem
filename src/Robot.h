@@ -72,8 +72,11 @@ public :
     void TakePlant(RobotCompass rc);
     void PlacePlant(RobotCompass rc);
     void SlowOpening(RobotCompass rc);
+    void SlowOpening(RobotCompass rc, GripperSide gs);
     void SlowGrabing(RobotCompass rc);
+    void SlowGrabing(RobotCompass rc, GripperSide gs);
     void SlowClosing(RobotCompass rc);
+    void SlowClosing(RobotCompass rc, GripperSide gs);
     void SlowElevatorUp(RobotCompass rc);
     void SlowElevatorDown(RobotCompass rc);
     void SlowElevatorGrab(RobotCompass rc);

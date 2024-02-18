@@ -19,6 +19,11 @@ enum class TableCompass{
     WEST
 };
 
+enum class GripperSide{
+    LEFT,
+    RIGHT
+};
+
 enum class RobotCompass{
     A,
     AB, // Emergency Button

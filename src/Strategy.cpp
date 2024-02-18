@@ -11,10 +11,19 @@ using namespace Score;
 
 void Robot::RecalagePrimaryBlue(){
 
-    motion.steppers.Engage();
-
+    //motion.steppers.Engage();
+    actuators.GoGrab(RobotCompass::AB);
+    actuators.GoGrab(RobotCompass::BC);
+    actuators.GoGrab(RobotCompass::CA);
+    // !!!!!!! TEST WIP !!!!!!!!!
+    // ----------------------
+    while(1){
+        actuators.TestSensors();
+        Wait(1000);
+    }
     TakePlant(RobotCompass::BC);
     PlacePlant(RobotCompass::BC);
+    // ----------------------
 
     motion.SetAbsPosition(Vec3(-1,-1,0));
 
@@ -97,25 +106,29 @@ void Robot::PlacePlant(RobotCompass rc){
 }
 
 void Robot::SlowGrabing(RobotCompass rc){
-    while(!actuators.runGrabbing(rc)) Wait(20);
+    while(!actuators.runGrabbing(rc)) Wait(Settings::Actuators::speed);
+}
+
+void Robot::SlowGrabing(RobotCompass rc, GripperSide gs){
+    while(!actuators.runGrabbing(rc,gs)) Wait(Settings::Actuators::speed);
 }
 
 void Robot::SlowOpening(RobotCompass rc){
-    while(!actuators.runOpening(rc)) Wait(20);
+    while(!actuators.runOpening(rc)) Wait(Settings::Actuators::speed);
 }
 
 void Robot::SlowClosing(RobotCompass rc){
-    while(!actuators.runClosing(rc)) Wait(20);
+    while(!actuators.runClosing(rc)) Wait(Settings::Actuators::speed);
 }
 
 void Robot::SlowElevatorUp(RobotCompass rc){
-    while(!actuators.runElevatorUp(rc)) Wait(30);
+    while(!actuators.runElevatorUp(rc)) Wait(Settings::Actuators::speed);
 }
 
 void Robot::SlowElevatorDown(RobotCompass rc){
-    while(!actuators.runElevatorDown(rc)) Wait(20);
+    while(!actuators.runElevatorDown(rc)) Wait(Settings::Actuators::speed);
 }
 
 void Robot::SlowElevatorGrab(RobotCompass rc){
-    while(!actuators.runElevatorGrab(rc)) Wait(20);
+    while(!actuators.runElevatorGrab(rc)) Wait(Settings::Actuators::speed);
 }

@@ -58,9 +58,16 @@ namespace TwinSystem{
         BistableServo leftGripper;
         BistableServo elevator;
 
-        GripperGroup(BistableServoProps rightGripProps, BistableServoProps leftGripProps, BistableServoProps elevatorProps) : rightGripper(rightGripProps), leftGripper(leftGripProps), elevator(elevatorProps){};
-    };
+        int rightSensor;
+        int leftSensor;
 
+        GripperGroup(BistableServoProps rightGripProps, int rightSensorPin,
+                     BistableServoProps leftGripProps, int leftSensorPin,
+                     BistableServoProps elevatorProps)
+            : rightGripper(rightGripProps), rightSensor(rightSensorPin),
+              leftGripper(leftGripProps),   leftSensor(leftSensorPin),
+              elevator(elevatorProps) {}
+    };
 
     class Actuators : public JobExecutor {
     private:
@@ -85,10 +92,16 @@ namespace TwinSystem{
         void Grab   (RobotCompass rc);
         void Ungrab (RobotCompass rc);
 
+        void TestSensors();
+        bool ReadSensor(RobotCompass rc, GripperSide gs);
+
         bool moveGripper(BistableServo& gripper, int target);
         bool runGrabbing(RobotCompass rc);
+        bool runGrabbing(RobotCompass rc, GripperSide gs);
         bool runOpening(RobotCompass rc);
+        bool runOpening(RobotCompass rc, GripperSide gs);
         bool runClosing(RobotCompass rc);
+        bool runClosing(RobotCompass rc, GripperSide gs);
         bool runElevatorUp(RobotCompass rc);
         bool runElevatorDown(RobotCompass rc);
         bool runElevatorGrab(RobotCompass rc);
