@@ -43,6 +43,7 @@ public:
     void enable(ServiceID id);
     void disable(ServiceID id);
 	void update();
+	void control();
     
     //Terminal
     void setConsoleLevel(ConsoleLevel level);
@@ -70,6 +71,8 @@ protected :
     Intercom intercom;
     Actuators actuators;
     Localisation localisation;
+
+    IntervalTimer interrupt;
 
 private:
     //Singleton

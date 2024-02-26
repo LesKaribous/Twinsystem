@@ -108,9 +108,10 @@ namespace Settings{
     namespace Motion{
         constexpr bool
         RELATIVE = false,
-        ABSOLUTE = true;
+        ABSOLUTE = true,
+        USE_GYROSCOPE = true;
 
-        constexpr int VELOCITY_SAMPLES = 1;
+        constexpr int VELOCITY_SAMPLES = 0;
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
@@ -126,11 +127,12 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 5000, // Old : 5000
+            ACCEL = 20000, // Old : 5000
             SPEED = 10000, // Old : 5000
-            PULLIN = 1000,
-            PID_MAX_PERIOD = 50,//ms
-            PID_MIN_PERIOD = 10;//ms
+            PULLIN = 500,
+            PID_MAX_PERIOD = 10,//ms
+            PID_MIN_PERIOD = 5,//ms
+            PID_INTERVAL = 10000;//microseconds
     }
 
     namespace Stepper{
@@ -157,12 +159,12 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, 1.165f, 0.747} //Cartesian : XYROT
+            { 0.5, 0.5f, 0.747f} //Cartesian : XYROT
         };
 
         const CalibrationProfile Secondary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.165f, 1.165f, 0.747} //Cartesian : XYROT
+            { 0.5f, 0.5f, 0.747f} //Cartesian : XYROT
         };
     }
 }

@@ -44,9 +44,12 @@ protected:
 
     SystemState getState();
     void loadService(Service* m);
+    void loadServiceInterrupt(Service* m, double interuptInterval);
+
     void update();
     void updateProgram();
     void updateServices();
+    void updateInterupt();
 
     inline SystemState systemState() const {return m_currentState;}
 

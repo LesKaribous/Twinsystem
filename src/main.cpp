@@ -6,3 +6,7 @@ void setup(){}
 void loop(){
 	os.update();
 }
+
+void control(){
+	os.control();
+}

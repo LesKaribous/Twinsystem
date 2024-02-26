@@ -28,13 +28,16 @@ OperatingSystem::OperatingSystem() : SystemBase(){
     //loadService(&lidar);
     loadService(&screen);       screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
     //loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
-    loadService(&motion);       screen.addBootProgress(10); screen.drawBootProgress("Linking motion...");
+    
     //loadService(&planner); screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
     //loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
     //loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
     loadService(&terminal);     screen.addBootProgress(10); screen.drawBootProgress("Linking terminal...");
     //loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
     //loadService(&localisation);
+
+    motion.enable();
+    screen.addBootProgress(10); screen.drawBootProgress("Starting motion...");
 
     //registerCommands();
 
@@ -89,6 +92,10 @@ void OperatingSystem::update(){
             execute(p);
         }    
     }*/
+}
+
+void OperatingSystem::control(){
+    motion.control();
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){

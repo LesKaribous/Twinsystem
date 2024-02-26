@@ -35,7 +35,8 @@ public:
     void complete() override;
     void forceCancel();
 
-    
+    void control();
+
     void resetCompass(); //zero orientation
     float getOrientation(); //rad
 
@@ -75,10 +76,8 @@ public:
 
     void move(Vec3 target);
 private:
-    void positionControl(float dt);
-    void speedControl(float dt);
+    void positionControl();
     void estimatePosition();
-    void estimateVelocity(float dt);
 
     Vec3 computeStaturedSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
@@ -86,25 +85,20 @@ private:
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
-    float _lastStepsCount    = 0;
-    Vec3 _lastStepsSum      = { 0, 0, 0}; //Steps
-    std::deque<Vec3> _lastStepsHistory; //Steps
+    std::deque<Vec3> _wheelVelocityHistory; //Steps
 
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _velocity 	     = { 0, 0, 0}; //Absolute mm, mm, rad /s
-    Vec3 _wheelVelocity       = { 0, 0, 0}; //Absolute steps / s
+
     Vec3 _targetWheelVelocity = { 0, 0, 0}; //Absolute steps / s
 
     Vec2 accelCorr; //Correct acceleration bias
 
     //PID
-    Vec3 _lastError 	  = { 0, 0, 0}; //Absolute mm, mm
-    Vec3 _integral 	      = { 0, 0, 0}; //Absolute mm, mm
-
-    Vec3 _velLastError 	  = { 0, 0, 0}; //Absolute mm, mm
-    Vec3 _velIntegral 	  = { 0, 0, 0}; //Absolute mm, mm
+    Vec3 _lastError 	  = { 0, 0, 0}; //XY, Theta
+    Vec3 _integral 	      = { 0, 0, 0}; //XY, Theta
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
@@ -113,6 +107,7 @@ private:
     bool _absolute = true;
     bool _optimizeRotation = true;
     bool _engaged, _sleeping;
+    bool _debug = true;
 
     float compassOffset;
 
@@ -121,9 +116,6 @@ private:
     RotateControl _sAController,
                   _sBController,
                   _sCController;
-
-    elapsedMillis _targetTimer;
-    elapsedMillis _outputTimer;
 
     // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
     //                                   id, address
