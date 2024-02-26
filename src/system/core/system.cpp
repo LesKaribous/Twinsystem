@@ -32,7 +32,7 @@ void SystemBase::loadService(Service* s){
 
 void SystemBase::loadServiceInterrupt(Service* s, double interuptInterval){
     if(hasService(s->getID())){
-        os.console.error("System") << s->toString() << " loaded." << Console::endl;
+        console.error("System") << s->toString() << " loaded." << Console::endl;
     }else m_services[s->getID()] = s;
 }
 
