@@ -1,5 +1,6 @@
 #include "intercom.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 #define LIDAR_SERIAL Serial1
 
@@ -22,13 +23,13 @@ void Intercom::disable(){
 void Intercom::sendMessage(const char* message) {
     _stream.print(message);
     _stream.write('\n');
-    os.console.trace("Intercom") << ">" << message << os.console.endl;
+    console.trace("Intercom") << ">" << message << console.endl;
 }
 
 void Intercom::sendMessage(const String& message) {
     _stream.print(message);
     _stream.write('\n');
-    os.console.trace("Intercom") << ">" << message.c_str() << os.console.endl;
+    console.trace("Intercom") << ">" << message.c_str() << console.endl;
 }
 
 
@@ -68,7 +69,7 @@ bool Intercom::closeRequest(const uint32_t& uid) {
         _requests.find(uid)->second.close();
         return true;
     }else{
-        os.console.warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid) << " does not exist" << os.console.endl;
+        console.warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid) << " does not exist" << console.endl;
         return false;
     };
 }
@@ -77,19 +78,19 @@ String Intercom::getRequestResponse(const uint32_t& uid) {
     if(_requests.count(uid) > 0){
         return _requests.find(uid)->second.getResponse();
     }else{
-        os.console.warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid)   << " does not exist" << os.console.endl;
+        console.warn("Intercom") << __FILE__ << " at line " << __LINE__ << " request " << int(uid)   << " does not exist" << console.endl;
         return "ERROR";
     };
 }
 
 void Intercom::onConnectionLost() {
-   os.console.warn("Intercom") << "Connection lost." << os.console.endl;
+    console.warn("Intercom") << "Connection lost." << console.endl;
     _connected = false;
     os.screen.intercom.SetValue(false);
 }
 
 void Intercom::onConnectionSuccess(){
-    os.console.info("Intercom") << "Connection successful." << os.console.endl;
+    console.info("Intercom") << "Connection successful." << console.endl;
     _connected = true;
     os.screen.intercom.SetValue(true);
 }
@@ -100,7 +101,7 @@ void Intercom::_processIncomingData() {
     while (_stream.available()) {
         String incomingMessage = _stream.readStringUntil('\n');
         incomingMessage.trim(); // Remove any leading/trailing whitespace or newline characters
-        os.console.trace("Intercom") << "<" << incomingMessage.c_str() << os.console.endl;
+        console.trace("Intercom") << "<" << incomingMessage.c_str() << console.endl;
         
         if (incomingMessage.startsWith("ping")) {
             onPingReceived();
@@ -130,7 +131,7 @@ void Intercom::_processPendingRequests() {
         Request::Status status = request.getStatus();
     
         if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 1000){
-            os.console.trace("Intercom") << ": request " << request.getPayload() << "too old, cleared." << os.console.endl;
+            console.trace("Intercom") << ": request " << request.getPayload() << "too old, cleared." << console.endl;
             request.close();
             ++it;
             continue;
@@ -149,15 +150,15 @@ void Intercom::_processPendingRequests() {
         } else if (status == Request::Status::OK) {
             ++it;
         } else if (status == Request::Status::CLOSED) {
-            os.console.trace("Intercom") << int(_requests.size()) << "currently in the buffer" << os.console.endl;
+            console.trace("Intercom") << int(_requests.size()) << "currently in the buffer" << console.endl;
             it = _requests.erase(it); // Remove the request from the map
 
         }  else if (status == Request::Status::TIMEOUT) {
             request.close();
-            os.console.error("Intercom") << ": request " << request.getPayload() << "timedout." << os.console.endl;
+            console.error("Intercom") << ": request " << request.getPayload() << "timedout." << console.endl;
         } else if (status == Request::Status::ERROR) {
             request.close();
-            os.console.error("Intercom") << ": request " << request.getPayload() << "unknown error." << os.console.endl;
+            console.error("Intercom") << ": request " << request.getPayload() << "unknown error." << console.endl;
         } else {
             ++it;
         }

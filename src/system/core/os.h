@@ -2,24 +2,17 @@
 
 #include "settings.h"
 #include "system/core/system.h"
-
+#include "system/core/console.h"
 #include "services/lidar/lidar.h"
 #include "services/chrono/chrono.h"
 #include "services/inputs/inputs.h"
 #include "services/motion/motion.h"
 #include "services/screen/screen.h"
-#include "services/terminal/console.h"
 //#include "modules/planner/planner.h"
 #include "services/neopixel/neopixel.h"
 #include "services/terminal/terminal.h"
 #include "services/actuators/actuators.h"
 #include "services/localisation/localisation.h"
-
-
-
-#define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
-#define THROW(x) os.console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
-#define os OperatingSystem::getInstance()
 
 enum class RobotState{
     IDLE,
@@ -32,12 +25,20 @@ enum class RobotState{
 
 class OperatingSystem : public SystemBase{
 public:
-    friend class CommandHandler;
-    Console console;
-    Screen screen;
+    //friend class CommandHandler;
+    friend class Service;
+    friend class Lidar;
+    friend class Inputs;
+    friend class Motion;
+    friend class Chronometer;
+    friend class NeoPixel;
+    friend class Terminal;
+    friend class Intercom;
+    friend class Actuators;
+    friend class Localisation;
 
     //Singleton
-    static OperatingSystem& getInstance();
+    static inline OperatingSystem& getInstance(){return m_instance;}
 
     void enable(ServiceID id);
     void disable(ServiceID id);
@@ -51,14 +52,19 @@ protected :
     void setState(RobotState);
     void printState(RobotState) const;
 
-public:
-    //Standalone services
-    Lidar lidar;
+
+
+    void loadService(Service*);
+    //void registerCommands();
+
+    RobotState _state;
     
+    //Standalone services
+    Screen screen;
+    Lidar lidar;
     Inputs inputs;
     Motion motion;
     Chronometer match; //for match time
-    //Planner planner;
     NeoPixel neopixel;
     Terminal terminal;
     Intercom intercom;
@@ -66,15 +72,9 @@ public:
     Localisation localisation;
 
 private:
-    void loadService(Service*);
-    void registerCommands();
-
-
-    RobotState _state;
-
     //Singleton
     OperatingSystem();
-    OperatingSystem(OperatingSystem &other); //Singletons should not be cloneable.
+    OperatingSystem(OperatingSystem &other) = delete; //Singletons should not be cloneable.
 
-    static OperatingSystem instance;
+    static OperatingSystem m_instance;
 };

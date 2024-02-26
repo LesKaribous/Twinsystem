@@ -1,5 +1,6 @@
 #include "commandHandler.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 CommandHandler::CommandHandler(){}
 void CommandHandler::registerCommand(const String& syntax, const String& description) {

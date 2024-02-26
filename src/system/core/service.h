@@ -17,7 +17,8 @@ enum ServiceID{
 };
 
 
-
+class OperatingSystem;
+class Console;
 // Base class for subsystems
 class Service {
 public:
@@ -42,5 +43,7 @@ protected:
     bool m_enabled = false;
     bool m_debug = false;
 
+    OperatingSystem& os;
+    Console& console;
 };
 

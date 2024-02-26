@@ -1,5 +1,6 @@
 #include "terminal.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Terminal::Terminal() : Service(TERMINAL){
     os.screen.addBootProgress(10);

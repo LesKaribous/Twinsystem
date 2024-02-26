@@ -1,6 +1,10 @@
 #pragma once
 #include "system/core/lib.h"
+#include "system/core/service.h"
 #include "consoleStream.h"
+
+#define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
+#define THROW(x) console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
 
 class ConsoleStream;
 
@@ -9,8 +13,9 @@ public:
 	friend class ConsoleStream;
 	static const String endl;
 
-	Console(ConsoleLevel lvl = ConsoleLevel::INFO);
-	~Console(){};
+	//Singleton
+    static inline Console& getInstance(){return m_instance;}
+	Console(Console &other) = delete; //Singletons should not be cloneable.	
 
 	inline ConsoleLevel getLevel() { return m_level; };
 	inline void setLevel(ConsoleLevel l) { m_level = l; };
@@ -37,6 +42,12 @@ public:
 	void line();
 
 private:
+
+    //Singleton
+    Console(ConsoleLevel lvl = ConsoleLevel::INFO);
+    static Console m_instance;
+
+
 	void write(const char* str);
  	ConsoleLevel m_level;
 };

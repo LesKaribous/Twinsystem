@@ -3,46 +3,47 @@
 #include <Arduino.h>
 
 const String Console::endl = "\n";
+Console Console::m_instance;
 
 ConsoleStream Console::trace(const ServiceID& origin) {
-	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
+	return ConsoleStream(*this, ConsoleLevel::VERBOSE, origin);
 }
 
 ConsoleStream Console::info(const ServiceID& origin) {
-	return ConsoleStream(ConsoleLevel::INFO, origin);
+	return ConsoleStream(*this,ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const ServiceID& origin) {
-	return ConsoleStream(ConsoleLevel::WARNING, origin);
+	return ConsoleStream(*this,ConsoleLevel::WARNING, origin);
 }
 
 ConsoleStream Console::error(const ServiceID& origin) {
-	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
+	return ConsoleStream(*this,ConsoleLevel::CRITICAL, origin);
 }
 
 ConsoleStream Console::success(const ServiceID& origin) {
-	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
+	return ConsoleStream(*this, ConsoleLevel::SUCCESS, origin);
 }
 
 
 ConsoleStream Console::info(const String& origin) {
-	return ConsoleStream(ConsoleLevel::INFO, origin);
+	return ConsoleStream(*this,ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const String& origin) {
-	return ConsoleStream(ConsoleLevel::WARNING, origin);
+	return ConsoleStream(*this,ConsoleLevel::WARNING, origin);
 }
 
 ConsoleStream Console::error(const String& origin) {
-	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
+	return ConsoleStream(*this,ConsoleLevel::CRITICAL, origin);
 }
 
 ConsoleStream Console::trace(const String& origin) {
-	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
+	return ConsoleStream(*this,ConsoleLevel::VERBOSE, origin);
 }
 
 ConsoleStream Console::success(const String& origin) {
-	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
+	return ConsoleStream(*this,ConsoleLevel::SUCCESS, origin);
 }
 
 
@@ -77,7 +78,7 @@ void Console::write(const char* str) {
 }
 
 void Console::plot(const String& n, String s){
-	os.console.print(">" + n + ":"); os.console.println(s);
+	print(">" + n + ":"); println(s);
 }
 
 void Console::print(const String& s){

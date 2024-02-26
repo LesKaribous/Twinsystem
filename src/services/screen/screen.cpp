@@ -1,7 +1,8 @@
 #include "pin.h"
 #include "settings.h"
-#include "os.h"
 #include "screen.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Screen::Screen() : Service(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT::RST, Pin::TFT::MOSI, Pin::TFT::SCK, Pin::TFT::MISO) {
     screen.begin();

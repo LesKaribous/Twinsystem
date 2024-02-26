@@ -1,6 +1,7 @@
 #include "lidar.h"
 #include "settings.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Lidar::Lidar() : Service(LIDAR){
 	os.screen.addBootProgress(10);
@@ -80,14 +81,14 @@ float Lidar::getMaxLidarDist(Vec2 pos, float angle){
 	tableHit.sub(pos);
 	float maxdist = tableHit.mag();
 
-	os.console.print("Lidar current pos : {");
-	os.console.print(pos.a);
-	os.console.print(",");
-	os.console.print(pos.b);
-	os.console.print("}, Angle : ");
-	os.console.print((angle * RAD_TO_DEG));
-	os.console.print(", max lidar dist : ");
-	os.console.println(maxdist);
+	console.print("Lidar current pos : {");
+	console.print(pos.a);
+	console.print(",");
+	console.print(pos.b);
+	console.print("}, Angle : ");
+	console.print((angle * RAD_TO_DEG));
+	console.print(", max lidar dist : ");
+	console.println(maxdist);
 
 	return maxdist;
 }

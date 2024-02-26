@@ -1,7 +1,7 @@
 #include "neopixel.h"
 #include "pin.h"
-#include "os.h"
-
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 #define NEOPIXEL_PIN Pin::Led::neopixel   // Change this to match the pin you are using
 #define NUM_LEDS 8       // Change this to match the number of LEDs in your strip

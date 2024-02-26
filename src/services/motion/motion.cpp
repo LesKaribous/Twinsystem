@@ -1,7 +1,8 @@
 #include "settings.h"
 #include "motion.h"
 #include "kinematics.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Motion::Motion() : Service(MOTION),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
@@ -57,12 +58,12 @@ Motion::Motion() : Service(MOTION),
     /* Initialise the sensor */
     while(!bno.begin()){
         /* There was a problem detecting the BNO055 ... check your connections */
-        os.console.error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << os.console.endl;
+        console.error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << console.endl;
     }
     bno.setExtCrystalUse(true);
 
     
-    os.console.info("Motion") << "Calibration settings : " << accelCorr << "\n";
+    console.info("Motion") << "Calibration settings : " << accelCorr << "\n";
 }
 
 Motion::~Motion(){}
@@ -80,7 +81,7 @@ void Motion::update(){
         if(isPending()){
             if(millis() - lastPIDTick  < Settings::Motion::PID_MIN_PERIOD) return;
             if(millis() - lastPIDTick > Settings::Motion::PID_MAX_PERIOD){
-                if(lastPIDTick != 0) os.console.info(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << os.console.endl;
+                if(lastPIDTick != 0) console.info(m_ID) << "PID update is too slow (" << int(millis() - lastPIDTick) << "ms | " << int(Settings::Motion::PID_MAX_PERIOD) << "ms)" << console.endl;
                 lastPIDTick = millis() - Settings::Motion::PID_MAX_PERIOD;
             }
             
@@ -89,13 +90,13 @@ void Motion::update(){
             //Speed estimation based on last steps
             estimateVelocity(dt);
 
-            //os.console.info() << _velocity << os.console.endl;
+            //console.info() << _velocity << console.endl;
 
             //Position estimation and rotation measure
             
             estimatePosition(); //in world frame of reference
             _position.c = getOrientation();
-            //os.console.info() << _velocity << os.console.endl;
+            //console.info() << _velocity << console.endl;
 
             positionControl(dt);
             speedControl(dt);
@@ -123,7 +124,7 @@ void Motion::speedControl(float dt){
     Vec3 corr = (error * kP) + (_velIntegral * kI) + (((error - _velLastError)/dt) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
     _velLastError = Vec3(error); //steps / s
 
-    //os.console.println("velocity : " + String(_velocity));
+    //console.println("velocity : " + String(_velocity));
 
     _sAController.overrideSpeed(corr.a); // set new speed
     _sBController.overrideSpeed(corr.b); // set new speed
@@ -162,12 +163,12 @@ void Motion::positionControl(float dt){
     _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
 
    if(true){
-        os.console.plot("px",_position.x);
-        os.console.plot("tx",_target.x);
-        os.console.plot("py",_position.y);
-        os.console.plot("ty",_target.y);
-        os.console.plot("pa",_position.c);
-        os.console.plot("ta",_target.c);
+        console.plot("px",_position.x);
+        console.plot("tx",_target.x);
+        console.plot("py",_position.y);
+        console.plot("ty",_target.y);
+        console.plot("pa",_position.c);
+        console.plot("ta",_target.c);
     }
 }
 
@@ -205,9 +206,9 @@ void  Motion::estimateVelocity(float dt){
     _wheelVelocity = _lastStepsSum/(dt*float(_lastStepsHistory.size()));
     _wheelVelocity.div(Settings::Stepper::STEP_MODE * RAD_TO_DEG);
 
-    os.console.plot("va",_wheelVelocity.a);
-    os.console.plot("vb",_wheelVelocity.b);
-    os.console.plot("vc",_wheelVelocity.c);
+    console.plot("va",_wheelVelocity.a);
+    console.plot("vb",_wheelVelocity.b);
+    console.plot("vc",_wheelVelocity.c);
 
     _velocity = fk(_wheelVelocity)/_calibration;
 }
@@ -246,9 +247,9 @@ void Motion::cancel() {
     _sBController.overrideSpeed(0); // set new speed
     _sCController.overrideSpeed(0); // set new speed
         
-    os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
-    os.console.info("Motion") << "Position : " << _position << os.console.endl;
-    os.console.info("Motion") << "Target was : " << _target << os.console.endl;
+    console.info("Motion") << "Start position : " << _startPosition << console.endl;
+    console.info("Motion") << "Position : " << _position << console.endl;
+    console.info("Motion") << "Target was : " << _target << console.endl;
     _startPosition = _position;
 }
 
@@ -266,9 +267,9 @@ void Motion::forceCancel() {
     _sBController.rotateAsync(_sB);
     _sCController.rotateAsync(_sC);
 
-    os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
-    os.console.info("Motion") << "Position : " << _position << os.console.endl;
-    os.console.info("Motion") << "Target was : " << _target << os.console.endl;
+    console.info("Motion") << "Start position : " << _startPosition << console.endl;
+    console.info("Motion") << "Position : " << _position << console.endl;
+    console.info("Motion") << "Target was : " << _target << console.endl;
     _startPosition = _position;
 }
 
@@ -279,9 +280,9 @@ void Motion::complete() {
     _sBController.overrideSpeed(0); // set new speed
     _sCController.overrideSpeed(0); // set new speed
 
-    //os.console.info("Motion") << "Start position : " << _startPosition << os.console.endl;
-    //os.console.info("Motion") << "Position : " << _position << os.console.endl;
-    //os.console.info("Motion") << "Target was : " << _target << os.console.endl;
+    //console.info("Motion") << "Start position : " << _startPosition << console.endl;
+    //console.info("Motion") << "Position : " << _position << console.endl;
+    //console.info("Motion") << "Target was : " << _target << console.endl;
 
     _position = _target;
     _startPosition = _position;
@@ -323,7 +324,7 @@ void  Motion::align(RobotCompass rc, float orientation){
 //Raw relative move request
 void  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!m_enabled) {
-        os.console.error("Motion") << "Motion not enabled" << os.console.endl;
+        console.error("Motion") << "Motion not enabled" << console.endl;
         return;
     }
     Job::reset();//Start a new job
@@ -331,22 +332,22 @@ void  Motion::move(Vec3 target){ //target is in world frame of reference
     target.c *= DEG_TO_RAD; //Convert to rotation to radian
     if(isRelative()){
         if(target.magSq() == 0){ //Test if move is 0 length
-            os.console.error("Motion") << "Move is null" << os.console.endl;
+            console.error("Motion") << "Move is null" << console.endl;
             Job::cancel();
             return;
         }
         _target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
-            os.console.error("Motion") << "Move is null" << os.console.endl;
+            console.error("Motion") << "Move is null" << console.endl;
             Job::cancel();
             return;
         }
         _target = target;
     }
 
-    //os.console.info("Motion") << "Current position : " << getAbsPosition() << os.console.endl;
-    //os.console.info("Motion") << "Current target   : " << getAbsTarget() << os.console.endl;
+    //console.info("Motion") << "Current position : " << getAbsPosition() << console.endl;
+    //console.info("Motion") << "Current target   : " << getAbsTarget() << console.endl;
      
 
     _lastError = _integral = Vec3(0); //Absolute mm, mm, rad

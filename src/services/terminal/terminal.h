@@ -1,8 +1,6 @@
 #pragma once
 #include "system/core/lib.h"
 #include "system/core/service.h"
-#include "console.h"
-
 
 class Terminal : public Service{
 public :

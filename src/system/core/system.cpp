@@ -1,8 +1,8 @@
 #include "system.h"
 #include "settings.h"
-#include "os.h"
+#include "system/core/console.h"
 
-SystemBase::SystemBase(){
+SystemBase::SystemBase() : console(Console::getInstance()){
     m_currentState = BOOT;
 }
 
@@ -12,12 +12,12 @@ SystemBase::~SystemBase(){
 
 void SystemBase::enable(ServiceID id) {
     if(hasService(id)) m_services[id]->enable();
-    else os.console.error("System") << "Service : " << Service::toString(id) << " not found." << os.console.endl;
+    else console.error("System") << "Service : " << Service::toString(id) << " not found." << console.endl;
 }
 
 void SystemBase::disable(ServiceID id) {
     if(hasService(id)) m_services[id]->disable();
-    else os.console.error("System") << "Service : " << Service::toString(id) << " not found." << os.console.endl;
+    else console.error("System") << "Service : " << Service::toString(id) << " not found." << console.endl;
 }
 
 bool SystemBase::hasService(ServiceID s ) const {
@@ -26,7 +26,7 @@ bool SystemBase::hasService(ServiceID s ) const {
 
 void SystemBase::loadService(Service* s){
     if(hasService(s->getID())){
-        os.console.error("System") << s->toString() << " loaded." << Console::endl;
+        console.error("System") << s->toString() << " loaded." << Console::endl;
     }else m_services[s->getID()] = s;
 }
 
@@ -67,6 +67,7 @@ void SystemBase::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
+/*
 void SystemBase::execute(String& script){
     m_program = interpreter.processScript(script);
     if(m_program.isValid()){
@@ -85,8 +86,9 @@ void SystemBase::execute(Program& prgm){
     }else{
         m_currentState = IDLE;
     }
-}
+}*/
 
+/*
 void SystemBase::updateProgram(){
     if(m_busy){ 
         if(m_currentJob->isPending() || m_currentJob->isPaused()){
@@ -99,7 +101,7 @@ void SystemBase::updateProgram(){
     if(!m_busy){
         if(m_program.isValid() && m_program.isPending()) m_program.step(); //Last statement finished step the program
     }
-}
+}*/
 
 void SystemBase::updateServices(){
     for(const auto& service : m_services) {
@@ -146,7 +148,7 @@ void SystemBase::handleIdleState(){
 void SystemBase::handleRunningState(){
     // Update each enabled subsystem
     updateServices();
-    updateProgram();
+    //updateProgram();
     //Run the program
 }
 

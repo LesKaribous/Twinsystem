@@ -1,6 +1,7 @@
 #include "geometry2D.h"
 #include "geometry3D.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 //---------- Polar Vec --------
 
@@ -72,7 +73,7 @@ Vec2 Vec2::fromString(const String& str){
     }else error = true;
     
     if(error){
-        os.console.error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << os.console.endl;
+        Console::getInstance().error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << Console::getInstance().endl;
     }else{
         float x = x_str.toFloat();
         float y = y_str.toFloat();
@@ -315,7 +316,7 @@ Vec2::operator String() const{
 float& Vec2::operator[](int i){
     if(i == 0) return x;
     if(i == 1) return y;
-    os.console.error("Vec2") << "Index out of bounds" << os.console.endl; 
+    Console::getInstance().error("Vec2") << "Index out of bounds" << Console::getInstance().endl; 
     return x;
 }
 

@@ -1,7 +1,7 @@
 #include "chrono.h"
 #include "settings.h"
-#include "os.h"
-
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Chronometer::Chronometer() : Service(CHRONO){
     os.screen.addBootProgress(10);

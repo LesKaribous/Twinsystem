@@ -1,10 +1,6 @@
 #include "os.h"
 
-OperatingSystem OperatingSystem::instance;
-
-OperatingSystem& OperatingSystem::getInstance(){
-    return instance;
-}
+OperatingSystem OperatingSystem::m_instance;
 
 void OperatingSystem::loadService(Service *service){
     SystemBase::loadService(service);
@@ -21,6 +17,7 @@ void OperatingSystem::disable(ServiceID id) {
 
 
 OperatingSystem::OperatingSystem() : SystemBase(){
+    setConsoleLevel(INFO);
     _state = RobotState::IDLE;
 
     motion.setCalibration(inputs.isPrimary() ? Settings::Calibration::Primary : Settings::Calibration::Secondary);
@@ -39,13 +36,13 @@ OperatingSystem::OperatingSystem() : SystemBase(){
     //loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
     //loadService(&localisation);
 
-    registerCommands();
+    //registerCommands();
 
     screen.addBootProgress(30);
     screen.drawBootProgress("Boot complete...");
     screen.setPage(Page::INIT);
 }
-
+/*
 void OperatingSystem::registerCommands(){
 
     // Registering commands with their syntax and description
@@ -79,10 +76,11 @@ void OperatingSystem::registerCommands(){
     // Expression::registerVariables("posA", "[1,2]");
     // Expression::registerVariables("posB", "[3,4]");
 }
-
+*/
 void OperatingSystem::update(){
 	SystemBase::update();
     
+    /*
     if( terminal.commandAvailable() > 0){
         console.println("Received command. parsing...");
         Program p = interpreter.processScript(terminal.dequeCommand());
@@ -90,11 +88,11 @@ void OperatingSystem::update(){
         if(p.isValid()){
             execute(p);
         }    
-    }
+    }*/
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
-	console.setLevel(level);
+	Console::getInstance().setLevel(level);
 }
 
 

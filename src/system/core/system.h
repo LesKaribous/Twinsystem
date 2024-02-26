@@ -2,10 +2,9 @@
 #include "system/core/lib.h"
 #include "system/core/job.h"
 #include "system/core/event.h"
-
 #include "system/timer/timer.h"
 #include "system/core/service.h"
-#include "system/core/interpreter.h"
+//#include "system/core/interpreter.h"
 
 enum SystemState{
     BOOT,    // booting
@@ -13,6 +12,10 @@ enum SystemState{
     RUNNING, // running services and a program is running
     STOPPED, // stopped services and programs are stopped
 };
+
+class Console;
+class Service;
+enum ServiceID;
 
 class SystemBase{
 public :
@@ -24,8 +27,8 @@ public :
     void disable(ServiceID serviceID);
     bool statusService(ServiceID serviceID);
 
-    void execute(String& script);
-    void execute(Program& script);
+    //void execute(String& script);
+    //void execute(Program& script);
 
     bool isBusy() const;
     void wait(unsigned long time);  //async
@@ -37,7 +40,7 @@ public :
 
 
 protected:
-    Interpreter interpreter;
+    //Interpreter interpreter;
 
     SystemState getState();
     void loadService(Service* m);
@@ -47,6 +50,8 @@ protected:
 
     inline SystemState systemState() const {return m_currentState;}
 
+    Console& console;
+
 private:
     //Async rountines
     void handleBootState();
@@ -55,9 +60,8 @@ private:
     void handleStoppedState();
 
     std::map<ServiceID, Service*> m_services;
-    Program m_program;
+    //Program m_program;
     SystemState m_currentState;
-
     //Utils
     Timer m_timer;
     

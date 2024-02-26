@@ -1,7 +1,7 @@
 #include "inputs.h"
 #include "settings.h"
-#include "os.h"
-
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 Inputs::Inputs() : 
     Service(INPUTS), 

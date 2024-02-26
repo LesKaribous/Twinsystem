@@ -1,6 +1,7 @@
 #include "actuators.h"
 #include "settings.h"
-#include "os.h"
+#include "system/core/os.h"
+#include "system/core/console.h"
 
 #define _GS_ Settings::Actuators::Gripper
 #define _CPS_ Settings::Actuators::cherryPicker

@@ -36,8 +36,6 @@ public:
     void forceCancel();
 
     
-    
-
     void resetCompass(); //zero orientation
     float getOrientation(); //rad
 

@@ -1,7 +1,7 @@
 #include "service.h"
+#include "os.h"
 
-
-Service::Service(ServiceID id) : m_ID(id){}
+Service::Service(ServiceID id) : os(OperatingSystem::getInstance()), console(Console::getInstance()), m_ID(id){}
 
 void Service::enable() {
     m_enabled = true;
