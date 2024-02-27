@@ -3,47 +3,47 @@
 #include <Arduino.h>
 
 const String Console::endl = "\n";
-Console Console::m_instance;
+ConsoleLevel Console::m_level = ConsoleLevel::INFO;
 
 ConsoleStream Console::trace(const ServiceID& origin) {
-	return ConsoleStream(*this, ConsoleLevel::VERBOSE, origin);
+	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
 }
 
 ConsoleStream Console::info(const ServiceID& origin) {
-	return ConsoleStream(*this,ConsoleLevel::INFO, origin);
+	return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const ServiceID& origin) {
-	return ConsoleStream(*this,ConsoleLevel::WARNING, origin);
+	return ConsoleStream(ConsoleLevel::WARNING, origin);
 }
 
 ConsoleStream Console::error(const ServiceID& origin) {
-	return ConsoleStream(*this,ConsoleLevel::CRITICAL, origin);
+	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
 }
 
 ConsoleStream Console::success(const ServiceID& origin) {
-	return ConsoleStream(*this, ConsoleLevel::SUCCESS, origin);
+	return ConsoleStream( ConsoleLevel::SUCCESS, origin);
 }
 
 
 ConsoleStream Console::info(const String& origin) {
-	return ConsoleStream(*this,ConsoleLevel::INFO, origin);
+	return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const String& origin) {
-	return ConsoleStream(*this,ConsoleLevel::WARNING, origin);
+	return ConsoleStream(ConsoleLevel::WARNING, origin);
 }
 
 ConsoleStream Console::error(const String& origin) {
-	return ConsoleStream(*this,ConsoleLevel::CRITICAL, origin);
+	return ConsoleStream(ConsoleLevel::CRITICAL, origin);
 }
 
 ConsoleStream Console::trace(const String& origin) {
-	return ConsoleStream(*this,ConsoleLevel::VERBOSE, origin);
+	return ConsoleStream(ConsoleLevel::VERBOSE, origin);
 }
 
 ConsoleStream Console::success(const String& origin) {
-	return ConsoleStream(*this,ConsoleLevel::SUCCESS, origin);
+	return ConsoleStream(ConsoleLevel::SUCCESS, origin);
 }
 
 
@@ -67,9 +67,8 @@ void header(){
 
 }
 
-Console::Console(ConsoleLevel lvl){
+void Console::start(){
 	Serial.begin(115200);
-	setLevel(lvl);
 	header();
 }
 

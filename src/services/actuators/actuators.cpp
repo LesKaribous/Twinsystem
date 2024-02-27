@@ -6,109 +6,59 @@
 #define _GS_ Settings::Actuators::Gripper
 #define _CPS_ Settings::Actuators::cherryPicker
 
-Actuators::Actuators() : Service(ACTUATORS), 
-gripperAB(  {Pin::Servo::ServoA1, _GS_::AB::right_Open, _GS_::AB::right_Close, _GS_::AB::right_Grab}, 
-            {Pin::Servo::ServoA3, _GS_::AB::left_Open,  _GS_::AB::left_Close, _GS_::AB::left_Grab}, 
-            {Pin::Servo::ServoA2, _GS_::AB::cherry_Open, _GS_::AB::cherry_Close}),
-
-gripperBC(  {Pin::Servo::ServoB1, _GS_::BC::right_Open, _GS_::BC::right_Close, _GS_::BC::right_Grab}, 
-            {Pin::Servo::ServoB3, _GS_::BC::left_Open,  _GS_::BC::left_Close, _GS_::BC::left_Grab}, 
-            {Pin::Servo::ServoB2, _GS_::BC::cherry_Open, _GS_::BC::cherry_Close} ),
-
-gripperCA(  {Pin::Servo::ServoC1, _GS_::CA::right_Open, _GS_::CA::right_Close, _GS_::CA::right_Grab}, 
-            {Pin::Servo::ServoC3, _GS_::CA::left_Open,  _GS_::CA::left_Close, _GS_::CA::left_Grab}, 
-            {Pin::Servo::ServoC2, _GS_::CA::cherry_Open, _GS_::CA::cherry_Close}),
-
-trap(Pin::CherryPicker::pinServoTrap, _CPS_::trap_Open, _CPS_::trap_Close, _CPS_::trap_Grab)
-
-{
-    os.screen.addBootProgress(10);
-    os.screen.drawBootProgress("Loading Actuators...");
-    _pinTurbine = Pin::CherryPicker::pinTurbine;
-}
-
-Actuators::~Actuators(){
-}
+Actuators::Actuators() : Service(ACTUATORS),
+gripperAB(ActuatorsPreset::AB),
+gripperBC(ActuatorsPreset::BC),
+gripperCA(ActuatorsPreset::CA){}
 
 void Actuators::update(){
 }
 
+void Actuators::enableTraco()
+{
+    digitalWrite(Pin::Outputs::enTraco, HIGH);
+}
+
+void Actuators::disableTraco()
+{
+    digitalWrite(Pin::Outputs::enTraco, LOW);
+}
+
 void Actuators::enable(){
-    gripperAB.cherryLocker.enable();
+    pinMode(Pin::Outputs::enTraco, OUTPUT); // Enable Traco to enable Servos
+    enableTraco();
+    gripperAB.elevator.enable();
     gripperAB.leftGripper.enable();
     gripperAB.rightGripper.enable();
-    gripperBC.cherryLocker.enable();
+    gripperBC.elevator.enable();
     gripperBC.leftGripper.enable();
     gripperBC.rightGripper.enable();
-    gripperCA.cherryLocker.enable();
+    gripperCA.elevator.enable();
     gripperCA.leftGripper.enable();
     gripperCA.rightGripper.enable();
-    trap.enable();
-    pinMode(_pinTurbine, OUTPUT);
-    digitalWrite(_pinTurbine, LOW);
 
-    trap.close();
-    close(RobotCompass::AB);
-    close(RobotCompass::BC);
-    close(RobotCompass::CA);
+    open(RobotCompass::AB);
+    open(RobotCompass::BC);
+    open(RobotCompass::CA);
+    moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
+    moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
+    moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 
     delay(1000);
-
     sleep();
 }
 
 void Actuators::disable(){
-    gripperAB.cherryLocker.disable();
+    disableTraco();
+    gripperAB.elevator.disable();
     gripperAB.leftGripper.disable();
     gripperAB.rightGripper.disable();
-    gripperBC.cherryLocker.disable();
+    gripperBC.elevator.disable();
     gripperBC.leftGripper.disable();
     gripperBC.rightGripper.disable();
-    gripperCA.cherryLocker.disable();
+    gripperCA.elevator.disable();
     gripperCA.leftGripper.disable();
     gripperCA.rightGripper.disable();
-    trap.disable();
-    digitalWrite(_pinTurbine, LOW);
-}
-
-void Actuators::lock(RobotCompass rc){
-    switch (rc)
-    {
-    case RobotCompass::AB :
-        gripperAB.cherryLocker.close();
-        break;
-
-    case RobotCompass::BC :
-        gripperBC.cherryLocker.close();
-        break;
-
-    case RobotCompass::CA :
-        gripperCA.cherryLocker.close();
-        break;
-    
-    default:
-        break;
-    }
-}
-
-void Actuators::unlock(RobotCompass rc){
-    switch (rc)
-    {
-    case RobotCompass::AB :
-        gripperAB.cherryLocker.open();
-        break;
-
-    case RobotCompass::BC :
-        gripperBC.cherryLocker.open();
-        break;
-
-    case RobotCompass::CA :
-        gripperCA.cherryLocker.open();
-        break;
-    
-    default:
-        break;
-    }
 }
 
 void Actuators::close(RobotCompass rc){
@@ -181,58 +131,163 @@ void Actuators::grab(RobotCompass rc){
     }
 }
 
-void Actuators::setTurbine(int speed){
-    analogWrite(_pinTurbine, map(speed, 0, 100, 0, 255));
+void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose){
+    getActuatorGroup(rc).elevator.moveToPose(static_cast<int>(pose));
 }
 
-void Actuators::stopTurbine(){
-    analogWrite(_pinTurbine, 0);
+bool Actuators::moveGripper(AdvancedServo& gripper, int target){
+    int pos = gripper.getPosition();
+    if (pos < target - 2)
+    {
+        gripper.moveTo(pos + 2);
+        return false; // Not arrived
+    }
+    else if (pos > target + 2)
+    {
+        gripper.moveTo(pos - 2);
+        return false; // Not arrived
+    }
+    return true; // Arrived
 }
 
-void Actuators::suckBall(){
-    trap.close();
-    setTurbine(100);
+ActuatorGroup &Actuators::getActuatorGroup(RobotCompass rc)
+{
+    switch (rc)
+    {
+    case RobotCompass::AB:
+        return gripperAB;
+    case RobotCompass::BC:
+        return gripperBC;
+    case RobotCompass::CA:
+        return gripperCA;
+    default:
+        break;
+    }
 }
 
-void Actuators::dropBall(){
-    stopTurbine();
-    trap.open();
+void Actuators::testSensors()
+{
+    Serial.println("Sensors:");
+    Serial.print("AB: R -  ");
+    Serial.print(readSensor(RobotCompass::AB,Side::RIGHT));
+    Serial.print(" | L -  ");
+    Serial.println(readSensor(RobotCompass::AB,Side::LEFT));
+    Serial.print("BC: R -  ");
+    Serial.print(readSensor(RobotCompass::BC,Side::RIGHT));
+    Serial.print(" | L -  ");
+    Serial.println(readSensor(RobotCompass::BC,Side::LEFT));
+    Serial.print("CA: R -  ");
+    Serial.print(readSensor(RobotCompass::CA,Side::RIGHT));
+    Serial.print(" | L -  ");
+    Serial.println(readSensor(RobotCompass::CA, Side::LEFT));
 }
 
-void Actuators::openTrap(){
-    trap.open();
+
+bool Actuators::runGrabbing(RobotCompass rc, Side gs){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    if (gs == Side::LEFT)
+        return moveGripper(group.leftGripper, group.leftGripper.getGrabPosition());
+    else if (gs == Side::RIGHT)
+        return moveGripper(group.rightGripper, group.rightGripper.getGrabPosition());
+    else if (gs == Side::BOTH){
+        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getGrabPosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getGrabPosition());
+        return leftArrived && rightArrived;
+    }
+    return true;
+}
+
+bool Actuators::runOpening(RobotCompass rc, Side gs){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    if (gs == Side::LEFT)
+        return moveGripper(group.leftGripper, group.leftGripper.getOpenPosition());
+    else if (gs == Side::RIGHT)
+        return moveGripper(group.rightGripper, group.rightGripper.getOpenPosition());
+    else if (gs == Side::BOTH){
+        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getOpenPosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getOpenPosition());
+        return leftArrived && rightArrived;
+    }
+    return true;
+}
+
+bool Actuators::runClosing(RobotCompass rc, Side gs){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    if (gs == Side::LEFT)
+        return moveGripper(group.leftGripper, group.leftGripper.getClosePosition());
+    else if (gs == Side::RIGHT)
+        return moveGripper(group.rightGripper, group.rightGripper.getClosePosition());
+    else if (gs == Side::BOTH){
+        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getClosePosition());
+        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getClosePosition());
+        return leftArrived && rightArrived;
+    }
+    return true;
+}
+
+bool Actuators::runElevatorUp(RobotCompass rc){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::UP)));
+}
+
+bool Actuators::runElevatorDown(RobotCompass rc){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::DOWN)));
+}
+
+bool Actuators::runElevatorGrab(RobotCompass rc){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::GRAB)));
 }
 
 
-void Actuators::closeTrap(){
-    trap.close();
-}
+bool Actuators::readSensor(RobotCompass rc, Side gs){
+    switch (rc)
+    {
+    case RobotCompass::AB:
+        if (gs == Side::RIGHT)
+            return digitalRead(Pin::Sensor::SensorRight_AB);
+        else if (gs == Side::LEFT)
+            return digitalRead(Pin::Sensor::SensorLeft_AB);
+        break;
 
+    case RobotCompass::BC:
+        if (gs == Side::RIGHT)
+            return digitalRead(Pin::Sensor::SensorRight_BC);
+        else if (gs == Side::LEFT)
+            return digitalRead(Pin::Sensor::SensorLeft_BC);
+        break;
 
-void Actuators::ungrab(RobotCompass rc){
-    open(rc);
+    case RobotCompass::CA:
+        if (gs == Side::RIGHT)
+            return digitalRead(Pin::Sensor::SensorRight_CA);
+        else if (gs == Side::LEFT)
+            return digitalRead(Pin::Sensor::SensorLeft_CA);
+        break;
+
+    default:
+        return false;
+        break;
+    }
 }
 
 void Actuators::applause(RobotCompass rc){
-    open(rc); unlock(rc);
+    close(rc);
     delay(500);
-    grab(rc); lock(rc);
+    grab(rc);
     delay(500);
-    open(rc); unlock(rc);
+    open(rc);
     delay(500);
-    grab(rc); lock(rc);
-    delay(500);
-    open(rc); unlock(rc);
 }
 
 void Actuators::sleep(){
-    gripperAB.cherryLocker.sleep();
+    gripperAB.elevator.sleep();
     gripperAB.leftGripper.sleep();
     gripperAB.rightGripper.sleep();
-    gripperBC.cherryLocker.sleep();
+    gripperBC.elevator.sleep();
     gripperBC.leftGripper.sleep();
     gripperBC.rightGripper.sleep();
-    gripperCA.cherryLocker.sleep();
+    gripperCA.elevator.sleep();
     gripperCA.leftGripper.sleep();
     gripperCA.rightGripper.sleep();
 }

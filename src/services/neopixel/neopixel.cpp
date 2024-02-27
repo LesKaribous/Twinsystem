@@ -1,14 +1,10 @@
 #include "neopixel.h"
 #include "pin.h"
-#include "system/core/os.h"
-#include "system/core/console.h"
 
 #define NEOPIXEL_PIN Pin::Led::neopixel   // Change this to match the pin you are using
 #define NUM_LEDS 8       // Change this to match the number of LEDs in your strip
 
 NeoPixel::NeoPixel() : Service(NEOPIXEL), strip(Adafruit_NeoPixel(NUM_LEDS, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800)){
-    os.screen.addBootProgress(10);
-	os.screen.drawBootProgress("Loading Neopixel...");
     strip.begin();
 }
 

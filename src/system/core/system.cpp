@@ -2,7 +2,7 @@
 #include "settings.h"
 #include "system/core/console.h"
 
-SystemBase::SystemBase() : console(Console::getInstance()){
+SystemBase::SystemBase() {
     m_currentState = BOOT;
 }
 
@@ -48,16 +48,18 @@ bool SystemBase::isBusy() const {
     return m_busy;
 }
 
-void SystemBase::wait(unsigned long time){
+void SystemBase::wait(unsigned long time, bool async) {
     m_busy = true;
     m_timer.setDuration(time);
     m_timer.start();
     m_currentJob = &m_timer;
+    if(!async)while(isBusy())update();
 }
 
-void SystemBase::waitUntil(Job& obj){
+void SystemBase::waitUntil(Job& obj, bool async){
     m_busy = true; 
     m_currentJob = &obj;
+    if(!async)while(isBusy())update();
 }
 
 
@@ -73,7 +75,7 @@ void SystemBase::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
-/*
+
 void SystemBase::execute(String& script){
     m_program = interpreter.processScript(script);
     if(m_program.isValid()){
@@ -92,9 +94,9 @@ void SystemBase::execute(Program& prgm){
     }else{
         m_currentState = IDLE;
     }
-}*/
+}
 
-/*
+
 void SystemBase::updateProgram(){
     if(m_busy){ 
         if(m_currentJob->isPending() || m_currentJob->isPaused()){
@@ -107,7 +109,7 @@ void SystemBase::updateProgram(){
     if(!m_busy){
         if(m_program.isValid() && m_program.isPending()) m_program.step(); //Last statement finished step the program
     }
-}*/
+}
 
 void SystemBase::updateServices(){
     for(const auto& service : m_services) {
@@ -138,28 +140,17 @@ void SystemBase::update() {
     default:
         break;
     }
-}
 
-void SystemBase::handleBootState(){
-    m_currentState = IDLE;
-}
-
-
-void SystemBase::handleIdleState(){
-    // Update each enabled subsystem
-    updateServices();
-
-}
-
-void SystemBase::handleRunningState(){
-    // Update each enabled subsystem
-    updateServices();
-    //updateProgram();
-    //Run the program
-}
-
-void SystemBase::handleStoppedState(){
-    //Do nothing.
+    if(m_currentJob){
+        if(m_currentJob->isPending()){
+            m_currentJob->run();
+            m_busy = true;
+        }
+        if(m_currentJob->isCompleted())m_busy = false;
+        if(m_currentJob->isCancelled())m_busy = false;
+        if(m_currentJob->isPaused())m_busy = true;
+    }
+    
 }
 
 SystemState SystemBase::getState(){

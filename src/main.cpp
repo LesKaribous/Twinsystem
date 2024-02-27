@@ -1,12 +1,15 @@
-#include "system/core/os.h"
-OperatingSystem& os = OperatingSystem::getInstance();
+#include "app.h"
 
-void setup(){}
- 
+App myApp;
+
+void setup(){
+	myApp.update();
+}
+
 void loop(){
-	os.update();
+	myApp.update();
 }
 
 void control(){
-	os.control();
+	//OperatingSystem::getInstance().control(); // for pid constroller
 }

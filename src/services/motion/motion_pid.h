@@ -1,16 +1,19 @@
 #pragma once
 #include "settings.h"
-#include "system/core/job.h"
 #include "system/core/service.h"
-#include "system/math/geometry.h"
+#include "system/core/lib.h"
+#include "system/core/job.h"
 
-class Motion : public Service, public Job{
+#include <deque>
+
+
+
+class MotionPID : public Service, public Job{
 public:
 
-    Motion();
-    void enable() override;
-    void disable() override;
-
+    MotionPID();
+    void enable() override;// Engaging motors make them ready to move. Motors may be engaged but sleeping !
+    void disable() override;// Disengaging motors turn them off. They cannot move at all.
     void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
     void disengage();// Disengaging motors turn them off. They cannot move at all.
     void wakeUp(); //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
@@ -18,11 +21,12 @@ public:
 
     void go(Vec2);
     void go(float x, float y);
+    void goTurn(float x, float y, float theta);
     void turn(float w);
     void align(RobotCompass, float orientation);
     void goAlign(Vec2 target, RobotCompass rc, float orientation);
 
-    //void setFeedrate(int); //0-100%
+    void setFeedrate(int); //0-100%
     void setCalibration(CalibrationProfile c);
 
     void run()override;
@@ -33,15 +37,20 @@ public:
     void complete() override;
     void forceCancel();
 
-    void estimatePosition();
+    void control();
+
+    void resetCompass(); //zero orientation
+    float getOrientation(); //rad
+
     void resetSteps();
-    bool hasFinished();
 
     //Setters
     void setAbsTarget(Vec3);    //mm, mm, rad
     void setAbsPosition(Vec3);  //mm, mm, rad
+
     void setAbsolute();
     void setRelative();
+
     //Getters
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
     Vec3 getAbsPosition() const;//Absolute mm, mm, rad
@@ -59,28 +68,52 @@ public:
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
     void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
 
+
+
     void move(Vec3 target);
+private:
+    void positionControl();
+    void estimatePosition();
 
-private :
-
+    Vec3 computeStaturedSpeed(Vec3 target);
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
+    std::deque<Vec3> _wheelVelocityHistory; //Steps
+
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _stepsTarget 	 = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _lastSteps      = { 0, 0, 0}; //relative steps
+    Vec3 _velocity 	     = { 0, 0, 0}; //Absolute mm, mm, rad /s
+
+    Vec3 _targetWheelVelocity = { 0, 0, 0}; //Absolute steps / s
+
+    Vec2 accelCorr; //Correct acceleration bias
+
+    //PID
+    Vec3 _lastError 	  = { 0, 0, 0}; //XY, Theta
+    Vec3 _integral 	      = { 0, 0, 0}; //XY, Theta
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
 
-    Stepper _sA, _sB, _sC;
-    StepControl _steppers;
-    bool _engaged, _sleeping;
+    unsigned lastPIDTick = 0;
     bool _absolute = true;
     bool _optimizeRotation = true;
+    bool _engaged, _sleeping;
     bool _debug = true;
+
+    float compassOffset;
+
+    //Stepper control
+    Stepper _sA, _sB, _sC;
+    RotateControl _sAController,
+                  _sBController,
+                  _sCController;
+
+    // Check I2C device address and correct line below (by default address is 0x29 or 0x28)
+    //                                   id, address
+    Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire2);
 };

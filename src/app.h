@@ -1,3 +1,20 @@
+#pragma once
+#include "system/core/os.h"
 
-void goTo(float x, float y);
-void turn(float angle);
+class App : public OperatingSystem{
+public:
+    App(){}
+
+    void handleIdleState() override;
+    void handleRunningState() override;
+
+    void TakePlant(RobotCompass rc);
+    void PlacePlant(RobotCompass rc);
+    void SlowGrabing(RobotCompass rc);
+    void SlowGrabing(RobotCompass rc, Side gs);
+    void SlowOpening(RobotCompass rc);
+    void SlowClosing(RobotCompass rc);
+    void SlowElevatorUp(RobotCompass rc);
+    void SlowElevatorDown(RobotCompass rc);
+    void SlowElevatorGrab(RobotCompass rc);
+};

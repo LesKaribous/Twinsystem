@@ -1,5 +1,5 @@
 #include "geometry3D.h"
-#include "system/core/console.h"
+#include "system/core/os.h"
 //---------- Vector3 ------------
 //Methods
 
@@ -54,7 +54,7 @@ Vec3 Vec3::fromString(const String& str){
     }else error = true;
     
     if(error){
-       Console::getInstance().error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << Console::getInstance().endl;
+       Console::error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << Console::endl;
     }else{
         float x = x_str.toFloat();
         float y = y_str.toFloat();
@@ -181,7 +181,7 @@ float& Vec3::operator[](int i){
     if(i == 1) return y;
     if(i == 2) return z;
 
-    Console::getInstance().error("Vec3") << "Index out of bounds" << Console::getInstance().endl; 
+    Console::error("Vec3") << "Index out of bounds" << Console::endl; 
     return x;
 }
 

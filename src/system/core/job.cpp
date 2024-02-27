@@ -30,7 +30,7 @@ String  Job::toString() const {
 			return "NONE";
 		break;
 	}
-	//os.console.log("Collision :", Intercom::collision(), INFO);
+	//Console::log("Collision :", Intercom::collision(), INFO);
 }
 
 bool Job::isPaused() const {

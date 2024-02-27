@@ -14,22 +14,20 @@
 #include "services/actuators/actuators.h"
 #include "services/localisation/localisation.h"
 
-enum class RobotState{
-    IDLE,
-    ARMED,
-    STARTING,
-    STARTED,
-    FINISHING,
-    FINISHED
-};
+#include "system/interpreter/interpreter.h"
+#include "system/interpreter/commandHandler.h"
+
+#include <memory>
 
 class OperatingSystem : public SystemBase{
 public:
-    //friend class CommandHandler;
+    friend class CommandHandler;
+    friend class App;
     friend class Service;
     friend class Lidar;
     friend class Inputs;
     friend class Motion;
+    friend class MotionPID;
     friend class Chronometer;
     friend class NeoPixel;
     friend class Terminal;
@@ -38,27 +36,16 @@ public:
     friend class Localisation;
 
     //Singleton
-    static inline OperatingSystem& getInstance(){return m_instance;}
+    OperatingSystem();
 
     void enable(ServiceID id);
     void disable(ServiceID id);
-	void update();
 	void control();
     
     //Terminal
     void setConsoleLevel(ConsoleLevel level);
 
 protected :
-    //State
-    void setState(RobotState);
-    void printState(RobotState) const;
-
-
-
-    void loadService(Service*);
-    //void registerCommands();
-
-    RobotState _state;
     
     //Standalone services
     Screen screen;
@@ -71,13 +58,16 @@ protected :
     Intercom intercom;
     Actuators actuators;
     Localisation localisation;
-
     IntervalTimer interrupt;
 
-private:
-    //Singleton
-    OperatingSystem();
-    OperatingSystem(OperatingSystem &other) = delete; //Singletons should not be cloneable.
+    virtual void handleIdleState() override;
+    virtual void handleRunningState() override;
 
-    static OperatingSystem m_instance;
+private:
+
+    void handleBootState() override;
+    void handleStoppedState() override;
+
+    void loadService(Service*);
+    void registerCommands();
 };

@@ -23,6 +23,12 @@ enum class RobotCompass{
     CA
 };
 
+enum class Side{
+    LEFT,
+    RIGHT, 
+    BOTH
+};
+
 float getCompassOrientation(TableCompass tc);
 float getCompassOrientation(RobotCompass rc);
 float getBorderDistance( Vec2 cartesianPos, float heading);

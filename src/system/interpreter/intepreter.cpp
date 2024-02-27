@@ -1,18 +1,17 @@
 #include "interpreter.h"
-#include "os.h"
+#include "system/core/os.h"
 
 // Constructor
-Interpreter::Interpreter() : pos(0) {
-    // Service commands
-}
+Interpreter::Interpreter() : pos(0) {}
 
 // Process a script
 Program Interpreter::processScript(const String& script) {
-    input = script.trim();
+    input = script;
+    input.trim();
     pos = 0;
     currentToken = nextToken();
 
-    Program prgm;
+    Program prgm(os);
 
     // Parse and execute statements until the end of the script
     while (currentToken.type != END_OF_SCRIPT) {
@@ -37,7 +36,7 @@ String Interpreter::currentPos(){
 void Interpreter::displaySyntaxError(const String& commandName) {
     for (const auto& info : CommandHandler::getCommands()) {
         if (info.second.syntax.startsWith(commandName)) {
-            os.console.error("Interpreter") << "Invalid syntax for " << commandName << ". Expected: " << info.second.syntax << os.console.endl;
+            Console::error("Interpreter") << "Invalid syntax for " << commandName << ". Expected: " << info.second.syntax << Console::endl;
             return;
         }
     }
@@ -79,7 +78,7 @@ Token Interpreter::nextToken() {
                 return nextToken(); // Recursively call to get the next token
             default:
                 // Handle error: unexpected character
-                os.console.error("Lexer") << currentPos() << "Unexpected character: " << ch << HERE << os.console.endl;
+                Console::error("Lexer") << currentPos() << "Unexpected character: " << ch << HERE << Console::endl;
                 pos++; // Skip the unexpected character
                 return nextToken(); // Recursively call to get the next token
         }
@@ -154,13 +153,13 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
     // Expect an opening parenthesis
     if (currentToken.type != LPAREN) {
         //error
-        os.console.error("Interpreter") << "Expecting '(' got " << currentToken.value << os.console.endl;
+        Console::error("Interpreter") << "Expecting '(' got " << currentToken.value << Console::endl;
     }else{
 
         String arg = untilLineEnd();
         int lastParenthesis = arg.lastIndexOf(")");
         if(lastParenthesis == -1){
-            os.console.error("Interpreter") << "missing right parenthesis in command statement"  << os.console.endl;
+            Console::error("Interpreter") << "missing right parenthesis in command statement"  << Console::endl;
         }
 
         arg = arg.substring(0, lastParenthesis); //remove last parenthesis
@@ -196,7 +195,7 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
     String expression = untilLineEnd();
 
     if(expression.lastIndexOf(")") == -1){
-        os.console.error("Interpreter") << "Expected ')' in if statement expression " <<  os.console.endl;
+        Console::error("Interpreter") << "Expected ')' in if statement expression " <<  Console::endl;
         return nullptr;
     }
 
@@ -221,7 +220,7 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
 
     if (currentToken.type != END) {
         // Handle error
-        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the 'end' keyword
@@ -244,13 +243,13 @@ std::shared_ptr<ForStatement> Interpreter::parseForStatement() {
     String stepExpression;
 
     if(currentToken.type != LPAREN){
-        os.console.error("Interpreter") << "Expected '()', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected '()', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the parenthesis
 
     if(currentToken.type != VAR){
-        os.console.error("Interpreter") << "Expected 'var', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected 'var', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the var
@@ -287,7 +286,7 @@ std::shared_ptr<ForStatement> Interpreter::parseForStatement() {
 
     if (currentToken.type != END) {
         // Handle error
-        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the 'end' keyword
@@ -304,7 +303,7 @@ std::shared_ptr<WhileStatement> Interpreter::parseWhileStatement() {
         else break;
     }
 
-    os.console.println(expression);
+    Console::println(expression);
     auto whileStmt = std::make_shared<WhileStatement>(expression);
     currentToken = nextToken(); // Consume the condition
 
@@ -315,7 +314,7 @@ std::shared_ptr<WhileStatement> Interpreter::parseWhileStatement() {
 
     if (currentToken.type != END) {
         // Handle error
-        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the 'end' keyword
@@ -332,7 +331,7 @@ std::shared_ptr<BlockStatement> Interpreter::parseBlockStatement() {
         else break;
     }
 
-    os.console.println(expression);
+    Console::println(expression);
     auto blockStmt = std::make_shared<BlockStatement>(expression);
     currentToken = nextToken(); // Consume the condition
 
@@ -343,7 +342,7 @@ std::shared_ptr<BlockStatement> Interpreter::parseBlockStatement() {
 
     if (currentToken.type != END) {
         // Handle error
-        os.console.error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << os.console.endl;
+        Console::error("Interpreter") << "Expected 'end', found : " << currentToken.value << HERE << Console::endl;
         return nullptr; // Return or handle the error as needed
     }
     currentToken = nextToken(); // Consume the 'end' keyword
@@ -366,7 +365,7 @@ std::shared_ptr<Statement> Interpreter::parseStatement() {
         return parseBlockStatement();
     } else {
         // Handle error: unexpected token
-        os.console.error("Parser") << currentPos() << "Unexpected token: " << currentToken.toString() << HERE << os.console.endl;
+        Console::error("Parser") << currentPos() << "Unexpected token: " << currentToken.toString() << HERE << Console::endl;
     }
 
     return nullptr; // Should never reach here

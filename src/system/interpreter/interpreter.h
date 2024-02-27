@@ -8,8 +8,9 @@ class Interpreter {
 public:
     Interpreter();
     Program processScript(const String& script);
-
+    inline void SetOS(OperatingSystem* _os){os = _os;}
 private:
+    OperatingSystem* os;
     // Lexer functions
     Token nextToken();
     Token parseNumber();

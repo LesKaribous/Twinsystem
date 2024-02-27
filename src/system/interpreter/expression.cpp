@@ -1,7 +1,7 @@
 #include "expression.h"
-#include "os.h"
+#include "system/core/os.h"
 
-Expression::Expression(const String &str) : pos(0)
+Expression::Expression(const String &str) :  pos(0)
 {
     String raw = str;
     raw = raw.trim();
@@ -15,30 +15,30 @@ Expression::Expression(const String &str) : pos(0)
 }
 
 void Expression::printCompiled(){
-    os.console.print("Compiled Expression : ");
+    Console::print("Compiled Expression : ");
     printCompiledNode(root);
-    os.console.println("");
+    Console::println("");
 }
 
 void Expression::printCompiledNode(std::shared_ptr<Node> node){
     if(node != nullptr){
         if(node->left != nullptr){
             if(node->left->right.get() != node.get()){
-                os.console.print("[");
+                Console::print("[");
                 printCompiledNode(node->left);
-                os.console.print("]>");
+                Console::print("]>");
             }
             
         }
         
-        os.console.print(Token::tokenTypetoString(node->type));
+        Console::print(Token::tokenTypetoString(node->type));
         
         if(node->right != nullptr){
             
             if(node->right->left.get() != node.get()){
-                os.console.print("<[");
+                Console::print("<[");
                 printCompiledNode(node->right);
-                os.console.print("]");
+                Console::print("]");
             }
         }
     }
@@ -172,7 +172,7 @@ std::shared_ptr<Node> Expression::parseFactor()
     else
     {
         // Handle error: unexpected token
-        os.console.error("Expression") << "Unexpected token while reading expression factor : "  << currentToken.toString() << os.console.endl;
+        Console::error("Expression") << "Unexpected token while reading expression factor : "  << currentToken.toString() << Console::endl;
     }
 
     return node;
@@ -183,7 +183,7 @@ std::shared_ptr<Node> Expression::parseVector()
 
     consumeToken(); // Consume the [ value
     if(!currentTokenIs(LITERAL) && !currentTokenIs(SUBTRACT)){
-        os.console.error("Expression") << "Expected litteral while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
+        Console::error("Expression") << "Expected litteral while reading vector. Got : " << currentToken.toString() << HERE << Console::endl;
         return nullptr;
     }
     
@@ -196,7 +196,7 @@ std::shared_ptr<Node> Expression::parseVector()
 
     if (!currentTokenIs(COMMA))
     {
-        os.console.error("Expression") << "Expected ',' while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
+        Console::error("Expression") << "Expected ',' while reading vector. Got : " << currentToken.toString() << HERE << Console::endl;
         return nullptr;
     }
 
@@ -242,7 +242,7 @@ std::shared_ptr<Node> Expression::parseVector()
     else
     {
         // Handle error: unexpected token
-        os.console.error("Expression") << "Unexpected token while reading vector. Got : " << currentToken.toString() << HERE << os.console.endl;
+        Console::error("Expression") << "Unexpected token while reading vector. Got : " << currentToken.toString() << HERE << Console::endl;
         return nullptr;
     }
 }
@@ -403,7 +403,7 @@ void Expression::consumeToken()
         {
             currentToken = {VARIABLE, value};
         }else{
-            //if(previousToken.type != VAR) os.console.warn("Expression") << "Unknown variable or identifier " << value << " used in program. make sure to use var to make a proper" << os.console.endl;
+            //if(previousToken.type != VAR) console.warn("Expression") << "Unknown variable or identifier " << value << " used in program. make sure to use var to make a proper" << console.endl;
             currentToken = {VARIABLE, value};
         }
     }
@@ -445,9 +445,9 @@ void Expression::consumeToken()
     else
     {
         // Handle error: unexpected character
-        os.console.error("Expression") << "Unexpected character : " << ch << os.console.endl;
+        Console::error("Expression") << "Unexpected character : " << ch << Console::endl;
     }
-    //os.console.println(currentToken.toString());
+    //console.println(currentToken.toString());
 }
 
 String Expression::evaluateNode(std::shared_ptr<Node> node)
@@ -493,7 +493,7 @@ String Expression::evaluateNode(std::shared_ptr<Node> node)
     case GREATER:
         return evaluateGreater(node);
     default:
-        os.console.error("Expression") << "Unknown node type during evaluation : " << os.console.endl;
+        Console::error("Expression") << "Unknown node type during evaluation : " << Console::endl;
         return ""; // Return an empty string or handle the error as needed
     }
 }
@@ -541,7 +541,7 @@ String Expression::addVectorsOrScalar(const Node &left, const Node &right)
     else
     {
         // Handle error: unexpected input
-        os.console.error("Expression") << "Unexpected input to addVectorsOrScalar" << os.console.endl;
+        Console::error("Expression") << "Unexpected input to addVectorsOrScalar" << Console::endl;
         return "";
     }
 }
@@ -580,7 +580,7 @@ String Expression::subVectorsOrScalar(const Node &left, const Node &right)
     else
     {
         // Handle error: unexpected input
-        os.console.error("Expression") << "Unexpected input to addVectorsOrScalar" << os.console.endl;
+        Console::error("Expression") << "Unexpected input to addVectorsOrScalar" << Console::endl;
         return "";
     }
 }
@@ -634,7 +634,7 @@ String Expression::multVectorsOrScalar(const Node &left, const Node &right)
     else
     {
         // Handle error: unexpected input
-        os.console.error("Expression") << "Unexpected input to multVectorsOrScalar" << os.console.endl;
+        Console::error("Expression") << "Unexpected input to multVectorsOrScalar" << Console::endl;
         return "";
     }
 }
@@ -687,7 +687,7 @@ String Expression::divVectorsOrScalar(const Node &left, const Node &right)
     else
     {
         // Handle error: unexpected input
-        os.console.error("Expression") << "Unexpected input to divVectorsOrScalar : " << left.value << " / " << right.value << os.console.endl;
+        Console::error("Expression") << "Unexpected input to divVectorsOrScalar : " << left.value << " / " << right.value << Console::endl;
         return "";
     }
 }
@@ -738,7 +738,7 @@ String Expression::evaluateLess(std::shared_ptr<Node> node)
     bool result = false;
     if (isVector(*node->left) || isVector(*node->right))
     {
-        os.console.error("Expression") << "Vector comparison is not supported yet." << os.console.endl;
+        Console::error("Expression") << "Vector comparison is not supported yet." << Console::endl;
     }
     else
     {
@@ -755,7 +755,7 @@ String Expression::evaluateGreater(std::shared_ptr<Node> node)
     bool result = false;
     if (isVector(*node->left) || isVector(*node->right))
     {
-        os.console.error("Expression") << "Vector comparison is not supported yet." << os.console.endl;
+        Console::error("Expression") << "Vector comparison is not supported yet." << Console::endl;
     }
     else
     {
@@ -771,7 +771,7 @@ String Expression::evaluateLessEqual(std::shared_ptr<Node> node)
     bool result = false;
     if (isVector(*node->left) || isVector(*node->right))
     {
-        os.console.error("Expression") << "Vector comparison is not supported yet." << os.console.endl;
+        Console::error("Expression") << "Vector comparison is not supported yet." << Console::endl;
     }
     else
     {
@@ -787,7 +787,7 @@ String Expression::evaluateGreaterEqual(std::shared_ptr<Node> node)
     bool result = false;
     if (isVector(*node->left) || isVector(*node->right))
     {
-        os.console.error("Expression") << "Vector comparison is not supported yet." << os.console.endl;
+        Console::error("Expression") << "Vector comparison is not supported yet." << Console::endl;
     }
     else
     {
@@ -847,11 +847,9 @@ String Expression::lookupVariableValue(const String &variableName)
     if (it != getVariables().end())
     {
         return it->second; // Return the value of the variable
-    }
-    else
-    {
+    } else{
         // Handle error: undefined variable
-        os.console.error("Expression") << "Error: Undefined variable " + variableName << os.console.endl;
+        Console::error("Expression") << "Error: Undefined variable " + variableName << Console::endl;
         return "error";
     }
 }

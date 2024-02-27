@@ -62,14 +62,13 @@ struct BlockStatement : public Statement{
     std::vector<std::shared_ptr<Statement>> content;
 };
 
-
 class Program : public Job {
+
     std::vector<std::shared_ptr<Statement>> _statements;
-
     size_t _currentTask = 0;
-
     CommandHandler commandHandler;
-
+    OperatingSystem* os;
+    
     // Execution functions
     void executeStatement(const std::shared_ptr<Statement>& statement);
     void executeCommand(const CommandStatement&);
@@ -85,7 +84,7 @@ class Program : public Job {
     
 public:
 
-    Program(){};
+    Program(OperatingSystem* os);
 
     inline void addStatement(std::shared_ptr<Statement> statement){_statements.push_back(statement);}
     inline bool isValid(){return _statements.size() > 0;};

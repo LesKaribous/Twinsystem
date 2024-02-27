@@ -11,10 +11,6 @@ private:
     Switch twinSwitch;
     Button resetButton;
     Switch strategySwitch;
-    Button upTrapSwitch;
-    Button downTrapSwith;
-    Switch lowTurbineSwitch;
-    Switch highTurbineSwitch;
     LocalisationSensor localisationSensorA;
     LocalisationSensor localisationSensorB;
     LocalisationSensor localisationSensorC;

@@ -4,10 +4,7 @@
 #include "system/core/os.h"
 #include "system/core/console.h"
 
-Localisation::Localisation() : Service(LOCALISATION){
-    os.screen.addBootProgress(10);
-	os.screen.drawBootProgress("Loading Localisation...");
-}
+Localisation::Localisation() : Service(LOCALISATION){}
 
 void Localisation::update(){
     if (m_enabled){
@@ -44,9 +41,9 @@ Vec2 Localisation::estimateDrift(Vec3 estimateCartesian){
         estimated.y = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c + 120*DEG_TO_RAD);
         estimated.z = getBorderDistance(Vec2(estimateCartesian), estimateCartesian.c - 120*DEG_TO_RAD);
         
-        console.info("Estimated") << Vec3(estimateCartesian.c *RAD_TO_DEG , estimateCartesian.c*RAD_TO_DEG + 120, estimateCartesian.c*RAD_TO_DEG + 120) << console.endl;
-        console.info("Estimated") << estimated << console.endl;
-        console.info("Mesured") << _measureRaw << console.endl;
+        Console::info("Estimated") << Vec3(estimateCartesian.c *RAD_TO_DEG , estimateCartesian.c*RAD_TO_DEG + 120, estimateCartesian.c*RAD_TO_DEG + 120) << Console::endl;
+        Console::info("Estimated") << estimated << Console::endl;
+        Console::info("Mesured") << _measureRaw << Console::endl;
 
         Vec3 polarDrift = estimated - _measureRaw;
 

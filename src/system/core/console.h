@@ -4,7 +4,7 @@
 #include "consoleStream.h"
 
 #define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
-#define THROW(x) console.println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+#define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
 
 class ConsoleStream;
 
@@ -13,41 +13,33 @@ public:
 	friend class ConsoleStream;
 	static const String endl;
 
-	//Singleton
-    static inline Console& getInstance(){return m_instance;}
-	Console(Console &other) = delete; //Singletons should not be cloneable.	
-
-	inline ConsoleLevel getLevel() { return m_level; };
-	inline void setLevel(ConsoleLevel l) { m_level = l; };
+	static inline ConsoleLevel getLevel() { return m_level; };
+	static inline void setLevel(ConsoleLevel l) { m_level = l; };
 
 	//Use the current log level
-	ConsoleStream info(const String& origin);
-	ConsoleStream warn(const String& origin);
-	ConsoleStream error(const String& origin);
-	ConsoleStream trace(const String& origin);
-	ConsoleStream success(const String& origin);
+	static void start();
+	
+	static ConsoleStream info(const String& origin);
+	static ConsoleStream warn(const String& origin);
+	static ConsoleStream error(const String& origin);
+	static ConsoleStream trace(const String& origin);
+	static ConsoleStream success(const String& origin);
 
 	//Use the current log level
-	ConsoleStream info(const ServiceID& origin = NOT_A_SERVICE);
-	ConsoleStream warn(const ServiceID& origin = NOT_A_SERVICE);
-	ConsoleStream error(const ServiceID& origin = NOT_A_SERVICE);
-	ConsoleStream trace(const ServiceID& origin = NOT_A_SERVICE);
-	ConsoleStream success(const ServiceID& origin = NOT_A_SERVICE);
+	static ConsoleStream info(const ServiceID& origin = NOT_A_SERVICE);
+	static ConsoleStream warn(const ServiceID& origin = NOT_A_SERVICE);
+	static ConsoleStream error(const ServiceID& origin = NOT_A_SERVICE);
+	static ConsoleStream trace(const ServiceID& origin = NOT_A_SERVICE);
+	static ConsoleStream success(const ServiceID& origin = NOT_A_SERVICE);
 
-	void plot(const String& name, String s);
+	static void plot(const String& name, String s);
 
-	void print(const String& s);
-	void println(const String& s);
-	void prettyPrint(const String& s);
-	void line();
+	static void print(const String& s);
+	static void println(const String& s);
+	static void prettyPrint(const String& s);
+	static void line();
 
 private:
-
-    //Singleton
-    Console(ConsoleLevel lvl = ConsoleLevel::INFO);
-    static Console m_instance;
-
-
-	void write(const char* str);
- 	ConsoleLevel m_level;
+	static void write(const char* str);
+ 	static ConsoleLevel m_level;
 };

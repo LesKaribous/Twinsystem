@@ -11,11 +11,11 @@ namespace Pin{
             starter = 26,
             teamSwitch = 27,
             strategySwitch = 28,
-            twinSwitch = 2,
-            upTrapSwitch = 34,
-            downTrapSwitch = 15,
-            lowTurbineSwitch = 14,  // I
-            highTurbineSwitch = 33;  // II
+            twinSwitch = 2;
+    }
+
+    namespace Outputs{
+        const int enTraco = 13; // Enable Traco regulator - Enable on true
     }
 
     namespace Led{
@@ -46,53 +46,48 @@ namespace Pin{
         stepC = 5, 
         stepA = 9;
     }
-
-    namespace Turbine{
-        const int 
-        enable = 39,
-        speed = 37;
-    }
-
+    
     namespace LocalisationSensors{
         const int SensorC = 40;
         const int SensorA = 41;
         const int SensorB = 42;
     }
-    
 
     // Actuator Pinout
     namespace Servo{
-        const int ServoC1 = 23; //P2
-        const int ServoC2 = 21; //A4
-        const int ServoC3 = 19; //D1
-
-        const int ServoA1 = 17; //A2
-        const int ServoA2 = 16; //A1
-        const int ServoA3 = 18; //D2
-
-        const int ServoB1 = 56; //D3
-        const int ServoB2 = 20; //A3
-        const int ServoB3 = 22; //P1
-        
-        const int ServoTrap = 55;
+        // Connector Act 1
+        // Bloç Servo 1 - BC
+        const int ServoA1 = 23; //P2
+        const int ServoA2 = 21; //A4
+        const int ServoA3 = 19; //D1
+        // Bloç Servo 2 - AB
+        const int ServoB1 = 17; //A2
+        const int ServoB2 = 16; //A1
+        const int ServoB3 = 18; //D2
+        // Bloç Servo 3 - CA
+        const int ServoC1 = 56; //D3
+        const int ServoC2 = 20; //A3
+        const int ServoC3 = 22; //P1
     }
 
-    namespace CherryPicker{
-        // EnableRegulator 
-        const int pinEnaTraco   = 39;   
-        // MotorDriver 
-        const int pinTurbine    = 37;   //P1 - 2
-        const int pinMotor      = 38;   //P2 - 1
-        // ServoMotors
-        const int pinServoTrap      = 55; //D2 - 6
-        const int pinServoExtended  = 53; //D3 - 9
-        // IHM BallGrabber
-        const int pinButtonGrabber01 = 34; //A1 - 8 - UP
-        const int pinButtonGrabber02 = 15; //A2 - 7 - DOWN
-        const int pinButtonGrabber03 = 14; //A3 - 4 - I
-        const int pinButtonGrabber04 = 33; //A4 - 3 - II
+    // Sensor Pinout
+    namespace Sensor{
+        // Connector Act 3
+        // ---
+        // Bloc Sensor 1 - BC
+        const int SensorRight_BC = 36; //P2
+        const int SensorLeft_BC  = 49; //A4
+        //const int SensorA3 = 48; //D1
+        // ---
+        // Bloc Sensor 2 - AB
+        const int SensorRight_AB = 31; //A2
+        const int SensorLeft_AB  = 32; //A1
+        //const int SensorB3 = 47; //D2
+        // ---
+        // Bloc Sensor 3 - CA
+        const int SensorRight_CA = 52; //D3
+        const int SensorLeft_CA  = 50; //A3
+        //const int SensorC3 = 35; //P1
     }
-
-
 }   
 

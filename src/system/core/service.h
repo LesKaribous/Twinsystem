@@ -7,6 +7,7 @@ enum ServiceID{
     SCREEN,
     INPUTS,
     MOTION,
+    MOTION_PID,
     PLANNER,
     NEOPIXEL,
     INTERCOM,
@@ -16,14 +17,11 @@ enum ServiceID{
     NOT_A_SERVICE
 };
 
-
 class OperatingSystem;
-class Console;
-// Base class for subsystems
 class Service {
 public:
-
     Service(ServiceID module);
+    inline void setOS(OperatingSystem* parent){ os = parent;};
     virtual void update() = 0;
 
     virtual void enable();
@@ -39,11 +37,9 @@ public:
     inline void toggleDebug(){m_debug = !m_debug;}
 
 protected:
-    const ServiceID m_ID;
+    OperatingSystem* os;
     bool m_enabled = false;
     bool m_debug = false;
-
-    OperatingSystem& os;
-    Console& console;
+    const ServiceID m_ID;
 };
 

@@ -2,10 +2,7 @@
 #include "system/core/os.h"
 #include "system/core/console.h"
 
-Terminal::Terminal() : Service(TERMINAL){
-    os.screen.addBootProgress(10);
-	os.screen.drawBootProgress("Loading Terminal...");
-}
+Terminal::Terminal() : Service(TERMINAL){}
 
 void Terminal::update(){
     if(!m_enabled) return;

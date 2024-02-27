@@ -10,41 +10,24 @@ Inputs::Inputs() :
     twinSwitch(Pin::Inputs::twinSwitch),
     resetButton(Pin::Inputs::resetButton),
     strategySwitch(Pin::Inputs::strategySwitch),
-    upTrapSwitch(Pin::Inputs::upTrapSwitch),
-    downTrapSwith(Pin::Inputs::downTrapSwitch),
-    lowTurbineSwitch(Pin::Inputs::lowTurbineSwitch),
-    highTurbineSwitch(Pin::Inputs::highTurbineSwitch),
     localisationSensorA(Pin::LocalisationSensors::SensorA),
     localisationSensorB(Pin::LocalisationSensors::SensorB),
     localisationSensorC(Pin::LocalisationSensors::SensorC)
 {
-    os.screen.addBootProgress(10);
-	os.screen.drawBootProgress("Loading Inputs...");
     starter.setInverted(true);
     teamSwitch.setInverted(true);
     twinSwitch.setInverted(true);
     resetButton.setInverted(true);
     strategySwitch.setInverted(true);
-    upTrapSwitch.setInverted(true);
-    downTrapSwith.setInverted(true);
-    lowTurbineSwitch.setInverted(true);
-    highTurbineSwitch.setInverted(true);
 
     starter.init();
     teamSwitch.init();
     twinSwitch.init();
     resetButton.init();
     strategySwitch.init();
-    upTrapSwitch.init();
-    downTrapSwith.init();
-    lowTurbineSwitch.init();
-    highTurbineSwitch.init();
     localisationSensorC.init();
     localisationSensorA.init();
     localisationSensorB.init();
-}
-
-Inputs::~Inputs(){
 }
 
 void Inputs::update(){
@@ -53,22 +36,15 @@ void Inputs::update(){
     twinSwitch.read();
     resetButton.read();
     strategySwitch.read();
-    upTrapSwitch.read();
-    downTrapSwith.read();
-    lowTurbineSwitch.read();
-    highTurbineSwitch.read();
     localisationSensorC.read();
     localisationSensorA.read();
     localisationSensorB.read();
 }
 
 bool Inputs::hasChanged() const{
-    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged() || lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
+    return resetButton.hasChanged() || starter.hasChanged() || teamSwitch.hasChanged() || strategySwitch.hasChanged() || twinSwitch.hasChanged();
 }
 
-bool Inputs::hasTurbineStateChanged(){
-    return lowTurbineSwitch.hasChanged() || highTurbineSwitch.hasChanged();
-}
  
 void Inputs::waitButtonRelease(){
     long time = millis();
@@ -81,21 +57,10 @@ void Inputs::waitButtonRelease(){
 void Inputs::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();
-    upTrapSwitch.disable();
-    downTrapSwith.disable();
-    lowTurbineSwitch.disable();
-    highTurbineSwitch.disable();
-	//avoidanceSwitch.disable();
 }
 void Inputs::unfreezeSettings(){
 	teamSwitch.enable();
 	strategySwitch.enable();
-    upTrapSwitch.enable();
-    downTrapSwith.enable();
-    lowTurbineSwitch.enable();
-    highTurbineSwitch.enable();
-
-	//avoidanceSwitch.enable();
 }
 
 bool Inputs::buttonPressed() const{
@@ -155,22 +120,6 @@ bool Inputs::getStrategyState() const{
 
 bool Inputs::getRobotType() const{
 	return twinSwitch.getState();
-}
-
-bool Inputs::getUpTrapState() const{
-    return upTrapSwitch.getState();
-}
-
-bool Inputs::getDownTrapState() const{
-    return downTrapSwith.getState();
-}
-
-bool Inputs::getLowTurbineState() const{
-    return lowTurbineSwitch.getState();
-}
-
-bool Inputs::getHighTurbineState() const{
-    return highTurbineSwitch.getState();
 }
 
 

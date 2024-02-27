@@ -2,14 +2,12 @@
 #include "system/core/lib.h"
 #include "consoleLevel.h"
 
-#include "system/core/service.h"
 #include "system/math/geometry.h"
 
 class ConsoleStream {
 public:
 
-	ConsoleStream(Console& console, ConsoleLevel lvl, ServiceID origin);
-	ConsoleStream(Console& console, ConsoleLevel lvl, const String& origin);
+	ConsoleStream(ConsoleLevel lvl, const String& origin);
 	
 	ConsoleStream& operator<<(short);
 	ConsoleStream& operator<<(int);
@@ -25,7 +23,6 @@ public:
 	ConsoleStream& operator<<(const char*);
 
 private:
-    Console& m_console;
 	static String header(ConsoleLevel lvl);
 	bool _ignored;
 };

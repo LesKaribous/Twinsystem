@@ -73,7 +73,7 @@ Vec2 Vec2::fromString(const String& str){
     }else error = true;
     
     if(error){
-        Console::getInstance().error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << Console::getInstance().endl;
+        Console::error("Vec2") << "Syntax error in Vec2 constructor. Given :" << str << Console::endl;
     }else{
         float x = x_str.toFloat();
         float y = y_str.toFloat();
@@ -316,7 +316,7 @@ Vec2::operator String() const{
 float& Vec2::operator[](int i){
     if(i == 0) return x;
     if(i == 1) return y;
-    Console::getInstance().error("Vec2") << "Index out of bounds" << Console::getInstance().endl; 
+    Console::error("Vec2") << "Index out of bounds" << Console::endl; 
     return x;
 }
 

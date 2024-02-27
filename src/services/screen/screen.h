@@ -21,7 +21,6 @@ public:
     friend class OperatingSystem;
 
     Screen();
-    ~Screen();
 
     void update() override;
     void drawBootProgress(String msg);//%

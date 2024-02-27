@@ -53,50 +53,7 @@ namespace Settings{
     }
 
     namespace Actuators{
-        namespace Gripper{
-            namespace AB{
-                constexpr int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
-            }
-            
-            namespace BC{
-                constexpr int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
-            }
-
-            namespace CA{
-                constexpr int 
-                right_Close = 30,
-                left_Close = 160,
-                cherry_Close = 100,
-                right_Open = 140,
-                left_Open = 50,
-                cherry_Open = 30,
-                right_Grab = 80,
-                left_Grab = 110;
-            }
-        }
-        
-        namespace cherryPicker{
-            constexpr int
-            trap_Close = 50,
-            trap_Open = 140,
-            trap_Grab = 50;
-        }
+        const int speed = 20;
     }
 
     namespace Geometry{
@@ -127,7 +84,7 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 20000, // Old : 5000
+            ACCEL = 10000, // Old : 5000
             SPEED = 10000, // Old : 5000
             PULLIN = 500,
             PID_MAX_PERIOD = 10,//ms

@@ -1,51 +1,11 @@
 #include "os.h"
 
-OperatingSystem OperatingSystem::m_instance;
-
-void OperatingSystem::loadService(Service *service){
-    SystemBase::loadService(service);
-    SystemBase::enable(service->getID());
-}
-
-void OperatingSystem::enable(ServiceID id) {
-    SystemBase::enable(id);
-}
-
-void OperatingSystem::disable(ServiceID id) {
-    SystemBase::disable(id);
-}
-
-
 OperatingSystem::OperatingSystem() : SystemBase(){
     setConsoleLevel(INFO);
-    _state = RobotState::IDLE;
-
-    motion.setCalibration(inputs.isPrimary() ? Settings::Calibration::Primary : Settings::Calibration::Secondary);
-    
-    screen.drawBootProgress("Linking modules...");
-    screen.addBootProgress(10);
-
-    //loadService(&lidar);
-    loadService(&screen);       screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
-    //loadService(&inputs);       screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
-    
-    //loadService(&planner); screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
-    //loadService(&neopixel);     screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
-    //loadService(&intercom);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
-    loadService(&terminal);     screen.addBootProgress(10); screen.drawBootProgress("Linking terminal...");
-    //loadService(&actuators);    screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
-    //loadService(&localisation);
-
-    motion.enable();
-    screen.addBootProgress(10); screen.drawBootProgress("Starting motion...");
-
-    //registerCommands();
-
-    screen.addBootProgress(30);
-    screen.drawBootProgress("Boot complete...");
-    screen.setPage(Page::INIT);
+    Console::start();
+    interpreter.SetOS(this);
 }
-/*
+
 void OperatingSystem::registerCommands(){
 
     // Registering commands with their syntax and description
@@ -65,12 +25,10 @@ void OperatingSystem::registerCommands(){
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode");
     CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position");
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0");
-    CommandHandler::registerCommand("grab(side)", "Grab object using actuator");
-    CommandHandler::registerCommand("ungrab(side)", "Ungrab object using actuator");
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side");
     CommandHandler::registerCommand("close(side)", "Close actuator on a specific side");
-    CommandHandler::registerCommand("openTrap(side)", "Open trap on a specific side");
-    CommandHandler::registerCommand("closeTrap(side)", "Close trap on a specific side");
+    CommandHandler::registerCommand("takePlant(side)", "wip");
+    CommandHandler::registerCommand("placePlant(side)", "wip");
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal");
     CommandHandler::registerCommand("help", "Display help");
 
@@ -79,27 +37,60 @@ void OperatingSystem::registerCommands(){
     // Expression::registerVariables("posA", "[1,2]");
     // Expression::registerVariables("posB", "[3,4]");
 }
-*/
-void OperatingSystem::update(){
-	SystemBase::update();
-    
-    /*
-    if( terminal.commandAvailable() > 0){
-        console.println("Received command. parsing...");
-        Program p = interpreter.processScript(terminal.dequeCommand());
-        
-        if(p.isValid()){
-            execute(p);
-        }    
-    }*/
+
+void OperatingSystem::handleBootState(){
+    screen.drawBootProgress("Linking modules...");
+    screen.addBootProgress(10);
+
+    loadService(&screen);     screen.addBootProgress(10); screen.drawBootProgress("Linking lidar...");
+    loadService(&lidar);      screen.addBootProgress(10); screen.drawBootProgress("Linking inputs...");
+    loadService(&inputs);     screen.addBootProgress(10); screen.drawBootProgress("Linking motion...");
+    loadService(&motion);     screen.addBootProgress(10); screen.drawBootProgress("Linking intercom...");
+    //loadService(&planner);  screen.addBootProgress(10); screen.drawBootProgress("Loading Lidar...");
+    //loadService(&neopixel); screen.addBootProgress(10); screen.drawBootProgress("Linking neopixel...");
+    loadService(&intercom);   screen.addBootProgress(10); screen.drawBootProgress("Linking terminal...");
+    loadService(&terminal);   screen.addBootProgress(10); screen.drawBootProgress("Linking actuators...");
+    loadService(&actuators);  screen.addBootProgress(10); screen.drawBootProgress("Loading commands...");
+    //loadService(&localisation);
+    motion.setCalibration(inputs.isPrimary() ? Settings::Calibration::Primary : Settings::Calibration::Secondary);
+    //motion.enable();
+    screen.addBootProgress(10); screen.drawBootProgress("Starting motion...");
+
+    registerCommands();
+
+    screen.addBootProgress(30);
+    screen.drawBootProgress("Boot complete...");
+    screen.setPage(Page::INIT);
+    screen.draw();
+    setSystemState(SystemState::IDLE);
 }
 
+void OperatingSystem::handleIdleState(){}
+
+void OperatingSystem::handleRunningState(){}
+
+void OperatingSystem::handleStoppedState(){}
+
 void OperatingSystem::control(){
-    motion.control();
+    //motion.control();
+}
+
+void OperatingSystem::loadService(Service *service){
+    service->setOS(this);
+    SystemBase::loadService(service);
+    SystemBase::enable(service->getID());
+}
+
+void OperatingSystem::enable(ServiceID id) {
+    SystemBase::enable(id);
+}
+
+void OperatingSystem::disable(ServiceID id) {
+    SystemBase::disable(id);
 }
 
 void OperatingSystem::setConsoleLevel(ConsoleLevel level){
-	Console::getInstance().setLevel(level);
+	console.setLevel(level);
 }
 
 

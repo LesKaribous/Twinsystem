@@ -1,10 +1,13 @@
 #include "program.h"
-#include "os.h"
+#include "system/core/os.h"
 
+ Program::Program(OperatingSystem* _os) : commandHandler(_os){
+    os = _os;
+ }
 
 void Program::executeCommand(const CommandStatement& command) {
     // Construct the arguments string
-    os.console.trace("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << os.console.endl;
+    Console::trace("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << Console::endl;
     String args;
     for (size_t i = 0; i < command.arguments.size(); ++i) {
         args += command.arguments[i];
@@ -36,7 +39,7 @@ void Program::executeIfStatement(IfStatement& ifStmt) {
     }else if(r.trim().equalsIgnoreCase("false")){
         conditionResult = false;
     }else{
-         os.console.error("Program") << "Error fired during if statement expression evaluation" << os.console.endl;
+         Console::error("Program") << "Error fired during if statement expression evaluation" << Console::endl;
          return;
     }
 
@@ -152,7 +155,7 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
             break;
         // Handle error: unexpected statement type
         default:
-            os.console.error("Interpreter")  << "Unexpected statement type" << HERE << os.console.endl;
+            Console::error("Interpreter")  << "Unexpected statement type" << HERE << Console::endl;
     }
 }
 

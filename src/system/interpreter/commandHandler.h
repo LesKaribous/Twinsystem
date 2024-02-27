@@ -1,7 +1,6 @@
 #pragma once
 #include "system/core/lib.h"
 #include "system/math/geometry.h"
-#include "commandHandler.h"
 
 //To add a new command, please create a new function in the function handler.
 //Then register the function in the 
@@ -13,16 +12,17 @@ struct CommandInfo {
     int numberOfArguments;
 };
 
+class OperatingSystem;
 class CommandHandler {
 private :
     std::vector<String> extractArguments(const String& args);
-
+    OperatingSystem* os = nullptr;
 protected :
     void execute(const String& command, const String& args);
 
 public:
     friend class Program;
-    CommandHandler();
+    CommandHandler(OperatingSystem* os);
 
     static void registerCommand(const String& syntax, const String& description);
     static std::map<String, CommandInfo>& getCommands();
@@ -53,12 +53,10 @@ public:
     void execute_resetCompass();
 
     //Actuators
-    void execute_grab(const String& side);
-    void execute_ungrab(const String& side);
     void execute_open(const String& side);
     void execute_close(const String& side);
-    void execute_openTrap(const String& side);
-    void execute_closeTrap(const String& side);
+    void execute_takePlant(const String& side);
+    void execute_placePlant(const String& side);
     
     bool execute_testTRUE();
     bool execute_testFALSE();

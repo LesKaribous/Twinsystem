@@ -25,8 +25,6 @@ Screen::Screen() : Service(SCREEN), screen(Pin::TFT::CS, Pin::TFT::DC, Pin::TFT:
     drawBootProgress("SystemBoot");
 }
 
-Screen::~Screen(){
-}
 
 void Screen::update(){
     x.read();
