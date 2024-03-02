@@ -17,6 +17,9 @@ enum ServiceID{
 }; 
 
 /*
+
+in header file : 
+
 class Example : public Service{
 public:
     void onUpdate()override;
@@ -25,6 +28,12 @@ public:
     Example(): Service(EXAMPLE_ID){};
     SERVICE(Screen)
 };
+
+
+in source file : 
+
+INSTANTIATE_SERVICE(Actuators)
+
 */
 
 #define SERVICE(X) public: \
@@ -36,6 +45,7 @@ public:
 private: \
     static X m_instance;
 
+#define INSTANTIATE_SERVICE(X) X X::m_instance;
 
 class Service{
 private:

@@ -1,8 +1,10 @@
 #include "os.h"
+#include "console.h"
 
 OS OS::m_instance;
 
 void OS::loop(){
+    updateServices();
     switch(m_state){
         case BOOT:
             boot();
@@ -65,6 +67,9 @@ void OS::setState(SystemState state){
 void OS::attachService(Service* service){
     if(service != nullptr){
         m_services[service->id()] = service;
+        Console::trace() << "Attached service: " << service->id() << Console::endl;
+        service->enable();
+        service->onAttach();
     }
 }
 
@@ -77,6 +82,14 @@ bool OS::statusService(ServiceID serviceID) const{
         return m_services.at(serviceID)->enabled();
     else
         return false;
+}
+
+void OS::updateServices(){
+    for(const auto& service : m_services) {
+        if(service.second->enabled()) {
+            service.second->onUpdate();
+        }
+    }
 }
 
 void OS::enable(ServiceID id){

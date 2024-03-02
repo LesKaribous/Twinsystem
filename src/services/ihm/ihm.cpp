@@ -1,5 +1,9 @@
 #include "ihm.h"
 #include "settings.h"
+#include "console.h"
+
+INSTANTIATE_SERVICE(IHM)
+
 IHM::IHM() : Service(ServiceID::ID_IHM), 
     starter(Pin::Inputs::starter),
     teamSwitch(Pin::Inputs::teamSwitch),
@@ -11,18 +15,19 @@ IHM::IHM() : Service(ServiceID::ID_IHM),
 
 
 void IHM::onAttach(){
+    Console::info() << "IHM activated" << Console::endl;
+
+    screen.begin();
     starter.setInverted(true);
     teamSwitch.setInverted(true);
     twinSwitch.setInverted(true);
     resetButton.setInverted(true);
     strategySwitch.setInverted(true);
-
     starter.init();
     teamSwitch.init();
     twinSwitch.init();
     resetButton.init();
     strategySwitch.init();
-
     x.init();
     y.init();
     z.init();

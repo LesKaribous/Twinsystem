@@ -18,9 +18,9 @@ public:
         RESET
     };
 
-    void onUpdate()override;
     void onAttach()override;
-
+    void onUpdate()override;
+   
     void setPage(Page p);
     void drawBootProgress(String msg);//%
     void addBootProgress(int v);//%

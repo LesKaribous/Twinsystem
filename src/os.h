@@ -18,6 +18,7 @@ public:
     void setRountine(SystemState state, routine_ptr func_ptr);
     void setState(SystemState state);
 
+    void updateServices();
     void enable(ServiceID);
     void disable(ServiceID);
     void attachService(Service*);
@@ -49,6 +50,6 @@ public:
 
 private:
     static OS m_instance;
-    OS();
+    OS(){};
 };
   
