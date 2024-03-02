@@ -1,7 +1,7 @@
 #pragma once
 
-#include "geometry2D.h"
-#include "geometry3D.h"
+#include "geometry/geometry2D.h"
+#include "geometry/geometry3D.h"
 
 struct WayPoint{
     float x, y, heading;

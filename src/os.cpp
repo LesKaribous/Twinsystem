@@ -84,6 +84,37 @@ bool OS::statusService(ServiceID serviceID) const{
         return false;
 }
 
+bool OS::debug(ServiceID s){
+    if(hasService(s))
+        return m_services[s]->debug();
+    else
+        return false;
+}
+
+void OS::toggleDebug(ServiceID s){
+    if(hasService(s))
+        m_services[s]->toggleDebug();
+}
+
+void OS::wait(unsigned long time, bool async) {
+    m_timer.setDuration(time);
+    m_timer.start();
+    m_currentJob = &m_timer;
+    if(!async)while(isBusy())run();
+}
+
+void OS::waitUntil(Job& obj, bool async){
+    m_currentJob = &obj;
+    if(!async)while(isBusy())run();
+}
+
+bool OS::isBusy() const{
+    if(m_currentJob == nullptr) return false;
+    else{
+        return m_currentJob->isPending();
+    }
+};
+
 void OS::updateServices(){
     for(const auto& service : m_services) {
         if(service.second->enabled()) {

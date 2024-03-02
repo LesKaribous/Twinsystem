@@ -1,5 +1,6 @@
 #pragma once
 #include "services/service.h"
+#include "utils/timer/timer.h"
 #include <map>
 
 class Service;
@@ -24,6 +25,12 @@ public:
     void attachService(Service*);
     bool hasService(ServiceID) const;
     bool statusService(ServiceID serviceID) const;
+    bool debug(ServiceID);
+    void toggleDebug(ServiceID s);
+
+    void wait(unsigned long time, bool async = false);
+    void waitUntil(Job& time, bool async = false);
+    bool isBusy() const;
 
 private:
     void boot();
@@ -38,6 +45,9 @@ private:
     routine_ptr m_runRoutine = nullptr; 
     routine_ptr m_stopRoutine = nullptr; 
     SystemState m_state = BOOT;
+
+    Timer m_timer;
+    Job* m_currentJob = nullptr;
 
 //Singleton
 public:

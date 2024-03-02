@@ -1,4 +1,5 @@
 #pragma once
+#include <Arduino.h>
 
 enum ServiceID{
     ID_LIDAR,
@@ -66,6 +67,10 @@ public:
     inline bool debug() const {return m_debug;}
     inline void toggleDebug(){m_debug = !m_debug;}
     inline bool enabled() const {return m_enabled;}
+
+    static ServiceID toID(String);
+    static String toString(ServiceID);
+    String Service::toString() const;
 };
 
 
