@@ -1,16 +1,9 @@
 #include "routines.h"
-#include "console.h"
-#include "services/ihm/ihm.h"
-#include "services/motion/motion.h"
-#include "services/actuators/actuators.h"
-#include "services/terminal/terminal.h"
-#include "utils/interpreter/interpreter.h"
 
 OS& os = OS::instance();
 IHM& ihm = IHM::instance();
 Motion& motion = Motion::instance();
 Actuators& actuators = Actuators::instance();
-
 Terminal& terminal = Terminal::instance();
 
 void onRobotBoot(){

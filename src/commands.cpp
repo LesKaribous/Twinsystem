@@ -1,8 +1,5 @@
 #include "commands.h"
-#include "os.h"
-#include "console.h"
-#include "services/service.h"
-#include "services/motion/motion.h"
+#include "routines.h"
 
 void registerCommands() {
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
@@ -31,7 +28,7 @@ void registerCommands() {
 void command_enable(const String& args){
     ServiceID serviceID = Service::toID(args);
     if(serviceID != ID_NOT_A_SERVICE){
-        OS::instance().enable(serviceID);
+        os.enable(serviceID);
         Console::info("Interpreter") << args <<  " enabled" << Console::endl;
     }else  Console::error("Interpreter") << "unknown service" << Console::endl;
 }
@@ -39,7 +36,7 @@ void command_enable(const String& args){
 void command_disable(const String& args){
     ServiceID serviceID = Service::toID(args);
     if(serviceID != ID_NOT_A_SERVICE){
-        OS::instance().disable(serviceID);
+        os.disable(serviceID);
         Console::info("Interpreter") << args <<  " disabled" << Console::endl;
     }else  Console::error("Interpreter") << "unknown service" << Console::endl;
 }
@@ -61,12 +58,12 @@ void command_debug(const String& args){
     if(args == ""){
         for ( int id = 0; id != ServiceID::ID_NOT_A_SERVICE; id++ ){
            ServiceID sID = static_cast<ServiceID>(id);
-           OS::instance().toggleDebug(sID);
+           os.toggleDebug(sID);
            Console::info("Interpreter") << Service::toString(sID) <<  " debug : " << (OS::instance().debug(sID) ? "ON" : "OFF") << Console::endl;
         }
     }else{
         ServiceID serviceID = Service::toID(args);
-        OS::instance().toggleDebug(serviceID);
+        os.toggleDebug(serviceID);
         Console::info("Interpreter") << args <<  " debug : "  << (OS::instance().debug(serviceID) ? "ON" : "OFF") << Console::endl;
     }
 }
@@ -76,40 +73,55 @@ void command_debug(const String& args){
 //Motion
 void command_go(const String& args){
     std::vector<String> arguments = CommandHandler::extractArguments(args);
+    if(arguments.size() != 2) return;
     float x = arguments[0].toFloat();
     float y = arguments[1].toFloat();
-    Motion::instance().go(x, y);
-    OS::instance().waitUntil(Motion::instance());
+    motion.go(x, y);
+    os.waitUntil(motion);
 }
 
 
 void command_move(const String& args){
-
+    std::vector<String> arguments = CommandHandler::extractArguments(args);
+    if(arguments.size() != 3) return;
+    float x = arguments[0].toFloat();
+    float y = arguments[1].toFloat();
+    float z = arguments[3].toFloat();
+    motion.move({x, y, z});
+    os.waitUntil(motion);
 }
 
 
 void command_turn(const String& args){
-
+    std::vector<String> arguments = CommandHandler::extractArguments(args);
+    if(arguments.size() != 1) return;
+    float x = arguments[0].toFloat();
+    motion.turn(x);
+    os.waitUntil(motion);
 }
 
 
 void command_pause(const String& args){
-
+    motion.pause();
+    os.waitUntil(motion);
 }
 
 
 void command_resume(const String& args){
-
+    motion.resume();
+    os.waitUntil(motion);
 }
 
 
 void command_cancel(const String& args){
-
+    motion.cancel();
+    os.waitUntil(motion);
 }
 
 
 void command_sleep(const String& args){
-
+    motion.sleep();
+    os.waitUntil(motion);
 }
 
 
