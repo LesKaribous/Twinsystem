@@ -126,59 +126,84 @@ void command_sleep(const String& args){
 
 
 void command_align(const String& args){
+    std::vector<String> arguments = CommandHandler::extractArguments(args);
+    String side = arguments[0];
+    float orientation = arguments[1].toFloat();
+   if(side.equalsIgnoreCase("A"))         motion.align(RobotCompass::A, orientation);
+    else if(side.equalsIgnoreCase("AB"))   motion.align(RobotCompass::AB, orientation);
+    else if(side.equalsIgnoreCase("B"))    motion.align(RobotCompass::B, orientation);
+    else if(side.equalsIgnoreCase("BC"))   motion.align(RobotCompass::BC, orientation);
+    else if(side.equalsIgnoreCase("C"))    motion.align(RobotCompass::C, orientation);
+    else if(side.equalsIgnoreCase("CA"))   motion.align(RobotCompass::CA, orientation);
 
+    os.waitUntil(motion);
 }
 
 
 void command_setAbsolute(const String& args){
-
+    motion.setAbsolute();
 }
 
 
 void command_setRelative(const String& args){
-
+    motion.setRelative();
 }
 
 
 void command_setAbsPosition(const String& args){
+    std::vector<String> arguments = CommandHandler::extractArguments(args);
 
+    float x = arguments[0].toFloat();
+    float y = arguments[1].toFloat();
+    float angle = arguments[2].toFloat();
+    motion.setAbsPosition({x, y, angle});
 }
 
 
 void command_resetCompass(const String& args){
-
+    //Not implemented yet
 }
 
 
 
 //Actuators
-void command_grab(const String& args){
+void command_grab(const String& side){
+    RobotCompass rc;
+    if(side.equals("AB")) rc = RobotCompass::AB;
+    else if(side.equals("BC")) rc = RobotCompass::BC;
+    else if(side.equals("CA")) rc = RobotCompass::CA;
 
+    actuators.grab(rc);
 }
 
 
-void command_ungrab(const String& args){
+void command_ungrab(const String& side){
+    RobotCompass rc;
+    if(side.equals("AB")) rc = RobotCompass::AB;
+    else if(side.equals("BC")) rc = RobotCompass::BC;
+    else if(side.equals("CA")) rc = RobotCompass::CA;
 
+    actuators.ungrab(rc);
 }
 
 
-void command_open(const String& args){
+void command_open(const String& side){
+    RobotCompass rc;
+    if(side.equals("AB")) rc = RobotCompass::AB;
+    else if(side.equals("BC")) rc = RobotCompass::BC;
+    else if(side.equals("CA")) rc = RobotCompass::CA;
 
+    actuators.open(rc);
 }
 
 
-void command_close(const String& args){
+void command_close(const String& side){
+    RobotCompass rc;
+    if(side.equals("AB")) rc = RobotCompass::AB;
+    else if(side.equals("BC")) rc = RobotCompass::BC;
+    else if(side.equals("CA")) rc = RobotCompass::CA;
 
-}
-
-
-void command_openTrap(const String& args){
-
-}
-
-
-void command_closeTrap(const String& args){
-
+    actuators.open(rc);
 }
 
 
@@ -190,7 +215,7 @@ void command_help(const String& args){
 
 
 void command_print(const String& args){
-
+    Console::print(args);
 }
 
 
