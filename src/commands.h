@@ -20,6 +20,7 @@ void command_pause(const String& args);
 void command_resume(const String& args);
 void command_cancel(const String& args);
 void command_sleep(const String& args);
+void command_wake(const String& args);
 void command_align(const String& args);
 void command_setAbsolute(const String& args);
 void command_setRelative(const String& args);

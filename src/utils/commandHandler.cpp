@@ -9,9 +9,9 @@ Command::Command(const String& synt, const String& desc, int argsCounts, command
     syntax(synt),
     description(desc),
     numberOfArguments(argsCounts),
-    callback(func){}
+    callback(func)
+{}
 
-CommandHandler::CommandHandler(){}
 
 std::map<String, Command>& CommandHandler::getCommands() {
     static std::map<String, Command> commands;

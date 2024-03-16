@@ -12,13 +12,13 @@ void registerCommands() {
     CommandHandler::registerCommand("resume", "Resume motion", command_resume);
     CommandHandler::registerCommand("cancel", "Cancel motion", command_cancel);
     CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
+    CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
     CommandHandler::registerCommand("align(side,angle)", "Align to a specific side and angle", command_align);
     CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode", command_setAbsolute);
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode", command_setRelative);
     CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0", command_resetCompass);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
-    CommandHandler::registerCommand("ungrab(side)", "Ungrab object using actuator", command_ungrab);
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal", command_print);
@@ -77,7 +77,7 @@ void command_go(const String& args){
     float x = arguments[0].toFloat();
     float y = arguments[1].toFloat();
     motion.go(x, y);
-    os.waitUntil(motion);
+    os.waitUntil(motion, true);
 }
 
 
@@ -88,7 +88,7 @@ void command_move(const String& args){
     float y = arguments[1].toFloat();
     float z = arguments[3].toFloat();
     motion.move({x, y, z});
-    os.waitUntil(motion);
+    os.waitUntil(motion, true);
 }
 
 
@@ -97,33 +97,28 @@ void command_turn(const String& args){
     if(arguments.size() != 1) return;
     float x = arguments[0].toFloat();
     motion.turn(x);
-    os.waitUntil(motion);
+    os.waitUntil(motion, true);
 }
-
 
 void command_pause(const String& args){
     motion.pause();
-    os.waitUntil(motion);
 }
-
 
 void command_resume(const String& args){
     motion.resume();
-    os.waitUntil(motion);
 }
-
 
 void command_cancel(const String& args){
     motion.cancel();
-    os.waitUntil(motion);
 }
-
 
 void command_sleep(const String& args){
     motion.sleep();
-    os.waitUntil(motion);
 }
 
+void command_wake(const String& args){
+    motion.wakeUp();
+}
 
 void command_align(const String& args){
     std::vector<String> arguments = CommandHandler::extractArguments(args);
@@ -136,7 +131,7 @@ void command_align(const String& args){
     else if(side.equalsIgnoreCase("C"))    motion.align(RobotCompass::C, orientation);
     else if(side.equalsIgnoreCase("CA"))   motion.align(RobotCompass::CA, orientation);
 
-    os.waitUntil(motion);
+    os.waitUntil(motion, true);
 }
 
 
@@ -174,16 +169,6 @@ void command_grab(const String& side){
     else if(side.equals("CA")) rc = RobotCompass::CA;
 
     actuators.grab(rc);
-}
-
-
-void command_ungrab(const String& side){
-    RobotCompass rc;
-    if(side.equals("AB")) rc = RobotCompass::AB;
-    else if(side.equals("BC")) rc = RobotCompass::BC;
-    else if(side.equals("CA")) rc = RobotCompass::CA;
-
-    actuators.ungrab(rc);
 }
 
 

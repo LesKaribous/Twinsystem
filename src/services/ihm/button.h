@@ -59,6 +59,31 @@ private:
     int _pin;
 };
 
+class PilotSwitch : public BooleanInput{
+public:
+    enum State {
+        ARMED,
+        ON,
+        OFF
+    };
+
+    PilotSwitch(int pin): _pin(pin){};
+    void init() override{
+        pinMode(_pin, INPUT_PULLUP);
+        value = digitalRead(_pin);
+        lastValue = !value;
+    }
+    void read() override{
+        if(!enabled) return;
+        lastValue = value;
+        value = digitalRead(_pin);
+        _hasChanged = value != lastValue;
+    }
+private:
+    int _pin;
+    State state = State::OFF;
+};
+
 class Button : public BooleanInput{
 public:
     Button(int pin): _pin(pin){};

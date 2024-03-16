@@ -67,8 +67,6 @@ class Program : public Job {
 
     size_t _currentTask = 0;
 
-    CommandHandler commandHandler;
-
     // Execution functions
     void executeStatement(const std::shared_ptr<Statement>& statement);
     void executeCommand(const CommandStatement&);
@@ -85,7 +83,8 @@ class Program : public Job {
 public:
 
     Program(){};
-
+    inline int currentTask() const { return _currentTask; }
+    inline int size() const { return _statements.size(); }
     inline void addStatement(std::shared_ptr<Statement> statement){_statements.push_back(statement);}
     inline bool isValid(){return _statements.size() > 0;};
 

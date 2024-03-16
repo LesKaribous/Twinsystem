@@ -85,7 +85,7 @@ namespace Settings{
         //old values 0.0004
         const uint32_t 
             ACCEL = 10000, // Old : 5000
-            SPEED = 10000, // Old : 5000
+            SPEED = 5000, // Old : 5000
             PULLIN = 500,
             PID_MAX_PERIOD = 10,//ms
             PID_MIN_PERIOD = 5,//ms

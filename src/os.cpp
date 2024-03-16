@@ -100,12 +100,12 @@ void OS::wait(unsigned long time, bool async) {
     m_timer.setDuration(time);
     m_timer.start();
     m_currentJob = &m_timer;
-    if(!async)while(isBusy())run();
+    if(!async)while(isBusy())loop();
 }
 
 void OS::waitUntil(Job& obj, bool async){
     m_currentJob = &obj;
-    if(!async)while(isBusy())run();
+    if(!async)while(isBusy())loop();
 }
 
 bool OS::isBusy() const{

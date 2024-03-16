@@ -25,6 +25,24 @@ public:
     void drawBootProgress(String msg);//%
     void addBootProgress(int v);//%
 
+
+    void freezeSettings();
+    void unfreezeSettings();
+
+    bool hasStarter() const;
+    bool buttonPressed() const;
+    bool starterPulled() const;
+    bool starterPlaced() const;
+    bool buttonReleased() const;
+    bool starterCancelled() const;
+    bool isColorBlue() const;
+    bool isColorGreen() const;
+    bool isPrimary() const;
+    bool isSecondary() const;
+    bool getRobotType() const;
+    bool getStrategyState() const;
+    void waitButtonRelease();
+    
 private:
     void clear();
     void draw();
@@ -43,25 +61,7 @@ private:
     void updateStrategyState(bool stratState);
     void updateInitState();
     void updateTeamColor(bool team);
-        
-    void freezeSettings();
-    void unfreezeSettings();
-
-    bool hasStarter() const;
-    bool buttonPressed() const;
-    bool starterPulled() const;
-    bool starterPlaced() const;
-    bool buttonReleased() const;
-    bool starterCancelled() const;
-    bool isColorBlue() const;
-    bool isColorGreen() const;
-    bool isPrimary() const;
-    bool isSecondary() const;
-    bool getRobotType() const;
-    bool getStrategyState() const;
-
-    void waitButtonRelease();
-    
+            
 
 private:
     //Public fields
@@ -77,7 +77,7 @@ private:
     BooleanField armed;
     BooleanField started;
 
-    Switch starter;
+    PilotSwitch starter;
     Switch teamSwitch;
     Switch twinSwitch;
     Switch strategySwitch;

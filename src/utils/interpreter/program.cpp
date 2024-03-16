@@ -14,7 +14,7 @@ void Program::executeCommand(const CommandStatement& command) {
     }
 
     // Call the execute method on the CommandHandler object
-    commandHandler.execute(command.name, args);
+    CommandHandler::execute(command.name, args);
 }
 
 String Program::evaluateExpression(const String& e){
@@ -74,7 +74,6 @@ String symbols[9]{
 
 int findClosestOperator(const String& str, int index, String& buf){
     int min = str.length();
-    //THROW(str)
     for(String test : symbols){
         int r = str.indexOf(test, index);
         if(r < min && r != -1){
@@ -201,6 +200,7 @@ void Program::stop(){
 }
 
 bool Program::step(){
+    THROW(_currentTask)
     _currentTask++;
     if(_currentTask >= _statements.size()){
         complete();

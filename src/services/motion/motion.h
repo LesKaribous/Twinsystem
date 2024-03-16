@@ -21,12 +21,13 @@ public:
     void wakeUp(); //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
     void sleep(); //Note : A move request will exit sleep mode and turn them on.
 
-    void go(Vec2);
-    void go(float x, float y);
-    void turn(float w);
-    void align(RobotCompass, float orientation);
-    void goAlign(Vec2 target, RobotCompass rc, float orientation);
-
+    Motion& go(Vec2);
+    Motion& go(float x, float y);
+    Motion& turn(float w);
+    Motion& align(RobotCompass, float orientation);
+    Motion& goAlign(Vec2 target, RobotCompass rc, float orientation);
+    Motion& move(Vec3 target);
+    
     //void setFeedrate(int); //0-100%
     void setCalibration(CalibrationProfile c);
 
@@ -63,7 +64,7 @@ public:
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
     void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
 
-    void move(Vec3 target);
+    
 
 private :
 

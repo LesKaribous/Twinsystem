@@ -14,8 +14,8 @@ public:
     friend class Interpreter;
     friend class Program;
     Command(){};
-protected:
     void execute(String arguments = "");
+protected:
     Command(const String& synt, const String& desc, int argsCounts, command_func_ptr func);
 
     String syntax;
@@ -27,9 +27,6 @@ private:
 };
 
 class CommandHandler {
-private :
-    
-    CommandHandler();
 protected :
    static void execute(const String& command, const String& args);
 

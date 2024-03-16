@@ -60,9 +60,8 @@ void Motion::onAttach(){
 }
 
 void Motion::onUpdate(){
-    if(enabled() && !_sleeping && !isPaused()){
+    if(enabled() && !_sleeping && !isPaused() && isPending()){
         if(hasFinished()){
-            THROW(0)
             complete();
         }
         estimatePosition();
@@ -106,33 +105,38 @@ void Motion::sleep(){
     _sleeping = true;
 }
 
-void  Motion::go(float x, float y){
+Motion& Motion::go(float x, float y){
     go(Vec2(x, y));
+    return *this;
 }
 
-void  Motion::turn(float angle){
+Motion& Motion::turn(float angle){
     if (_absolute) move({_position.a, _position.b, angle });
     else move({0, 0, angle});
+    return *this;
 }
   
-void  Motion::go(Vec2 target){
+Motion& Motion::go(Vec2 target){
     if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
     else move({target.a, target.b, 0});
+    return *this;
 }
 
-void Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
+Motion& Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
     float rotation = (orientation - getCompassOrientation(rc));
 
     if (_absolute) move({target.a, target.b, rotation});
     else move({target.a, target.b, rotation - _position.c*RAD_TO_DEG});
+    return *this;
 }
 
-void  Motion::align(RobotCompass rc, float orientation){
+Motion&  Motion::align(RobotCompass rc, float orientation){
     turn((orientation - getCompassOrientation(rc)));
+    return *this;
 }
 
 //Raw relative move request
-void  Motion::move(Vec3 target){ //target is in world frame of reference
+Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
         Console::error("MotionPID") << "MotionPID not enabled" << Console::endl;
         return;
@@ -163,6 +167,7 @@ void  Motion::move(Vec3 target){ //target is in world frame of reference
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
     _steppers.moveAsync(_sA, _sB, _sC);
+    return *this;
 }
 
 // void Motion::setFeedrate(int feed){
@@ -189,7 +194,7 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    return !_steppers.isRunning() && (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
+    return !_steppers.isRunning();
 }
 
 void Motion::cancel() {
@@ -213,6 +218,14 @@ void Motion::cancel() {
 void Motion::complete() {
     Job::complete();
     _startPosition = _position = _target;
+    _stepsTarget = Vec3(0,0,0);
+    _sA.setPosition(0);
+    _sB.setPosition(0);
+    _sC.setPosition(0);
+    _sA.setTargetAbs(0);
+    _sB.setTargetAbs(0);
+    _sC.setTargetAbs(0);
+    Console::println("complete");
 }
 
 void Motion::forceCancel() {
