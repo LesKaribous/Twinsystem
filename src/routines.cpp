@@ -53,7 +53,22 @@ void onRobotIdle(){
         //os.setState(OS::RUNNING);
         //ihm.setPage(IHM::Page::MATCH);
     //}
-    //if(ihm.hasStarter()) return;
+    if(ihm.hasStarter()){
+        ihm.freezeSettings();
+        while(true){
+            ihm.onUpdate();
+            if(ihm.starterPulled() && !ihm.buttonPressed()){
+                ihm.setPage(IHM::Page::MATCH);
+                os.setState(OS::RUNNING);
+                break;
+            }else if(ihm.starterPulled() && ihm.buttonPressed()){
+                ihm.unfreezeSettings();
+                break;
+            }
+            delay(10);
+        }
+    }
+
     if(ihm.buttonPressed()){
         recalage();
     };
@@ -67,11 +82,12 @@ void onRobotIdle(){
 }
 
 void onRobotRun(){
-
+    motion.go(300,300);
+    os.setState(OS::STOPPING);
 }
 
 void onRobotStop(){
-
+    motion.disable();
 }
 
 void recalage(){
@@ -83,8 +99,9 @@ void probeBorder(TableCompass tc, RobotCompass rc){
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeed = motion.getFeedrate();
 	bool m_probing = true;
-    
-    motion.setFeedrate(0.1);
+    motion.setSync();
+
+    motion.setFeedrate(0.5);
 	motion.setRelative();
 	motion.align(rc, getCompassOrientation(tc));
 

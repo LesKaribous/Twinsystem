@@ -78,6 +78,7 @@ void IHM::setPage(Page p){
     currentPage = p;
     clear();
     needDraw = true;
+    lastDraw = 0;
 }
 
 void IHM::addBootProgress(int v){

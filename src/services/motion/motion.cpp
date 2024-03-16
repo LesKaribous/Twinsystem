@@ -147,7 +147,7 @@ Motion&  Motion::align(RobotCompass rc, float orientation){
 //Raw relative move request
 Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
-        Console::error("MotionPID") << "MotionPID not enabled" << Console::endl;
+        Console::error("Motion") << "MotionPID not enabled" << Console::endl;
         return *this;
     }
     Job::reset();//Start a new job
@@ -155,22 +155,23 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     target.c *= DEG_TO_RAD; //Convert to rotation to radian
     if(isRelative()){
         if(target.magSq() == 0){ //Test if move is 0 length
-            Console::error("MotionPID") << "Move is null" << Console::endl;
+            Console::error("Motion") << "Move is null" << Console::endl;
             Job::cancel();
             return *this;
         }
         target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
-            Console::error("MotionPID") << "Move is null" << Console::endl;
+            Console::error("Motion") << "Move is null" << Console::endl;
             Job::cancel();
             return *this;
         }
     }
-    _target = target;Console::info("Motion") << "Target is " << _target << Console::endl;
+    _target = target; Console::info("Motion") << "Target is " << _target << Console::endl;
 
     //to relative step target 
-    Vec3 _relTarget = _target - _position; Console::info("Motion") << "Relative target is " << _relTarget << Console::endl;
+    Console::info("Motion") << "Position is " << _position << Console::endl;
+    Vec3 _relTarget = toRelativeTarget(_target); Console::info("Motion") << "Relative target is " << _relTarget << Console::endl;
     if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
     _stepsTarget = targetToSteps(_relTarget); Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
     
@@ -264,10 +265,12 @@ void Motion::forceCancel() {
 
 Vec3 Motion::toRelativeTarget(Vec3 absTarget){
     absTarget.sub(_position); 		 //Convert  target relativeto Absolute
+    absTarget.rotateZ(_position.c);
     return absTarget;
 }
 
 Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
+    relTarget.rotateZ(-_position.c);
     relTarget.add(_position); 		 //Convert  target relativeto Absolute
     return relTarget;
 }
@@ -362,6 +365,7 @@ bool Motion::isMoving() const{
 
 
 void  Motion::setAbsPosition(Vec3 newPos){
+    THROW(newPos);
     _position = newPos; 
 }
 

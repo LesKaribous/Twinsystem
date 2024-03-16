@@ -78,7 +78,7 @@ private:
     BooleanField armed;
     BooleanField started;
 
-    PilotSwitch starter;
+    Switch starter;
     Switch teamSwitch;
     Switch twinSwitch;
     Switch strategySwitch;

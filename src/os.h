@@ -12,6 +12,7 @@ public:
         BOOT,    // booting
         IDLE,    // running services but no programs running
         RUNNING, // running services and a program is running
+        STOPPING, // running services and a program is running
         STOPPED, // stopped services and programs are stopped
     };
 

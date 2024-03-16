@@ -4,7 +4,6 @@
 OS OS::m_instance;
 
 void OS::loop(){
-    updateServices();
     switch(m_state){
         case BOOT:
             boot();
@@ -15,7 +14,7 @@ void OS::loop(){
         case RUNNING:
             run();
             break;
-        case STOPPED:
+        case STOPPING:
             stop();
             break;
         default: 
@@ -29,15 +28,19 @@ void OS::boot(){
 }
 
 void OS::idle(){
+    updateServices();
     executeRoutine(m_idleRoutine);
 }
 
 void OS::run(){
+    updateServices();
     executeRoutine(m_runRoutine);
 }
 
 void OS::stop(){
+    updateServices();
     executeRoutine(m_stopRoutine);
+    m_state = STOPPED;
 }
 
 void OS::flush(){
