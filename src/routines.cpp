@@ -7,7 +7,6 @@ Motion& motion = Motion::instance();
 Actuators& actuators = Actuators::instance();
 Terminal& terminal = Terminal::instance();
 
-
 void recalage();
 
 void onRobotBoot(){
@@ -37,11 +36,14 @@ void onTerminalCommand(){
         Interpreter in;
         Program prgm = in.processScript(rawcmd);
         if(prgm.isValid()){ //TODO Integrate that in OS
+            Console::println("Starting program");
             prgm.start();
             while(os.isBusy()) os.flush();
             while(prgm.step()){
                 while(os.isBusy()) os.flush();
             };
+        }else {
+            Console::println("Invalid program : Unknown error");
         }
     }
 }
@@ -74,12 +76,15 @@ void onRobotStop(){
 
 void recalage(){
     probeBorder(TableCompass::SOUTH, RobotCompass::BC);
+    probeBorder(TableCompass::WEST, RobotCompass::BC);
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc){
 	boolean wasAbsolute = motion.isAbsolute();
+    float currentFeed = motion.getFeedrate();
 	bool m_probing = true;
-
+    
+    motion.setFeedrate(0.1);
 	motion.setRelative();
 	motion.align(rc, getCompassOrientation(tc));
 
@@ -94,27 +99,25 @@ void probeBorder(TableCompass tc, RobotCompass rc){
 		position.a = 3000.0 - _offset; //We hit Xmax
 		//_probedX = true;
 		motion.setAbsPosition(position);
-	}
-	if(tc == TableCompass::SOUTH){
+	}else if(tc == TableCompass::SOUTH){
 		position.a = 0.0 + _offset; //We hit Xmin
 		//_probedX = true;
 		motion.setAbsPosition(position);
-	}
-	if(tc == TableCompass::EAST){
+	}else if(tc == TableCompass::EAST){
 		position.b = 2000.0 - _offset; //We hit Ymax
 		//_probedY = true;
 		motion.setAbsPosition(position);
-	}
-	if(tc == TableCompass::WEST){
+	}else if(tc == TableCompass::WEST){
 		position.b = 0.0 + _offset; //We hit Ymin
 		//_probedY = true;
 		motion.setAbsPosition(position);
 	}
 
-	motion.setAbsPosition(position);
+	//motion.setAbsPosition(position);
 
 	motion.goPolar(getCompassOrientation(rc),-100);
 
 	if(wasAbsolute) motion.setAbsolute();
+    motion.setFeedrate(currentFeed);
 	//_probing = false;
 }

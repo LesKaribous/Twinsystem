@@ -31,6 +31,5 @@ Vec3 fk(Vec3 target){
     };
     
     target.mult(P);
-    
     return target;
 }

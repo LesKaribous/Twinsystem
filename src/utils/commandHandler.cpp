@@ -33,9 +33,17 @@ bool CommandHandler::hasCommand(const String &command){
     return getCommands().find(command) != getCommands().end();
 }
 
-void CommandHandler::execute(const String& command, const String& args) {
+void CommandHandler::execute(const String& command, const args_t& args) {
     if(hasCommand(command)){
-        getCommands()[command].callback(args);
+        std::vector<Expression> argsExpression;
+        std::vector<String> argsEvaluated;
+        for(auto& arg : args){
+            argsExpression.emplace_back(arg);
+        }
+        for(auto& exp : argsExpression){
+            argsEvaluated.push_back(exp.evaluate());
+        }
+        getCommands()[command].callback(argsEvaluated);
     }else{
         Console::println("Unknown command: " + command);
     }

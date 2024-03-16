@@ -5,34 +5,35 @@
 
 void registerCommands();
 
-void command_enable(const String& args);
-void command_disable(const String& args);
-void command_status(const String& args); //Display all status
-void command_status(const String& args); //Display single status
-void command_debug(const String& args); //Display all status
-void command_debug(const String& args); //Display single status
+void command_enable(const args_t& args);
+void command_disable(const args_t& args);
+void command_status(const args_t& args); //Display all status
+void command_status(const args_t& args); //Display single status
+void command_debug(const args_t& args); //Display all status
+void command_debug(const args_t& args); //Display single status
 
 //Motion
-void command_go(const String& args);
-void command_goPolar(const String& args);
-void command_move(const String& args);
-void command_turn(const String& args);
-void command_pause(const String& args);
-void command_resume(const String& args);
-void command_cancel(const String& args);
-void command_sleep(const String& args);
-void command_wake(const String& args);
-void command_align(const String& args);
-void command_setAbsolute(const String& args);
-void command_setRelative(const String& args);
-void command_setAbsPosition(const String& args);
-void command_resetCompass(const String& args);
+void command_go(const args_t& args);
+void command_goPolar(const args_t& args);
+void command_move(const args_t& args);
+void command_turn(const args_t& args);
+void command_rawTurn(const args_t& args); //turn without optimization (without modulo)
+void command_pause(const args_t& args);
+void command_resume(const args_t& args);
+void command_cancel(const args_t& args);
+void command_sleep(const args_t& args);
+void command_wake(const args_t& args);
+void command_align(const args_t& args);
+void command_setAbsolute(const args_t& args);
+void command_setRelative(const args_t& args);
+void command_setAbsPosition(const args_t& args);
+void command_resetCompass(const args_t& args);
 
 //Actuators
-void command_grab(const String& args);
-void command_open(const String& args);
-void command_close(const String& args);
+void command_grab(const args_t& args);
+void command_open(const args_t& args);
+void command_close(const args_t& args);
 
 //Terminal
-void command_help(const String& args);
-void command_print(const String& args);
+void command_help(const args_t& args);
+void command_print(const args_t& args);

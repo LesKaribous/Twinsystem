@@ -6,7 +6,9 @@
 #include <vector>
 #include <Arduino.h>
 
-using command_func_ptr = void (*)(const String& args) ;
+using arg_t = String;
+using args_t = std::vector<String>;
+using command_func_ptr = void (*)(const args_t& args);
 
 class Command {
 public:
@@ -14,7 +16,10 @@ public:
     friend class Interpreter;
     friend class Program;
     Command(){};
-    void execute(String arguments = "");
+
+    inline String& getSyntax(){return syntax;}
+    inline String& getDesc(){return description;}
+
 protected:
     Command(const String& synt, const String& desc, int argsCounts, command_func_ptr func);
 
@@ -28,7 +33,7 @@ private:
 
 class CommandHandler {
 protected :
-   static void execute(const String& command, const String& args);
+   static void execute(const String& command, const args_t& args);
 
 public:
     friend class Program;

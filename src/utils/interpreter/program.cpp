@@ -5,16 +5,9 @@
 void Program::executeCommand(const CommandStatement& command) {
     // Construct the arguments string
     Console::trace("Program") << "Running command : " << command.name << "( " << int(command.arguments.size()) << " )" << Console::endl;
-    String args;
-    for (size_t i = 0; i < command.arguments.size(); ++i) {
-        args += command.arguments[i];
-        if (i < command.arguments.size() - 1) {
-            args += ',';
-        }
-    }
 
     // Call the execute method on the CommandHandler object
-    CommandHandler::execute(command.name, args);
+    CommandHandler::execute(command.name, command.arguments);
 }
 
 String Program::evaluateExpression(const String& e){
@@ -165,6 +158,7 @@ void Program::reset(){
 
 void Program::start(){
     if(_statements.size() > 0){
+        THROW(1);
         Job::start();
         _currentTask = 0;
         executeStatement(_statements[_currentTask]);

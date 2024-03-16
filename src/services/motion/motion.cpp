@@ -3,6 +3,7 @@
 #include "kinematics.h"
 #include "settings.h"
 #include "console.h"
+#include "motion.h"
 
 INSTANTIATE_SERVICE(Motion)
 
@@ -105,11 +106,13 @@ void Motion::sleep(){
 }
 
 Motion& Motion::go(float x, float y){
+    setStepsVelocity(Settings::Motion::SPEED);
     go(Vec2(x, y));
     return *this;
 }
 
 Motion& Motion::goPolar(float heading, float dist){
+    setStepsVelocity(Settings::Motion::SPEED);
     PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
     if (_absolute){
         Vec2 target = _position + poltarget.toVec2();
@@ -123,22 +126,16 @@ Motion& Motion::goPolar(float heading, float dist){
 }
 
 Motion& Motion::turn(float angle){
+    setStepsVelocity(Settings::Motion::TURN_SPEED);
     if (_absolute) move({_position.a, _position.b, angle });
     else move({0, 0, angle});
     return *this;
 }
   
 Motion& Motion::go(Vec2 target){
+    setStepsVelocity(Settings::Motion::SPEED);
     if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
     else move({target.a, target.b, 0});
-    return *this;
-}
-
-Motion& Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
-    float rotation = (orientation - getCompassOrientation(rc));
-
-    if (_absolute) move({target.a, target.b, rotation});
-    else move({target.a, target.b, rotation - _position.c*RAD_TO_DEG});
     return *this;
 }
 
@@ -170,23 +167,27 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
             return *this;
         }
     }
-    _target = target;// Console::info("Motion") << "Target is " << _target << Console::endl;
-    _stepsTarget = targetToSteps(_target - _position);// Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+    _target = target;Console::info("Motion") << "Target is " << _target << Console::endl;
 
+    //to relative step target 
+    Vec3 _relTarget = _target - _position; Console::info("Motion") << "Relative target is " << _relTarget << Console::endl;
+    if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
+    _stepsTarget = targetToSteps(_relTarget); Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+    
     Job::start(); //robot is moving from now
     wakeUp();
     resetSteps();
+
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
     if(m_async)_steppers.moveAsync(_sA, _sB, _sC);
-    else _steppers.move(_sA, _sB, _sC);
+    else{
+        _steppers.move(_sA, _sB, _sC);
+        complete();
+    }
     return *this;
 }
-
-// void Motion::setFeedrate(int feed){
-
-// }
 
 void Motion::setCalibration(CalibrationProfile c){
     _calibration = c.Cartesian;
@@ -208,10 +209,10 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    //THROW(_sA.getPosition());
-    //THROW(_sB.getPosition());
-    //THROW(_sC.getPosition());
-    //THROW(_stepsTarget);
+    THROW(_sA.getPosition());
+    THROW(_sB.getPosition());
+    THROW(_sC.getPosition());
+    THROW(_stepsTarget);
     return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
 }
 
@@ -306,7 +307,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
     Vec3 angularTarget = ik(relTarget*_calibration) / Settings::Geometry::WHEEL_RADIUS;
-    Vec3 f_res = (angularTarget / (PI/100.0) ) * Settings::Stepper::STEP_MODE;
+    Vec3 f_res = (angularTarget / (PI/200.0) ) * Settings::Stepper::STEP_MODE;
     return Vec3(int(f_res.a), int(f_res.b), int(f_res.c));
 }
 
@@ -364,10 +365,16 @@ void  Motion::setAbsPosition(Vec3 newPos){
     _position = newPos; 
 }
 
-void  Motion::setAbsTarget(Vec3 newTarget){
-    _target = newTarget;
+void Motion::setStepsVelocity(float v){
+    _sA.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
+    _sB.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
+    _sC.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
 }
 
+void Motion::setAbsTarget(Vec3 newTarget)
+{
+    _target = newTarget;
+}
 
 void  Motion::setAbsolute(){
     _absolute = true;
@@ -382,4 +389,12 @@ void Motion::setAsync(){
 }
 void Motion::setSync(){
     m_async = false;
+}
+
+void Motion::setFeedrate(float feed){
+    m_feedrate = min(max(feed, 1.0), 0.1);
+}
+
+float Motion::getFeedrate() const{
+    return m_feedrate;
 }

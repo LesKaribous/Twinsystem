@@ -85,8 +85,9 @@ namespace Settings{
         //old values 0.0004
         const uint32_t 
             ACCEL = 10000, // Old : 5000
-            SPEED = 5000, // Old : 5000
-            PULLIN = 500,
+            SPEED = 8000, // Old : 5000
+            TURN_SPEED = 3000, // Old : 5000
+            PULLIN = 200,
             PID_MAX_PERIOD = 10,//ms
             PID_MIN_PERIOD = 5,//ms
             PID_INTERVAL = 10000;//microseconds
@@ -116,12 +117,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 0.5, -0.5f, 0.747f} //Cartesian : XYROT
-        };
-
-        const CalibrationProfile Secondary = {
-            { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 0.5f, -0.5f, 0.747f} //Cartesian : XYROT
+            { 1.052, -1.052f, 0.671f} //Cartesian : XYROT
         };
     }
 }

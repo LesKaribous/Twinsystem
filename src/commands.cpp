@@ -9,6 +9,7 @@ void registerCommands() {
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
     CommandHandler::registerCommand("move(x,y,angle)", "Move to a specific position", command_move);
     CommandHandler::registerCommand("turn(angle)", "Turn to a specific angle", command_turn);
+    CommandHandler::registerCommand("rawTurn(angle)", "Turn to a specific angle without optimization", command_rawTurn);
     CommandHandler::registerCommand("pause", "Pause motion", command_pause);
     CommandHandler::registerCommand("resume", "Resume motion", command_resume);
     CommandHandler::registerCommand("cancel", "Cancel motion", command_cancel);
@@ -26,114 +27,121 @@ void registerCommands() {
     CommandHandler::registerCommand("help", "Display help", command_help);
 }
 
-void command_enable(const String& args){
-    ServiceID serviceID = Service::toID(args);
+void command_enable(const args_t& args){
+    if(args.size() != 1) return;
+    ServiceID serviceID = Service::toID(args[0]);
     if(serviceID != ID_NOT_A_SERVICE){
         os.enable(serviceID);
-        Console::info("Interpreter") << args <<  " enabled" << Console::endl;
+        Console::info("Interpreter") << args[0] <<  " enabled" << Console::endl;
     }else  Console::error("Interpreter") << "unknown service" << Console::endl;
 }
 
-void command_disable(const String& args){
-    ServiceID serviceID = Service::toID(args);
+void command_disable(const args_t& args){
+    if(args.size() != 1) return;
+    ServiceID serviceID = Service::toID(args[0]);
     if(serviceID != ID_NOT_A_SERVICE){
         os.disable(serviceID);
-        Console::info("Interpreter") << args <<  " disabled" << Console::endl;
+        Console::info("Interpreter") << args[0] <<  " disabled" << Console::endl;
     }else  Console::error("Interpreter") << "unknown service" << Console::endl;
 }
 
-void command_status(const String& args){
-    if(args == ""){
+void command_status(const args_t& args){
+    if(args.size() != 1){
         for ( int id = 0; id != ServiceID::ID_NOT_A_SERVICE; id++ ){
            ServiceID sID = static_cast<ServiceID>(id);
            Console::info("Interpreter") << Service::toString(sID) <<  " : " << (OS::instance().statusService(sID) ? "ON" : "OFF") << Console::endl;
         }
     }else{
-        ServiceID serviceID = Service::toID(args);
-        Console::info("Interpreter") << args <<  " : " << (OS::instance().statusService(serviceID) ? "ON" : "OFF") << Console::endl;
+        ServiceID serviceID = Service::toID(args[0]);
+        Console::info("Interpreter") << args[0] <<  " : " << (OS::instance().statusService(serviceID) ? "ON" : "OFF") << Console::endl;
     }
 } 
 
 
-void command_debug(const String& args){
-    if(args == ""){
+void command_debug(const args_t& args){
+    if(args.size() != 1){
         for ( int id = 0; id != ServiceID::ID_NOT_A_SERVICE; id++ ){
            ServiceID sID = static_cast<ServiceID>(id);
            os.toggleDebug(sID);
            Console::info("Interpreter") << Service::toString(sID) <<  " debug : " << (OS::instance().debug(sID) ? "ON" : "OFF") << Console::endl;
         }
     }else{
-        ServiceID serviceID = Service::toID(args);
+        ServiceID serviceID = Service::toID(args[0]);
         os.toggleDebug(serviceID);
-        Console::info("Interpreter") << args <<  " debug : "  << (OS::instance().debug(serviceID) ? "ON" : "OFF") << Console::endl;
+        Console::info("Interpreter") << args[0] <<  " debug : "  << (OS::instance().debug(serviceID) ? "ON" : "OFF") << Console::endl;
     }
 }
 
 
 
 //Motion
-void command_go(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-    if(arguments.size() != 2) return;
-    float x = arguments[0].toFloat();
-    float y = arguments[1].toFloat();
+void command_go(const args_t& args){
+    if(args.size() != 2) return;
+    float x = args[0].toFloat();
+    float y = args[1].toFloat();
     motion.go(x, y);
     os.waitUntil(motion, true);
 }
 
 //Motion
-void command_goPolar(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-    if(arguments.size() != 2) return;
-    float angle = arguments[0].toFloat();
-    float dist = arguments[1].toFloat();
+void command_goPolar(const args_t& args){
+    if(args.size() != 2) return;
+    float angle = args[0].toFloat();
+    float dist = args[1].toFloat();
     motion.goPolar(angle, dist);
     os.waitUntil(motion, true);
 }
 
-void command_move(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-    if(arguments.size() != 3) return;
-    float x = arguments[0].toFloat();
-    float y = arguments[1].toFloat();
-    float z = arguments[3].toFloat();
+void command_move(const args_t& args){
+    if(args.size() != 3) return;
+    float x = args[0].toFloat();
+    float y = args[1].toFloat();
+    float z = args[3].toFloat();
     motion.move({x, y, z});
     os.waitUntil(motion, true);
 }
 
 
-void command_turn(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-    if(arguments.size() != 1) return;
-    float x = arguments[0].toFloat();
+void command_turn(const args_t& args){
+    if(args.size() != 1)return;
+    float x = args[0].toFloat();
     motion.turn(x);
     os.waitUntil(motion, true);
 }
 
-void command_pause(const String& args){
+void command_rawTurn(const args_t& args){
+    if(args.size() != 1)return;
+    float x = args[0].toFloat();
+    motion.disableOptimization();
+    motion.turn(x);
+    motion.enableOptimization();
+    os.waitUntil(motion, true);
+}
+
+void command_pause(const args_t& args){
     motion.pause();
 }
 
-void command_resume(const String& args){
+void command_resume(const args_t& args){
     motion.resume();
 }
 
-void command_cancel(const String& args){
+void command_cancel(const args_t& args){
     motion.cancel();
 }
 
-void command_sleep(const String& args){
+void command_sleep(const args_t& args){
     motion.sleep();
 }
 
-void command_wake(const String& args){
+void command_wake(const args_t& args){
     motion.wakeUp();
 }
 
-void command_align(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-    String side = arguments[0];
-    float orientation = arguments[1].toFloat();
+void command_align(const args_t& args){
+    if(args.size() != 2)return;
+    String side = args[0];
+    float orientation = args[1].toFloat();
    if(side.equalsIgnoreCase("A"))         motion.align(RobotCompass::A, orientation);
     else if(side.equalsIgnoreCase("AB"))   motion.align(RobotCompass::AB, orientation);
     else if(side.equalsIgnoreCase("B"))    motion.align(RobotCompass::B, orientation);
@@ -145,34 +153,35 @@ void command_align(const String& args){
 }
 
 
-void command_setAbsolute(const String& args){
+void command_setAbsolute(const args_t& args){
     motion.setAbsolute();
 }
 
 
-void command_setRelative(const String& args){
+void command_setRelative(const args_t& args){
     motion.setRelative();
 }
 
 
-void command_setAbsPosition(const String& args){
-    std::vector<String> arguments = CommandHandler::extractArguments(args);
-
-    float x = arguments[0].toFloat();
-    float y = arguments[1].toFloat();
-    float angle = arguments[2].toFloat();
+void command_setAbsPosition(const args_t& args){
+    if(args.size() != 3)return;
+    float x = args[0].toFloat();
+    float y = args[1].toFloat();
+    float angle = args[2].toFloat();
     motion.setAbsPosition({x, y, angle});
 }
 
 
-void command_resetCompass(const String& args){
+void command_resetCompass(const args_t& args){
     //Not implemented yet
 }
 
 
 
 //Actuators
-void command_grab(const String& side){
+void command_grab(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
     RobotCompass rc;
     if(side.equals("AB")) rc = RobotCompass::AB;
     else if(side.equals("BC")) rc = RobotCompass::BC;
@@ -182,7 +191,9 @@ void command_grab(const String& side){
 }
 
 
-void command_open(const String& side){
+void command_open(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
     RobotCompass rc;
     if(side.equals("AB")) rc = RobotCompass::AB;
     else if(side.equals("BC")) rc = RobotCompass::BC;
@@ -192,7 +203,9 @@ void command_open(const String& side){
 }
 
 
-void command_close(const String& side){
+void command_close(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
     RobotCompass rc;
     if(side.equals("AB")) rc = RobotCompass::AB;
     else if(side.equals("BC")) rc = RobotCompass::BC;
@@ -204,13 +217,21 @@ void command_close(const String& side){
 
 
 //Terminal
-void command_help(const String& args){
-
+void command_help(const args_t& args){
+    auto& commands = CommandHandler::getCommands();
+    for (auto i = commands.begin(); i != commands.end(); i++){
+        Command c = i->second;
+        Console::print(c.getSyntax()); 
+        Console::print(" : "); 
+        Console::println(c.getSyntax()); 
+    }
 }
 
 
-void command_print(const String& args){
-    Console::print(args);
+void command_print(const args_t& args){
+    for(arg_t a : args){
+        Console::print(a);   
+    }
 }
 
 

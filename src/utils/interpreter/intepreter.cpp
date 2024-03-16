@@ -184,7 +184,7 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
             index++;
         }
         if(argBuf.length() > 0) command->arguments.push_back(argBuf);
-        //for(const String& str : command->arguments) THROW(str);
+        for(const String& str : command->arguments) THROW(str);
     }
     currentToken = nextToken();
     return command;

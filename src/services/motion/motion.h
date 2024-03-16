@@ -26,7 +26,6 @@ public:
     Motion& goPolar(float angle, float dist);
     Motion& turn(float w);
     Motion& align(RobotCompass, float orientation);
-    Motion& goAlign(Vec2 target, RobotCompass rc, float orientation);
     Motion& move(Vec3 target);
     
     //void setFeedrate(int); //0-100%
@@ -44,12 +43,16 @@ public:
     bool hasFinished();
 
     //Setters
+    void setStepsVelocity(float velocity); //feed rate will be appied automatically (see setFeedrate)
     void setAbsTarget(Vec3);    //mm, mm, rad
     void setAbsPosition(Vec3);  //mm, mm, rad
     void setAbsolute();
     void setRelative();
     void setAsync(); //Non blocking
     void setSync(); //Blocking
+
+    void setFeedrate(float feed);
+    float getFeedrate() const;
     //Getters
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
     Vec3 getAbsPosition() const;//Absolute mm, mm, rad
@@ -87,6 +90,9 @@ private :
 
     Stepper _sA, _sB, _sC;
     StepControl _steppers;
+
+    float m_feedrate = 1.0;
+
     bool _engaged, _sleeping;
     bool _absolute = true;
     bool _optimizeRotation = true;
