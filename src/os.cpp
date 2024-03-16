@@ -14,7 +14,7 @@ void OS::loop(){
         case RUNNING:
             run();
             break;
-        case STOPPING:
+        case STOPPED:
             stop();
             break;
         default: 
@@ -38,9 +38,7 @@ void OS::run(){
 }
 
 void OS::stop(){
-    updateServices();
     executeRoutine(m_stopRoutine);
-    m_state = STOPPED;
 }
 
 void OS::flush(){

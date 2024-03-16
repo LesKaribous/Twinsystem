@@ -83,11 +83,17 @@ void onRobotIdle(){
 
 void onRobotRun(){
     motion.go(300,300);
-    os.setState(OS::STOPPING);
+
+
+    //end match
+    ihm.setRobotPosition(motion.getAbsPosition());
+    motion.disable();
+    os.setState(OS::STOPPED);
 }
 
+
 void onRobotStop(){
-    motion.disable();
+    ihm.onUpdate();
 }
 
 void recalage(){
