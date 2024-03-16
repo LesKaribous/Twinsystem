@@ -10,8 +10,8 @@ namespace POI{
     const Vec2 b2 = Vec2(225,1775); //BLUE
     const Vec2 b3 = Vec2(2775,1000); //BLUE
 
-    const Vec2 y1 = Vec2(2775,1775); //YELLOW
-    const Vec2 y2 = Vec2(2775,225);  //YELLOW
+    const Vec2 y1 = Vec2(2775,225); //YELLOW
+    const Vec2 y2 = Vec2(2775,1775);  //YELLOW
     const Vec2 y3 = Vec2(225,1000);  //YELLOW
 	// ------------------------------------------
     // Plant Supply - Center

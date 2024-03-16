@@ -1,6 +1,7 @@
 #pragma once
 #include "os.h"
 #include "console.h"
+#include "poi.h"
 #include "services/ihm/ihm.h"
 #include "services/motion/motion.h"
 #include "services/actuators/actuators.h"

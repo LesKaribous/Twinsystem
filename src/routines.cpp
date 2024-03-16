@@ -53,25 +53,25 @@ void onRobotIdle(){
         //os.setState(OS::RUNNING);
         //ihm.setPage(IHM::Page::MATCH);
     //}
-    if(ihm.hasStarter()){
-        ihm.freezeSettings();
-        while(true){
-            ihm.onUpdate();
-            if(ihm.starterPulled() && !ihm.buttonPressed()){
-                ihm.setPage(IHM::Page::MATCH);
-                os.setState(OS::RUNNING);
-                break;
-            }else if(ihm.starterPulled() && ihm.buttonPressed()){
-                ihm.unfreezeSettings();
-                break;
-            }
-            delay(10);
-        }
-    }
+    // if(ihm.hasStarter()){
+    //     ihm.freezeSettings();
+    //     while(true){
+    //         ihm.onUpdate();
+    //         if(ihm.starterPulled() && !ihm.buttonPressed()){
+    //             ihm.setPage(IHM::Page::MATCH);
+    //             os.setState(OS::RUNNING);
+    //             break;
+    //         }else if(ihm.starterPulled() && ihm.buttonPressed()){
+    //             ihm.unfreezeSettings();
+    //             break;
+    //         }
+    //         delay(10);
+    //     }
+    // }
 
     if(ihm.buttonPressed()){
         recalage();
-    };
+    }
 
     if(terminal.commandAvailable()){
         onTerminalCommand();
@@ -97,8 +97,11 @@ void onRobotStop(){
 }
 
 void recalage(){
+    motion.setSync();
+    actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
     probeBorder(TableCompass::SOUTH, RobotCompass::BC);
     probeBorder(TableCompass::WEST, RobotCompass::BC);
+    //motion.go(POI::b1);
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc){

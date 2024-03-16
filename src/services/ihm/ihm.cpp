@@ -231,11 +231,11 @@ void IHM::updateTeamColor(bool team){
     screen.setTextSize(4);
     screen.setCursor(60,230);
     screen.setTextColor(ILI9341_WHITE);
-    if(team == Settings::Match::GREEN)
+    if(team == Settings::Match::YELLOW)
     {
-        screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_GREEN);
+        screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_YELLOW);
         screen.fillRoundRect(15, 218, 210, 57, 15, ILI9341_BLACK);
-        screen.println("Green");
+        screen.println("Yellow");
     }
     else
     {
@@ -437,8 +437,8 @@ bool IHM::isSecondary() const{
 bool IHM::isColorBlue() const{
 	return teamSwitch.getState() == Settings::Match::BLUE;
 }
-bool IHM::isColorGreen() const{
-	return teamSwitch.getState() == Settings::Match::GREEN;
+bool IHM::isColorYellow() const{
+	return teamSwitch.getState() == Settings::Match::YELLOW;
 }
 
 bool IHM::getStrategyState() const{

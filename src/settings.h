@@ -26,7 +26,7 @@ namespace Settings{
         NOBROWN = false,
 
         BLUE   = false,
-        GREEN  = true;
+        YELLOW  = true;
 
         constexpr unsigned long 
         DURATION = 100*1000,        //100s
