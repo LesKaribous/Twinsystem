@@ -38,20 +38,20 @@ void onTerminalCommand(){
         Program prgm = in.processScript(rawcmd);
         if(prgm.isValid()){ //TODO Integrate that in OS
             prgm.start();
-            while(os.isBusy()) os.loop();
+            while(os.isBusy()) os.flush();
             while(prgm.step()){
-                while(os.isBusy()) os.loop();
+                while(os.isBusy()) os.flush();
             };
         }
     }
 }
 
 void onRobotIdle(){
-    if(ihm.starterPulled()){
-        os.setState(OS::RUNNING);
-        ihm.setPage(IHM::Page::MATCH);
-    }
-    if(ihm.hasStarter()) return;
+    //if(!ihm.starterPulled()){
+        //os.setState(OS::RUNNING);
+        //ihm.setPage(IHM::Page::MATCH);
+    //}
+    //if(ihm.hasStarter()) return;
     if(ihm.buttonPressed()){
         recalage();
     };
@@ -59,7 +59,9 @@ void onRobotIdle(){
     if(terminal.commandAvailable()){
         onTerminalCommand();
     }
-    delay(10);
+
+    ihm.setRobotPosition(motion.getAbsPosition());
+    //delay(10);
 }
 
 void onRobotRun(){
@@ -71,5 +73,49 @@ void onRobotStop(){
 }
 
 void recalage(){
-    os.waitUntil(motion.go(-100,0));
+    motion.setAsync();
+    motion.go(-100,0);
+}
+
+void probeBorder(TableCompass tc, RobotCompass rc){
+	boolean wasAbsolute = motion.isAbsolute();
+	bool m_probing = true;
+
+	motion.setRelative();
+	motion.align(rc, getCompassOrientation(tc));
+
+	motion.goPolar(getCompassOrientation(rc),200);
+	motion.goPolar(getCompassOrientation(rc),80);
+
+	float _offset = getOffsets(rc);
+
+	Vec3 position = motion.getAbsPosition();
+
+	if(tc == TableCompass::NORTH){
+		position.a = 3000.0 - _offset; //We hit Xmax
+		//_probedX = true;
+		motion.setAbsPosition(position);
+	}
+	if(tc == TableCompass::SOUTH){
+		position.a = 0.0 + _offset; //We hit Xmin
+		//_probedX = true;
+		motion.setAbsPosition(position);
+	}
+	if(tc == TableCompass::EAST){
+		position.b = 2000.0 - _offset; //We hit Ymax
+		//_probedY = true;
+		motion.setAbsPosition(position);
+	}
+	if(tc == TableCompass::WEST){
+		position.b = 0.0 + _offset; //We hit Ymin
+		//_probedY = true;
+		motion.setAbsPosition(position);
+	}
+
+	motion.setAbsPosition(position);
+
+	motion.goPolar(getCompassOrientation(rc),-100);
+
+	if(wasAbsolute) motion.setAbsolute();
+	//_probing = false;
 }

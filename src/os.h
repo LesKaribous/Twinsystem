@@ -15,6 +15,7 @@ public:
         STOPPED, // stopped services and programs are stopped
     };
 
+    void flush(); //Run the current task until it's done. (Blocking)
     void loop();
     void setRountine(SystemState state, routine_ptr func_ptr);
     void setState(SystemState state);
@@ -29,7 +30,8 @@ public:
     void toggleDebug(ServiceID s);
 
     void wait(unsigned long time, bool async = false);
-    void waitUntil(Job& time, bool async = false);
+    void waitUntil(Job& job, bool async = false);
+    void execute(Job& job, bool async = true);
     bool isBusy() const;
 
 private:

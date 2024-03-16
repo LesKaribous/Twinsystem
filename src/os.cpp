@@ -40,6 +40,10 @@ void OS::stop(){
     executeRoutine(m_stopRoutine);
 }
 
+void OS::flush(){
+    while(isBusy())m_currentJob->run();
+}
+
 void OS::setRountine(SystemState state, routine_ptr func_ptr){
     if(func_ptr == nullptr) return;
     switch(state){
@@ -106,6 +110,11 @@ void OS::wait(unsigned long time, bool async) {
 void OS::waitUntil(Job& obj, bool async){
     m_currentJob = &obj;
     if(!async)while(isBusy())loop();
+}
+
+void OS::execute(Job& obj, bool async){
+    m_currentJob = &obj;
+    if(!async)while(isBusy()) loop();
 }
 
 bool OS::isBusy() const{

@@ -110,6 +110,19 @@ Motion& Motion::go(float x, float y){
     return *this;
 }
 
+Motion& Motion::goPolar(float heading, float dist){
+    PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
+    if (_absolute){
+        Vec2 target = _position + poltarget.toVec2();
+        move({target.a, target.b, _position.c*RAD_TO_DEG});
+    }
+    else{
+        Vec2 reltarget = poltarget.toVec2();
+        move({reltarget.a, reltarget.b, 0});
+    }
+
+}
+
 Motion& Motion::turn(float angle){
     if (_absolute) move({_position.a, _position.b, angle });
     else move({0, 0, angle});
@@ -158,15 +171,17 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
             return;
         }
     }
-    _target = target; ///current world target
-    _stepsTarget = targetToSteps(_target);
+    _target = target; Console::info("Motion") << "Target is " << _target << Console::endl;
+    _stepsTarget = targetToSteps(_target - _position); Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+
     Job::start(); //robot is moving from now
     wakeUp();
     resetSteps();
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
-    _steppers.moveAsync(_sA, _sB, _sC);
+    if(m_async)_steppers.moveAsync(_sA, _sB, _sC);
+    else _steppers.move(_sA, _sB, _sC);
     return *this;
 }
 
@@ -194,7 +209,11 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    return !_steppers.isRunning();
+    THROW(_sA.getPosition());
+    THROW(_sB.getPosition());
+    THROW(_sC.getPosition());
+    THROW(_stepsTarget);
+    return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
 }
 
 void Motion::cancel() {
@@ -288,7 +307,8 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
     Vec3 angularTarget = ik(relTarget) / Settings::Geometry::WHEEL_RADIUS;
-    return (angularTarget / (PI/100.0) ) * float(Settings::Stepper::STEP_MODE);
+    Vec3 f_res = (angularTarget / (PI/100.0) ) * Settings::Stepper::STEP_MODE;
+    return Vec3(int(f_res.a), int(f_res.b), int(f_res.c));
 }
 
 
@@ -358,3 +378,9 @@ void  Motion::setRelative(){
     _absolute = false;
 }
 
+void Motion::setAsync(){
+    m_async = true;
+}
+void Motion::setSync(){
+    m_async = false;
+}

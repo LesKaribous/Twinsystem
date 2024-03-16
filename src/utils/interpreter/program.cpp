@@ -200,7 +200,7 @@ void Program::stop(){
 }
 
 bool Program::step(){
-    THROW(_currentTask)
+    //THROW(_currentTask)
     _currentTask++;
     if(_currentTask >= _statements.size()){
         complete();

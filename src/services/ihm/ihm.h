@@ -2,6 +2,7 @@
 #include "services/service.h"
 #include "services/ihm/fields.h"
 #include "services/ihm/button.h"
+#include "utils/geometry.h"
 #include "pin.h"
 #include <ILI9341_t3n.h>
 
@@ -24,7 +25,7 @@ public:
     void setPage(Page p);
     void drawBootProgress(String msg);//%
     void addBootProgress(int v);//%
-
+    void setRobotPosition(Vec3 p);
 
     void freezeSettings();
     void unfreezeSettings();

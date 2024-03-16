@@ -23,6 +23,7 @@ public:
 
     Motion& go(Vec2);
     Motion& go(float x, float y);
+    Motion& goPolar(float angle, float dist);
     Motion& turn(float w);
     Motion& align(RobotCompass, float orientation);
     Motion& goAlign(Vec2 target, RobotCompass rc, float orientation);
@@ -47,6 +48,8 @@ public:
     void setAbsPosition(Vec3);  //mm, mm, rad
     void setAbsolute();
     void setRelative();
+    void setAsync(); //Non blocking
+    void setSync(); //Blocking
     //Getters
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
     Vec3 getAbsPosition() const;//Absolute mm, mm, rad
@@ -67,7 +70,7 @@ public:
     
 
 private :
-
+    bool m_async = false; //blocking by default
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);

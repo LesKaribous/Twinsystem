@@ -86,6 +86,12 @@ void IHM::addBootProgress(int v){
     }
 }
 
+void IHM::setRobotPosition(Vec3 pos){
+    x.setValue(pos.x);
+    y.setValue(pos.y);
+    z.setValue(pos.z);
+}
+
 void IHM::drawBootProgress(String msg){
     if (currentPage == Page::BOOT){
         if(needDraw){

@@ -6,6 +6,7 @@ void registerCommands() {
     CommandHandler::registerCommand("disable(service)", "Disable a specific service", command_disable);
     CommandHandler::registerCommand("status(service)", "Display single status", command_status);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
+    CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
     CommandHandler::registerCommand("move(x,y,angle)", "Move to a specific position", command_move);
     CommandHandler::registerCommand("turn(angle)", "Turn to a specific angle", command_turn);
     CommandHandler::registerCommand("pause", "Pause motion", command_pause);
@@ -80,6 +81,15 @@ void command_go(const String& args){
     os.waitUntil(motion, true);
 }
 
+//Motion
+void command_goPolar(const String& args){
+    std::vector<String> arguments = CommandHandler::extractArguments(args);
+    if(arguments.size() != 2) return;
+    float angle = arguments[0].toFloat();
+    float dist = arguments[1].toFloat();
+    motion.goPolar(angle, dist);
+    os.waitUntil(motion, true);
+}
 
 void command_move(const String& args){
     std::vector<String> arguments = CommandHandler::extractArguments(args);

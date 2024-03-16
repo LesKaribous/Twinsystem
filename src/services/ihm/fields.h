@@ -58,7 +58,7 @@ public:
         value = _reference;
     }
 
-    void SetValue(float ref) {_reference = ref;}
+    void setValue(float ref) {_reference = ref;}
 
 private:
     float _reference;
@@ -79,7 +79,7 @@ public:
         value = _reference;
     }
 
-    void SetValue(bool ref) {_reference = ref;}
+    void setValue(bool ref) {_reference = ref;}
 
     virtual bool getState() const{
         return _inverted ? !value : value;
