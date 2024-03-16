@@ -15,7 +15,6 @@ Motion::Motion() : Service(ID_MOTION),
 
 void Motion::onAttach(){
     Console::info() << "Motion activated" << Console::endl;
-    _calibration = Settings::Calibration::Primary.Cartesian; //set to primary by default
     
     _absolute = Settings::Motion::ABSOLUTE;
 
@@ -152,7 +151,7 @@ Motion&  Motion::align(RobotCompass rc, float orientation){
 Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
         Console::error("MotionPID") << "MotionPID not enabled" << Console::endl;
-        return;
+        return *this;
     }
     Job::reset();//Start a new job
     
@@ -161,18 +160,18 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         if(target.magSq() == 0){ //Test if move is 0 length
             Console::error("MotionPID") << "Move is null" << Console::endl;
             Job::cancel();
-            return;
+            return *this;
         }
         target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
             Console::error("MotionPID") << "Move is null" << Console::endl;
             Job::cancel();
-            return;
+            return *this;
         }
     }
-    _target = target; Console::info("Motion") << "Target is " << _target << Console::endl;
-    _stepsTarget = targetToSteps(_target - _position); Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+    _target = target;// Console::info("Motion") << "Target is " << _target << Console::endl;
+    _stepsTarget = targetToSteps(_target - _position);// Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
 
     Job::start(); //robot is moving from now
     wakeUp();
@@ -209,10 +208,10 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    THROW(_sA.getPosition());
-    THROW(_sB.getPosition());
-    THROW(_sC.getPosition());
-    THROW(_stepsTarget);
+    //THROW(_sA.getPosition());
+    //THROW(_sB.getPosition());
+    //THROW(_sC.getPosition());
+    //THROW(_stepsTarget);
     return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
 }
 
@@ -296,7 +295,7 @@ void  Motion::estimatePosition(){ //We are not using the estimated velocity to p
     Vec3 del = fk(linearDelta);
     del.rotateZ((_position.c + del.c)); //Transform to workd space
 
-    _position += del*_calibration;
+    _position += del/_calibration;
 }
 
 Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
@@ -306,7 +305,7 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
 }
 
 Vec3 Motion::targetToSteps(Vec3 relTarget){
-    Vec3 angularTarget = ik(relTarget) / Settings::Geometry::WHEEL_RADIUS;
+    Vec3 angularTarget = ik(relTarget*_calibration) / Settings::Geometry::WHEEL_RADIUS;
     Vec3 f_res = (angularTarget / (PI/100.0) ) * Settings::Stepper::STEP_MODE;
     return Vec3(int(f_res.a), int(f_res.b), int(f_res.c));
 }

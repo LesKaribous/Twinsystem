@@ -19,3 +19,5 @@ void onRobotRun();
 void onRobotStop();
 
 void onTerminalCommand();
+
+void probeBorder(TableCompass tc, RobotCompass rc);

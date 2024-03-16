@@ -73,8 +73,7 @@ void onRobotStop(){
 }
 
 void recalage(){
-    motion.setAsync();
-    motion.go(-100,0);
+    probeBorder(TableCompass::SOUTH, RobotCompass::BC);
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc){
