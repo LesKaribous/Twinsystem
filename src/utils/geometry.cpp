@@ -69,22 +69,22 @@ float getBorderDistance(Vec2 pos, float angle){
 float getOffsets(RobotCompass rc){
     switch (rc){
     case RobotCompass::A:
-        return 157.01;
+        return 126.00;
         break;
     case RobotCompass::B:
-        return 136.28;
+        return 126.00;
         break;
     case RobotCompass::C:
-        return 136.28;
+        return 126.00;
         break;
     case RobotCompass::AB:
-        return 134.06;
+        return 101.97;
         break;
     case RobotCompass::BC:
-        return 134.06;
+        return 101.97;
         break;
     case RobotCompass::CA:
-        return 134.06;
+        return 101.97;
         break;
     default:
         return 0;
