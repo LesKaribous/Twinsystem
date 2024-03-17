@@ -3,7 +3,7 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.5);
+    motion.setFeedrate(0.4);
     if(ihm.isColorBlue()) matchBlue();
     else matchYellow();
 }
@@ -32,25 +32,56 @@ void recalage(){
 }
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
-    float offset = 50.0;
+    float startOffset = 260.0;
+    float grabOffset = 60.0;
+    float pushOffset = 20.0;
     float newTargetY = target.y;
+
+    // Ralentir
+    motion.setFeedrate(0.1);
+
+    // Mettre les bras en position Grab
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+    actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+    actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
+
+    // On se positionne en bordure de zone
+    if(tc == TableCompass::EAST) newTargetY = newTargetY - startOffset;
+    else if(tc == TableCompass::WEST) newTargetY = newTargetY + startOffset;
+    motion.go(target.x, newTargetY);
     
     for(int i = 0; i < 3; i++){
 
-        actuators.moveElevator(rc,ElevatorPose::GRAB);
+        
         actuators.open(rc);
 
-        if(tc == TableCompass::EAST) newTargetY = newTargetY + offset;
-        else if(tc == TableCompass::WEST) newTargetY = newTargetY - offset;
+        // Avancer vers la plante
+        if(tc == TableCompass::EAST) newTargetY = newTargetY + grabOffset;
+        else if(tc == TableCompass::WEST) newTargetY = newTargetY - grabOffset;
         motion.go(target.x, newTargetY);
 
+        // Prendre la plante
+        actuators.close(rc);
+        waitMs(1000);
+
+        // Avancer un peu avant de grab
+        if(tc == TableCompass::EAST) motion.go(target.x, newTargetY + pushOffset);
+        else if(tc == TableCompass::WEST) motion.go(target.x, newTargetY - pushOffset);
+
         actuators.grab(rc);
-        os.wait(1000,true);
+        waitMs(1000);
+
+        // Reculer
+        if(tc == TableCompass::EAST) motion.go(target.x, newTargetY - grabOffset);
+        else if(tc == TableCompass::WEST) motion.go(target.x, newTargetY + grabOffset);
+        
+        // Lever les plantes et suivant
         actuators.moveElevator(rc,ElevatorPose::UP);
         rc = nextActuator(rc);
         if(i<2) motion.align(rc, getCompassOrientation(tc)); // Ne pas effectuer la rotation sur la derniere action
     }
-        
+
+    motion.setFeedrate(0.4);    
 }
 
 void matchBlue(){
@@ -63,6 +94,12 @@ void matchYellow(){
     motion.go(2000,400);
     // Macro to take plants
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
+}
+
+void waitMs(unsigned long time){
+    // To fix with asynch wait
+    //os.wait(time,false);
+    delay(time); // WIP -> To fix
 }
 
 RobotCompass nextActuator(RobotCompass rc){
@@ -81,7 +118,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance){
 	bool m_probing = true;
     motion.setSync();
 
-    motion.setFeedrate(0.1);
+    motion.setFeedrate(0.15);
 	motion.setRelative();
 	motion.align(rc, getCompassOrientation(tc));
 

@@ -16,7 +16,7 @@ namespace POI{
 	// ------------------------------------------
     // Plant Supply - Center
     const Vec2 plantSupplySE = Vec2(1000,1300);     //Plant supply SOUTH EAST
-    const Vec2 plantSupplySW = Vec2(1000,700);      //Plant supply SOUTH WEST
+    const Vec2 plantSupplySW = Vec2(1005,700);      //Plant supply SOUTH WEST
 
     const Vec2 plantSupplyNE = Vec2(2000,1300);     //Plant supply NORTH EAST
     const Vec2 plantSupplyNW = Vec2(2000,700);      //Plant supply NORTH WEST

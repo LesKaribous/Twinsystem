@@ -36,15 +36,15 @@ namespace ActuatorsPreset{
         Pin::Sensor::SensorRight_AB, 
         Pin::Sensor::SensorLeft_AB,
         //position servo
-        120, //right_Close
+        100, //right_Close
         10,  //right_Open   
         180, //right_Grab   
-        120, //left_Close   
+        100, //left_Close   
         10,  //left_Open    
         180, //left_Grab    
         15,  //elevator_Down
         160, //elevator_Up  
-        50   //elevator_Grab
+        35   //elevator_Grab
     };
         
     const ActuatorsProperty BC = {
@@ -55,15 +55,15 @@ namespace ActuatorsPreset{
         Pin::Sensor::SensorRight_BC, 
         Pin::Sensor::SensorLeft_BC,
         //position servo
-        100, //right_Close
+        80, //right_Close
         10,  //right_Open   
         160, //right_Grab   
-        100, //left_Close   
+        80, //left_Close   
         10,  //left_Open    
         160, //left_Grab    
         0,   //elevator_Down
         130, //elevator_Up  
-        20   //elevator_Grab
+        10   //elevator_Grab
     };
 
     const ActuatorsProperty CA = {
@@ -74,15 +74,15 @@ namespace ActuatorsPreset{
         Pin::Sensor::SensorRight_CA, 
         Pin::Sensor::SensorLeft_CA,
         //position servo
-        120, //right_Close
+        100, //right_Close
         10,  //right_Open   
         180, //right_Grab   
-        120, //left_Close   
+        100, //left_Close   
         10,  //left_Open    
         180, //left_Grab    
         0,   //elevator_Down
         130, //elevator_Up  
-        25   //elevator_Grab
+        10   //elevator_Grab
     };
 }
 
