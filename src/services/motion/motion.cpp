@@ -116,26 +116,26 @@ Motion& Motion::goPolar(float heading, float dist){
     PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
     if (_absolute){
         Vec2 target = _position + poltarget.toVec2();
-        move({target.a, target.b, _position.c*RAD_TO_DEG});
+        move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
     }
     else{
         Vec2 reltarget = poltarget.toVec2();
-        move({reltarget.a, reltarget.b, 0});
+        move(Vec3(reltarget.a, reltarget.b, 0));
     }
-
+    return *this;
 }
 
 Motion& Motion::turn(float angle){
     setStepsVelocity(Settings::Motion::TURN_SPEED);
-    if (_absolute) move({_position.a, _position.b, angle });
-    else move({0, 0, angle});
+    if (_absolute) move(Vec3(_position.a, _position.b, angle));
+    else move(Vec3(0, 0, angle));
     return *this;
 }
   
 Motion& Motion::go(Vec2 target){
     setStepsVelocity(Settings::Motion::SPEED);
-    if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
-    else move({target.a, target.b, 0});
+    if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
+    else move(Vec3(target.a, target.b, 0));
     return *this;
 }
 
