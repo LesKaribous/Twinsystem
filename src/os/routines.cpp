@@ -63,10 +63,6 @@ void onIntercomDisconnected(){
 }
 
 void onRobotIdle(){
-    if(!ihm.starterPulled()){
-        os.setState(OS::RUNNING);
-        ihm.setPage(IHM::Page::MATCH);
-    }
     if(ihm.hasStarter()){
         ihm.freezeSettings();
         while(true){

@@ -396,7 +396,7 @@ void Motion::setSync(){
 }
 
 void Motion::setFeedrate(float feed){
-    m_feedrate = min(max(feed, 1.0), 0.1);
+    m_feedrate = max(min(feed, 1.0), 0.1);
 }
 
 float Motion::getFeedrate() const{

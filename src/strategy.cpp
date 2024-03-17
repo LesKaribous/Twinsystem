@@ -2,7 +2,10 @@
 #include "os/routines.h"
 
 void match(){
-
+    //start match
+    motion.setFeedrate(0.5);
+    if(ihm.isColorBlue()) matchBlue();
+    else matchYellow();
 }
 
 void recalage(){
@@ -29,22 +32,23 @@ void recalage(){
 }
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
-    float offset = 100.0;
+    float offset = 50.0;
     float newTargetY = target.y;
-    if(tc == TableCompass::EAST){
-        newTargetY = newTargetY - offset;
-    }
-    else if(tc == TableCompass::WEST){
-        newTargetY = newTargetY + offset;
-    }
-
+    
     for(int i = 0; i < 3; i++){
+
         actuators.moveElevator(rc,ElevatorPose::GRAB);
         actuators.open(rc);
+
+        if(tc == TableCompass::EAST) newTargetY = newTargetY + offset;
+        else if(tc == TableCompass::WEST) newTargetY = newTargetY - offset;
         motion.go(target.x, newTargetY);
-        actuators.close(rc);
+
+        actuators.grab(rc);
+        os.wait(1000,true);
         actuators.moveElevator(rc,ElevatorPose::UP);
-        motion.align(rc, getCompassOrientation(tc));
+        rc = nextActuator(rc);
+        if(i<2) motion.align(rc, getCompassOrientation(tc)); // Ne pas effectuer la rotation sur la derniere action
     }
         
 }
@@ -62,11 +66,13 @@ void matchYellow(){
 }
 
 RobotCompass nextActuator(RobotCompass rc){
-    return static_cast<RobotCompass>((static_cast<int>(rc) + 2) % 6);
+    int RobotCompassSize = 6;
+    return static_cast<RobotCompass>((static_cast<int>(rc) + 2) % RobotCompassSize);
 }
 
 RobotCompass previousActuator(RobotCompass rc){
-    return static_cast<RobotCompass>((static_cast<int>(rc) - 2) % 6);
+    int RobotCompassSize = 6;
+    return static_cast<RobotCompass>((static_cast<int>(rc) + RobotCompassSize - 2) % RobotCompassSize);
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance){
@@ -75,7 +81,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance){
 	bool m_probing = true;
     motion.setSync();
 
-    motion.setFeedrate(0.5);
+    motion.setFeedrate(0.1);
 	motion.setRelative();
 	motion.align(rc, getCompassOrientation(tc));
 
@@ -109,6 +115,5 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance){
 	motion.goPolar(getCompassOrientation(rc),-clearance);
 
 	if(wasAbsolute) motion.setAbsolute();
-    motion.setFeedrate(currentFeed);
 	//_probing = false;
 }
