@@ -1,5 +1,4 @@
 #include "consoleStream.h"
-#include "os.h"
 #include "console.h"
 
 ConsoleStream::ConsoleStream(ConsoleLevel lvl, const String& origin) {
