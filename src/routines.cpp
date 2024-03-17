@@ -5,6 +5,7 @@ OS& os = OS::instance();
 IHM& ihm = IHM::instance();
 Motion& motion = Motion::instance();
 Actuators& actuators = Actuators::instance();
+Intercom& intercom = Intercom::instance();
 Terminal& terminal = Terminal::instance();
 
 void recalage();
@@ -19,6 +20,11 @@ void onRobotBoot(){
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
+
+    ihm.drawBootProgress("Linking intercom");
+    os.attachService(&intercom); ihm.addBootProgress(10);
+    intercom.setConnectLostCallback(onIntercomDisconnected);
+    intercom.setConnectionSuccessCallback(onIntercomConnected);
 
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
@@ -46,6 +52,14 @@ void onTerminalCommand(){
             Console::println("Invalid program : Unknown error");
         }
     }
+}
+
+void onIntercomConnected(){
+    ihm.setIntercomState(true);
+}
+
+void onIntercomDisconnected(){
+    ihm.setIntercomState(false);
 }
 
 void onRobotIdle(){
@@ -83,8 +97,6 @@ void onRobotIdle(){
 
 void onRobotRun(){
     motion.go(300,300);
-
-
     //end match
     ihm.setRobotPosition(motion.getAbsPosition());
     motion.disable();

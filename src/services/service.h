@@ -1,6 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
+using callback_ptr = void (*)();
+
 enum ServiceID{
     ID_LIDAR,
     ID_CHRONO,

@@ -43,6 +43,7 @@ public:
     bool getRobotType() const;
     bool getStrategyState() const;
     void waitButtonRelease();
+    void setIntercomState(bool);
     
 private:
     void clear();
