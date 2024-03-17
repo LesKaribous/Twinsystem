@@ -1,5 +1,5 @@
 #include "consoleStream.h"
-#include "console.h"
+#include "os/console.h"
 
 ConsoleStream::ConsoleStream(ConsoleLevel lvl, const String& origin) {
 	_ignored = false;

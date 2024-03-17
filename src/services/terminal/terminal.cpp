@@ -1,5 +1,5 @@
 #include "terminal.h"
-#include "console.h"
+#include "os/console.h"
 
 INSTANTIATE_SERVICE(Terminal)
 

@@ -1,7 +1,7 @@
 #include "settings.h"
 #include "motion_pid.h"
 #include "kinematics.h"
-#include "console.h"
+#include "os/console.h"
 
 MotionPID::MotionPID() : Service(ID_MOTION_PID),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),

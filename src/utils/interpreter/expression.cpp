@@ -1,5 +1,5 @@
 #include "expression.h"
-#include "console.h"
+#include "os/console.h"
 
 Expression::Expression(const String &str) : pos(0)
 {

@@ -1,5 +1,5 @@
 #include "intercom.h"
-#include "console.h"
+#include "os/console.h"
 #define LIDAR_SERIAL Serial1
 
 INSTANTIATE_SERVICE(Intercom)

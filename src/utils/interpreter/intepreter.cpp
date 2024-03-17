@@ -1,5 +1,5 @@
 #include "interpreter.h"
-#include "console.h"
+#include "os/console.h"
 
 // Constructor
 Interpreter::Interpreter() : pos(0) {

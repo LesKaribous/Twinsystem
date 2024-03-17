@@ -1,5 +1,5 @@
 #include "program.h"
-#include "console.h"
+#include "os/console.h"
 
 
 void Program::executeCommand(const CommandStatement& command) {

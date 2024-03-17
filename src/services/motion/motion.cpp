@@ -2,7 +2,7 @@
 #include "utils/geometry.h"
 #include "kinematics.h"
 #include "settings.h"
-#include "console.h"
+#include "os/console.h"
 #include "motion.h"
 
 INSTANTIATE_SERVICE(Motion)

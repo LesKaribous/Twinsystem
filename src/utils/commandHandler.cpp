@@ -1,5 +1,5 @@
 #include "commandHandler.h"
-#include "console.h"
+#include "os/console.h"
 #include "utils/interpreter/expression.h"
 #include <algorithm>
 #include <map>
