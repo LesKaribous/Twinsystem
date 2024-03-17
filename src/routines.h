@@ -21,4 +21,13 @@ void onRobotStop();
 
 void onTerminalCommand();
 
-void probeBorder(TableCompass tc, RobotCompass rc);
+void matchBlue();
+void matchYellow();
+
+void recalage();
+
+// Macros
+RobotCompass nextActuator(RobotCompass rc);         //Recupere l'orientation de l'actionneur suivant
+RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de l'actionneur précedant
+void takePlants(Vec2 target, RobotCompass rc, TableCompass tc);
+void probeBorder(TableCompass tc, RobotCompass rc, float clearance);
