@@ -3,7 +3,6 @@
 
 void setup(){
 	Console::init();
-	Console::setLevel(ConsoleLevel::VERBOSE);
 
 	os.setRountine(OS::BOOT, onRobotBoot);		//Execute once
 	os.setRountine(OS::IDLE, onRobotIdle);		//Execute during preparation phase 	(loop)
