@@ -3,7 +3,9 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.7);
+    testEvitemment();
+    return;
     if(ihm.isColorBlue()) matchBlue();
     else matchYellow();
 }
@@ -31,6 +33,15 @@ void recalage(){
     }
 }
 
+
+void testEvitemment(){
+    for(int i=0;i<5; i++){
+        motion.go(1000,1000);
+        motion.go(250,250);
+        os.wait(2000);
+    }
+}
+
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
     float startOffset = 260.0;
     float grabOffset = 60.0;
@@ -51,8 +62,6 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
     motion.go(target.x, newTargetY);
     
     for(int i = 0; i < 3; i++){
-
-        
         actuators.open(rc);
 
         // Avancer vers la plante

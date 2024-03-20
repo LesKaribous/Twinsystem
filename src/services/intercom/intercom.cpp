@@ -52,15 +52,13 @@ void Intercom::sendMessage(const String& message) {
     Console::trace("Intercom") << ">" << message.c_str() << Console::endl;
 }
 
-
-uint32_t Intercom::sendRequest(const String& payload, long timeout){
-    Request req(payload, timeout);
+uint32_t Intercom::sendRequest(const String& payload, long timeout,  requestCallback_ptr cbfunc,  callback_ptr func){
+    Request req(payload, timeout, cbfunc, func);
     req.send(*this);
     _requests.insert({req.ID(), req});
 
     return req.ID();
 }
-
 
 void Intercom::pingReceived() {
     sendMessage("pong");
@@ -181,15 +179,24 @@ void Intercom::_processPendingRequests() {
 
 uint32_t Request::_uidCounter = 0;
 
-Request::Request(const String& payload, long timeout)
+Request::Request(const String& payload, long timeout, requestCallback_ptr func_call, callback_ptr timeout_call)
     :   _uid(0),
         _payload(payload), 
         _lastSent(0),
         _responseTime(0),
         _timeout(timeout),
-        _status(Status::IDLE)
+        _status(Status::IDLE), 
+        _callback(func_call),
+        _timeoutCallback(timeout_call)
         {_uid = _uidCounter++;}
 
+void Request::setTimeoutCallback(callback_ptr func){
+    _timeoutCallback = func;
+}
+
+void Request::setCallback(requestCallback_ptr func){
+    _callback = func;
+}
 
 void Request::send(Intercom& channel){
     _status = Status::SENT;
@@ -205,10 +212,12 @@ void Request::onResponse(const String& response){
     _status = Status::OK;
     _responseTime = millis();
     _response = response;
+    if(_callback) _callback(response);
 }
 
 void Request::onTimeout(){
     _status = Status::TIMEOUT;
+    if(_timeoutCallback) _timeoutCallback();
 }
 
 void Request::setStatus(Status status){

@@ -2,13 +2,13 @@
 #include "os/commands.h"
 #include "strategy.h"
 
-
 OS& os = OS::instance();
 IHM& ihm = IHM::instance();
 Motion& motion = Motion::instance();
 Actuators& actuators = Actuators::instance();
 Intercom& intercom = Intercom::instance();
 Terminal& terminal = Terminal::instance();
+Lidar& lidar = Lidar::instance();
 
 void onRobotBoot(){
     os.attachService(&ihm); 
@@ -26,40 +26,17 @@ void onRobotBoot(){
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);
 
+    ihm.drawBootProgress("Linking lidar...");
+    os.attachService(&lidar); ihm.addBootProgress(10);
+    delay(100);
+    lidar.disable();
+
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
 
     ihm.setPage(IHM::Page::INIT);
 
     registerCommands();
-}
-
-void onTerminalCommand(){
-    Interpreter interpreter;
-    if( terminal.commandAvailable() > 0){
-        Console::println("Received command. parsing...");
-        String rawcmd = terminal.dequeCommand();
-        Interpreter in;
-        Program prgm = in.processScript(rawcmd);
-        if(prgm.isValid()){ //TODO Integrate that in OS
-            Console::println("Starting program");
-            prgm.start();
-            while(os.isBusy()) os.flush();
-            while(prgm.step()){
-                while(os.isBusy()) os.flush();
-            };
-        }else {
-            Console::println("Invalid program : Unknown error");
-        }
-    }
-}
-
-void onIntercomConnected(){
-    ihm.setIntercomState(true);
-}
-
-void onIntercomDisconnected(){
-    ihm.setIntercomState(false);
 }
 
 void onRobotIdle(){
@@ -93,13 +70,49 @@ void onRobotIdle(){
 
 void onRobotRun(){
     //start match
+    lidar.enable();
     match();
 
     motion.disable();
     os.setState(OS::STOPPED);
 }
 
-
 void onRobotStop(){
     ihm.onUpdate();
+}
+
+void onIntercomConnected(){
+    ihm.setIntercomState(true);
+}
+
+void onIntercomDisconnected(){
+    ihm.setIntercomState(false);
+}
+
+void onOppenentDetected(const String& arg){
+    Console::println(arg);
+}
+
+void onIntercomMessage(){
+    
+}
+
+void onTerminalCommand(){
+    Interpreter interpreter;
+    if( terminal.commandAvailable() > 0){
+        Console::println("Received command. parsing...");
+        String rawcmd = terminal.dequeCommand();
+        Interpreter in;
+        Program prgm = in.processScript(rawcmd);
+        if(prgm.isValid()){ //TODO Integrate that in OS
+            Console::println("Starting program");
+            prgm.start();
+            while(os.isBusy()) os.flush();
+            while(prgm.step()){
+                while(os.isBusy()) os.flush();
+            };
+        }else {
+            Console::println("Invalid program : Unknown error");
+        }
+    }
 }

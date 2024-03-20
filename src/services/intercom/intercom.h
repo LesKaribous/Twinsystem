@@ -2,6 +2,8 @@
 #include "services/service.h"
 #include <map>
 
+using requestCallback_ptr = void (*)(const String&);
+
 class Intercom;
 
 class Request {
@@ -15,7 +17,10 @@ public:
         ERROR
     };
     
-    Request(const String& payload, long timeout = 5000);
+    Request(const String& payload,  long timeout = 5000, requestCallback_ptr callback = nullptr, callback_ptr timeout_callback = nullptr);
+
+    void setTimeoutCallback(callback_ptr func);
+    void setCallback(requestCallback_ptr func);
 
     void send(Intercom& channel);
     void close();
@@ -44,7 +49,8 @@ private:
     unsigned long _timeout;
 
     Status _status;
-
+    requestCallback_ptr _callback;
+    callback_ptr _timeoutCallback;
     static uint32_t _uidCounter;
 };
 
@@ -61,7 +67,7 @@ public:
     void sendMessage(const char* message);
     void sendMessage(const String& message);
 
-    uint32_t sendRequest(const String& payload, long timeout = 200);
+    uint32_t sendRequest(const String& payload, long timeout = 200, requestCallback_ptr cbfunc = nullptr, callback_ptr func = nullptr);
     bool closeRequest(const uint32_t&);
     String getRequestResponse(const uint32_t&);
 

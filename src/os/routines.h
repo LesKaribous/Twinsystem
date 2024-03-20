@@ -4,6 +4,7 @@
 #include "poi.h"
 #include "services/ihm/ihm.h"
 #include "services/motion/motion.h"
+#include "services/lidar/lidar.h"
 #include "services/intercom/intercom.h"
 #include "services/actuators/actuators.h"
 #include "services/terminal/terminal.h"
@@ -15,6 +16,7 @@ extern Motion& motion;
 extern Actuators& actuators;
 extern Intercom& intercom;
 extern Terminal& terminal;
+extern Lidar& lidar;
 
 void onRobotBoot();
 void onRobotIdle();
@@ -24,3 +26,6 @@ void onRobotStop();
 void onTerminalCommand();
 void onIntercomConnected();
 void onIntercomDisconnected();
+
+void onIntercomMessage();
+void onOppenentDetected(const String& arg);
