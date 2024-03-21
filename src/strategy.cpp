@@ -35,6 +35,12 @@ void recalage(){
 
 
 void testEvitemment(){
+    motion.setAsync();
+
+    async motion.go(100, 0);
+    async motion.go(0, 0);
+
+    return;
     for(int i=0;i<5; i++){
         motion.go(1000,1000);
         motion.go(250,250);

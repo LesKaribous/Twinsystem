@@ -3,41 +3,58 @@
 
 OS OS::m_instance;
 
-void OS::loop(){
+void OS::run(){
     switch(m_state){
         case BOOT:
-            boot();
+            boot_routine();
             break;
         case IDLE:
-            idle();
+            idle_routine();
+            break;
+        case PROGRAM:
+            program_routine();
             break;
         case RUNNING:
-            run();
+            run_routine();
             break;
         case STOPPED:
-            stop();
+            stop_routine();
             break;
         default: 
         break;
     }
 }
 
-void OS::boot(){
+void OS::start(){
+    m_state = PROGRAM;
+}
+
+void OS::stop(){
+    m_state = STOPPED;
+}
+
+void OS::boot_routine(){
     executeRoutine(m_bootRoutine);
     m_state = IDLE;
 }
 
-void OS::idle(){
+void OS::idle_routine(){
     updateServices();
     executeRoutine(m_idleRoutine);
 }
 
-void OS::run(){
+void OS::run_routine(){
     updateServices();
     executeRoutine(m_runRoutine);
 }
 
-void OS::stop(){
+void OS::program_routine(){
+    m_state = RUNNING;
+    executeRoutine(m_programRoutine);
+    m_state = STOPPED;
+}
+
+void OS::stop_routine(){
     executeRoutine(m_stopRoutine);
 }
 
@@ -56,6 +73,9 @@ void OS::setRountine(SystemState state, routine_ptr func_ptr){
             break;
         case RUNNING:
             m_runRoutine = func_ptr;
+            break;
+        case PROGRAM:
+            m_programRoutine = func_ptr;
             break;
         case STOPPED:
             m_stopRoutine = func_ptr;
@@ -110,12 +130,12 @@ void OS::wait(unsigned long time, bool async) {
 
 void OS::waitUntil(Job& obj, bool async){
     m_currentJob = &obj;
-    if(!async)while(isBusy())loop();
+    if(!async)while(obj.isPending()) loop();
 }
 
 void OS::execute(Job& obj, bool async){
     m_currentJob = &obj;
-    if(!async)while(isBusy()) loop();
+    if(!async)while(obj.isPending()) loop();
 }
 
 bool OS::isBusy() const{
@@ -144,5 +164,7 @@ void OS::disable(ServiceID id){
 void OS::executeRoutine(routine_ptr routine){
     if(routine != nullptr){
         routine();
+    }else{
+        Console::error("OS") << "Routine is nullptr" << Console::endl;
     }
 }

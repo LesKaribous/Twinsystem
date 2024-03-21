@@ -73,7 +73,7 @@ public:
     
 
 private :
-    bool m_async = false; //blocking by default
+    bool m_async = true; //blocking by default
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 targetToSteps(Vec3 relativeTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);

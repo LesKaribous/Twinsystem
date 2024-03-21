@@ -1,5 +1,6 @@
 #pragma once
 #include "os/os.h"
+#include "os/asyncExecutor.h"
 #include "console.h"
 #include "poi.h"
 #include "services/ihm/ihm.h"
@@ -18,10 +19,12 @@ extern Intercom& intercom;
 extern Terminal& terminal;
 extern Lidar& lidar;
 
-void onRobotBoot();
-void onRobotIdle();
-void onRobotRun();
-void onRobotStop();
+void robotProgram();//Execute once (onRobotRun will be executed when possible during this program)
+
+void onRobotBoot(); //Execute once at boot
+void onRobotIdle(); //Execute before robotProgram (idle loop)
+void onRobotRun();  //Execute during robotProgram (run loop)
+void onRobotStop(); //Execute while robot stopped (stop loop)
 
 void onTerminalCommand();
 void onIntercomConnected();

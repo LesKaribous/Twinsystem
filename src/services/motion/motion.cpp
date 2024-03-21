@@ -147,7 +147,7 @@ Motion&  Motion::align(RobotCompass rc, float orientation){
 //Raw relative move request
 Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
-        Console::error("Motion") << "MotionPID not enabled" << Console::endl;
+        Console::error("Motion") << "Motion not enabled" << Console::endl;
         return *this;
     }
     Job::reset();//Start a new job
@@ -167,13 +167,13 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
             return *this;
         }
     }
-    _target = target; Console::info("Motion") << "Target is " << _target << Console::endl;
+    _target = target; Console::trace("Motion") << "Target is " << _target << Console::endl;
 
     //to relative step target 
-    Console::info("Motion") << "Position is " << _position << Console::endl;
-    Vec3 _relTarget = toRelativeTarget(_target); Console::info("Motion") << "Relative target is " << _relTarget << Console::endl;
+    Console::trace("Motion") << "Position is " << _position << Console::endl;
+    Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
     if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
-    _stepsTarget = targetToSteps(_relTarget); Console::info("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+    _stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
     
     Job::start(); //robot is moving from now
     wakeUp();
@@ -210,10 +210,10 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    THROW(_sA.getPosition());
-    THROW(_sB.getPosition());
-    THROW(_sC.getPosition());
-    THROW(_stepsTarget);
+    // THROW(_sA.getPosition());
+    // THROW(_sB.getPosition());
+    // THROW(_sC.getPosition());
+    // THROW(_stepsTarget);
     return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
 }
 
@@ -225,7 +225,7 @@ void Motion::cancel() {
     estimatePosition();
 
     _startPosition = _position;
-    _stepsTarget = Vec3(0,0,0);
+    _lastSteps = _stepsTarget = Vec3(0,0,0);
 
     _sA.setPosition(0);
     _sB.setPosition(0);
@@ -238,14 +238,14 @@ void Motion::cancel() {
 void Motion::complete() {
     Job::complete();
     _startPosition = _position = _target;
-    _stepsTarget = Vec3(0,0,0);
+    _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
-    Console::println("complete");
+    //Console::println("complete");
 }
 
 void Motion::forceCancel() {
@@ -253,7 +253,7 @@ void Motion::forceCancel() {
     _steppers.emergencyStop(); // set new speed
     estimatePosition();
     _startPosition = _position;
-    _stepsTarget = Vec3(0,0,0);
+    _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
@@ -292,7 +292,7 @@ void  Motion::estimatePosition(){ //We are not using the estimated velocity to p
     Vec3 delta = steps - _lastSteps;
     _lastSteps = steps;
 
-    Vec3 angularDelta = (delta / Settings::Stepper::STEP_MODE) * (PI/100);
+    Vec3 angularDelta = (delta / Settings::Stepper::STEP_MODE) * (PI/200);
     Vec3 linearDelta = angularDelta * Settings::Geometry::WHEEL_RADIUS;
 
     //Calculate XYZ delta
@@ -365,7 +365,7 @@ bool Motion::isMoving() const{
 
 
 void  Motion::setAbsPosition(Vec3 newPos){
-    THROW(newPos);
+    // THROW(newPos);
     _position = newPos; 
 }
 

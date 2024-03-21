@@ -13,10 +13,14 @@ public:
         IDLE,    // running services but no programs running
         RUNNING, // running services and a program is running
         STOPPED, // stopped services and programs are stopped
+        PROGRAM, // main program (not really a state since Running will be executed during program)
     };
 
+    void start();
+    void stop();
+    void run();
     void flush(); //Run the current task until it's done. (Blocking)
-    void loop();
+
     void setRountine(SystemState state, routine_ptr func_ptr);
     void setState(SystemState state);
 
@@ -35,10 +39,11 @@ public:
     bool isBusy() const;
 
 private:
-    void boot();
-    void idle();
-    void run();
-    void stop();
+    void boot_routine();
+    void idle_routine();
+    void run_routine();
+    void program_routine();
+    void stop_routine();
     void executeRoutine(routine_ptr routine);
 
     std::map<ServiceID, Service*> m_services;
@@ -46,6 +51,7 @@ private:
     routine_ptr m_idleRoutine = nullptr; 
     routine_ptr m_runRoutine = nullptr; 
     routine_ptr m_stopRoutine = nullptr; 
+    routine_ptr m_programRoutine = nullptr; 
     SystemState m_state = BOOT;
 
     Timer m_timer;

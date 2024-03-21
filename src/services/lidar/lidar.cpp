@@ -11,7 +11,7 @@ void Lidar::onAttach(){
 }
 
 void Lidar::onUpdate(){
-    Console::info("Lidar") << "send request" << Console::endl;
+    //Console::info("Lidar") << "send request" << Console::endl;
     if(enabled())
         intercom.sendRequest("checkLidar", 1000, onOppenentDetected, onIntercomDisconnected);
 }

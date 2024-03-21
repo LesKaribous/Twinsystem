@@ -10,6 +10,13 @@ Intercom& intercom = Intercom::instance();
 Terminal& terminal = Terminal::instance();
 Lidar& lidar = Lidar::instance();
 
+void robotProgram(){
+    Console::println("Started match");
+    lidar.enable();
+    match();
+    motion.disable();
+}
+
 void onRobotBoot(){
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
@@ -40,28 +47,41 @@ void onRobotBoot(){
 }
 
 void onRobotIdle(){
-    if(ihm.hasStarter()){
+    static bool hadStarter = false;
+    static bool buttonWasPressed = false;
+
+    if(ihm.hasStarter() && !hadStarter){
         ihm.freezeSettings();
-        while(true){
-            ihm.onUpdate();
-            if(ihm.starterPulled() && !ihm.buttonPressed()){
-                ihm.setPage(IHM::Page::MATCH);
-                os.setState(OS::RUNNING);
-                break;
-            }else if(ihm.starterPulled() && ihm.buttonPressed()){
-                ihm.unfreezeSettings();
-                break;
-            }
-            delay(10);
-        }
+        hadStarter = true;
+        return;
     }
 
-    if(ihm.buttonPressed()){
+    if(!ihm.hasStarter() && hadStarter && !ihm.buttonPressed()){
+        ihm.setPage(IHM::Page::MATCH);
+        os.start();
+        return;
+    }
+    
+    if(!ihm.hasStarter() && hadStarter &&  ihm.buttonPressed()){
+        ihm.unfreezeSettings();
+        hadStarter = false;
+        buttonWasPressed = true;
+        return;
+    } 
+
+    if(ihm.buttonPressed() && !buttonWasPressed && !hadStarter && !ihm.hasStarter()){
         recalage();
+        return;
+    }
+
+    if(!ihm.buttonPressed() && buttonWasPressed){
+        buttonWasPressed = false;
+        return;
     }
 
     if(terminal.commandAvailable()){
         onTerminalCommand();
+        return;
     }
 
     ihm.setRobotPosition(motion.getAbsPosition());
@@ -69,12 +89,8 @@ void onRobotIdle(){
 }
 
 void onRobotRun(){
-    //start match
-    lidar.enable();
-    match();
-
-    motion.disable();
-    os.setState(OS::STOPPED);
+    Console::println("running...");
+    ihm.setRobotPosition(motion.getAbsPosition());
 }
 
 void onRobotStop(){
@@ -90,7 +106,7 @@ void onIntercomDisconnected(){
 }
 
 void onOppenentDetected(const String& arg){
-    Console::println(arg);
+    //Console::println(arg);
 }
 
 void onIntercomMessage(){

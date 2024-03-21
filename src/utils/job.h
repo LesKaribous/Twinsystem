@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+//#include "os/asyncExecutor.h"
 
 enum class JobState{
     IDLE,
@@ -16,7 +17,8 @@ public:
     ~Job();// make the class polymorphic by providing a virtual destructor
 
     String toString() const;
-    
+    //operator AsyncExecutor() { OS::instance().waitUntil(*this); };
+
     bool isIdle()const;
     bool isPaused()const;
     bool isPending()const;
