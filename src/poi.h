@@ -29,18 +29,18 @@ namespace POI{
     const Vec2 solarPanelBlue_2 = Vec2(500,1800);      //Solar panel Blue 2
     const Vec2 solarPanelBlue_3 = Vec2(725,1800);      //Solar panel Blue 3
 
-    const Vec2 solarPanelYellow_1 = Vec2(1275,1800);   //Solar panel Yellow 1
-    const Vec2 solarPanelYellow_2 = Vec2(1500,1800);   //Solar panel Yellow 2
-    const Vec2 solarPanelYellow_3 = Vec2(1725,1800);   //Solar panel Yellow 3
+    const Vec2 solarPanelOther_1 = Vec2(1275,1800);   //Solar panel No Team 1
+    const Vec2 solarPanelOther_2 = Vec2(1500,1800);   //Solar panel No Team 2
+    const Vec2 solarPanelOther_3 = Vec2(1725,1800);   //Solar panel No Team 3
 
-    const Vec2 solarPanelOther_1 = Vec2(2725,1800);    //Solar panel No Team 1
-    const Vec2 solarPanelOther_2 = Vec2(2500,1800);    //Solar panel No Team 2
-    const Vec2 solarPanelOther_3 = Vec2(2275,1800);    //Solar panel No Team 3
+    const Vec2 solarPanelYellow_1 = Vec2(2725,1800);    //Solar panel Yellow 1
+    const Vec2 solarPanelYellow_2 = Vec2(2500,1800);    //Solar panel Yellow 2
+    const Vec2 solarPanelYellow_3 = Vec2(2275,1800);    //Solar panel Yellow 3
     // ------------------------------------------
     // Planters
     const Vec2 planterBlueSouth = Vec2(0,612);          //Planter Blue South
     const Vec2 planterBlueNorth = Vec2(3000,1388);      //Planter Blue North
-    const Vec2 planterBlueWest  = Vec2(762,0);        //Planter Blue West
+    const Vec2 planterBlueWest  = Vec2(762,0);          //Planter Blue West
 
     const Vec2 planterYellowSouth = Vec2(0,1388);       //Planter Yellow South
     const Vec2 planterYellowNorth = Vec2(3000,612);     //Planter Yellow North

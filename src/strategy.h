@@ -16,4 +16,5 @@ RobotCompass nextActuator(RobotCompass rc);         //Recupere l'orientation de 
 RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de l'actionneur précedant
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc);
-void probeBorder(TableCompass tc, RobotCompass rc, float clearance);
+void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter = true);
+void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist = 200.0, float probeDist = 80.0 );
