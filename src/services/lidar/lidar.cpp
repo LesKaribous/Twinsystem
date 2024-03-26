@@ -1,5 +1,8 @@
 #include "lidar.h"
 #include "os/routines.h"
+#include "os/console.h"
+#include "robot.h"
+
 INSTANTIATE_SERVICE(Lidar)
 
 Lidar::Lidar() : Service(ID_LIDAR){}

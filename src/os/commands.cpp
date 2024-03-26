@@ -1,4 +1,5 @@
 #include "commands.h"
+#include "robot.h"
 #include "routines.h"
 #include "strategy.h"
 
@@ -81,8 +82,7 @@ void command_go(const args_t& args){
     if(args.size() != 2) return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
-    motion.go(x, y);
-    os.waitUntil(motion, true);
+    async motion.go(x, y);
 }
 
 //Motion
@@ -90,8 +90,7 @@ void command_goPolar(const args_t& args){
     if(args.size() != 2) return;
     float angle = args[0].toFloat();
     float dist = args[1].toFloat();
-    motion.goPolar(angle, dist);
-    os.waitUntil(motion, true);
+    async motion.goPolar(angle, dist);
 }
 
 void command_move(const args_t& args){
@@ -99,25 +98,22 @@ void command_move(const args_t& args){
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     float z = args[3].toFloat();
-    motion.move({x, y, z});
-    os.waitUntil(motion, true);
+    async motion.move({x, y, z});
 }
 
 
 void command_turn(const args_t& args){
     if(args.size() != 1)return;
     float x = args[0].toFloat();
-    motion.turn(x);
-    os.waitUntil(motion, true);
+    async motion.turn(x);
 }
 
 void command_rawTurn(const args_t& args){
     if(args.size() != 1)return;
     float x = args[0].toFloat();
     motion.disableOptimization();
-    motion.turn(x);
+    async motion.turn(x);
     motion.enableOptimization();
-    os.waitUntil(motion, true);
 }
 
 void command_pause(const args_t& args){
@@ -144,14 +140,12 @@ void command_align(const args_t& args){
     if(args.size() != 2)return;
     String side = args[0];
     float orientation = args[1].toFloat();
-   if(side.equalsIgnoreCase("A"))         motion.align(RobotCompass::A, orientation);
-    else if(side.equalsIgnoreCase("AB"))   motion.align(RobotCompass::AB, orientation);
-    else if(side.equalsIgnoreCase("B"))    motion.align(RobotCompass::B, orientation);
-    else if(side.equalsIgnoreCase("BC"))   motion.align(RobotCompass::BC, orientation);
-    else if(side.equalsIgnoreCase("C"))    motion.align(RobotCompass::C, orientation);
-    else if(side.equalsIgnoreCase("CA"))   motion.align(RobotCompass::CA, orientation);
-
-    os.waitUntil(motion, true);
+    if(side.equalsIgnoreCase("A"))         async motion.align(RobotCompass::A, orientation);
+    else if(side.equalsIgnoreCase("AB"))   async motion.align(RobotCompass::AB, orientation);
+    else if(side.equalsIgnoreCase("B"))    async motion.align(RobotCompass::B, orientation);
+    else if(side.equalsIgnoreCase("BC"))   async motion.align(RobotCompass::BC, orientation);
+    else if(side.equalsIgnoreCase("C"))    async motion.align(RobotCompass::C, orientation);
+    else if(side.equalsIgnoreCase("CA"))   async motion.align(RobotCompass::CA, orientation);
 }
 
 
@@ -184,36 +178,27 @@ void command_resetCompass(const args_t& args){
 void command_grab(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    RobotCompass rc;
-    if(side.equals("AB")) rc = RobotCompass::AB;
-    else if(side.equals("BC")) rc = RobotCompass::BC;
-    else if(side.equals("CA")) rc = RobotCompass::CA;
-
-    actuators.grab(rc);
+    if(side.equals("AB")) actuators.grab(RobotCompass::AB);
+    else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
 }
 
 
 void command_open(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    RobotCompass rc;
-    if(side.equals("AB")) rc = RobotCompass::AB;
-    else if(side.equals("BC")) rc = RobotCompass::BC;
-    else if(side.equals("CA")) rc = RobotCompass::CA;
-
-    actuators.open(rc);
+    if(side.equals("AB")) actuators.open(RobotCompass::AB);
+    else if(side.equals("BC")) actuators.open(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.open(RobotCompass::CA);
 }
 
 
 void command_close(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    RobotCompass rc;
-    if(side.equals("AB")) rc = RobotCompass::AB;
-    else if(side.equals("BC")) rc = RobotCompass::BC;
-    else if(side.equals("CA")) rc = RobotCompass::CA;
-
-    actuators.open(rc);
+    if(side.equals("AB")) actuators.close(RobotCompass::AB);
+    else if(side.equals("BC")) actuators.close(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.close(RobotCompass::CA);
 }
 
 //Routines 

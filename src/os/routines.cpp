@@ -1,14 +1,10 @@
 #include "os/routines.h"
 #include "os/commands.h"
+#include "robot.h"
 #include "strategy.h"
 
-OS& os = OS::instance();
-IHM& ihm = IHM::instance();
-Motion& motion = Motion::instance();
-Actuators& actuators = Actuators::instance();
-Intercom& intercom = Intercom::instance();
-Terminal& terminal = Terminal::instance();
-Lidar& lidar = Lidar::instance();
+#include "os/os.h"
+#include "os/asyncExecutor.h"
 
 void robotProgram(){
     Console::println("Started match");
@@ -17,36 +13,7 @@ void robotProgram(){
     motion.disable();
 }
 
-void onRobotBoot(){
-    os.attachService(&ihm); 
-    ihm.drawBootProgress("Linking ihm...");
-    ihm.addBootProgress(10); 
-    
-    ihm.drawBootProgress("Linking motion...");
-    os.attachService(&motion); ihm.addBootProgress(10);
-
-    ihm.drawBootProgress("Linking actuators...");
-    os.attachService(&actuators); ihm.addBootProgress(10);
-
-    ihm.drawBootProgress("Linking intercom");
-    os.attachService(&intercom); ihm.addBootProgress(10);
-    intercom.setConnectLostCallback(onIntercomDisconnected);
-    intercom.setConnectionSuccessCallback(onIntercomConnected);
-
-    ihm.drawBootProgress("Linking lidar...");
-    os.attachService(&lidar); ihm.addBootProgress(10);
-    delay(100);
-    lidar.disable();
-
-    ihm.drawBootProgress("Linking terminal...");
-    os.attachService(&terminal); ihm.addBootProgress(10);
-
-    ihm.setPage(IHM::Page::INIT);
-
-    registerCommands();
-}
-
-void onRobotIdle(){
+void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
@@ -84,8 +51,39 @@ void onRobotIdle(){
         return;
     }
 
+}
+
+void onRobotBoot(){
+    os.attachService(&ihm); 
+    ihm.drawBootProgress("Linking ihm...");
+    ihm.addBootProgress(10); 
+    
+    ihm.drawBootProgress("Linking motion...");
+    os.attachService(&motion); ihm.addBootProgress(10);
+
+    ihm.drawBootProgress("Linking actuators...");
+    os.attachService(&actuators); ihm.addBootProgress(10);
+
+    ihm.drawBootProgress("Linking intercom");
+    os.attachService(&intercom); ihm.addBootProgress(10);
+    intercom.setConnectLostCallback(onIntercomDisconnected);
+    intercom.setConnectionSuccessCallback(onIntercomConnected);
+
+    ihm.drawBootProgress("Linking lidar...");
+    os.attachService(&lidar); ihm.addBootProgress(10);
+    delay(100);
+    lidar.disable();
+
+    ihm.drawBootProgress("Linking terminal...");
+    os.attachService(&terminal); ihm.addBootProgress(10);
+
+    ihm.setPage(IHM::Page::INIT);
+
+    registerCommands();
+}
+
+void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
-    //delay(10);
 }
 
 void onRobotRun(){
@@ -106,6 +104,10 @@ void onIntercomDisconnected(){
 }
 
 void onIntercomMessage(const String& message){
+    
+}
+
+void onOppenentDetected(const String& arg){
     
 }
 
