@@ -13,6 +13,8 @@ public:
     void enable() override;
     void disable() override;
 
+    void showRadarLED();
+    void showStatusLED();
 
 
 private :

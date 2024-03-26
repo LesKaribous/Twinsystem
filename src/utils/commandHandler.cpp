@@ -51,9 +51,8 @@ void CommandHandler::execute(const String& command, const args_t& args) {
 
 std::vector<String> CommandHandler::extractArguments(const String& args) {
     std::vector<String> arguments;
-    int start = 0;
+    //int start = 0;
     int end = args.indexOf(',');
-    bool ignoreVectorComma = false;
     if(end != -1){
         String argBuf = "";
         uint index = 0;

@@ -1,6 +1,6 @@
 #include "advancedServo.h"
 AdvancedServo::AdvancedServo(int pin, int defaultPos, int minPos, int maxPos) :
-    m_pin(pin), m_enabled(false), m_sleeping(false), m_minPos(minPos), m_maxPos(maxPos), m_defaultPos(defaultPos)
+    m_position(0), m_enabled(false), m_sleeping(false), m_pin(pin), m_minPos(minPos), m_maxPos(maxPos), m_defaultPos(defaultPos)
 {}
 
 void AdvancedServo::moveToDefault(){
@@ -34,7 +34,7 @@ int AdvancedServo::getPose(int index) const{
         //Console::error("AdvancedServo") << "Invalid index" << index << " in  m_poses array " << HERE << Console::endl;
         return m_defaultPos;
     }
-    return m_poses[index];
+    return m_poses.at(index);
 }
 
 void AdvancedServo::sleep(){

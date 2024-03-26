@@ -72,7 +72,7 @@ public:
 
     static ServiceID toID(String);
     static String toString(ServiceID);
-    String Service::toString() const;
+    String toString() const;
 };
 
 

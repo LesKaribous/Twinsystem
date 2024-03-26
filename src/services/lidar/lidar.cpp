@@ -18,10 +18,16 @@ void Lidar::onUpdate(){
 
 void Lidar::enable(){
     Service::enable();
-    intercom.sendRequest("displayLidar",500);
 }
 
 void Lidar::disable(){
     Service::disable();
+}
+
+void Lidar::showRadarLED(){
+    intercom.sendRequest("displayLidar",500);
+}
+
+void Lidar::showStatusLED(){
     intercom.sendRequest("displayIntercom",500);
 }
