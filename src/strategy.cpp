@@ -5,7 +5,7 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.7);
+    motion.setFeedrate(0.4);
     //testEvitemment();
     //return;
     if(ihm.isColorBlue()) matchBlue();
@@ -124,7 +124,9 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         async motion.go(target);
     }
     // Poser les plantes
-    actuators.moveElevator(rc,ElevatorPose::GRAB);
+    if(planter)actuators.moveElevator(rc,ElevatorPose::BORDER);
+    else actuators.moveElevator(rc,ElevatorPose::GRAB);
+    
     waitMs(1000);
     // Ouvrir les bras
     actuators.open(rc);
@@ -164,6 +166,29 @@ void matchBlue(){
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
     async motion.go(110,612); // Dégagement latéral des pots
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
+    // Dégagement de zone
+    //async motion.go(POI::plantSupplySW);
+    async motion.go(887,1000);
+    async motion.go(POI::b2);
+    probeBorder(TableCompass::EAST, RobotCompass::AB,100);
+    probeBorder(TableCompass::SOUTH, RobotCompass::CA,100);
+    async motion.go(POI::b2);
+    // Ajuster le bras pour le panneaux
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::BORDER);
+    waitMs(500);
+    actuators.close(RobotCompass::AB);
+    waitMs(500);
+    // S'approcher et tourner les panneaux
+    async motion.go(POI::solarPanelBlue_1);
+    async motion.go(POI::solarPanelBlue_3);
+    // Ranger les bras
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.open(RobotCompass::AB);
+    // Aller en zone de recharge 
+    async motion.go(POI::b2);
+    // Fin de match
+    motion.disengage();
+    actuators.disable();
 }
 
 void matchYellow(){

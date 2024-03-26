@@ -24,7 +24,8 @@ const int
     left_Grab,
     elevator_Down,
     elevator_Up,
-    elevator_Grab;
+    elevator_Grab,
+    elevator_Border;
 };
 
 namespace ActuatorsPreset{
@@ -44,7 +45,8 @@ namespace ActuatorsPreset{
         180, //left_Grab    
         15,  //elevator_Down
         160, //elevator_Up  
-        35   //elevator_Grab
+        35,   //elevator_Grab
+        80   //elevator_Border
     };
         
     const ActuatorsProperty BC = {
@@ -63,7 +65,8 @@ namespace ActuatorsPreset{
         160, //left_Grab    
         0,   //elevator_Down
         130, //elevator_Up  
-        10   //elevator_Grab
+        10,   //elevator_Grab
+        60   //elevator_Border
     };
 
     const ActuatorsProperty CA = {
@@ -82,14 +85,16 @@ namespace ActuatorsPreset{
         180, //left_Grab    
         0,   //elevator_Down
         130, //elevator_Up  
-        10   //elevator_Grab
+        10,   //elevator_Grab
+        60   //elevator_Border
     };
 }
 
 enum class ElevatorPose{
     UP = 0,
     DOWN = 1, 
-    GRAB = 2
+    GRAB = 2,
+    BORDER = 3
 };
 
 struct ActuatorGroup{
@@ -110,6 +115,7 @@ struct ActuatorGroup{
             elevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevator_Down);
             elevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevator_Up);
             elevator.setPose(static_cast<int>(ElevatorPose::GRAB), presets.elevator_Grab);
+            elevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevator_Border);
         }
 };
 
@@ -147,6 +153,7 @@ public:
     bool runElevatorUp(RobotCompass rc);
     bool runElevatorDown(RobotCompass rc);
     bool runElevatorGrab(RobotCompass rc);
+    bool runElevatorBorder(RobotCompass rc);
 
     void enableTraco();
     void disableTraco();

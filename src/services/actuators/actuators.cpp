@@ -254,6 +254,11 @@ bool Actuators::runElevatorGrab(RobotCompass rc){
     return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::GRAB)));
 }
 
+bool Actuators::runElevatorBorder(RobotCompass rc){
+    ActuatorGroup &group = getActuatorGroup(rc);
+    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::BORDER)));
+}
+
 
 bool Actuators::readSensor(RobotCompass rc, Side gs){
     switch (rc)
