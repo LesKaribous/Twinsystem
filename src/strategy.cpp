@@ -175,12 +175,13 @@ void matchBlue(){
     async motion.go(POI::b2);
     // Ajuster le bras pour le panneaux
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::BORDER);
-    waitMs(500);
+    waitMs(1000);
     actuators.close(RobotCompass::AB);
-    waitMs(500);
+    waitMs(1000);
     // S'approcher et tourner les panneaux
     async motion.go(POI::solarPanelBlue_1);
     async motion.go(POI::solarPanelBlue_3);
+    async motion.go(850,1670); // Dégagement
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
     actuators.open(RobotCompass::AB);

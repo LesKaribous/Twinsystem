@@ -46,7 +46,7 @@ namespace ActuatorsPreset{
         15,  //elevator_Down
         160, //elevator_Up  
         35,   //elevator_Grab
-        80   //elevator_Border
+        90   //elevator_Border
     };
         
     const ActuatorsProperty BC = {
