@@ -192,7 +192,7 @@ RobotCompass previousActuator(RobotCompass rc){
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist){
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
-	bool m_probing = true;
+	//bool m_probing = true;
     //motion.setSync();
     //Console::println("Recalling");
 
