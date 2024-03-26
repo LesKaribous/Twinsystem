@@ -156,14 +156,14 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(isRelative()){
         if(target.magSq() == 0){ //Test if move is 0 length
             Console::error("Motion") << "Move is null" << Console::endl;
-            Job::cancel();
+            complete();
             return *this;
         }
         target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
             Console::error("Motion") << "Move is null" << Console::endl;
-            Job::cancel();
+            complete();
             return *this;
         }
     }

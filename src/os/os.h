@@ -2,6 +2,7 @@
 #include "services/service.h"
 #include "utils/timer/timer.h"
 #include <map>
+#include <queue>
 
 class Service;
 using routine_ptr = void (*)();
@@ -14,6 +15,7 @@ public:
         RUNNING, // running services and a program is running
         STOPPED, // stopped services and programs are stopped
         PROGRAM, // main program (not really a state since Running will be executed during program)
+        IDLE_PROGRAM, // idle program (not really a state since IDLE will be executed during program)
     };
 
     void start();
@@ -36,15 +38,20 @@ public:
     void wait(unsigned long time, bool async = false);
     void waitUntil(Job& job, bool async = false);
     void execute(Job& job, bool async = true);
-    bool isBusy() const;
+    bool isBusy();
 
 private:
     void boot_routine();
     void idle_routine();
     void run_routine();
     void program_routine();
+    void idle_program_routine();
     void stop_routine();
     void executeRoutine(routine_ptr routine);
+
+    Job* currentJob();
+    void addJob(Job* job);
+    void killCurrentJob();
 
     std::map<ServiceID, Service*> m_services;
     routine_ptr m_bootRoutine = nullptr; 
@@ -52,10 +59,11 @@ private:
     routine_ptr m_runRoutine = nullptr; 
     routine_ptr m_stopRoutine = nullptr; 
     routine_ptr m_programRoutine = nullptr; 
+    routine_ptr m_idleProgramRoutine = nullptr; 
     SystemState m_state = BOOT;
 
     Timer m_timer;
-    Job* m_currentJob = nullptr;
+    std::queue<Job*> m_jobs;
 
 //Singleton
 public:

@@ -11,6 +11,9 @@ void OS::run(){
         case IDLE:
             idle_routine();
             break;
+        case IDLE_PROGRAM:
+            idle_program_routine();
+            break;
         case PROGRAM:
             program_routine();
             break;
@@ -35,17 +38,26 @@ void OS::stop(){
 
 void OS::boot_routine(){
     executeRoutine(m_bootRoutine);
-    m_state = IDLE;
+    m_state = IDLE_PROGRAM;
+    //Console::println(m_state);
 }
 
 void OS::idle_routine(){
     updateServices();
     executeRoutine(m_idleRoutine);
+    if(currentJob() != nullptr){
+        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
+        else currentJob()->run();
+    }
 }
 
 void OS::run_routine(){
     updateServices();
     executeRoutine(m_runRoutine);
+    if(currentJob() != nullptr){
+        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
+        else currentJob()->run();
+    }
 }
 
 void OS::program_routine(){
@@ -54,12 +66,15 @@ void OS::program_routine(){
     m_state = STOPPED;
 }
 
-void OS::stop_routine(){
-    executeRoutine(m_stopRoutine);
+void OS::idle_program_routine(){
+    m_state = IDLE;
+    updateServices();
+    executeRoutine(m_idleProgramRoutine);
+    if(m_state == IDLE) m_state = IDLE_PROGRAM;
 }
 
-void OS::flush(){
-    while(isBusy())m_currentJob->run();
+void OS::stop_routine(){
+    executeRoutine(m_stopRoutine);
 }
 
 void OS::setRountine(SystemState state, routine_ptr func_ptr){
@@ -74,6 +89,9 @@ void OS::setRountine(SystemState state, routine_ptr func_ptr){
         case RUNNING:
             m_runRoutine = func_ptr;
             break;
+        case IDLE_PROGRAM:
+            m_idleProgramRoutine = func_ptr;
+        break;
         case PROGRAM:
             m_programRoutine = func_ptr;
             break;
@@ -124,26 +142,39 @@ void OS::toggleDebug(ServiceID s){
 void OS::wait(unsigned long time, bool async) {
     m_timer.setDuration(time);
     m_timer.start();
-    m_currentJob = &m_timer;
-    if(!async)while(isBusy())loop();
+    addJob(&m_timer);
+    if(!async)while(m_timer.isPending())run();
 }
 
 void OS::waitUntil(Job& obj, bool async){
-    m_currentJob = &obj;
-    if(!async)while(obj.isPending()) loop();
+    addJob(&obj);
+    if(!async) while(obj.isPending()) run();
 }
 
 void OS::execute(Job& obj, bool async){
-    m_currentJob = &obj;
-    if(!async)while(obj.isPending()) loop();
+    addJob(&obj);
+    if(!async)while(obj.isPending()) run();
 }
 
-bool OS::isBusy() const{
-    if(m_currentJob == nullptr) return false;
-    else{
-        return m_currentJob->isPending();
-    }
+void OS::flush(){
+    while(isBusy()) run();
+}
+
+bool OS::isBusy() {
+    return m_jobs.size() != 0;
 };
+
+Job* OS::currentJob(){
+    if(m_jobs.size() == 0) return nullptr;
+    else return m_jobs.front();
+}
+void OS::addJob(Job* job){
+    m_jobs.push(job);
+}
+void OS::killCurrentJob(){
+    if(m_jobs.size() == 0) return;
+    m_jobs.pop();
+}
 
 void OS::updateServices(){
     for(const auto& service : m_services) {
