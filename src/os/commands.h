@@ -34,6 +34,9 @@ void command_grab(const args_t& args);
 void command_open(const args_t& args);
 void command_close(const args_t& args);
 
+//Routine
+void command_recalage(const args_t& args);
+
 //Terminal
 void command_help(const args_t& args);
 void command_print(const args_t& args);

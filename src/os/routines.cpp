@@ -105,11 +105,7 @@ void onIntercomDisconnected(){
     ihm.setIntercomState(false);
 }
 
-void onOppenentDetected(const String& arg){
-    //Console::println(arg);
-}
-
-void onIntercomMessage(){
+void onIntercomMessage(const String& message){
     
 }
 

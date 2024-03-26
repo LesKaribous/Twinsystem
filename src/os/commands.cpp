@@ -1,5 +1,6 @@
 #include "commands.h"
 #include "routines.h"
+#include "strategy.h"
 
 void registerCommands() {
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
@@ -23,6 +24,7 @@ void registerCommands() {
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
+    CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal", command_print);
     CommandHandler::registerCommand("help", "Display help", command_help);
 }
@@ -214,6 +216,11 @@ void command_close(const args_t& args){
     actuators.open(rc);
 }
 
+//Routines 
+
+void command_recalage(const args_t& args){
+    recalage();
+}
 
 
 //Terminal
@@ -223,7 +230,7 @@ void command_help(const args_t& args){
         Command c = i->second;
         Console::print(c.getSyntax()); 
         Console::print(" : "); 
-        Console::println(c.getSyntax()); 
+        Console::println(c.getDesc()); 
     }
 }
 
