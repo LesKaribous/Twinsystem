@@ -2,9 +2,10 @@
 #include "services/service.h"
 #include <map>
 
-using requestCallback_ptr = void (*)(const String&);
-
 class Intercom;
+class Request;
+
+using requestCallback_ptr = void (*)(const Request&);
 
 class Request {
 public:

@@ -1,5 +1,5 @@
 
-PImage tablePNG;
+Table table = new Table();
 Robot robot = new Robot();
 
 void setup(){
@@ -16,21 +16,10 @@ void draw(){
   
   translate(50,50);
   
-  drawTable();
-  //rect(50,50,table_px.x, table_px.y);
+  table.draw();
   robot.draw();
   
-
-}
-
-void drawTable(){
-  pushMatrix();
-  rotate(PI/2.0);
-  translate(10,-1000);
-  image(tablePNG, 0, 0, toPixel(2000), toPixel(3000));
-  popMatrix();
-}
-
-void drawRobot(PVector p) {
-
+  PVector l = table.grad_sdf(table.getCursorPos());
+  float dist = toPixel(table.sdf(table.getCursorPos()));
+  line(mouseX - 50, mouseY - 50, l.x * dist, l.y*dist);
 }
