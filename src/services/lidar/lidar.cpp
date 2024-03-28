@@ -14,9 +14,18 @@ void Lidar::onAttach(){
 }
 
 void Lidar::onUpdate(){
-    //Console::info("Lidar") << "send request" << Console::endl;
-    //if(enabled())
-        //intercom.sendRequest("checkLidar", 1000, onOppenentDetected, onIntercomDisconnected);
+    if(enabled()){
+        if(millis() - m_lastPosUpdate > 100){
+            m_lastPosUpdate = millis();
+            Vec3 pos = motion.getAbsPosition();
+            intercom.sendRequest("setRobotPosition(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z) + ")", 100);
+        }
+
+        if(millis() - m_lastOccupancyRequest > 150){
+            m_lastOccupancyRequest = millis();
+            intercom.sendRequest("getOccupancyMap()", 1000, onOccupancyResponse, onOccupancyTimeout);
+        }
+    }
 }
 
 void Lidar::enable(){

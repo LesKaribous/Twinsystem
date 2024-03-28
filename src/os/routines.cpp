@@ -114,11 +114,15 @@ void onIntercomMessage(const Request& req){
     req_time_sum += req.getResponseTime();
     req_count++;
     avg_reply_time = req_time_sum/req_count;
-    Console::println("AVG reply time : " + String(avg_reply_time));
-    Console::println("reply time : " + String(req.getResponseTime()));
+    //Console::println("AVG reply time : " + String(avg_reply_time));
+    //Console::println("reply time : " + String(req.getResponseTime()));
 }
 
-void onOppenentDetected(const String& arg){
+void onOccupancyResponse(const Request& req){
+    
+}
+
+void onOccupancyTimeout(){
     
 }
 

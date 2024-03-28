@@ -15,4 +15,6 @@ void onIntercomConnected();
 void onIntercomDisconnected();
 
 void onIntercomMessage(const Request&);
-void onOppenentDetected(const String&);
+void onOccupancyResponse(const Request&);
+void onOccupancyTimeout();
+

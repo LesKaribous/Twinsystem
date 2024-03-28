@@ -8,17 +8,16 @@ class Table{
   }
   
   float sdf( PVector pos){
-    PVector p = pos.copy().sub(new PVector(dim.x/2, dim.y/2));
-    PVector d = (new PVector(abs(p.x), abs(p.y))).sub(dim);
+    PVector p = pos.copy().sub(new PVector(dim.x/2.0, dim.y/2.0));
+    PVector d = (new PVector(abs(p.x), abs(p.y))).sub(dim.copy().mult(0.5));
     return (new PVector(max(d.x,0.0), max(d.y,0.0))).mag() + min(max(d.x,d.y),0.0);
   }
   
   PVector grad_sdf(PVector pos){
-    float x = sdf(pos.copy().add(new PVector(1,0,0)));
-    float y = sdf(pos.copy().add(new PVector(0,1,0)));
+    float x = sdf(pos.copy().add(new PVector(0.1,0,0))) - sdf(pos.copy().sub(new PVector(0.1,0,0)));
+    float y = sdf(pos.copy().add(new PVector(0,0.1,0))) - sdf(pos.copy().sub(new PVector(0,0.1,0)));
     PVector grad = new PVector(x, y);
-    grad.normalize();
-    return grad;
+    return grad.normalize();
   }
   
   PVector getCursorPos(){

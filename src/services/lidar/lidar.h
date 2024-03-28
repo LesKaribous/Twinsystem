@@ -17,7 +17,8 @@ public:
     void showStatusLED();
 
 private :
-
+    long m_lastPosUpdate = 0;
+    long m_lastOccupancyRequest = 0;
 
     SERVICE(Lidar);
 };
