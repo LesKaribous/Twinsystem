@@ -8,7 +8,6 @@ Request::Request(const String& content, long timeout, requestCallback_ptr func_c
         _content(content), 
         _response(""), 
         _lastSent(0),
-        _responseTime(0),
         _timeout(timeout),
         _status(Status::IDLE), 
         _callback(func_call),
@@ -28,8 +27,7 @@ Request::Request(int id, const String& content)
         _content(content),
         _response(""), 
         _lastSent(0),
-        _responseTime(0),
-        _timeout(1000),
+        _timeout(0),
         _status(Status::IDLE), 
         _callback(nullptr),
         _timeoutCallback(nullptr)

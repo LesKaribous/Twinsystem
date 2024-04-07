@@ -4,7 +4,7 @@
 #include "utils/geometry.h"
 
 #define INTERCOM_SERIAL Serial1
-#define INTERCOM_BAUDRATE 57600
+#define INTERCOM_BAUDRATE 250000
 
 // Struct definition
 struct  CalibrationProfile{

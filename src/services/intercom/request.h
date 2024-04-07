@@ -22,7 +22,7 @@ public:
     };
     
     Request(int id, const String& content); //When you receive a request
-    Request(const String& payload,  long timeout = 1000, requestCallback_ptr callback = nullptr, callback_ptr timeout_callback = nullptr); //When you send a request
+    Request(const String& payload,  long timeout = 0, requestCallback_ptr callback = nullptr, callback_ptr timeout_callback = nullptr); //When you send a request
 
     void setTimeoutCallback(callback_ptr func);
     void setCallback(requestCallback_ptr func);
@@ -58,7 +58,6 @@ private:
     unsigned long _responseTime;
     unsigned long _timeout;
     static int _uidCounter;
-
     Status _status;
     requestCallback_ptr _callback;
     callback_ptr _timeoutCallback;

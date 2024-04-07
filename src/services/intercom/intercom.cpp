@@ -144,7 +144,7 @@ void Intercom::_processIncomingData() {
                 int crc = incomingMessage.substring(crc_separatorIndex + 1).toInt(); //without crc
                 
                 if(!checkCRC(incomingMessage.substring(0, crc_separatorIndex), crc)){
-                    Console::error("Intercom") << "Bad crc for message " << incomingMessage << Console::endl;
+                    Console::trace("Intercom") << "Bad crc for message " << incomingMessage << Console::endl;
                     continue;
                 }
 
@@ -153,7 +153,7 @@ void Intercom::_processIncomingData() {
                     Request& request = requestIt->second;
                     request.onResponse(responseData);
                 }else{
-                    Console::error("Intercom")<< "not found" << Console::endl;
+                    Console::trace("Intercom")<< "not found" << Console::endl;
                 }
             }
 
@@ -198,8 +198,8 @@ void Intercom::_processPendingRequests() {
         } else if (status == Request::Status::SENT) {
             if (request.isTimedOut()) {
                 request.onTimeout();
-                
             } else {
+                if(millis() - request.getLastSent() > 5)  request.send();
                 ++it;
             }
         } else if (status == Request::Status::OK) {
@@ -212,7 +212,7 @@ void Intercom::_processPendingRequests() {
         }  else if (status == Request::Status::TIMEOUT) {
             request.close();
             //Serial.print(request.getPayload());
-            Console::error("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
+            Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
         } else if (status == Request::Status::ERROR) {
             request.close();
             Console::error("Intercom") << "request " << request.getContent() << " unknown error." << Console::endl;

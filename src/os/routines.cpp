@@ -6,6 +6,10 @@
 #include "os/os.h"
 #include "os/asyncExecutor.h"
 
+
+static int local_counter = 0;
+static int remote_counter = 0;
+
 void robotProgram(){
     Console::println("Started match");
     lidar.enable();
@@ -18,9 +22,13 @@ void robotIdleProgram(){
     static bool buttonWasPressed = false;
     static long lastReq = 0;
 
-    if(millis() - lastReq > 100){
-        intercom.sendRequest("main2lidar", 200, onIntercomRequestReply);
+    if(millis() - lastReq > 30){
+        intercom.sendRequest(String(local_counter++), 30, onIntercomRequestReply);
         lastReq = millis();
+
+        Console::print(local_counter);
+        Console::print(":");
+        Console::println(remote_counter);
     }
 
     if(ihm.hasStarter() && !hadStarter){
@@ -125,9 +133,14 @@ void onIntercomRequestReply(Request& req){
     req_time_sum += req.getResponseTime();
     req_count++;
     avg_reply_time = req_time_sum/req_count;
-    //Console::println(req.getResponse());
-    Console::println("AVG reply time : " + String(avg_reply_time));
-    Console::println("reply time : " + String(req.getResponseTime()));
+
+    if(req.getResponse().startsWith("=")){
+        remote_counter = req.getResponse().substring(1).toInt();
+    }else if(req.getResponse() == req.getContent()){
+        intercom.sendRequest("+", 0);
+    }
+    //Console::println("AVG reply time : " + String(avg_reply_time));
+    //Console::println("reply time : " + String(req.getResponseTime()));
 }
 
 void onOccupancyResponse(Request& req){
