@@ -42,7 +42,7 @@ public:
     
 private:
     uint32_t _uid;
-    String _payload;
+    String _content;
     String _response;
     unsigned long _lastSent;
     unsigned long _responseTime;

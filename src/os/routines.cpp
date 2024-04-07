@@ -89,6 +89,7 @@ void onRobotIdle(){
 void onRobotRun(){
     Console::println("running...");
     ihm.setRobotPosition(motion.getAbsPosition());
+    //lidar.setRobotPosition(motion.getAbsPosition())
 }
 
 void onRobotStop(){

@@ -1,10 +1,12 @@
 #include "intercom.h"
 #include "os/console.h"
+#include "comUtilities.h"
 #define LIDAR_SERIAL Serial1
 
 INSTANTIATE_SERVICE(Intercom)
 
 Intercom::Intercom() : Service(ID_INTERCOM),  _stream(LIDAR_SERIAL) {}
+
 
 void Intercom::onAttach() {
     Console::info() << "Intercom activated" << Console::endl;
@@ -54,9 +56,8 @@ void Intercom::sendMessage(const String& message) {
 
 uint32_t Intercom::sendRequest(const String& payload, long timeout,  requestCallback_ptr cbfunc,  callback_ptr func){
     Request req(payload, timeout, cbfunc, func);
-    req.send(*this);
     _requests.insert({req.ID(), req});
-
+    req.send(*this);
     return req.ID();
 }
 
@@ -120,16 +121,27 @@ void Intercom::_processIncomingData() {
         } else if (incomingMessage.startsWith("pong")) {
             if(!isConnected())onConnectionSuccess();
         }else if (!_requests.empty()) {
-            int separatorIndex = incomingMessage.indexOf(':');
-            if (separatorIndex > 0) {
-                uint32_t responseId = incomingMessage.substring(0, separatorIndex).toInt();
-                String responseData = incomingMessage.substring(separatorIndex + 1);
+            
+            String responseIdRaw = incomingMessage.substring(0, 4);
+            if(responseIdRaw.length() != 4) {
+                //Bad response id
+                continue;
+            }
 
-                auto requestIt = _requests.find(responseId);
-                if (requestIt != _requests.end()) {
-                    Request& request = requestIt->second;
-                    request.onResponse(responseData);
-                }
+            byte buf[4];
+            responseIdRaw.getBytes(buf, 4);
+
+            uint32_t responseId = parseUInt32(buf);
+            String responseData = incomingMessage.substring(5, incomingMessage.length()-1); //without crc
+
+            if(checkCRC(responseData, incomingMessage[incomingMessage.length()-1])){
+                Console::error("Intercom") << "Bad crc for message" << incomingMessage << Console::endl;
+            }
+
+            auto requestIt = _requests.find(responseId);
+            if (requestIt != _requests.end()) {
+                Request& request = requestIt->second;
+                request.onResponse(responseData);
             }
         }
     }
@@ -138,7 +150,6 @@ void Intercom::_processIncomingData() {
 void Intercom::_processPendingRequests() {
     for (auto it = _requests.begin(); it != _requests.end();) {
 
-        
         Request& request = it->second;
         Request::Status status = request.getStatus();
     
@@ -179,9 +190,9 @@ void Intercom::_processPendingRequests() {
 
 uint32_t Request::_uidCounter = 0;
 
-Request::Request(const String& payload, long timeout, requestCallback_ptr func_call, callback_ptr timeout_call)
+Request::Request(const String& content, long timeout, requestCallback_ptr func_call, callback_ptr timeout_call)
     :   _uid(0),
-        _payload(payload), 
+        _content(content), 
         _lastSent(0),
         _responseTime(0),
         _timeout(timeout),
@@ -233,7 +244,7 @@ Request::Status Request::getStatus() const{
 }
 
 const String& Request::getMessage() const{
-    return _payload;
+    return _content;
 }
 
 const String& Request::getResponse() const{
@@ -241,8 +252,24 @@ const String& Request::getResponse() const{
     return _response;
 }
 
+//uuidcontentcrc
 String Request::getPayload() const{
-    return String(String(_uid) + ":" + _payload);
+    u_int size = _content.length();
+    size += 4; // uuid:
+    size += 1; // |crc
+    byte uuid[4];
+    serializeUInt32(uuid, _uid);
+    
+    char rawBuf[size];
+    rawBuf[0] = uuid[0];
+    rawBuf[1] = uuid[1];
+    rawBuf[2] = uuid[2];
+    rawBuf[3] = uuid[3];
+
+    _content.toCharArray(rawBuf, size, 4);
+
+    rawBuf[size-1] = CRC8.smbus((uint8_t*)rawBuf, size-1);
+    return String(rawBuf);
 }
 
 bool Request::isTimedOut() const{
