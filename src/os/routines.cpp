@@ -18,7 +18,7 @@ void robotIdleProgram(){
     static bool buttonWasPressed = false;
     static long lastReq = 0;
 
-    if(millis() - lastReq > 200){
+    if(millis() - lastReq > 100){
         intercom.sendRequest("main2lidar", 200, onIntercomRequestReply);
         lastReq = millis();
     }
@@ -114,23 +114,23 @@ void onIntercomDisconnected(){
 }
 
 
-void onIntercomRequest(const Request& req){
-    Console::println(req.getContent());
+void onIntercomRequest(Request& req){
+    //Console::println(req.getContent());
 }
 
-void onIntercomRequestReply(const Request& req){
+void onIntercomRequestReply(Request& req){
     static long avg_reply_time = 0;
     static long req_count = 0;
     static long req_time_sum = 0;
     req_time_sum += req.getResponseTime();
     req_count++;
     avg_reply_time = req_time_sum/req_count;
-    Console::println(req.getResponse());
-    //Console::println("AVG reply time : " + String(avg_reply_time));
-    //Console::println("reply time : " + String(req.getResponseTime()));
+    //Console::println(req.getResponse());
+    Console::println("AVG reply time : " + String(avg_reply_time));
+    Console::println("reply time : " + String(req.getResponseTime()));
 }
 
-void onOccupancyResponse(const Request& req){
+void onOccupancyResponse(Request& req){
     
 }
 

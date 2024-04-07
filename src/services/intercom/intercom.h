@@ -6,7 +6,7 @@
 class Request;
 
 using messageCallback_ptr = void (*)(const String&);
-using requestCallback_ptr = void (*)(const Request&);
+using requestCallback_ptr = void (*)(Request&);
 
 class Intercom : public Service{
 public:
@@ -21,9 +21,9 @@ public:
     void sendMessage(const char* message);
     void sendMessage(const String& message);
 
-    uint32_t sendRequest(const String& payload, long timeout = 200, requestCallback_ptr cbfunc = nullptr, callback_ptr func = nullptr);
-    bool closeRequest(const uint32_t&);
-    String getRequestResponse(const uint32_t&);
+    int sendRequest(const String& payload, long timeout = 200, requestCallback_ptr cbfunc = nullptr, callback_ptr func = nullptr);
+    bool closeRequest(int);
+    String getRequestResponse(int);
 
     void setConnectLostCallback(callback_ptr callback);
     void setRequestCallback(requestCallback_ptr callback);
@@ -38,7 +38,7 @@ private:
     void connectionSuccess(); 
 
     Stream& _stream;
-    std::map<uint32_t,Request> _sentRequests;
+    std::map<int,Request> _sentRequests;
     //std::map<uint32_t,Request> _receivedRequests;
 
     requestCallback_ptr onRequestCallback = nullptr;

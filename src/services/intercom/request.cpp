@@ -1,7 +1,7 @@
 #include "request.h"
 #include "comUtilities.h"
 
-uint32_t Request::_uidCounter = 0;
+int Request::_uidCounter = 0;
 
 Request::Request(const String& content, long timeout, requestCallback_ptr func_call, callback_ptr timeout_call)
     :   _uid(0),
@@ -23,7 +23,7 @@ Request::Request(const String& content, long timeout, requestCallback_ptr func_c
             _crc = String((int) CRC8.smbus((uint8_t*)payload.c_str(), payload.length()));
         }
 
-Request::Request(uint8_t id, const String& content)
+Request::Request(int id, const String& content)
     :   _uid(id),
         _content(content),
         _response(""), 
@@ -35,11 +35,11 @@ Request::Request(uint8_t id, const String& content)
         _timeoutCallback(nullptr)
         {           
             _prefix = "";
-            _prefix +=  'r';
+            _prefix +=  "r";
             _prefix += String(_uid) + ":";
 
             String payload = _prefix + _content;
-
+            
             _crc = String((int) CRC8.smbus((uint8_t*)payload.c_str(), payload.length()));
         }
 
@@ -60,7 +60,9 @@ void Request::send(){
 void Request::reply(const String& answer){
     _status = Status::CLOSED;
     _lastSent = millis();
-    _response = answer;
+    _content = answer;
+    String payload = _prefix + _content;
+    _crc = String((int) CRC8.smbus((uint8_t*)payload.c_str(), payload.length()));
     Intercom::instance().sendMessage(getPayload());
 }
 
@@ -71,9 +73,9 @@ void Request::close(){
 
 void Request::onResponse(const String& response){
     _status = Status::OK;
-    _responseTime = millis();
+    _responseTime = millis() - _lastSent;
     _response = response;
-    if(_callback) _callback(response);
+    if(_callback) _callback(*this);
 }
 
 void Request::onTimeout(){
@@ -85,7 +87,7 @@ void Request::setStatus(Status status){
     _status = status;
 }
     
-uint32_t Request::ID() const{
+int Request::ID() const{
     return _uid;
 }
 

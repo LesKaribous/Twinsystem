@@ -5,7 +5,7 @@
 class Request;
 
 using messageCallback_ptr = void (*)(const String&);
-using requestCallback_ptr = void (*)(const Request&);
+using requestCallback_ptr = void (*)(Request&);
 
 class Intercom;
 
@@ -21,7 +21,7 @@ public:
         ERROR
     };
     
-    Request(uint8_t id, const String& content); //When you receive a request
+    Request(int id, const String& content); //When you receive a request
     Request(const String& payload,  long timeout = 1000, requestCallback_ptr callback = nullptr, callback_ptr timeout_callback = nullptr); //When you send a request
 
     void setTimeoutCallback(callback_ptr func);
@@ -37,7 +37,7 @@ public:
     
     bool isTimedOut() const;
 
-    uint32_t ID() const;
+    int ID() const;
     Status getStatus() const;
     String getPayload() const;
 
@@ -49,7 +49,7 @@ public:
     unsigned long getLastSent() const;
     
 private:
-    uint32_t _uid;
+    int _uid;
     String _prefix;
     String _crc;
     String _content;
@@ -57,9 +57,9 @@ private:
     unsigned long _lastSent;
     unsigned long _responseTime;
     unsigned long _timeout;
+    static int _uidCounter;
 
     Status _status;
     requestCallback_ptr _callback;
     callback_ptr _timeoutCallback;
-    static uint32_t _uidCounter;
 };
