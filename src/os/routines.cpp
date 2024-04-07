@@ -16,8 +16,12 @@ void robotProgram(){
 void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
+    static long lastReq = 0;
 
-    //intercom.sendRequest("perfTest",100, onIntercomMessage);
+    if(millis() - lastReq > 200){
+        intercom.sendRequest("main2lidar", 200, onIntercomRequestReply);
+        lastReq = millis();
+    }
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -72,6 +76,7 @@ void onRobotBoot(){
     os.attachService(&intercom); ihm.addBootProgress(10);
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);
+    intercom.setRequestCallback(onIntercomRequest);
 
     ihm.drawBootProgress("Linking lidar...");
     os.attachService(&lidar); ihm.addBootProgress(10);
@@ -108,13 +113,19 @@ void onIntercomDisconnected(){
     ihm.setIntercomState(false);
 }
 
-void onIntercomMessage(const Request& req){
+
+void onIntercomRequest(const Request& req){
+    Console::println(req.getContent());
+}
+
+void onIntercomRequestReply(const Request& req){
     static long avg_reply_time = 0;
     static long req_count = 0;
     static long req_time_sum = 0;
     req_time_sum += req.getResponseTime();
     req_count++;
     avg_reply_time = req_time_sum/req_count;
+    Console::println(req.getResponse());
     //Console::println("AVG reply time : " + String(avg_reply_time));
     //Console::println("reply time : " + String(req.getResponseTime()));
 }

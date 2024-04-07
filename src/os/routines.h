@@ -14,7 +14,9 @@ void onTerminalCommand();
 void onIntercomConnected();
 void onIntercomDisconnected();
 
-void onIntercomMessage(const Request&);
+void onIntercomRequest(const Request&);
+void onIntercomRequestReply(const Request&);
+
 void onOccupancyResponse(const Request&);
 void onOccupancyTimeout();
 
