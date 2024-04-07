@@ -166,7 +166,6 @@ void Intercom::_processPendingRequests() {
         } else if (status == Request::Status::SENT) {
             if (request.isTimedOut()) {
                 request.onTimeout();
-                
             } else {
                 ++it;
             }
@@ -178,7 +177,7 @@ void Intercom::_processPendingRequests() {
 
         }  else if (status == Request::Status::TIMEOUT) {
             request.close();
-            Console::error("Intercom") << ": request " << request.getPayload() << "timedout." << Console::endl;
+            Console::error("Intercom") << ": request " << request.getPayload() << "timeout." << Console::endl;
         } else if (status == Request::Status::ERROR) {
             request.close();
             Console::error("Intercom") << ": request " << request.getPayload() << "unknown error." << Console::endl;
@@ -221,14 +220,16 @@ void Request::close(){
 
 void Request::onResponse(const String& response){
     _status = Status::OK;
-    _responseTime = millis();
+    _responseTime = millis() - _lastSent;
     _response = response;
-    if(_callback) _callback(response);
+    if(_callback) _callback(*this);
+    close();
 }
 
 void Request::onTimeout(){
     _status = Status::TIMEOUT;
     if(_timeoutCallback) _timeoutCallback();
+    close();
 }
 
 void Request::setStatus(Status status){

@@ -17,7 +17,10 @@ void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
+    //intercom.sendRequest("perfTest",100, onIntercomMessage);
+
     if(ihm.hasStarter() && !hadStarter){
+        lidar.showRadarLED();
         ihm.freezeSettings();
         hadStarter = true;
         return;
@@ -31,6 +34,7 @@ void robotIdleProgram(){
     
     if(!ihm.hasStarter() && hadStarter &&  ihm.buttonPressed()){
         ihm.unfreezeSettings();
+        lidar.showStatusLED();
         hadStarter = false;
         buttonWasPressed = true;
         return;
@@ -72,6 +76,7 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking lidar...");
     os.attachService(&lidar); ihm.addBootProgress(10);
     delay(100);
+    lidar.showStatusLED();
     lidar.disable();
 
     ihm.drawBootProgress("Linking terminal...");
@@ -87,7 +92,6 @@ void onRobotIdle(){
 }
 
 void onRobotRun(){
-    Console::println("running...");
     ihm.setRobotPosition(motion.getAbsPosition());
     //lidar.setRobotPosition(motion.getAbsPosition())
 }
@@ -104,11 +108,22 @@ void onIntercomDisconnected(){
     ihm.setIntercomState(false);
 }
 
-void onIntercomMessage(const String& message){
+void onIntercomMessage(const Request& req){
+    static long avg_reply_time = 0;
+    static long req_count = 0;
+    static long req_time_sum = 0;
+    req_time_sum += req.getResponseTime();
+    req_count++;
+    avg_reply_time = req_time_sum/req_count;
+    //Console::println("AVG reply time : " + String(avg_reply_time));
+    //Console::println("reply time : " + String(req.getResponseTime()));
+}
+
+void onOccupancyResponse(const Request& req){
     
 }
 
-void onOppenentDetected(const String& arg){
+void onOccupancyTimeout(){
     
 }
 

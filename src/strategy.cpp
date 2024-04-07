@@ -5,7 +5,7 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.7);
+    motion.setFeedrate(0.4);
     //testEvitemment();
     //return;
     if(ihm.isColorBlue()) matchBlue();
@@ -124,15 +124,19 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         async motion.go(target);
     }
     // Poser les plantes
-    actuators.moveElevator(rc,ElevatorPose::GRAB);
+    if(planter)actuators.moveElevator(rc,ElevatorPose::PLANTER);
+    else actuators.moveElevator(rc,ElevatorPose::GRAB);
+    
     waitMs(1000);
     // Ouvrir les bras
-    actuators.open(rc);
-    waitMs(1000);
+    slowOpennig(rc, 50);
     if(planter){
+        // Se reculer un peu (ATTENTION ON EST DE L'AUTRE COTE DE LA BORDURE)
+        motion.setRelative();
+        async motion.goPolar(getCompassOrientation(rc),-10);
+        motion.setAbsolute();
         // Lever l'ascensceur
-        actuators.moveElevator(rc,ElevatorPose::UP);
-        waitMs(1000);
+        SlowElevatorUp(rc, 10);
         // Se reculer
         motion.setRelative();
         async motion.goPolar(getCompassOrientation(rc),-200);
@@ -147,7 +151,6 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         actuators.moveElevator(rc,ElevatorPose::UP);
         waitMs(1000);
     }
-    
     // Vitesse normale
     motion.setFeedrate(0.4);
 }
@@ -164,6 +167,30 @@ void matchBlue(){
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
     async motion.go(110,612); // Dégagement latéral des pots
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
+    // Dégagement de zone
+    //async motion.go(POI::plantSupplySW);
+    async motion.go(887,1000);
+    async motion.go(POI::b2);
+    probeBorder(TableCompass::EAST, RobotCompass::AB,100);
+    probeBorder(TableCompass::SOUTH, RobotCompass::CA,100);
+    async motion.go(POI::b2);
+    // Ajuster le bras pour le panneaux
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::BORDER);
+    waitMs(1000);
+    actuators.close(RobotCompass::AB);
+    waitMs(1000);
+    // S'approcher et tourner les panneaux
+    async motion.go(POI::solarPanelBlue_1);
+    async motion.go(POI::solarPanelBlue_3);
+    async motion.go(850,1670); // Dégagement
+    // Ranger les bras
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.open(RobotCompass::AB);
+    // Aller en zone de recharge 
+    async motion.go(POI::b2);
+    // Fin de match
+    motion.disengage();
+    actuators.disable();
 }
 
 void matchYellow(){
@@ -177,6 +204,48 @@ void waitMs(unsigned long time){
     // To fix with asynch wait
     os.wait(time,false);
     //delay(time); // WIP -> To fix
+}
+
+void SlowElevatorUp(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runElevatorUp(rc)) waitMs(ms);
+}
+
+void SlowElevatorDown(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runElevatorDown(rc)) waitMs(ms);
+}
+
+void SlowElevatorGrab(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runElevatorGrab(rc)) waitMs(ms);
+}
+
+void SlowElevatorPlanter(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runElevatorPlanter(rc)) waitMs(ms);
+}
+
+void SlowClosing(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runClosing(rc)) waitMs(ms);
+}
+
+void slowOpennig(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runOpening(rc)) waitMs(ms);
 }
 
 RobotCompass nextActuator(RobotCompass rc){

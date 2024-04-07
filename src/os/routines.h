@@ -1,5 +1,6 @@
 #pragma once
 #include "os/console.h"
+#include "services/intercom/intercom.h"
 
 void robotIdleProgram();//Execute infinetly before match (onRobotIdle will be executed in parallel (when possible) during this program)
 void robotProgram();//Execute once (onRobotRun will be executed in parallel (when possible) during this program)
@@ -13,5 +14,7 @@ void onTerminalCommand();
 void onIntercomConnected();
 void onIntercomDisconnected();
 
-void onIntercomMessage(const String&);
-void onOppenentDetected(const String&);
+void onIntercomMessage(const Request&);
+void onOccupancyResponse(const Request&);
+void onOccupancyTimeout();
+
