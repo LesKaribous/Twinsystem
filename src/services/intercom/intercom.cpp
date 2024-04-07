@@ -20,7 +20,7 @@ void Intercom::onUpdate() {
     }
     _processPendingRequests();
 
-    if(millis() - _lastPing > 500 && (!_connected || (_connected && millis() - _lastStream > 2000))){
+    if(millis() - _lastPing > 500 && (!_connected || (_connected && millis() - _lastStream > 1000))){
         sendMessage("ping");
         _lastPing = millis();
     }
@@ -185,7 +185,7 @@ void Intercom::_processPendingRequests() {
         Request& request = it->second;
         Request::Status status = request.getStatus();
     
-        if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 1000){
+        if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 300){
             Console::trace("Intercom") << ": request " << request.getContent() << "too old, cleared." << Console::endl;
             request.close();
             ++it;
@@ -199,7 +199,7 @@ void Intercom::_processPendingRequests() {
             if (request.isTimedOut()) {
                 request.onTimeout();
             } else {
-                if(millis() - request.getLastSent() > 5)  request.send();
+                if(millis() - request.getLastSent() > 10)  request.send();
                 ++it;
             }
         } else if (status == Request::Status::OK) {

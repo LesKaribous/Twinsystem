@@ -20,11 +20,11 @@ void Lidar::onUpdate(){
             Vec3 pos = motion.getAbsPosition();
             intercom.sendRequest("setRobotPosition(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z) + ")", 100);
         }
-
+        /*
         if(millis() - m_lastOccupancyRequest > 150){
             m_lastOccupancyRequest = millis();
             intercom.sendRequest("getOccupancyMap()", 1000, onOccupancyResponse, onOccupancyTimeout);
-        }
+        }*/
     }
 }
 
@@ -37,9 +37,11 @@ void Lidar::disable(){
 }
 
 void Lidar::showRadarLED(){
-    intercom.sendRequest("displayLidar",500);
+    intercom.sendRequest("displayLidar",100);
+    Console::println("displayLidar");
 }
 
 void Lidar::showStatusLED(){
-    intercom.sendRequest("displayIntercom",500);
+    intercom.sendRequest("displayIntercom",100);
+    Console::println("displayIntercom");
 }
