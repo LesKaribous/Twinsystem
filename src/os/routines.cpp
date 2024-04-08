@@ -56,6 +56,7 @@ void robotIdleProgram(){
 }
 
 void onRobotBoot(){
+
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10); 
@@ -87,11 +88,23 @@ void onRobotBoot(){
 }
 
 void onRobotIdle(){
-    ihm.setRobotPosition(motion.getAbsPosition());
+    //ihm.setRobotPosition(motion.getAbsPosition());
+
+    static int lastUpdate = 0;
+
+    if(millis() - lastUpdate > 50){
+        lastUpdate = millis();
+        Vec3 pos = motion.getAbsPosition();
+        String posStr = "checkObstacle(";
+        posStr+= String(pos.x) + ",";
+        posStr+= String(pos.y) + ",";
+        posStr+= String(pos.z) + ")";
+        intercom.sendRequest(posStr, 50, onIntercomRequestReply);
+    }
 }
 
 void onRobotRun(){
-    ihm.setRobotPosition(motion.getAbsPosition());
+    //ihm.setRobotPosition(motion.getAbsPosition());
     //lidar.setRobotPosition(motion.getAbsPosition())
 }
 
@@ -113,7 +126,26 @@ void onIntercomRequest(Request& req){
 }
 
 void onIntercomRequestReply(Request& req){
+    if(req.getContent().startsWith("setRobotPosition")){
+        String reqStr = "getRobotPosition()";
+        Console::println(reqStr);
+        intercom.sendRequest(reqStr, 10);
+    }else if(req.getContent().startsWith("getRobotPosition")){
+        Console::println(req.getResponse());
+        String str = req.getResponse();
+        int indexOpen = str.indexOf("(");
+        int indexClose = str.indexOf(")");
 
+        if(indexOpen >= 0 && indexClose >= 1 ){
+            std::vector<String> posVec = CommandHandler::extractArguments(str.substring(indexOpen+1, indexClose));
+            if(posVec.size() == 3){
+                ihm.setRobotPosition(Vec3(posVec[0].toInt(), posVec[1].toInt(), posVec[2].toInt()));
+            }
+        
+        }
+
+        
+    }
 }
 
 void onOccupancyResponse(Request& req){
