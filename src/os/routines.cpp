@@ -89,13 +89,13 @@ void onRobotBoot(){
 
 void onRobotIdle(){
     //ihm.setRobotPosition(motion.getAbsPosition());
-
     static int lastUpdate = 0;
 
-    if(millis() - lastUpdate > 50){
+    if(millis() - lastUpdate > 100){
+        //Console::println("setRobotPosition sent");
         lastUpdate = millis();
         Vec3 pos = motion.getAbsPosition();
-        String posStr = "checkObstacle(";
+        String posStr = "setRobotPosition(";
         posStr+= String(pos.x) + ",";
         posStr+= String(pos.y) + ",";
         posStr+= String(pos.z) + ")";
@@ -127,24 +127,35 @@ void onIntercomRequest(Request& req){
 
 void onIntercomRequestReply(Request& req){
     if(req.getContent().startsWith("setRobotPosition")){
-        String reqStr = "getRobotPosition()";
-        Console::println(reqStr);
-        intercom.sendRequest(reqStr, 10);
-    }else if(req.getContent().startsWith("getRobotPosition")){
-        Console::println(req.getResponse());
-        String str = req.getResponse();
-        int indexOpen = str.indexOf("(");
-        int indexClose = str.indexOf(")");
+        Console::println("setRobotPosition replied successfully");
+        String command = req.getResponse();
+        Console::println(command);
+        int openBracket = command.indexOf("(");
+        int closedBracket = command.indexOf(")");
+        if(openBracket == -1 || closedBracket == -1)return;
 
-        if(indexOpen >= 0 && indexClose >= 1 ){
-            std::vector<String> posVec = CommandHandler::extractArguments(str.substring(indexOpen+1, indexClose));
-            if(posVec.size() == 3){
-                ihm.setRobotPosition(Vec3(posVec[0].toInt(), posVec[1].toInt(), posVec[2].toInt()));
-            }
+        String argString = command.substring(openBracket + 1, closedBracket);
+
+        std::vector<String> args;
+        int comma;
         
+        comma = argString.indexOf(",");if(comma == -1) return;
+        args.push_back(argString.substring(0, comma));
+        argString = argString.substring(comma+1);
+
+        comma = argString.indexOf(",");if(comma == -1) return;
+        args.push_back(argString.substring(0, comma));
+        argString = argString.substring(comma+1);
+
+        args.push_back(argString);
+
+        if(args.size() == 3){
+            float x = args[0].toFloat();
+            float y = args[1].toFloat();
+            float z = args[2].toFloat();
+
+            ihm.setRobotPosition({x, y, z});
         }
-
-        
     }
 }
 
