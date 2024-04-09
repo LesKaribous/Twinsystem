@@ -16,6 +16,8 @@ public:
     void showRadarLED();
     void showStatusLED();
 
+    void setLidarPosition(Vec3 pos);
+
 private :
     long m_lastPosUpdate = 0;
     long m_lastOccupancyRequest = 0;

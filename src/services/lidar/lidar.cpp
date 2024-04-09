@@ -45,3 +45,16 @@ void Lidar::showStatusLED(){
     intercom.sendRequest("displayIntercom",100);
     Console::println("displayIntercom");
 }
+
+void Lidar::setLidarPosition(Vec3 pos){
+    static Vec3 lastPos = Vec3(0);
+
+    if(lastPos != pos){
+        lastPos = pos;
+        String posStr = "setRobotPosition(";
+        posStr+= String(pos.x) + ",";
+        posStr+= String(pos.y) + ",";
+        posStr+= String(pos.z) + ")";
+        intercom.sendRequest(posStr, 50, onIntercomRequestReply);
+    }
+}

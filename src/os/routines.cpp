@@ -17,6 +17,10 @@ void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
+
+    ihm.setRobotPosition(motion.getAbsPosition());
+    lidar.setLidarPosition(motion.getAbsPosition());
+    
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
         ihm.freezeSettings();
@@ -88,24 +92,13 @@ void onRobotBoot(){
 }
 
 void onRobotIdle(){
-    //ihm.setRobotPosition(motion.getAbsPosition());
-    static int lastUpdate = 0;
-
-    if(millis() - lastUpdate > 100){
-        //Console::println("setRobotPosition sent");
-        lastUpdate = millis();
-        Vec3 pos = motion.getAbsPosition();
-        String posStr = "setRobotPosition(";
-        posStr+= String(pos.x) + ",";
-        posStr+= String(pos.y) + ",";
-        posStr+= String(pos.z) + ")";
-        intercom.sendRequest(posStr, 50, onIntercomRequestReply);
-    }
+    ihm.setRobotPosition(motion.getAbsPosition());
+    lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotRun(){
-    //ihm.setRobotPosition(motion.getAbsPosition());
-    //lidar.setRobotPosition(motion.getAbsPosition())
+    ihm.setRobotPosition(motion.getAbsPosition());
+    lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotStop(){
@@ -128,34 +121,6 @@ void onIntercomRequest(Request& req){
 void onIntercomRequestReply(Request& req){
     if(req.getContent().startsWith("setRobotPosition")){
         Console::println("setRobotPosition replied successfully");
-        String command = req.getResponse();
-        Console::println(command);
-        int openBracket = command.indexOf("(");
-        int closedBracket = command.indexOf(")");
-        if(openBracket == -1 || closedBracket == -1)return;
-
-        String argString = command.substring(openBracket + 1, closedBracket);
-
-        std::vector<String> args;
-        int comma;
-        
-        comma = argString.indexOf(",");if(comma == -1) return;
-        args.push_back(argString.substring(0, comma));
-        argString = argString.substring(comma+1);
-
-        comma = argString.indexOf(",");if(comma == -1) return;
-        args.push_back(argString.substring(0, comma));
-        argString = argString.substring(comma+1);
-
-        args.push_back(argString);
-
-        if(args.size() == 3){
-            float x = args[0].toFloat();
-            float y = args[1].toFloat();
-            float z = args[2].toFloat();
-
-            ihm.setRobotPosition({x, y, z});
-        }
     }
 }
 
