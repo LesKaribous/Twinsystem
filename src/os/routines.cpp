@@ -17,8 +17,8 @@ void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    //intercom.sendRequest("perfTest",100, onIntercomMessage);
-
+    ihm.setRobotPosition(motion.getAbsPosition());
+    
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
         ihm.freezeSettings();
@@ -58,6 +58,7 @@ void robotIdleProgram(){
 }
 
 void onRobotBoot(){
+
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10); 
@@ -72,12 +73,13 @@ void onRobotBoot(){
     os.attachService(&intercom); ihm.addBootProgress(10);
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);
+    intercom.setRequestCallback(onIntercomRequest);
 
     ihm.drawBootProgress("Linking lidar...");
     os.attachService(&lidar); ihm.addBootProgress(10);
     delay(100);
     lidar.showStatusLED();
-    lidar.disable();
+    lidar.enable();//lidar.disable();
 
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
@@ -89,10 +91,12 @@ void onRobotBoot(){
 
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotRun(){
     ihm.setRobotPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotStop(){
@@ -107,18 +111,16 @@ void onIntercomDisconnected(){
     ihm.setIntercomState(false);
 }
 
-void onIntercomMessage(const Request& req){
-    static long avg_reply_time = 0;
-    static long req_count = 0;
-    static long req_time_sum = 0;
-    req_time_sum += req.getResponseTime();
-    req_count++;
-    avg_reply_time = req_time_sum/req_count;
-    //Console::println("AVG reply time : " + String(avg_reply_time));
-    //Console::println("reply time : " + String(req.getResponseTime()));
+
+void onIntercomRequest(Request& req){
+
 }
 
-void onOccupancyResponse(const Request& req){
+void onIntercomRequestReply(Request& req){
+
+}
+
+void onOccupancyResponse(Request& req){
     
 }
 

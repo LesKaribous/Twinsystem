@@ -4,6 +4,7 @@
 
 void setup(){
 	Console::init();
+	Console::setLevel(ConsoleLevel::INFO);
 
 	os.setRountine(OS::BOOT, onRobotBoot);		//Execute once						(setup)
 	os.setRountine(OS::IDLE, onRobotIdle);		//Execute during preparation phase 	(loop)

@@ -3,6 +3,9 @@
 #include "pin.h"
 #include "utils/geometry.h"
 
+#define INTERCOM_SERIAL Serial1
+#define INTERCOM_BAUDRATE 31250
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,

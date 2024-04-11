@@ -6,6 +6,7 @@ enum ConsoleLevel {
     SUCCESS,
     WARNING,
     CRITICAL,
+    DISABLED
 };
 
 
