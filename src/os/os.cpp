@@ -145,17 +145,17 @@ void OS::wait(unsigned long time, bool runasync) {
     m_timer.setDuration(time);
     m_timer.start();
     addJob(&m_timer);
-    if(!runasync)while(m_timer.isPending())run();
+    if(!runasync)while(m_timer.isPending()|| m_timer.isPaused())run();
 }
 
 void OS::waitUntil(Job& obj, bool runasync){
     addJob(&obj);
-    if(!runasync) while(obj.isPending()) run();
+    if(!runasync) while(obj.isPending() || obj.isPaused()) run();
 }
 
 void OS::execute(Job& obj, bool runasync){
     addJob(&obj);
-    if(!runasync)while(obj.isPending()) run();
+    if(!runasync)while(obj.isPending()|| obj.isPaused()) run();
 }
 
 void OS::flush(){

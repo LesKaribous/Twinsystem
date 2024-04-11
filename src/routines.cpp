@@ -3,6 +3,7 @@
 #include "robot.h"
 #include "strategy.h"
 #include "os/os.h"
+#include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
 
 
@@ -13,12 +14,22 @@ void robotProgram(){
     motion.disable();
 }
 
+void distanceCB(Request& req){
+    int d = req.getResponse().toInt();
+    Console::println(">Distance:" + String(d));
+}
+
 void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
     ihm.setRobotPosition(motion.getAbsPosition());
     
+    RUN_EVERY(
+        //int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
+        intercom.sendRequest("getDistance(90)", 100, distanceCB);
+    , 50)
+
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
         ihm.freezeSettings();
@@ -65,6 +76,9 @@ void onRobotBoot(){
     
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
+
+    ihm.drawBootProgress("Linking safety...");
+    os.attachService(&safety); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);

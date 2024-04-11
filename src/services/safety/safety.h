@@ -13,6 +13,6 @@ public:
     SERVICE(Safety)
 
 private:
-    int m_currentDistance;
+    int m_currentDistance = infinity();
 };
 EXTERN_DECLARATION(Safety, safety)

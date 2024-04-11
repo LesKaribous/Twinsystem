@@ -9,7 +9,8 @@ INSTANTIATE_SERVICE(Safety, safety)
 
 void getDistanceCallback(Request& req){
     int d = req.getResponse().toInt();
-    if(d > 10 && d < 1000) safety.setSafeDistance(d);
+    Console::println(d);
+    if(d > 10 && d < 3000) safety.setSafeDistance(d);
 }
 
 void Safety::onAttach(){
@@ -25,8 +26,10 @@ void Safety::onUpdate(){
 
     if(motion.isMoving() && m_currentDistance < 300){
         motion.pause();
+        Console::println("pause");
     }else if(motion.isPaused() && m_currentDistance > 300){
         motion.resume();
+        Console::println("resume");
     }
 }
 
