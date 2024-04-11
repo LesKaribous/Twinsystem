@@ -14,10 +14,11 @@ void Lidar::onAttach(){
 }
 
 void Lidar::onUpdate(){
+    static Vec3 pos;
     if(enabled()){
-        if(millis() - m_lastPosUpdate > 100){
+        if(millis() - m_lastPosUpdate > 100 && Vec3::distanceBetween(pos, motion.getAbsPosition()) > 10){
             m_lastPosUpdate = millis();
-            Vec3 pos = motion.getAbsPosition();
+            pos = motion.getAbsPosition();
             intercom.sendRequest("setRobotPosition(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z) + ")", 100);
         }
         /*
@@ -44,17 +45,4 @@ void Lidar::showRadarLED(){
 void Lidar::showStatusLED(){
     intercom.sendRequest("displayIntercom",100);
     Console::println("displayIntercom");
-}
-
-void Lidar::setLidarPosition(Vec3 pos){
-    static Vec3 lastPos = Vec3(0);
-
-    if(lastPos != pos){
-        lastPos = pos;
-        String posStr = "setRobotPosition(";
-        posStr+= String(pos.x) + ",";
-        posStr+= String(pos.y) + ",";
-        posStr+= String(pos.z) + ")";
-        intercom.sendRequest(posStr, 50, onIntercomRequestReply);
-    }
 }

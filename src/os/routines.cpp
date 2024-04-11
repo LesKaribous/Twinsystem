@@ -17,9 +17,7 @@ void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-
     ihm.setRobotPosition(motion.getAbsPosition());
-    lidar.setLidarPosition(motion.getAbsPosition());
     
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -81,7 +79,7 @@ void onRobotBoot(){
     os.attachService(&lidar); ihm.addBootProgress(10);
     delay(100);
     lidar.showStatusLED();
-    lidar.disable();
+    lidar.enable();//lidar.disable();
 
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
@@ -93,12 +91,12 @@ void onRobotBoot(){
 
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
-    lidar.setLidarPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotRun(){
     ihm.setRobotPosition(motion.getAbsPosition());
-    lidar.setLidarPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotStop(){
@@ -119,9 +117,7 @@ void onIntercomRequest(Request& req){
 }
 
 void onIntercomRequestReply(Request& req){
-    if(req.getContent().startsWith("setRobotPosition")){
-        Console::println("setRobotPosition replied successfully");
-    }
+
 }
 
 void onOccupancyResponse(Request& req){
