@@ -2,7 +2,7 @@
 #include "settings.h"
 #include "os/console.h"
 
-INSTANTIATE_SERVICE(Actuators)
+INSTANTIATE_SERVICE(Actuators, actuators)
 
 #define _GS_ Settings::Actuators::Gripper
 #define _CPS_ Settings::Actuators::cherryPicker

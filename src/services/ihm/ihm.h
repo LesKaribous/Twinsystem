@@ -94,3 +94,5 @@ private:
 
     int bootProgress = 0;
 };
+
+EXTERN_DECLARATION(IHM, ihm)

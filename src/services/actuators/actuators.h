@@ -165,3 +165,4 @@ private :
     SERVICE(Actuators)
 };
 
+EXTERN_DECLARATION(Actuators, actuators)

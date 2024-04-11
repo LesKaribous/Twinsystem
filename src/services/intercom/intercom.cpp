@@ -2,7 +2,7 @@
 #include "os/console.h"
 #define LIDAR_SERIAL Serial1
 
-INSTANTIATE_SERVICE(Intercom)
+INSTANTIATE_SERVICE(Intercom, intercom)
 
 Intercom::Intercom() : Service(ID_INTERCOM),  _stream(LIDAR_SERIAL) {}
 

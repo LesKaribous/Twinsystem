@@ -5,7 +5,7 @@
 #include "os/console.h"
 #include "motion.h"
 
-INSTANTIATE_SERVICE(Motion)
+INSTANTIATE_SERVICE(Motion, motion)
 
 Motion::Motion() : Service(ID_MOTION),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),

@@ -22,3 +22,5 @@ private :
 
     SERVICE(Lidar);
 };
+
+EXTERN_DECLARATION(Lidar, lidar)

@@ -2,7 +2,7 @@
 #include "settings.h"
 #include "os/console.h"
 
-INSTANTIATE_SERVICE(IHM)
+INSTANTIATE_SERVICE(IHM, ihm)
 
 IHM::IHM() : Service(ServiceID::ID_IHM), 
     starter(Pin::Inputs::starter),

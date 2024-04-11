@@ -3,6 +3,8 @@
 
 OS OS::m_instance;
 
+OS& os = OS::instance();
+
 void OS::run(){
     switch(m_state){
         case BOOT:
@@ -139,21 +141,21 @@ void OS::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
-void OS::wait(unsigned long time, bool async) {
+void OS::wait(unsigned long time, bool runasync) {
     m_timer.setDuration(time);
     m_timer.start();
     addJob(&m_timer);
-    if(!async)while(m_timer.isPending())run();
+    if(!runasync)while(m_timer.isPending())run();
 }
 
-void OS::waitUntil(Job& obj, bool async){
+void OS::waitUntil(Job& obj, bool runasync){
     addJob(&obj);
-    if(!async) while(obj.isPending()) run();
+    if(!runasync) while(obj.isPending()) run();
 }
 
-void OS::execute(Job& obj, bool async){
+void OS::execute(Job& obj, bool runasync){
     addJob(&obj);
-    if(!async)while(obj.isPending()) run();
+    if(!runasync)while(obj.isPending()) run();
 }
 
 void OS::flush(){

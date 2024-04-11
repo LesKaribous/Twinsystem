@@ -15,7 +15,6 @@
 #include <utility/imumaths.h>
 #include <SPI.h>
 
-
 class MotionPID : public Service, public Job{
 public:
 

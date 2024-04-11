@@ -100,3 +100,4 @@ private :
 
     SERVICE(Motion);
 };
+EXTERN_DECLARATION(Motion, motion)

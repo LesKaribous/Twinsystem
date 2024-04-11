@@ -7,6 +7,7 @@ enum ServiceID{
     ID_LIDAR,
     ID_CHRONO,
     ID_IHM,
+    ID_SAFETY,
     ID_MOTION,
     ID_MOTION_PID,
     ID_PLANNER,
@@ -48,7 +49,8 @@ INSTANTIATE_SERVICE(Actuators)
 private: \
     static X m_instance;
 
-#define INSTANTIATE_SERVICE(X) X X::m_instance;
+#define INSTANTIATE_SERVICE(className, name) className className::m_instance; className& name = className::instance();
+#define EXTERN_DECLARATION(className, name) extern className& name;
 
 class Service{
 private:

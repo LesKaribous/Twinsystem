@@ -99,4 +99,4 @@ private:
 
     SERVICE(Intercom)
 };
-
+EXTERN_DECLARATION(Intercom, intercom)
