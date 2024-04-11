@@ -1,7 +1,7 @@
 #include "strategy.h"
 #include "poi.h"
 #include "robot.h"
-#include "os/routines.h"
+#include "routines.h"
 
 void match(){
     //start match

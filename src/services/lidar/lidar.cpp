@@ -1,6 +1,6 @@
 #include "lidar.h"
-#include "os/routines.h"
 #include "os/console.h"
+#include "services/intercom/intercom.h"
 #include "services/motion/motion.h"
 
 INSTANTIATE_SERVICE(Lidar, lidar)
