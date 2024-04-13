@@ -20,6 +20,17 @@ void getDistanceCallback(Request& req){
     //Console::println( d );
 }
 
+
+void Safety::enable(){
+    Service::enable();
+}
+
+void Safety::disable(){
+    Service::disable();
+    m_obstacleDetected = false;
+}
+
+
 void Safety::onAttach(){
 }
 
@@ -35,8 +46,8 @@ void Safety::onUpdate(){
 
     
     if(m_obstacleDetected/*m_currentDistance <= 350*/){
-        if(motion.isMoving()) motion.pause();
-        m_lastSeen = millis();
+        if(motion.isMoving() && !motion.isRotating()) motion.pause();
+        if(!motion.isRotating()) m_lastSeen = millis();
     }
 
     

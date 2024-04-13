@@ -4,6 +4,9 @@
 class Safety : public Service{
 public:
 
+    void enable() override;
+    void disable() override;
+
     void onAttach()override;
     void onUpdate()override;
 
