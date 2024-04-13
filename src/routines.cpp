@@ -152,6 +152,7 @@ void onIntercomRequestReply(Request& req){
 void onMatchNearEnd(){
     motion.cancel();
     motion.setFeedrate(1.0);
+    motion.setAbsolute();
     if(ihm.isColorBlue()) async motion.go(POI::b2);
     else async motion.go(POI::y2);
     onMatchEnd();
