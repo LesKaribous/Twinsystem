@@ -5,7 +5,7 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(1.0);
     //testEvitemment();
     //return;
     if(ihm.isColorBlue()) matchBlue();
@@ -57,7 +57,7 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
     float newTargetY = target.y;
 
     // Ralentir
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.6);
 
     // Mettre les bras en position Grab
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
@@ -100,14 +100,14 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
         if(i<2) async motion.align(rc, getCompassOrientation(tc)); // Ne pas effectuer la rotation sur la derniere action
     }
 
-    motion.setFeedrate(0.6);    
+    motion.setFeedrate(1.0);    
 }
 
 void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
 
     float clearance = 200.0;
     // Ralentir
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.6);
     // Vérifier que le bras est en position UP
     actuators.moveElevator(rc,ElevatorPose::UP);
     // S'orienter vers la position de placement
@@ -154,17 +154,19 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         //waitMs(1000);
     }
     // Vitesse normale
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(1.0);
 }
 
 void matchBlue(){
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(1.0);
     async motion.go(1000,400);
     // Macro to take plants
     takePlants(POI::plantSupplySW, RobotCompass::CA, TableCompass::EAST);
     // Macro place plants
     placePlants(POI::planterBlueWest, RobotCompass::AB, TableCompass::WEST);
     placePlants(POI::b1, RobotCompass::BC, TableCompass::WEST, false);
+    ihm.addScorePoints(8);
+
     // Dégagement des pots
     async motion.go(200,300); // Possitionnement face bordure
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
@@ -197,7 +199,7 @@ void matchBlue(){
 }
 
 void matchYellow(){
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(1.0);
     async motion.go(2000,400);
     // Macro to take plants
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
@@ -307,7 +309,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     //motion.setSync();
     //Console::println("Recalling");
 
-    motion.setFeedrate(0.15);
+    motion.setFeedrate(0.4);
 	async motion.align(rc, getCompassOrientation(tc));
 
     motion.setRelative();

@@ -35,13 +35,15 @@ void Safety::onAttach(){
 }
 
 void Safety::onUpdate(){
+    if(!enabled()){return;}
+
     RUN_EVERY(
         if(!motion.hasFinished()){
             int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
             //intercom.sendRequest("getDistance("+ String(streer) +")", 100, getDistanceCallback);
             //Console::println( String("streer:") + String(streer));
             intercom.sendRequest("checkObstacle("+ String(streer) +")", 100, getDistanceCallback);
-            Serial.println(m_obstacleDetected);
+            //Serial.println(m_obstacleDetected);
         }
     , 100)
 
@@ -51,6 +53,7 @@ void Safety::onUpdate(){
         if(!motion.isRotating()) m_lastSeen = millis();
     }
 
+    if(millis() - m_lastSeen > 2000) m_obstacleDetected = false;
     
     if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
         motion.resume();

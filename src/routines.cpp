@@ -2,6 +2,7 @@
 #include "os/commands.h"
 #include "robot.h"
 #include "strategy.h"
+#include "poi.h"
 #include "os/os.h"
 #include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
@@ -84,8 +85,8 @@ void onRobotBoot(){
     os.attachService(&chrono); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking safety...");
-    safety.disable();
     os.attachService(&safety); ihm.addBootProgress(10);
+    safety.disable();
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
@@ -114,9 +115,11 @@ void onRobotBoot(){
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
     
+    RUN_EVERY(
     int streer = round(RAD_TO_DEG * motion.getAbsoluteTargetDirection()); //We are moving in this direction
     Console::print(">streer:");
     Console::println(streer);
+    , 100)
     //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
@@ -147,15 +150,20 @@ void onIntercomRequestReply(Request& req){
 }
 
 void onMatchNearEnd(){
+    motion.cancel();
+    motion.setFeedrate(1.0);
+    if(ihm.isColorBlue()) async motion.go(POI::b2);
+    else async motion.go(POI::y2);
+    onMatchEnd();
+}
+
+void onMatchEnd(){
     safety.disable();
     lidar.disable();
     motion.pause(); //pause the program if possible
     motion.disable();
     actuators.disable();
     actuators.disable();
-}
-
-void onMatchEnd(){
     os.stop();
 }
 

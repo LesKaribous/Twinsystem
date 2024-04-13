@@ -403,6 +403,10 @@ void IHM::setTime(int t){
     time.SetValue(t);
 }
 
+void IHM::addScorePoints(int p){
+    score.SetValue(score.getValue() + p);
+}
+
 void IHM::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();

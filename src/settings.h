@@ -32,8 +32,8 @@ namespace Settings{
         YELLOW  = true;
 
         constexpr unsigned long 
-        DURATION = 100*1000,        //100s
-        NEARLY_FINISH = 10 * 1000,       //10s before the end
+        DURATION = 90*1000,        //100s
+        NEARLY_FINISH = 5 * 1000,       //10s before the end
         ENDMATCH = 200;             //200ms before the end
         
         constexpr float 
@@ -87,10 +87,10 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 5000, // Old : 5000
-            SPEED = 8000, // Old : 5000
-            TURN_SPEED = 6000, // Old : 5000
-            PULLIN = 200,
+            ACCEL = 1000, // equivalent fullsteps/s^2
+            SPEED = 600, // equivalent fullsteps/s
+            TURN_SPEED = 500, // Old : 5000
+            PULLIN = 20,
             PID_MAX_PERIOD = 10,//ms
             PID_MIN_PERIOD = 5,//ms
             PID_INTERVAL = 10000;//microseconds
@@ -109,7 +109,7 @@ namespace Settings{
         DIR_C_POLARITY = true;
 
         constexpr u_int8_t 
-        STEP_MODE = 8;
+        STEP_MODE = 4;
     }
 
     namespace Lidar{

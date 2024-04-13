@@ -8,6 +8,9 @@ ServiceID Service::toID(String str){
     if(str.equalsIgnoreCase("CHRONO"))
         return ID_CHRONO;
 
+    if(str.equalsIgnoreCase("SAFETY"))
+        return ID_SAFETY;
+
     if(str.equalsIgnoreCase("IHM"))
         return ID_IHM;
 
@@ -41,6 +44,9 @@ ServiceID Service::toID(String str){
 
     if(id == ID_CHRONO)
         return "CHRONO";
+
+    if(id == ID_SAFETY)
+        return "SAFETY";
 
     if(id == ID_IHM)
         return "IHM";

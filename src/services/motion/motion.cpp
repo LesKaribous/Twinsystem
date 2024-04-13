@@ -43,13 +43,13 @@ void Motion::onAttach(){
     _sB.setInverseRotation(Settings::Stepper::DIR_B_POLARITY);
     _sC.setInverseRotation(Settings::Stepper::DIR_C_POLARITY);
 
-    _sA.setMaxSpeed(Settings::Motion::SPEED);
-    _sB.setMaxSpeed(Settings::Motion::SPEED);
-    _sC.setMaxSpeed(Settings::Motion::SPEED);
+    _sA.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
+    _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
+    _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
 
-    _sA.setAcceleration(Settings::Motion::ACCEL);
-    _sB.setAcceleration(Settings::Motion::ACCEL);
-    _sC.setAcceleration(Settings::Motion::ACCEL);
+    _sA.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
+    _sB.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
+    _sC.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
 
     /* Initialise the sensor */
     /*while(!bno.begin()){
@@ -373,9 +373,9 @@ void  Motion::setAbsPosition(Vec3 newPos){
 }
 
 void Motion::setStepsVelocity(float v){
-    _sA.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
-    _sB.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
-    _sC.setMaxSpeed(min(max(m_feedrate * v, Settings::Motion::PULLIN), Settings::Motion::SPEED));
+    _sA.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    _sB.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    _sC.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
 }
 
 void Motion::setAbsTarget(Vec3 newTarget)

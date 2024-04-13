@@ -188,10 +188,13 @@ namespace TeensyStep
     template <typename a, typename t>
     void StepControlBase<a, t>::stop()
     {
+        Serial.print("ts:stop");
         stopAsync();
         while (this->isRunning())
         {
+            
             delay(1);
         }
+        Serial.print("ts:stopdone");
     }
 }

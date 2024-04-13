@@ -45,6 +45,7 @@ public:
     void waitButtonRelease();
     void setIntercomState(bool);
     void setTime(int t);
+    void addScorePoints(int t);
 
 private:
     void clear();
