@@ -7,6 +7,8 @@ void registerCommands() {
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
     CommandHandler::registerCommand("disable(service)", "Disable a specific service", command_disable);
     CommandHandler::registerCommand("status(service)", "Display single status", command_status);
+    CommandHandler::registerCommand("getDistance(angle)", "Send a distance request to TwinLidar", command_getDistance);
+    CommandHandler::registerCommand("lidarMode(mode)", "Change neopixel display mode on lidar", command_lidarMode);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
     CommandHandler::registerCommand("move(x,y,angle)", "Move to a specific position", command_move);
@@ -21,6 +23,7 @@ void registerCommands() {
     CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode", command_setAbsolute);
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode", command_setRelative);
     CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
+    CommandHandler::registerCommand("setAbsolutePosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0", command_resetCompass);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
@@ -73,6 +76,20 @@ void command_debug(const args_t& args){
         os.toggleDebug(serviceID);
         Console::info("Interpreter") << args[0] <<  " debug : "  << (OS::instance().debug(serviceID) ? "ON" : "OFF") << Console::endl;
     }
+}
+
+
+//Lidar
+void command_getDistance(const args_t& args){
+    if(args.size() != 1) return;
+    int angle = args[0].toInt();
+    if(angle > 0 && angle < 360) askDistance(angle);
+}
+
+void command_lidarMode(const args_t& args){
+    if(args.size() != 1) return;
+    if(args[0].equalsIgnoreCase("radar"))lidar.showRadarLED();
+    else if(args[0].equalsIgnoreCase("intercom"))lidar.showStatusLED();
 }
 
 
@@ -163,7 +180,7 @@ void command_setAbsPosition(const args_t& args){
     if(args.size() != 3)return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
-    float angle = args[2].toFloat();
+    float angle = args[2].toFloat() * DEG_TO_RAD;
     motion.setAbsPosition({x, y, angle});
 }
 

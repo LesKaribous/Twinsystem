@@ -12,6 +12,9 @@ void command_status(const args_t& args); //Display single status
 void command_debug(const args_t& args); //Display all status
 void command_debug(const args_t& args); //Display single status
 
+void command_lidarMode(const args_t& args);
+void command_getDistance(const args_t& args);
+
 //Motion
 void command_go(const args_t& args);
 void command_goPolar(const args_t& args);

@@ -206,6 +206,9 @@ void Motion::pause(){
 
 void Motion::resume(){
     Job::resume();
+    _sA.setTargetAbs(_stepsTarget.a);
+    _sB.setTargetAbs(_stepsTarget.b);
+    _sC.setTargetAbs(_stepsTarget.c);
     _steppers.moveAsync(_sA, _sB, _sC); // set new speed
 }
 
@@ -237,7 +240,7 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
-    _startPosition = _position = _target;
+    //_startPosition = _position = _target;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
     _sB.setPosition(0);

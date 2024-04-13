@@ -20,17 +20,15 @@ void distanceCB(Request& req){
     Console::println(">Distance:" + String(d));
 }
 
+void askDistance(int angle){
+    intercom.sendRequest("getDistance(" + String(angle) +")", 100, distanceCB);
+}
+
 void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
     ihm.setRobotPosition(motion.getAbsPosition());
-    
-    RUN_EVERY(
-        //int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
-        int streer = 45;
-        intercom.sendRequest("getDistance(" + String(streer) +")", 100, distanceCB);
-    , 100)
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -108,6 +106,10 @@ void onRobotBoot(){
 
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
+    
+    int streer = round(RAD_TO_DEG * motion.getAbsoluteTargetDirection()); //We are moving in this direction
+    Console::print(">streer:");
+    Console::println(streer);
     //lidar.setLidarPosition(motion.getAbsPosition());
 }
 

@@ -5,7 +5,7 @@
 
 void match(){
     //start match
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.6);
     //testEvitemment();
     //return;
     if(ihm.isColorBlue()) matchBlue();
