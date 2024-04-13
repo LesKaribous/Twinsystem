@@ -25,8 +25,9 @@ void recalage(){
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
     }
     else{
+        motion.setAbsPosition({-1,-1,PI});
         probeBorder(TableCompass::NORTH, RobotCompass::BC,100);
-        probeBorder(TableCompass::EAST,  RobotCompass::BC,100);
+        probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
         async motion.go(POI::y1);
         async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
         actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
@@ -52,11 +53,11 @@ void testEvitemment(){
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
     float startOffset = 260.0;
     float grabOffset = 80.0;
-    float pushOffset = 60.0;
+    float pushOffset = 70.0;
     float newTargetY = target.y;
 
     // Ralentir
-    motion.setFeedrate(0.25);
+    motion.setFeedrate(0.4);
 
     // Mettre les bras en position Grab
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
@@ -79,7 +80,7 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
         }
         // Rapprocher les plantes
         actuators.close(rc);
-        waitMs(1000);
+        waitMs(500);
 
         // Avancer un peu avant de grab
         if(tc == TableCompass::EAST) async motion.go(target.x, newTargetY + pushOffset);
@@ -87,7 +88,7 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
 
         // Prendre les plantes
         actuators.grab(rc);
-        waitMs(1000);
+        waitMs(500);
 
         // Reculer
         if(tc == TableCompass::EAST) async motion.go(target.x, newTargetY);
@@ -99,7 +100,7 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
         if(i<2) async motion.align(rc, getCompassOrientation(tc)); // Ne pas effectuer la rotation sur la derniere action
     }
 
-    motion.setFeedrate(0.25);    
+    motion.setFeedrate(0.6);    
 }
 
 void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
@@ -127,7 +128,7 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
     if(planter)actuators.moveElevator(rc,ElevatorPose::PLANTER);
     else actuators.moveElevator(rc,ElevatorPose::GRAB);
     
-    waitMs(1000);
+    waitMs(800);
     // Ouvrir les bras
     slowOpennig(rc, 50);
     if(planter){
@@ -136,26 +137,28 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         async motion.goPolar(getCompassOrientation(rc),-10);
         motion.setAbsolute();
         // Lever l'ascensceur
-        SlowElevatorUp(rc, 10);
+        SlowElevatorBorder(rc, 10);
         // Se reculer
         motion.setRelative();
-        async motion.goPolar(getCompassOrientation(rc),-200);
+        async motion.goPolar(getCompassOrientation(rc),-150);
         motion.setAbsolute();
+        actuators.moveElevator(rc,ElevatorPose::UP);
     }
     else{
         // Se reculer
         motion.setRelative();
-        async motion.goPolar(getCompassOrientation(rc),-200);
+        async motion.goPolar(getCompassOrientation(rc),-100);
         motion.setAbsolute();
         // Lever l'ascensceur
         actuators.moveElevator(rc,ElevatorPose::UP);
-        waitMs(1000);
+        //waitMs(1000);
     }
     // Vitesse normale
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.6);
 }
 
 void matchBlue(){
+    motion.setFeedrate(0.6);
     async motion.go(1000,400);
     // Macro to take plants
     takePlants(POI::plantSupplySW, RobotCompass::CA, TableCompass::EAST);
@@ -176,9 +179,9 @@ void matchBlue(){
     async motion.go(POI::b2);
     // Ajuster le bras pour le panneaux
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::BORDER);
-    waitMs(1000);
+    waitMs(800);
     actuators.close(RobotCompass::AB);
-    waitMs(1000);
+    waitMs(800);
     // S'approcher et tourner les panneaux
     async motion.go(POI::solarPanelBlue_1);
     async motion.go(POI::solarPanelBlue_3);
@@ -194,10 +197,42 @@ void matchBlue(){
 }
 
 void matchYellow(){
+    motion.setFeedrate(0.6);
     async motion.go(2000,400);
     // Macro to take plants
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
-    placePlants(POI::planterYellowWest, RobotCompass::AB, TableCompass::WEST);
+    // Macro place plants
+    placePlants(POI::planterYellowWest, RobotCompass::CA, TableCompass::WEST);
+    placePlants(POI::y1, RobotCompass::BC, TableCompass::WEST, false);
+    // Dégagement des pots
+    async motion.go(2800,300); // Possitionnement face bordure
+    probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
+    async motion.go(2890,612); // Dégagement latéral des pots
+    placePlants(POI::planterYellowNorth, RobotCompass::AB, TableCompass::NORTH);
+    // Dégagement de zone
+    //async motion.go(POI::plantSupplySW);
+    async motion.go(2113,1000);
+    async motion.go(POI::y2);
+    probeBorder(TableCompass::EAST, RobotCompass::CA,100);
+    probeBorder(TableCompass::NORTH, RobotCompass::AB,100);
+    async motion.go(POI::y2);
+    // Ajuster le bras pour le panneaux
+    actuators.moveElevator(RobotCompass::CA,ElevatorPose::BORDER);
+    waitMs(800);
+    actuators.close(RobotCompass::CA);
+    waitMs(800);
+    // S'approcher et tourner les panneaux
+    async motion.go(POI::solarPanelYellow_1);
+    async motion.go(POI::solarPanelYellow_3);
+    async motion.go(2150,1670); // Dégagement
+    // Ranger les bras
+    actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
+    actuators.open(RobotCompass::CA);
+    // Aller en zone de recharge 
+    async motion.go(POI::y2);
+    // Fin de match
+    motion.disengage();
+    actuators.disable();
 }
 
 void waitMs(unsigned long time){
@@ -225,6 +260,13 @@ void SlowElevatorGrab(RobotCompass rc, int speed){
     speed = constrain(speed, 0, 100);
     int ms = map(speed, 0, 100, 50, 0);
     while(!actuators.runElevatorGrab(rc)) waitMs(ms);
+}
+
+void SlowElevatorBorder(RobotCompass rc, int speed){
+    //convert %speed into ms
+    speed = constrain(speed, 0, 100);
+    int ms = map(speed, 0, 100, 50, 0);
+    while(!actuators.runElevatorBorder(rc)) waitMs(ms);
 }
 
 void SlowElevatorPlanter(RobotCompass rc, int speed){

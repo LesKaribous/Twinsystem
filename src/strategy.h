@@ -18,6 +18,7 @@ RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de 
 void SlowElevatorUp(RobotCompass rc, int speed);
 void SlowElevatorDown(RobotCompass rc, int speed);
 void SlowElevatorGrab(RobotCompass rc, int speed);
+void SlowElevatorBorder(RobotCompass rc, int speed);
 void SlowElevatorPlanter(RobotCompass rc, int speed);
 void SlowClosing(RobotCompass rc, int speed);
 void slowOpennig(RobotCompass rc, int speed);
