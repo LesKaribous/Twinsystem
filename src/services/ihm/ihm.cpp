@@ -399,6 +399,10 @@ void IHM::setIntercomState(bool value){
     intercom.setValue(value);
 }
 
+void IHM::setTime(int t){
+    time.SetValue(t);
+}
+
 void IHM::freezeSettings(){
 	teamSwitch.disable();
 	strategySwitch.disable();

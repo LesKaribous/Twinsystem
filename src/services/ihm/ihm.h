@@ -44,7 +44,8 @@ public:
     bool getStrategyState() const;
     void waitButtonRelease();
     void setIntercomState(bool);
-    
+    void setTime(int t);
+
 private:
     void clear();
     void draw();

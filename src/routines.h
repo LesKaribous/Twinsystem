@@ -17,6 +17,9 @@ void onIntercomDisconnected();
 void onIntercomRequest(Request&);
 void onIntercomRequestReply(Request&);
 
+void onMatchNearEnd();
+void onMatchEnd();
+
 void onOccupancyResponse(Request&);
 void onOccupancyTimeout();
 

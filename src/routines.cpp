@@ -11,6 +11,7 @@ void robotProgram(){
     Console::println("Started match");
     lidar.enable();
     safety.enable();
+    chrono.start();
     match();
     motion.disable();
 }
@@ -77,31 +78,37 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
 
+    ihm.drawBootProgress("Linking chrono...");
+    chrono.setNearEndCallback(onMatchNearEnd);
+    chrono.setEndCallback(onMatchEnd);
+    os.attachService(&chrono); ihm.addBootProgress(10);
+
     ihm.drawBootProgress("Linking safety...");
-    os.attachService(&safety); ihm.addBootProgress(10);
     safety.disable();
+    os.attachService(&safety); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking intercom");
-    os.attachService(&intercom); ihm.addBootProgress(10);
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);
     intercom.setRequestCallback(onIntercomRequest);
+    os.attachService(&intercom); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking lidar...");
     os.attachService(&lidar); ihm.addBootProgress(10);
-    delay(100);
     lidar.showStatusLED();
     lidar.enable();//lidar.disable();
 
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
 
+    ihm.drawBootProgress("Registering Commands..."); 
+    registerCommands(); ihm.addBootProgress(10);
+
     ihm.setPage(IHM::Page::INIT);
 
-    registerCommands();
 }
 
 void onRobotIdle(){
@@ -137,6 +144,19 @@ void onIntercomRequest(Request& req){
 
 void onIntercomRequestReply(Request& req){
 
+}
+
+void onMatchNearEnd(){
+    safety.disable();
+    lidar.disable();
+    motion.pause(); //pause the program if possible
+    motion.disable();
+    actuators.disable();
+    actuators.disable();
+}
+
+void onMatchEnd(){
+    os.stop();
 }
 
 void onOccupancyResponse(Request& req){
