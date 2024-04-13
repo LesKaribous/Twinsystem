@@ -200,7 +200,7 @@ void Motion::run(){
 
 void Motion::pause(){
     Job::pause();
-    _steppers.stop(); // set new speed
+    _steppers.stopAsync(); // set new speed
 
 }
 
@@ -220,7 +220,7 @@ bool Motion::hasFinished() {
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        _steppers.stop();
+        _steppers.stopAsync();
     }
     estimatePosition();
 
@@ -342,7 +342,7 @@ void Motion::resetSteps(){
 }
 
 float Motion::getAbsoluteTargetDirection() const{
-    return Vec2(_target - _position).heading() - _position.c;
+    return Vec2(_target - _position).heading();// - _position.c;
 }
 
 bool  Motion::isAbsolute() const{

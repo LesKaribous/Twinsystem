@@ -10,6 +10,7 @@
 void robotProgram(){
     Console::println("Started match");
     lidar.enable();
+    safety.enable();
     match();
     motion.disable();
 }
@@ -27,8 +28,9 @@ void robotIdleProgram(){
     
     RUN_EVERY(
         //int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
-        intercom.sendRequest("getDistance(90)", 100, distanceCB);
-    , 50)
+        int streer = 45;
+        intercom.sendRequest("getDistance(" + String(streer) +")", 100, distanceCB);
+    , 100)
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -79,6 +81,7 @@ void onRobotBoot(){
 
     ihm.drawBootProgress("Linking safety...");
     os.attachService(&safety); ihm.addBootProgress(10);
+    safety.disable();
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);

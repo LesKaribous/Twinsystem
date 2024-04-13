@@ -16,10 +16,10 @@ void Lidar::onAttach(){
 void Lidar::onUpdate(){
     static Vec3 pos;
     if(enabled()){
-        if(millis() - m_lastPosUpdate > 100 && Vec3::distanceBetween(pos, motion.getAbsPosition()) > 10){
+        if((millis() - m_lastPosUpdate > 100 && Vec3::distanceBetween(pos, motion.getAbsPosition()) > 10) || millis() - m_lastPosUpdate > 1000){
             m_lastPosUpdate = millis();
             pos = motion.getAbsPosition();
-            intercom.sendRequest("setRobotPosition(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z) + ")", 100);
+            intercom.sendRequest("setRobotPosition(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z*RAD_TO_DEG) + ")", 100);
         }
         /*
         if(millis() - m_lastOccupancyRequest > 150){
