@@ -1,11 +1,11 @@
 #include "strategy.h"
 #include "poi.h"
 #include "robot.h"
-#include "os/routines.h"
+#include "routines.h"
 
 void match(){
     //start match
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.6);
     //testEvitemment();
     //return;
     if(ihm.isColorBlue()) matchBlue();

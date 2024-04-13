@@ -7,8 +7,8 @@ class Robot{
   PVector acceleration;
   
   PVector target;
-  float vMax = 500;
-  float aMax = 500;
+  float vMax = 1000;
+  float aMax = 2000;
   
   Robot(){
     position = new PVector(225,225);
@@ -27,19 +27,27 @@ class Robot{
     PVector reltarget = target.copy().sub(position);
     float d = reltarget.mag();
     if(d == 0){
-      if(velocity.mag() != 0)velocity.mult(0);
+      if(velocity.mag() < 5) velocity.mult(0);
+      return;
     }
+    
+    PVector targetVel = reltarget.copy().normalize().mult(vMax);
     
     float deccelTime = velocity.mag()/aMax;
     float travelTime = sqrt(2.0*d/aMax);
     
-    if(deccelTime >= travelTime){ //we should deccel
-      acceleration = reltarget.copy().normalize().mult(-aMax);
-      if(velocity.mag()<10 ){//stop
+    if(deccelTime > travelTime){ //we should deccel
+      PVector velError = PVector.sub(targetVel, velocity);
+      acceleration = velError.normalize().mult(aMax);
+      
+      if(velocity.mag()<100){//stop
         acceleration.mult(0);
+        velocity.mult(0);
+        position = target.copy();
       }
     }else if(velocity.mag() < vMax){
-      acceleration = reltarget.copy().normalize().mult(aMax);
+      PVector velError = PVector.sub(targetVel, velocity);
+      acceleration = velError.normalize().mult(aMax);
     }else{
       acceleration.mult(0);
     }

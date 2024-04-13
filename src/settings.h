@@ -3,6 +3,9 @@
 #include "pin.h"
 #include "utils/geometry.h"
 
+#define INTERCOM_SERIAL Serial1
+#define INTERCOM_BAUDRATE 31250
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,
@@ -57,8 +60,8 @@ namespace Settings{
     }
 
     namespace Geometry{
-        constexpr float 
-        RADIUS = 125.98f,
+        constexpr double 
+        RADIUS = 125.98,
         WHEEL_RADIUS = 30;
     }
     
@@ -84,8 +87,8 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 10000, // Old : 5000
-            SPEED = 10000, // Old : 5000
+            ACCEL = 5000, // Old : 5000
+            SPEED = 8000, // Old : 5000
             TURN_SPEED = 6000, // Old : 5000
             PULLIN = 200,
             PID_MAX_PERIOD = 10,//ms

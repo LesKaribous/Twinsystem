@@ -20,5 +20,9 @@ private :
     long m_lastPosUpdate = 0;
     long m_lastOccupancyRequest = 0;
 
+    float x, y, theta;//abs
+
     SERVICE(Lidar);
 };
+
+EXTERN_DECLARATION(Lidar, lidar)

@@ -1,23 +1,34 @@
-#include "os/routines.h"
+#include "routines.h"
 #include "os/commands.h"
 #include "robot.h"
 #include "strategy.h"
-
 #include "os/os.h"
-#include "os/asyncExecutor.h"
+#include "utils/timer/timer.h"
+#include "utils/interpreter/interpreter.h"
+
 
 void robotProgram(){
     Console::println("Started match");
     lidar.enable();
+    safety.enable();
     match();
     motion.disable();
+}
+
+void distanceCB(Request& req){
+    int d = req.getResponse().toInt();
+    Console::println(">Distance:" + String(d));
+}
+
+void askDistance(int angle){
+    intercom.sendRequest("getDistance(" + String(angle) +")", 100, distanceCB);
 }
 
 void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    //intercom.sendRequest("perfTest",100, onIntercomMessage);
+    ihm.setRobotPosition(motion.getAbsPosition());
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -58,12 +69,17 @@ void robotIdleProgram(){
 }
 
 void onRobotBoot(){
+
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10); 
     
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
+
+    ihm.drawBootProgress("Linking safety...");
+    os.attachService(&safety); ihm.addBootProgress(10);
+    safety.disable();
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
@@ -72,12 +88,13 @@ void onRobotBoot(){
     os.attachService(&intercom); ihm.addBootProgress(10);
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);
+    intercom.setRequestCallback(onIntercomRequest);
 
     ihm.drawBootProgress("Linking lidar...");
     os.attachService(&lidar); ihm.addBootProgress(10);
     delay(100);
     lidar.showStatusLED();
-    lidar.disable();
+    lidar.enable();//lidar.disable();
 
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
@@ -89,10 +106,16 @@ void onRobotBoot(){
 
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
+    
+    int streer = round(RAD_TO_DEG * motion.getAbsoluteTargetDirection()); //We are moving in this direction
+    Console::print(">streer:");
+    Console::println(streer);
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotRun(){
     ihm.setRobotPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotStop(){
@@ -107,18 +130,16 @@ void onIntercomDisconnected(){
     ihm.setIntercomState(false);
 }
 
-void onIntercomMessage(const Request& req){
-    static long avg_reply_time = 0;
-    static long req_count = 0;
-    static long req_time_sum = 0;
-    req_time_sum += req.getResponseTime();
-    req_count++;
-    avg_reply_time = req_time_sum/req_count;
-    //Console::println("AVG reply time : " + String(avg_reply_time));
-    //Console::println("reply time : " + String(req.getResponseTime()));
+
+void onIntercomRequest(Request& req){
+
 }
 
-void onOccupancyResponse(const Request& req){
+void onIntercomRequestReply(Request& req){
+
+}
+
+void onOccupancyResponse(Request& req){
     
 }
 

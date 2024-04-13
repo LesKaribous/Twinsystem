@@ -14,7 +14,10 @@ void onTerminalCommand();
 void onIntercomConnected();
 void onIntercomDisconnected();
 
-void onIntercomMessage(const Request&);
-void onOccupancyResponse(const Request&);
+void onIntercomRequest(Request&);
+void onIntercomRequestReply(Request&);
+
+void onOccupancyResponse(Request&);
 void onOccupancyTimeout();
 
+void askDistance(int angle);

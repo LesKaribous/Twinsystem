@@ -184,7 +184,7 @@ std::shared_ptr<CommandStatement> Interpreter::parseCommandStatement() {
             index++;
         }
         if(argBuf.length() > 0) command->arguments.push_back(argBuf);
-        for(const String& str : command->arguments) THROW(str);
+        //for(const String& str : command->arguments) THROW(str);
     }
     currentToken = nextToken();
     return command;
@@ -214,7 +214,7 @@ std::shared_ptr<IfStatement> Interpreter::parseIfStatement() {
     // Parse the false branch (if present)
     if (currentToken.type == ELSE) {
         currentToken = nextToken(); // Consume the 'else' keyword
-        THROW(currentToken.toString())
+        //THROW(currentToken.toString())
         while (currentToken.type != END && currentToken.type != END_OF_SCRIPT) {
             ifStmt->falseBranch.push_back(parseStatement());
         }

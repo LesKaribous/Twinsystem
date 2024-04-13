@@ -21,3 +21,5 @@ private:
 
     SERVICE(Terminal)
 };
+
+EXTERN_DECLARATION(Terminal, terminal)

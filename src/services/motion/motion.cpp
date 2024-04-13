@@ -5,7 +5,7 @@
 #include "os/console.h"
 #include "motion.h"
 
-INSTANTIATE_SERVICE(Motion)
+INSTANTIATE_SERVICE(Motion, motion)
 
 Motion::Motion() : Service(ID_MOTION),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
@@ -200,12 +200,15 @@ void Motion::run(){
 
 void Motion::pause(){
     Job::pause();
-    _steppers.stop(); // set new speed
+    _steppers.stopAsync(); // set new speed
 
 }
 
 void Motion::resume(){
     Job::resume();
+    _sA.setTargetAbs(_stepsTarget.a);
+    _sB.setTargetAbs(_stepsTarget.b);
+    _sC.setTargetAbs(_stepsTarget.c);
     _steppers.moveAsync(_sA, _sB, _sC); // set new speed
 }
 
@@ -220,7 +223,7 @@ bool Motion::hasFinished() {
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        _steppers.stop();
+        _steppers.stopAsync();
     }
     estimatePosition();
 
@@ -237,7 +240,7 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
-    _startPosition = _position = _target;
+    //_startPosition = _position = _target;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
     _sB.setPosition(0);
@@ -342,7 +345,7 @@ void Motion::resetSteps(){
 }
 
 float Motion::getAbsoluteTargetDirection() const{
-    return Vec2(_target - _position).heading() - _position.c;
+    return Vec2(_target - _position).heading();// - _position.c;
 }
 
 bool  Motion::isAbsolute() const{
