@@ -8,10 +8,7 @@ void registerCommands();
 void command_enable(const args_t& args);
 void command_disable(const args_t& args);
 void command_status(const args_t& args); //Display all status
-void command_status(const args_t& args); //Display single status
 void command_debug(const args_t& args); //Display all status
-void command_debug(const args_t& args); //Display single status
-
 void command_lidarMode(const args_t& args);
 void command_getDistance(const args_t& args);
 

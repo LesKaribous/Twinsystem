@@ -1,4 +1,5 @@
 #pragma once
+#include "settings.h"
 #include "services/service.h"
 #include "debug/consoleStream.h"
 

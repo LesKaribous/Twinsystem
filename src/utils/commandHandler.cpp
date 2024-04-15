@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 
+static std::map<String, Command> commands;
 
 Command::Command(const String& synt, const String& desc, int argsCounts, command_func_ptr func) : 
     syntax(synt),
@@ -12,9 +13,7 @@ Command::Command(const String& synt, const String& desc, int argsCounts, command
     callback(func)
 {}
 
-
 std::map<String, Command>& CommandHandler::getCommands() {
-    static std::map<String, Command> commands;
     return commands;
 }
 
@@ -26,6 +25,7 @@ void CommandHandler::registerCommand(const String& syntax, const String& descrip
         name = syntax.substring(0,i);
     
     Command cmd = Command(syntax, description, numberOfArguments, func);
+    Console::println(name);
     getCommands()[name] =  cmd;
 }
 

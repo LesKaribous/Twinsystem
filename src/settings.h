@@ -6,6 +6,9 @@
 #define INTERCOM_SERIAL Serial1
 #define INTERCOM_BAUDRATE 31250
 
+#define CONSOLE_SERIAL Serial
+#define CONSOLE_BAUDRATE 14400
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,
@@ -87,13 +90,13 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-            ACCEL = 1000, // equivalent fullsteps/s^2
-            SPEED = 600, // equivalent fullsteps/s
-            TURN_SPEED = 500, // Old : 5000
-            PULLIN = 20,
-            PID_MAX_PERIOD = 10,//ms
-            PID_MIN_PERIOD = 5,//ms
-            PID_INTERVAL = 10000;//microseconds
+        ACCEL = 1000, // equivalent fullsteps/s^2
+        SPEED = 600, // equivalent fullsteps/s
+        TURN_SPEED = 500, // Old : 5000
+        PULLIN = 20,
+        PID_MAX_PERIOD = 10,//ms
+        PID_MIN_PERIOD = 5,//ms
+        PID_INTERVAL = 10000;//microseconds
     }
 
     namespace Stepper{
@@ -116,7 +119,6 @@ namespace Settings{
         constexpr unsigned long persitency = 1000;//ms
     } // namespace Lidar
     
-
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC

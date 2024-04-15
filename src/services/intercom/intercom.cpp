@@ -211,7 +211,7 @@ void Intercom::_processPendingRequests() {
 
         }  else if (status == Request::Status::TIMEOUT) {
             request.close();
-            //Serial.print(request.getPayload());
+            //CONSOLE_SERIAL.print(request.getPayload());
             Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
         } else if (status == Request::Status::ERROR) {
             request.close();

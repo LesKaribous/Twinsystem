@@ -12,8 +12,8 @@ void Terminal::onAttach(){
 void Terminal::onUpdate(){
     if(!enabled()) return;
     
-    if (Serial.available() > 0) {
-        String command = Serial.readString();
+    if (CONSOLE_SERIAL.available() > 0) {
+        String command = CONSOLE_SERIAL.readString();
         _pendingCommands.push_back(command);
         if(_pendingCommands.size() > 10) _pendingCommands.pop_front();
         
