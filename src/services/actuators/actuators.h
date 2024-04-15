@@ -11,6 +11,8 @@ const int
 rightServoPin,
 leftServoPin,
 elevatorServoPin,
+forkElevatorPin,
+forkServoPin,
 rightSensorPin,
 leftSensorPin;
 
@@ -26,7 +28,13 @@ const int
     elevator_Up,
     elevator_Grab,
     elevator_Border,
-    elevator_Planter;
+    elevator_Planter,
+    elevatorFork_Up,
+    elevatorFork_Down,
+    elevatorFork_Border,
+    fork_Up,
+    fork_Down,
+    fork_Grab;
 };
 
 namespace ActuatorsPreset{
@@ -35,6 +43,8 @@ namespace ActuatorsPreset{
         Pin::Servo::ServoB3, //rightServoPin
         Pin::Servo::ServoB2, //leftServoPin
         Pin::Servo::ServoB1, //elevatorServoPin
+        Pin::ServoFork::ServoAB_Elevator,
+        Pin::ServoFork::ServoAB_Fork,
         Pin::Sensor::SensorRight_AB, 
         Pin::Sensor::SensorLeft_AB,
         //position servo
@@ -48,7 +58,13 @@ namespace ActuatorsPreset{
         160, //elevator_Up  
         35,   //elevator_Grab
         90,   //elevator_Border
-        60   //elevator_Planter
+        60,   //elevator_Planter
+        10,     //FORK - elevatorFork_Up
+        10,     //FORK - elevatorFork_Down
+        10,     //FORK - elevatorFork_Border
+        10,     //FORK - fork_Up
+        10,     //FORK - fork_Down
+        10      //FORK - fork_Grab
     };
         
     const ActuatorsProperty BC = {
@@ -56,6 +72,8 @@ namespace ActuatorsPreset{
         Pin::Servo::ServoA3, //rightServoPin
         Pin::Servo::ServoA2, //leftServoPin
         Pin::Servo::ServoA1, //elevatorServoPin
+        Pin::ServoFork::ServoBC_Elevator,
+        Pin::ServoFork::ServoBC_Fork,
         Pin::Sensor::SensorRight_BC, 
         Pin::Sensor::SensorLeft_BC,
         //position servo
@@ -69,7 +87,13 @@ namespace ActuatorsPreset{
         130, //elevator_Up  
         10,   //elevator_Grab
         60,   //elevator_Border
-        30   //elevator_Planter
+        30,   //elevator_Planter
+        10,     //FORK - elevatorFork_Up
+        10,     //FORK - elevatorFork_Down
+        10,     //FORK - elevatorFork_Border
+        10,     //FORK - fork_Up
+        10,     //FORK - fork_Down
+        10      //FORK - fork_Grab
     };
 
     const ActuatorsProperty CA = {
@@ -77,6 +101,8 @@ namespace ActuatorsPreset{
         Pin::Servo::ServoC3, //rightServoPin
         Pin::Servo::ServoC2, //leftServoPin
         Pin::Servo::ServoC1, //elevatorServoPin
+        Pin::ServoFork::ServoCA_Elevator,
+        Pin::ServoFork::ServoCA_Fork,
         Pin::Sensor::SensorRight_CA, 
         Pin::Sensor::SensorLeft_CA,
         //position servo
@@ -90,7 +116,13 @@ namespace ActuatorsPreset{
         130, //elevator_Up  
         10,   //elevator_Grab
         60,   //elevator_Border
-        30   //elevator_Planter
+        30,   //elevator_Planter
+        10,     //FORK - elevatorFork_Up
+        10,     //FORK - elevatorFork_Down
+        10,     //FORK - elevatorFork_Border
+        10,     //FORK - fork_Up
+        10,     //FORK - fork_Down
+        10      //FORK - fork_Grab
     };
 }
 
