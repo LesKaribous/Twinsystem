@@ -43,7 +43,7 @@ void Safety::onUpdate(){
             //intercom.sendRequest("getDistance("+ String(streer) +")", 100, getDistanceCallback);
             //Console::println( String("streer:") + String(streer));
             intercom.sendRequest("checkObstacle("+ String(streer) +")", 100, getDistanceCallback);
-            //Serial.println(m_obstacleDetected);
+            //CONSOLE_SERIAL.println(m_obstacleDetected);
         }
     , 100)
 

@@ -47,32 +47,32 @@ ConsoleStream Console::success(const String& origin) {
 
 
 void header(){
-	Serial.println("");
-	Serial.println("  _______       _                     _"                        );
-	Serial.println(" |__   __|     (_)                   | |"                       );
-	Serial.println("    | |_      ___ _ __  ___ _   _ ___| |_ ___ _ __ ___  "       );
-	Serial.println("    | \\ \\ /\\ / / | '_ \\/ __| | | / __| __/ _ \\ '_ ` _ \\"  );
-	Serial.println("    | |\\ V  V /| | | | \\__ \\ |_| \\__ \\ ||  __/ | | | | |"  );
-	Serial.println("    |_| \\_/\\_/ |_|_| |_|___/\\__, |___/\\__\\___|_| |_| |_|"  );
-	Serial.println("                             __/ |"                             );
-	Serial.println("                            |___/"                              );
-	Serial.println();
-	Serial.println("Author  : Nadarbreicq, JulesTopart ");
-	Serial.println();
-	Serial.print("Twinsystem... compiled  ");
-	Serial.print(__DATE__);
-	Serial.print(" at ");
-	Serial.println(__TIME__);
+	CONSOLE_SERIAL.println("");
+	CONSOLE_SERIAL.println("  _______       _                     _"                        );
+	CONSOLE_SERIAL.println(" |__   __|     (_)                   | |"                       );
+	CONSOLE_SERIAL.println("    | |_      ___ _ __  ___ _   _ ___| |_ ___ _ __ ___  "       );
+	CONSOLE_SERIAL.println("    | \\ \\ /\\ / / | '_ \\/ __| | | / __| __/ _ \\ '_ ` _ \\"  );
+	CONSOLE_SERIAL.println("    | |\\ V  V /| | | | \\__ \\ |_| \\__ \\ ||  __/ | | | | |"  );
+	CONSOLE_SERIAL.println("    |_| \\_/\\_/ |_|_| |_|___/\\__, |___/\\__\\___|_| |_| |_|"  );
+	CONSOLE_SERIAL.println("                             __/ |"                             );
+	CONSOLE_SERIAL.println("                            |___/"                              );
+	CONSOLE_SERIAL.println();
+	CONSOLE_SERIAL.println("Author  : Nadarbreicq, JulesTopart ");
+	CONSOLE_SERIAL.println();
+	CONSOLE_SERIAL.print("Twinsystem... compiled  ");
+	CONSOLE_SERIAL.print(__DATE__);
+	CONSOLE_SERIAL.print(" at ");
+	CONSOLE_SERIAL.println(__TIME__);
 
 }
 
 void Console::init(){
-	Serial.begin(115200);
+	CONSOLE_SERIAL.begin(CONSOLE_BAUDRATE);
 	header();
 }
 
 void Console::write(const char* str) {
-	Serial.write(str);
+	CONSOLE_SERIAL.write(str);
 }
 
 void Console::plot(const String& n, String s){
@@ -80,28 +80,28 @@ void Console::plot(const String& n, String s){
 }
 
 void Console::print(const String& s){
-	Serial.print(s);
+	CONSOLE_SERIAL.print(s);
 }
 
 void Console::println(const String& s){
-	Serial.println(s);
+	CONSOLE_SERIAL.println(s);
 }
 
 void Console::prettyPrint(const String& s){
 	int l = 0;
 	line();
-	Serial.print(l);
-	Serial.print(":\t");
+	CONSOLE_SERIAL.print(l);
+	CONSOLE_SERIAL.print(":\t");
 	for (size_t i = 0; i <= s.length(); i++){
 		if(s[i] == '\n'){
-			Serial.println();
-			Serial.print(++l);
-			Serial.print(":\t");
+			CONSOLE_SERIAL.println();
+			CONSOLE_SERIAL.print(++l);
+			CONSOLE_SERIAL.print(":\t");
 		}else{
-			Serial.print(s[i]);
+			CONSOLE_SERIAL.print(s[i]);
 		}
 	}
-	Serial.println(s[s.length() - 1]);
+	CONSOLE_SERIAL.println(s[s.length() - 1]);
 	line();
 }
 

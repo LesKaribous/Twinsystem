@@ -6,8 +6,8 @@
 void match(){
     //start match
     motion.setFeedrate(1.0);
-    //testEvitemment();
-    //return;
+    testEvitemment();
+    return;
     if(ihm.isColorBlue()) matchBlue();
     else matchYellow();
 }
@@ -38,16 +38,9 @@ void recalage(){
 
 void testEvitemment(){
     motion.setAsync();
-
-    async motion.go(100, 0);
-    async motion.go(0, 0);
-
-    return;
-    for(int i=0;i<5; i++){
-        motion.go(1000,1000);
-        motion.go(250,250);
-        os.wait(2000);
-    }
+    motion.go(1000,1000);
+    os.wait(1000);
+    async motion.go(225, 255);
 }
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
@@ -309,7 +302,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     //motion.setSync();
     //Console::println("Recalling");
 
-    motion.setFeedrate(0.4);
+    motion.setFeedrate(0.3);
 	async motion.align(rc, getCompassOrientation(tc));
 
     motion.setRelative();

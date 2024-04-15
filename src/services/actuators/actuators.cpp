@@ -181,19 +181,19 @@ ActuatorGroup &Actuators::getActuatorGroup(RobotCompass rc)
 
 void Actuators::testSensors()
 {
-    Serial.println("Sensors:");
-    Serial.print("AB: R -  ");
-    Serial.print(readSensor(RobotCompass::AB,Side::RIGHT));
-    Serial.print(" | L -  ");
-    Serial.println(readSensor(RobotCompass::AB,Side::LEFT));
-    Serial.print("BC: R -  ");
-    Serial.print(readSensor(RobotCompass::BC,Side::RIGHT));
-    Serial.print(" | L -  ");
-    Serial.println(readSensor(RobotCompass::BC,Side::LEFT));
-    Serial.print("CA: R -  ");
-    Serial.print(readSensor(RobotCompass::CA,Side::RIGHT));
-    Serial.print(" | L -  ");
-    Serial.println(readSensor(RobotCompass::CA, Side::LEFT));
+    CONSOLE_SERIAL.println("Sensors:");
+    CONSOLE_SERIAL.print("AB: R -  ");
+    CONSOLE_SERIAL.print(readSensor(RobotCompass::AB,Side::RIGHT));
+    CONSOLE_SERIAL.print(" | L -  ");
+    CONSOLE_SERIAL.println(readSensor(RobotCompass::AB,Side::LEFT));
+    CONSOLE_SERIAL.print("BC: R -  ");
+    CONSOLE_SERIAL.print(readSensor(RobotCompass::BC,Side::RIGHT));
+    CONSOLE_SERIAL.print(" | L -  ");
+    CONSOLE_SERIAL.println(readSensor(RobotCompass::BC,Side::LEFT));
+    CONSOLE_SERIAL.print("CA: R -  ");
+    CONSOLE_SERIAL.print(readSensor(RobotCompass::CA,Side::RIGHT));
+    CONSOLE_SERIAL.print(" | L -  ");
+    CONSOLE_SERIAL.println(readSensor(RobotCompass::CA, Side::LEFT));
 }
 
 

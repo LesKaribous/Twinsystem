@@ -7,7 +7,6 @@
 #include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
 
-
 void robotProgram(){
     Console::println("Started match");
     lidar.enable();
@@ -15,15 +14,6 @@ void robotProgram(){
     chrono.start();
     match();
     motion.disable();
-}
-
-void distanceCB(Request& req){
-    int d = req.getResponse().toInt();
-    Console::println(">Distance:" + String(d));
-}
-
-void askDistance(int angle){
-    intercom.sendRequest("getDistance(" + String(angle) +")", 100, distanceCB);
 }
 
 void robotIdleProgram(){
@@ -108,19 +98,14 @@ void onRobotBoot(){
     ihm.drawBootProgress("Registering Commands..."); 
     registerCommands(); ihm.addBootProgress(10);
 
+    ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
-
+    
+    
 }
 
 void onRobotIdle(){
     ihm.setRobotPosition(motion.getAbsPosition());
-    
-    RUN_EVERY(
-    int streer = round(RAD_TO_DEG * motion.getAbsoluteTargetDirection()); //We are moving in this direction
-    Console::print(">streer:");
-    Console::println(streer);
-    , 100)
-    //lidar.setLidarPosition(motion.getAbsPosition());
 }
 
 void onRobotRun(){
