@@ -32,8 +32,8 @@ const int
     elevatorFork_Up,
     elevatorFork_Down,
     elevatorFork_Border,
-    fork_Up,
-    fork_Down,
+    fork_Close,
+    fork_Open,
     fork_Grab;
 };
 
@@ -62,8 +62,8 @@ namespace ActuatorsPreset{
         10,     //FORK - elevatorFork_Up
         10,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Up
-        10,     //FORK - fork_Down
+        10,     //FORK - fork_Close
+        10,     //FORK - fork_Open
         10      //FORK - fork_Grab
     };
         
@@ -91,8 +91,8 @@ namespace ActuatorsPreset{
         10,     //FORK - elevatorFork_Up
         10,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Up
-        10,     //FORK - fork_Down
+        10,     //FORK - fork_Close
+        10,     //FORK - fork_Open
         10      //FORK - fork_Grab
     };
 
@@ -120,8 +120,8 @@ namespace ActuatorsPreset{
         10,     //FORK - elevatorFork_Up
         10,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Up
-        10,     //FORK - fork_Down
+        10,     //FORK - fork_Close
+        10,     //FORK - fork_Open
         10      //FORK - fork_Grab
     };
 }
@@ -141,19 +141,30 @@ struct ActuatorGroup{
     GripperServo leftGripper;
     const int leftSensor;
 
+    GripperServo forkGripper;
+
     AdvancedServo elevator;
 
-    ActuatorGroup(ActuatorsProperty presets) : 
+    AdvancedServo forkElevator;
+
+    ActuatorGroup(ActuatorsProperty presets) :
         rightGripper(presets.rightServoPin, presets.right_Open, presets.right_Close, presets.right_Grab), 
         rightSensor(presets.rightSensorPin),
         leftGripper(presets.leftServoPin, presets.left_Open, presets.left_Close, presets.left_Grab),  
         leftSensor(presets.leftSensorPin),
-        elevator(presets.elevatorServoPin) {
+        forkGripper(presets.forkServoPin, presets.fork_Open, presets.fork_Close, presets.fork_Grab),
+        elevator(presets.elevatorServoPin),
+        forkElevator(presets.forkElevatorPin) 
+        {
             elevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevator_Down);
             elevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevator_Up);
             elevator.setPose(static_cast<int>(ElevatorPose::GRAB), presets.elevator_Grab);
             elevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevator_Border);
             elevator.setPose(static_cast<int>(ElevatorPose::PLANTER), presets.elevator_Planter);
+
+            forkElevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevatorFork_Up);
+            forkElevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevatorFork_Down);
+            forkElevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevatorFork_Border);
         }
 };
 
@@ -181,10 +192,15 @@ public:
     void grab   (RobotCompass rc);
     void applause(RobotCompass rc);
 
+    void forkUp   (RobotCompass rc);
+    void forkDown (RobotCompass rc);
+    void forkGrab (RobotCompass rc);
+    
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex);
-    void testSensors();
+    void moveForkElevator(RobotCompass rc, ElevatorPose poseIndex);
     bool readSensor(RobotCompass rc, Side gs);
-
+    void testSensors();
+    
     bool runGrabbing(RobotCompass rc, Side gs = Side::BOTH);
     bool runOpening(RobotCompass rc, Side gs = Side::BOTH);
     bool runClosing(RobotCompass rc, Side gs = Side::BOTH);

@@ -144,8 +144,64 @@ void Actuators::grab(RobotCompass rc){
     }
 }
 
+void Actuators::forkUp(RobotCompass rc){
+    switch (rc)
+    {
+    case RobotCompass::AB :
+        gripperAB.forkGripper.close();
+        break;
+    case RobotCompass::BC :
+        gripperBC.forkGripper.close();
+        break;
+    case RobotCompass::CA :
+        gripperCA.forkGripper.close();
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Actuators::forkDown(RobotCompass rc){
+    switch (rc)
+    {
+    case RobotCompass::AB :
+        gripperAB.forkGripper.open();
+        break;
+    case RobotCompass::BC :
+        gripperBC.forkGripper.open();
+        break;
+    case RobotCompass::CA :
+        gripperCA.forkGripper.open();
+        break;
+    default:
+        break;
+    }
+}
+
+void Actuators::forkGrab(RobotCompass rc){
+    switch (rc)
+    {
+    case RobotCompass::AB :
+        gripperAB.forkGripper.grab();
+        break;
+    case RobotCompass::BC :
+        gripperBC.forkGripper.grab();
+        break;
+    case RobotCompass::CA :
+        gripperCA.forkGripper.grab();
+        break;
+    default:
+        break;
+    }
+}
+
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose){
     getActuatorGroup(rc).elevator.moveToPose(static_cast<int>(pose));
+}
+
+void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose){
+    getActuatorGroup(rc).forkElevator.moveToPose(static_cast<int>(pose));
 }
 
 bool Actuators::moveGripper(AdvancedServo& gripper, int target){
