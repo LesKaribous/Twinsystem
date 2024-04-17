@@ -6,10 +6,14 @@
 void match(){
     //start match
     motion.setFeedrate(1.0);
-    testEvitemment();
-    return;
-    if(ihm.isColorBlue()) matchBlue();
-    else matchYellow();
+    if(ihm.isPrimary()){
+        if(ihm.isColorBlue()) matchBlue();
+        else matchYellow();
+    }
+    else {
+        if(ihm.isColorBlue()) secondaryMatchBlue();
+        else secondaryMatchYellow();
+    }
 }
 
 void recalage(){
@@ -231,10 +235,33 @@ void matchYellow(){
     actuators.disable();
 }
 
+void secondaryMatchBlue(){
+    Serial.println("Start Match Secondary");
+    while(1){
+        actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+        actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
+        actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
+        actuators.forkDown(RobotCompass::AB);
+        //actuators.forkDown(RobotCompass::BC);
+        actuators.forkDown(RobotCompass::CA);
+        waitMs(2000);
+        actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+        actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
+        actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
+        actuators.forkGrab(RobotCompass::AB);
+        //actuators.forkUp(RobotCompass::BC);
+        actuators.forkUp(RobotCompass::CA);
+        waitMs(2000);
+    }
+}
+
+void secondaryMatchYellow(){
+
+}
+
 void waitMs(unsigned long time){
-    // To fix with asynch wait
     os.wait(time,false);
-    //delay(time); // WIP -> To fix
+    //delay(time);
 }
 
 void SlowElevatorUp(RobotCompass rc, int speed){

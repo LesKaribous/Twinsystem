@@ -41,6 +41,13 @@ void Actuators::onAttach(){
     moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 
+    forkUp(RobotCompass::AB);
+    forkUp(RobotCompass::BC);
+    forkUp(RobotCompass::CA);
+    moveForkElevator(RobotCompass::AB, ElevatorPose::DOWN);
+    moveForkElevator(RobotCompass::BC, ElevatorPose::DOWN);
+    moveForkElevator(RobotCompass::CA, ElevatorPose::DOWN);
+
     delay(1000);
     sleep();
 }

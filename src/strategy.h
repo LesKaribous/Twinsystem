@@ -7,6 +7,9 @@ void match();
 void matchBlue();
 void matchYellow();
 
+void secondaryMatchBlue();
+void secondaryMatchYellow();
+
 void testEvitemment();
 
 // Macros
