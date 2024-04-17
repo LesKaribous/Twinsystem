@@ -98,6 +98,14 @@ void onRobotBoot(){
     ihm.drawBootProgress("Registering Commands..."); 
     registerCommands(); ihm.addBootProgress(10);
 
+    Expression::registerVariables("A", "A");
+    Expression::registerVariables("AB", "AB");
+    Expression::registerVariables("B", "B");
+    Expression::registerVariables("BC", "BC");
+    Expression::registerVariables("C", "C");
+    Expression::registerVariables("CA", "CA");
+
+
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
     

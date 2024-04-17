@@ -25,7 +25,7 @@ void CommandHandler::registerCommand(const String& syntax, const String& descrip
         name = syntax.substring(0,i);
     
     Command cmd = Command(syntax, description, numberOfArguments, func);
-    Console::println(name);
+    //Console::println(name);
     getCommands()[name] =  cmd;
 }
 

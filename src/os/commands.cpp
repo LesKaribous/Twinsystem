@@ -30,6 +30,8 @@ void registerCommands() {
     CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal", command_print);
     CommandHandler::registerCommand("help", "Display help", command_help);
+
+    
 }
 
 void command_enable(const args_t& args){

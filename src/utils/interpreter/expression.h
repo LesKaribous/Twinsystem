@@ -77,3 +77,5 @@ private:
     static String lookupVariableValue(const String& variableName);
     static std::map<String, String>& getVariables();
 };
+
+extern std::map<String, String> variables;

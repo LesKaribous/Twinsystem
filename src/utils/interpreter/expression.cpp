@@ -1,6 +1,8 @@
 #include "expression.h"
 #include "os/console.h"
 
+static std::map<String, String> variables;
+
 Expression::Expression(const String &str) : pos(0)
 {
     String raw = str;
@@ -61,7 +63,6 @@ void Expression::setVariable(const String &varname, const String &value)
 
 std::map<String, String> &Expression::getVariables()
 {
-    static std::map<String, String> variables;
     return variables;
 }
 
