@@ -25,6 +25,12 @@ public:
     bool isCompleted()const;
     bool isCancelled()const;
 
+    inline explicit operator bool() const {
+        return isCompleted();  // Return true if the job succeeded
+    }
+
+    long elaspedTime() const;
+    long pauseDuration() const;
 
     virtual void run() = 0; 
     virtual void reset();   //Set to IDLE
@@ -36,5 +42,7 @@ public:
 
 protected:
     JobState m_state = JobState::IDLE;
+    long startTime = 0;
+    long pauseTime = 0;
 };
     

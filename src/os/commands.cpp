@@ -7,7 +7,6 @@ void registerCommands() {
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
     CommandHandler::registerCommand("disable(service)", "Disable a specific service", command_disable);
     CommandHandler::registerCommand("status(service)", "Display single status", command_status);
-    CommandHandler::registerCommand("getDistance(angle)", "Send a distance request to TwinLidar", command_getDistance);
     CommandHandler::registerCommand("lidarMode(mode)", "Change neopixel display mode on lidar", command_lidarMode);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
@@ -80,11 +79,6 @@ void command_debug(const args_t& args){
 
 
 //Lidar
-void command_getDistance(const args_t& args){
-    if(args.size() != 1) return;
-    int angle = args[0].toInt();
-    if(angle > 0 && angle < 360) askDistance(angle);
-}
 
 void command_lidarMode(const args_t& args){
     if(args.size() != 1) return;

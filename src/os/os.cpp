@@ -141,11 +141,15 @@ void OS::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
-void OS::wait(unsigned long time, bool runasync) {
+Job& OS::wait(unsigned long time, bool runasync) {
     m_timer.setDuration(time);
     m_timer.start();
-    addJob(&m_timer);
-    if(!runasync)while(m_timer.isPending()|| m_timer.isPaused())run();
+    //addJob(&m_timer);
+    if(!runasync)while(m_timer.isPending()|| m_timer.isPaused()){
+        m_timer.run();
+        run();
+    }
+    return m_timer;
 }
 
 void OS::waitUntil(Job& obj, bool runasync){

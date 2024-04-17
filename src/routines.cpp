@@ -16,15 +16,6 @@ void robotProgram(){
     motion.disable();
 }
 
-void distanceCB(Request& req){
-    int d = req.getResponse().toInt();
-    Console::println(">Distance:" + String(d));
-}
-
-void askDistance(int angle){
-    intercom.sendRequest("getDistance(" + String(angle) +")", 100, distanceCB);
-}
-
 void robotIdleProgram(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;

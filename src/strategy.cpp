@@ -15,6 +15,7 @@ void match(){
 void recalage(){
     //motion.setSync();
     actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
+    waitMs(800);
     if(ihm.isColorBlue()){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
@@ -38,9 +39,9 @@ void recalage(){
 
 void testEvitemment(){
     motion.setAsync();
-    motion.go(1000,1000);
-    os.wait(1000);
-    async motion.go(225, 255);
+    async motion.go(2775, 225 + 500) || async motion.go(2775, 225);
+
+
 }
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){

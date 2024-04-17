@@ -53,7 +53,15 @@ void Safety::onUpdate(){
         if(!motion.isRotating()) m_lastSeen = millis();
     }
 
-    if(millis() - m_lastSeen > 2000) m_obstacleDetected = false;
+    if(m_obstacleDetected && !motion.hasFinished() && motion.isPaused() && motion.pauseDuration() > 1000){
+        motion.cancel();
+        m_obstacleDetected = false;
+        Console::println("cancelled");
+    }
+
+    if(millis() - m_lastSeen > 2000){
+        m_obstacleDetected = false;
+    }
     
     if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
         motion.resume();

@@ -2,6 +2,8 @@
 
 Job::Job(){
 	m_state = JobState::IDLE;
+	startTime = 0;
+	pauseTime = 0;
 }
 
 Job::~Job(){
@@ -53,18 +55,34 @@ bool Job::isCompleted() const{
 	return m_state == JobState::COMPLETED;
 }
 
-void  Job::reset(){
-	m_state = JobState::IDLE;
+long Job::elaspedTime() const{
+	if(startTime == 0) return 0;
+    else return millis() - startTime;
+}
+
+long Job::pauseDuration() const
+{
+	if(pauseTime == 0) return 0;
+    else return millis() - pauseTime;
+}
+
+void Job::reset()
+{
+	startTime = 0;
+	pauseTime = 0;
+    m_state = JobState::IDLE;
 }
 
 void  Job::start(){
 	if(m_state == JobState::IDLE){
+		startTime = millis();
 		m_state = JobState::PENDING;
 	}
 }
 
 void  Job::pause(){
 	if(m_state == JobState::PENDING){
+		pauseTime = millis();
 		m_state = JobState::PAUSED;
 	}
 }

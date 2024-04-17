@@ -35,7 +35,7 @@ public:
     bool debug(ServiceID);
     void toggleDebug(ServiceID s);
 
-    void wait(unsigned long time, bool runasync = false);
+    Job& wait(unsigned long time, bool runasync = false);
     void waitUntil(Job& job, bool runasync = false);
     void execute(Job& job, bool runasync = true);
     bool isBusy();
