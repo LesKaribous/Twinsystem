@@ -93,17 +93,17 @@ namespace Pin{
     // Actuator Fork Pinout for second robot
     namespace ServoFork{
         // Connector Act 2
-        // Bloç Servo 1 - BC
-        const int ServoBC_Elevator = 38; //P2 - 10 - 1 -> Non utilisé
-        const int ServoBC_Fork = 34; //A4 - 8 - 3 -> Non utilisé 
-        //const int ServoBC_3 = 39; //D1 - 4 - 5
-        // Bloç Servo 2 - AB
-        const int ServoAB_Elevator = 14; //A2 - 2 - 7
-        const int ServoAB_Fork = 15; //A1 - 1 - 8
-        //const int ServoAB_3 = 55; //D2 - 3 - 6
-        // Bloç Servo 3 - CA
-        const int ServoCA_Elevator = 53; //D3 - 5 - 9
-        const int ServoCA_Fork = 33; //A3 - 7 - 4
+        // Bloc Servo 1 - AB
+        const int ServoAB_Elevator = 38; //P2 - 10 - 1 -> Non utilisé
+        const int ServoAB_Fork = 34; //A4 - 8 - 3 
+        //const int ServoAB_3 = 39; //D1 - 4 - 5
+        // Bloc Servo 2 - CA
+        const int ServoCA_Elevator = 14; //A2 - 2 - 7
+        const int ServoCA_Fork = 15; //A1 - 1 - 8
+        //const int ServoCA_3 = 55; //D2 - 3 - 6
+        // Bloc Servo 3 - BC
+        const int ServoBC_Elevator = 53; //D3 - 5 - 9 -> Non utilisé 
+        const int ServoBC_Fork = 33; //A3 - 7 - 4 -> Non utilisé 
         //const int ServoCA_3 = 37; //P1 - 9 - 2
     }
 }   

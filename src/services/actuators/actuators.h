@@ -59,12 +59,12 @@ namespace ActuatorsPreset{
         35,   //elevator_Grab
         90,   //elevator_Border
         60,   //elevator_Planter
-        10,     //FORK - elevatorFork_Up
-        10,     //FORK - elevatorFork_Down
+        100,     //FORK - elevatorFork_Up
+        180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Close
-        10,     //FORK - fork_Open
-        10      //FORK - fork_Grab
+        120,     //FORK - fork_Close
+        12,     //FORK - fork_Open
+        60      //FORK - fork_Grab
     };
         
     const ActuatorsProperty BC = {
@@ -88,12 +88,12 @@ namespace ActuatorsPreset{
         10,   //elevator_Grab
         60,   //elevator_Border
         30,   //elevator_Planter
-        10,     //FORK - elevatorFork_Up
-        10,     //FORK - elevatorFork_Down
+        100,     //FORK - elevatorFork_Up
+        180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Close
-        10,     //FORK - fork_Open
-        10      //FORK - fork_Grab
+        120,     //FORK - fork_Close
+        12,     //FORK - fork_Open
+        60      //FORK - fork_Grab
     };
 
     const ActuatorsProperty CA = {
@@ -117,12 +117,12 @@ namespace ActuatorsPreset{
         10,   //elevator_Grab
         60,   //elevator_Border
         30,   //elevator_Planter
-        10,     //FORK - elevatorFork_Up
-        10,     //FORK - elevatorFork_Down
+        100,     //FORK - elevatorFork_Up
+        180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        10,     //FORK - fork_Close
-        10,     //FORK - fork_Open
-        10      //FORK - fork_Grab
+        120,     //FORK - fork_Close
+        12,     //FORK - fork_Open
+        60      //FORK - fork_Grab
     };
 }
 
@@ -170,9 +170,9 @@ struct ActuatorGroup{
 
 class Actuators : public Service, public Job{
 protected:
-    ActuatorGroup gripperAB; //Right group when facing screen
-    ActuatorGroup gripperBC; //Opposed to the screen
-    ActuatorGroup gripperCA; //Left group when facing screen
+    ActuatorGroup gripperAB; // Facing BAU
+    ActuatorGroup gripperBC; // Facing Init button
+    ActuatorGroup gripperCA; // Facing Tirette
     
 public:
     friend class App;
