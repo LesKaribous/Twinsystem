@@ -197,6 +197,7 @@ public:
     void forkDown (RobotCompass rc);
     void forkGrab (RobotCompass rc);
     
+    void moveElevatorAngle(RobotCompass rc, int angle);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex);
     void moveForkElevator(RobotCompass rc, ElevatorPose poseIndex);
     bool readSensor(RobotCompass rc, Side gs);
