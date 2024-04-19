@@ -201,6 +201,7 @@ void matchBlue(){
     actuators.open(RobotCompass::AB);
     // Aller en zone de recharge 
     async motion.go(POI::b2);
+    ihm.addScorePoints(10); //zone d'arrivée
     // Fin de match
     motion.disengage();
     actuators.disable();
@@ -241,11 +242,13 @@ void matchYellow(){
     async motion.go(POI::solarPanelYellow_3);
     async motion.go(2150,1670); // Dégagement
     ihm.addScorePoints(15); //3x panneaux
+    
     // Ranger les bras
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.open(RobotCompass::CA);
     // Aller en zone de recharge 
     async motion.go(POI::y2);
+    ihm.addScorePoints(10); //zone d'arrivée
     // Fin de match
     motion.disengage();
     actuators.disable();

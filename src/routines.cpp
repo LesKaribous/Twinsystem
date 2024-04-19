@@ -162,6 +162,7 @@ void onMatchNearEnd(){
     motion.setAbsolute();
     if(ihm.isColorBlue()) async motion.go(POI::b2);
     else async motion.go(POI::y2);
+    ihm.addScorePoints(10); //zone d'arrivée
     onMatchEnd();
 }
 
