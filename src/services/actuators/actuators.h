@@ -51,13 +51,13 @@ namespace ActuatorsPreset{
         100, //right_Close
         10,  //right_Open   
         180, //right_Grab   
-        100, //left_Close   
-        10,  //left_Open    
-        180, //left_Grab    
+        60, //left_Close   
+        0,  //left_Open    
+        150, //left_Grab    
         15,  //elevator_Down
-        160, //elevator_Up  
-        35,   //elevator_Grab
-        90,   //elevator_Border
+        110, //elevator_Up  
+        25,   //elevator_Grab
+        60,   //elevator_Border
         60,   //elevator_Planter
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
@@ -84,9 +84,9 @@ namespace ActuatorsPreset{
         10,  //left_Open    
         160, //left_Grab    
         0,   //elevator_Down
-        130, //elevator_Up  
-        10,   //elevator_Grab
-        60,   //elevator_Border
+        140, //elevator_Up  
+        20,   //elevator_Grab
+        70,   //elevator_Border
         30,   //elevator_Planter
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
@@ -113,9 +113,9 @@ namespace ActuatorsPreset{
         10,  //left_Open    
         180, //left_Grab    
         0,   //elevator_Down
-        130, //elevator_Up  
-        10,   //elevator_Grab
-        60,   //elevator_Border
+        105, //elevator_Up  
+        18,   //elevator_Grab
+        53,   //elevator_Border
         30,   //elevator_Planter
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
