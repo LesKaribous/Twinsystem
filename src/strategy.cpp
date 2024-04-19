@@ -12,7 +12,7 @@ void testConditionnal(){
 void match(){
     //start match
     motion.setFeedrate(1.0);
-        if(ihm.isPrimary()){
+    if(ihm.isPrimary()){
         if(ihm.isColorBlue()) matchBlue();
         else matchYellow();
     }
@@ -166,14 +166,18 @@ void matchBlue(){
     takePlants(POI::plantSupplySW, RobotCompass::CA, TableCompass::EAST);
     // Macro place plants
     placePlants(POI::planterBlueWest, RobotCompass::AB, TableCompass::WEST);
+    ihm.addScorePoints(8); //plante valid + jardiniere x2
+
     placePlants(POI::b1, RobotCompass::BC, TableCompass::WEST, false);
-    ihm.addScorePoints(8);
+    //ihm.addScorePoints(8); We don't know the plant type here
 
     // Dégagement des pots
     async motion.go(200,300); // Possitionnement face bordure
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
     async motion.go(110,612); // Dégagement latéral des pots
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
+    ihm.addScorePoints(8); //plante valid + jardiniere x2
+
     // Dégagement de zone
     //async motion.go(POI::plantSupplySW);
     async motion.go(887,1000);
@@ -190,6 +194,8 @@ void matchBlue(){
     async motion.go(POI::solarPanelBlue_1);
     async motion.go(POI::solarPanelBlue_3);
     async motion.go(850,1670); // Dégagement
+    ihm.addScorePoints(15); //3 panneaux retournés
+
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
     actuators.open(RobotCompass::AB);
@@ -207,6 +213,7 @@ void matchYellow(){
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
     // Macro place plants
     placePlants(POI::planterYellowWest, RobotCompass::CA, TableCompass::WEST);
+    
     placePlants(POI::y1, RobotCompass::BC, TableCompass::WEST, false);
     // Dégagement des pots
     async motion.go(2800,300); // Possitionnement face bordure
@@ -241,7 +248,7 @@ void matchYellow(){
 
 void secondaryMatchBlue(){
     Serial.println("Start Match Secondary");
-    while(1){
+    //while(1){
         actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
         actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
         actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
@@ -256,7 +263,7 @@ void secondaryMatchBlue(){
         //actuators.forkUp(RobotCompass::BC);
         actuators.forkUp(RobotCompass::CA);
         waitMs(2000);
-    }
+    //}
 }
 
 void secondaryMatchYellow(){

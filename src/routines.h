@@ -23,4 +23,3 @@ void onMatchEnd();
 void onOccupancyResponse(Request&);
 void onOccupancyTimeout();
 
-void askDistance(int angle);
