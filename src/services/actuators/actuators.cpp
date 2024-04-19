@@ -228,6 +228,10 @@ void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose){
     getActuatorGroup(rc).elevator.moveToPose(static_cast<int>(pose));
 }
 
+void Actuators::moveElevatorAngle(RobotCompass rc, int angle){
+    getActuatorGroup(rc).elevator.moveTo(angle);
+}
+
 void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose){
     //getActuatorGroup(rc).forkElevator.moveToPose(static_cast<int>(pose));
 }

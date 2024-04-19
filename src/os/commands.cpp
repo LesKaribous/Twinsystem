@@ -25,6 +25,7 @@ void registerCommands() {
     CommandHandler::registerCommand("setAbsolutePosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0", command_resetCompass);
     CommandHandler::registerCommand("elevator(side, pose)", "Raise elevator to desired pose", command_elevator);
+    CommandHandler::registerCommand("move_elevator(side, angle)", "Raise elevator to desired angle", command_move_elevator);
     CommandHandler::registerCommand("raise(side)", "Raise elevator", command_raise);
     CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
@@ -227,6 +228,18 @@ void command_elevator(const args_t& args){
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose(pose));
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose(pose));
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose(pose));
+}
+
+void command_move_elevator(const args_t& args){
+
+    if(args.size() != 2)return;
+    const String& side = args[0];
+    const String& poseStr = args[1];
+    int pose = poseStr.toInt();
+
+    if(side.equals("AB")) actuators.moveElevatorAngle(RobotCompass::AB, pose);
+    else if(side.equals("BC")) actuators.moveElevatorAngle(RobotCompass::BC, pose);
+    else if(side.equals("CA")) actuators.moveElevatorAngle(RobotCompass::CA, pose);
 }
 
 void command_raise(const args_t& args){
