@@ -58,7 +58,7 @@ namespace ActuatorsPreset{
         110, //elevator_Up  
         25,   //elevator_Grab
         60,   //elevator_Border
-        60,   //elevator_Planter
+        40,   //elevator_Planter
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
@@ -87,7 +87,7 @@ namespace ActuatorsPreset{
         140, //elevator_Up  
         20,   //elevator_Grab
         70,   //elevator_Border
-        30,   //elevator_Planter
+        40,   //elevator_Planter
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
