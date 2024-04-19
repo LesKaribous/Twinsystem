@@ -60,7 +60,7 @@ Token Interpreter::nextToken() {
     // Handle different token types
     if (isDigit(ch)) {
         return parseNumber();
-    } else if (isAlpha(ch)) {
+    } else if (isAlpha(ch)|| ch == '_') {
         return parseIdentifier();
     } else {
         switch (ch) {

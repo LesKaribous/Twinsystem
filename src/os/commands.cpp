@@ -25,7 +25,7 @@ void registerCommands() {
     CommandHandler::registerCommand("setAbsolutePosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0", command_resetCompass);
     CommandHandler::registerCommand("elevator(side, pose)", "Raise elevator to desired pose", command_elevator);
-    CommandHandler::registerCommand("move_elevator(side, angle)", "Raise elevator to desired angle", command_move_elevator);
+    CommandHandler::registerCommand("moveElevator(side,angle)", "Raise elevator to desired angle", command_move_elevator);
     CommandHandler::registerCommand("raise(side)", "Raise elevator", command_raise);
     CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
