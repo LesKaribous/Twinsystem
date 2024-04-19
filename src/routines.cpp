@@ -105,6 +105,14 @@ void onRobotBoot(){
     Expression::registerVariables("C", "C");
     Expression::registerVariables("CA", "CA");
 
+    Expression::registerVariables("MOTION", "MOTION");
+    Expression::registerVariables("ACTUATORS", "ACTUATORS");
+    Expression::registerVariables("SAFETY", "SAFETY");
+    Expression::registerVariables("CHRONO", "CHRONO");
+    Expression::registerVariables("IHM", "IHM");
+    Expression::registerVariables("INTERCOM", "INTERCOM");
+    Expression::registerVariables("LIDAR", "LIDAR");
+    Expression::registerVariables("TERMINAL", "TERMINAL");
 
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
