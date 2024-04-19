@@ -4,9 +4,6 @@
 
 INSTANTIATE_SERVICE(Actuators, actuators)
 
-#define _GS_ Settings::Actuators::Gripper
-#define _CPS_ Settings::Actuators::cherryPicker
-
 Actuators::Actuators() : Service(ID_ACTUATORS),
 gripperAB(ActuatorsPreset::AB),
 gripperBC(ActuatorsPreset::BC),
@@ -19,20 +16,20 @@ void Actuators::onAttach(){
     gripperAB.elevator.enable();
     gripperAB.leftGripper.enable();
     gripperAB.rightGripper.enable();
-    gripperAB.forkGripper.enable();
-    gripperAB.forkElevator.enable();
+    //gripperAB.forkGripper.enable();
+    //gripperAB.forkElevator.enable();
 
     gripperBC.elevator.enable();
     gripperBC.leftGripper.enable();
     gripperBC.rightGripper.enable();
-    gripperBC.forkGripper.enable();
-    gripperBC.forkElevator.enable();
+    //gripperBC.forkGripper.enable();
+    //gripperBC.forkElevator.enable();
 
     gripperCA.elevator.enable();
     gripperCA.leftGripper.enable();
     gripperCA.rightGripper.enable();
-    gripperCA.forkGripper.enable();
-    gripperCA.forkElevator.enable();
+    //gripperCA.forkGripper.enable();
+    //gripperCA.forkElevator.enable();
 
     open(RobotCompass::AB);
     open(RobotCompass::BC);
@@ -68,20 +65,20 @@ void Actuators::enable(){
     gripperAB.elevator.enable();
     gripperAB.leftGripper.enable();
     gripperAB.rightGripper.enable();
-    gripperAB.forkGripper.enable();
-    gripperAB.forkElevator.enable();
+    //gripperAB.forkGripper.enable();
+    //gripperAB.forkElevator.enable();
 
     gripperBC.elevator.enable();
     gripperBC.leftGripper.enable();
     gripperBC.rightGripper.enable();
-    gripperBC.forkGripper.enable();
-    gripperBC.forkElevator.enable();
+    // gripperBC.forkGripper.enable();
+    // gripperBC.forkElevator.enable();
 
     gripperCA.elevator.enable();
     gripperCA.leftGripper.enable();
     gripperCA.rightGripper.enable();
-    gripperCA.forkGripper.enable();
-    gripperCA.forkElevator.enable();
+    // gripperCA.forkGripper.enable();
+    // gripperCA.forkElevator.enable();
 }
 
 void Actuators::disable(){
@@ -89,20 +86,20 @@ void Actuators::disable(){
     gripperAB.elevator.disable();
     gripperAB.leftGripper.disable();
     gripperAB.rightGripper.disable();
-    gripperAB.forkGripper.disable();
-    gripperAB.forkElevator.disable();
+    // gripperAB.forkGripper.disable();
+    // gripperAB.forkElevator.disable();
 
     gripperBC.elevator.disable();
     gripperBC.leftGripper.disable();
     gripperBC.rightGripper.disable();
-    gripperBC.forkGripper.disable();
-    gripperBC.forkElevator.disable();
+    // gripperBC.forkGripper.disable();
+    // gripperBC.forkElevator.disable();
 
     gripperCA.elevator.disable();
     gripperCA.leftGripper.disable();
     gripperCA.rightGripper.disable();
-    gripperCA.forkGripper.disable();
-    gripperCA.forkElevator.disable();
+    // gripperCA.forkGripper.disable();
+    // gripperCA.forkElevator.disable();
 }
 
 void Actuators::close(RobotCompass rc){
@@ -179,13 +176,13 @@ void Actuators::forkUp(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        gripperAB.forkGripper.close();
+        //gripperAB.forkGripper.close();
         break;
     case RobotCompass::BC :
-        gripperBC.forkGripper.close();
+        //gripperBC.forkGripper.close();
         break;
     case RobotCompass::CA :
-        gripperCA.forkGripper.close();
+        //gripperCA.forkGripper.close();
         break;
 
     default:
@@ -197,13 +194,13 @@ void Actuators::forkDown(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        gripperAB.forkGripper.open();
+        //gripperAB.forkGripper.open();
         break;
     case RobotCompass::BC :
-        gripperBC.forkGripper.open();
+        //gripperBC.forkGripper.open();
         break;
     case RobotCompass::CA :
-        gripperCA.forkGripper.open();
+        //gripperCA.forkGripper.open();
         break;
     default:
         break;
@@ -214,13 +211,13 @@ void Actuators::forkGrab(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        gripperAB.forkGripper.grab();
+        //gripperAB.forkGripper.grab();
         break;
     case RobotCompass::BC :
-        gripperBC.forkGripper.grab();
+        //gripperBC.forkGripper.grab();
         break;
     case RobotCompass::CA :
-        gripperCA.forkGripper.grab();
+        //gripperCA.forkGripper.grab();
         break;
     default:
         break;
@@ -232,7 +229,7 @@ void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose){
 }
 
 void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose){
-    getActuatorGroup(rc).forkElevator.moveToPose(static_cast<int>(pose));
+    //getActuatorGroup(rc).forkElevator.moveToPose(static_cast<int>(pose));
 }
 
 bool Actuators::moveGripper(AdvancedServo& gripper, int target){

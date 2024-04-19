@@ -3,11 +3,16 @@
 #include "robot.h"
 #include "routines.h"
 
+/*
+void testConditionnal(){
+    async motion.go(1200,300) || async motion.go(500,1500);
+}
+*/
+
 void match(){
     //start match
     motion.setFeedrate(1.0);
-
-    if(ihm.isPrimary()){
+        if(ihm.isPrimary()){
         if(ihm.isColorBlue()) matchBlue();
         else matchYellow();
     }
@@ -45,8 +50,6 @@ void recalage(){
 void testEvitemment(){
     motion.setAsync();
     async motion.go(2775, 225 + 500) || async motion.go(2775, 225 + 250) || async motion.go(2775, 225);
-
-
 }
 
 void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){

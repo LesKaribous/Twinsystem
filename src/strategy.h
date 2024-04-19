@@ -9,9 +9,6 @@ void matchYellow();
 
 void secondaryMatchBlue();
 void secondaryMatchYellow();
-
-void testEvitemment();
-
 // Macros
 void waitMs(unsigned long time);
 

@@ -141,20 +141,20 @@ struct ActuatorGroup{
     GripperServo leftGripper;
     const int leftSensor;
 
-    GripperServo forkGripper;
+    //GripperServo forkGripper;
 
     AdvancedServo elevator;
 
-    AdvancedServo forkElevator;
+    //AdvancedServo forkElevator;
 
     ActuatorGroup(ActuatorsProperty presets) :
         rightGripper(presets.rightServoPin, presets.right_Open, presets.right_Close, presets.right_Grab), 
         rightSensor(presets.rightSensorPin),
         leftGripper(presets.leftServoPin, presets.left_Open, presets.left_Close, presets.left_Grab),  
         leftSensor(presets.leftSensorPin),
-        forkGripper(presets.forkServoPin, presets.fork_Open, presets.fork_Close, presets.fork_Grab),
-        elevator(presets.elevatorServoPin),
-        forkElevator(presets.forkElevatorPin) 
+        /*forkGripper(presets.forkServoPin, presets.fork_Open, presets.fork_Close, presets.fork_Grab),*/
+        elevator(presets.elevatorServoPin)/*,
+        forkElevator(presets.forkElevatorPin)*/
         {
             elevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevator_Down);
             elevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevator_Up);
@@ -162,14 +162,15 @@ struct ActuatorGroup{
             elevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevator_Border);
             elevator.setPose(static_cast<int>(ElevatorPose::PLANTER), presets.elevator_Planter);
 
-            forkElevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevatorFork_Up);
-            forkElevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevatorFork_Down);
-            forkElevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevatorFork_Border);
+            //forkElevator.setPose(static_cast<int>(ElevatorPose::UP), presets.elevatorFork_Up);
+            //forkElevator.setPose(static_cast<int>(ElevatorPose::DOWN), presets.elevatorFork_Down);
+            //forkElevator.setPose(static_cast<int>(ElevatorPose::BORDER), presets.elevatorFork_Border);
         }
 };
 
 class Actuators : public Service, public Job{
-protected:
+//protected:
+public:
     ActuatorGroup gripperAB; // Facing BAU
     ActuatorGroup gripperBC; // Facing Init button
     ActuatorGroup gripperCA; // Facing Tirette

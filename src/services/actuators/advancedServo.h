@@ -21,7 +21,8 @@ public:
 
     inline bool isSleeping() const {return m_sleeping;}
     inline bool isEnable() const {return m_enabled;}
-private:
+//private:
+public:
     Servo m_servo;
     int m_position;
     std::unordered_map<int, int> m_poses;

@@ -24,6 +24,8 @@ void registerCommands() {
     CommandHandler::registerCommand("setAbsPosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("setAbsolutePosition(x,y,angle)", "Set absolute position", command_setAbsPosition);
     CommandHandler::registerCommand("resetCompass", "Reset compass and set to 0", command_resetCompass);
+    CommandHandler::registerCommand("raise(side)", "Raise elevator", command_raise);
+    CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
     CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -213,6 +215,34 @@ void command_close(const args_t& args){
     else if(side.equals("BC")) actuators.close(RobotCompass::BC);
     else if(side.equals("CA")) actuators.close(RobotCompass::CA);
 }
+
+void command_raise(const args_t& args){
+    //Servo test;
+    //test.attach(56);
+    //test.write(130);
+    /*
+    actuators.gripperCA.elevator.m_servo.detach();
+    actuators.gripperCA.elevator.m_servo.attach(56);
+    actuators.gripperCA.elevator.m_servo.write(130);
+    */
+    //Console::println("coucou");
+    //return;
+
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
+    else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
+    else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
+}
+
+void command_lower(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
+    else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
+    else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
+}
+
 
 //Routines 
 

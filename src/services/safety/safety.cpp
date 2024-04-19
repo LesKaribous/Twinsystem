@@ -52,13 +52,13 @@ void Safety::onUpdate(){
         if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
         if(!motion.isRotating()) m_lastSeen = millis();
     }
-
+/*
     if(m_obstacleDetected && !motion.hasFinished() && motion.isPaused() && motion.pauseDuration() > 1000){
         motion.cancel();
         m_obstacleDetected = false;
         Console::println("cancelled");
     }
-
+*/
     if(millis() - m_lastSeen > 2000){
         m_obstacleDetected = false;
     }

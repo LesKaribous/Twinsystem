@@ -29,6 +29,8 @@ void command_setAbsPosition(const args_t& args);
 void command_resetCompass(const args_t& args);
 
 //Actuators
+void command_raise(const args_t& args);
+void command_lower(const args_t& args);
 void command_grab(const args_t& args);
 void command_open(const args_t& args);
 void command_close(const args_t& args);
