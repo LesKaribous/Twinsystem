@@ -213,13 +213,17 @@ void matchYellow(){
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
     // Macro place plants
     placePlants(POI::planterYellowWest, RobotCompass::CA, TableCompass::WEST);
-    
+    ihm.addScorePoints(8); //plante valid + jardiniere x2
+
     placePlants(POI::y1, RobotCompass::BC, TableCompass::WEST, false);
+    //ihm.addScorePoints(8); We don't know the plant type here
+
     // Dégagement des pots
     async motion.go(2800,300); // Possitionnement face bordure
     probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
     async motion.go(2890,612); // Dégagement latéral des pots
     placePlants(POI::planterYellowNorth, RobotCompass::AB, TableCompass::NORTH);
+    ihm.addScorePoints(8); //plante valid + jardiniere x2
     // Dégagement de zone
     //async motion.go(POI::plantSupplySW);
     async motion.go(2113,1000);
@@ -236,6 +240,7 @@ void matchYellow(){
     async motion.go(POI::solarPanelYellow_1);
     async motion.go(POI::solarPanelYellow_3);
     async motion.go(2150,1670); // Dégagement
+    ihm.addScorePoints(15); //3x panneaux
     // Ranger les bras
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.open(RobotCompass::CA);

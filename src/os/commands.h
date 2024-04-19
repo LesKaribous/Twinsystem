@@ -34,6 +34,7 @@ void command_lower(const args_t& args);
 void command_grab(const args_t& args);
 void command_open(const args_t& args);
 void command_close(const args_t& args);
+void command_elevator(const args_t& args);
 
 //Routine
 void command_recalage(const args_t& args);

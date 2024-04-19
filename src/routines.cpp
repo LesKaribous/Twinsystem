@@ -114,6 +114,12 @@ void onRobotBoot(){
     Expression::registerVariables("LIDAR", "LIDAR");
     Expression::registerVariables("TERMINAL", "TERMINAL");
 
+    Expression::registerVariables("UP", "0");
+    Expression::registerVariables("DOWN", "1");
+    Expression::registerVariables("GRAB", "2");
+    Expression::registerVariables("BORDER", "3");
+    Expression::registerVariables("PLANTER", "4");
+
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
     
