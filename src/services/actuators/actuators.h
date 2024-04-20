@@ -202,6 +202,8 @@ public:
     void moveForkElevator(RobotCompass rc, ElevatorPose poseIndex);
     bool readSensor(RobotCompass rc, Side gs);
     void testSensors();
+
+    int howManyPlant(RobotCompass rc);
     
     bool runGrabbing(RobotCompass rc, Side gs = Side::BOTH);
     bool runOpening(RobotCompass rc, Side gs = Side::BOTH);

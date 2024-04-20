@@ -31,6 +31,13 @@ void Actuators::onAttach(){
     //gripperCA.forkGripper.enable();
     //gripperCA.forkElevator.enable();
 
+    pinMode(Pin::Sensor::SensorLeft_AB, INPUT_PULLUP);
+    pinMode(Pin::Sensor::SensorRight_AB, INPUT_PULLUP);
+    pinMode(Pin::Sensor::SensorLeft_BC, INPUT_PULLUP);
+    pinMode(Pin::Sensor::SensorRight_BC, INPUT_PULLUP);
+    pinMode(Pin::Sensor::SensorLeft_CA, INPUT_PULLUP);
+    pinMode(Pin::Sensor::SensorRight_CA, INPUT_PULLUP);
+
     open(RobotCompass::AB);
     open(RobotCompass::BC);
     open(RobotCompass::CA);
@@ -382,6 +389,32 @@ bool Actuators::readSensor(RobotCompass rc, Side gs){
         break;
     }
     return false;
+}
+
+int Actuators::howManyPlant(RobotCompass rc){
+    int count = 0;
+    switch (rc)
+    {
+    case RobotCompass::AB:
+        count += digitalRead(Pin::Sensor::SensorRight_AB) ? 0 : 1;
+        count += digitalRead(Pin::Sensor::SensorLeft_AB) ? 0 : 1;
+        break;
+
+    case RobotCompass::BC:
+        count += digitalRead(Pin::Sensor::SensorRight_BC) ? 0 : 1;
+        count += digitalRead(Pin::Sensor::SensorLeft_BC)  ? 0 : 1;
+        break;
+
+    case RobotCompass::CA:
+        count += digitalRead(Pin::Sensor::SensorRight_CA)  ? 0 : 1;
+        count += digitalRead(Pin::Sensor::SensorLeft_CA) ? 0 : 1;
+        break;
+
+    default:
+        return 0;
+        break;
+    }
+    return count;
 }
 
 void Actuators::applause(RobotCompass rc){

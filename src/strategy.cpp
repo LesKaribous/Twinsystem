@@ -165,8 +165,9 @@ void matchBlue(){
     // Macro to take plants
     takePlants(POI::plantSupplySW, RobotCompass::CA, TableCompass::EAST);
     // Macro place plants
+    int plants = actuators.howManyPlant(RobotCompass::AB);
     placePlants(POI::planterBlueWest, RobotCompass::AB, TableCompass::WEST);
-    ihm.addScorePoints(8); //plante valid + jardiniere x2
+    ihm.addScorePoints(plants * 4); //plante valid + jardiniere x2
 
     placePlants(POI::b1, RobotCompass::BC, TableCompass::WEST, false);
     //ihm.addScorePoints(8); We don't know the plant type here
@@ -175,8 +176,10 @@ void matchBlue(){
     async motion.go(200,300); // Possitionnement face bordure
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
     async motion.go(110,612); // Dégagement latéral des pots
+
+    plants = actuators.howManyPlant(RobotCompass::CA);
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
-    ihm.addScorePoints(8); //plante valid + jardiniere x2
+    ihm.addScorePoints(plants * 4); //plante valid + jardiniere x2
 
     // Dégagement de zone
     //async motion.go(POI::plantSupplySW);
@@ -213,8 +216,9 @@ void matchYellow(){
     // Macro to take plants
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
     // Macro place plants
+    int plants = actuators.howManyPlant(RobotCompass::CA);
     placePlants(POI::planterYellowWest, RobotCompass::CA, TableCompass::WEST);
-    ihm.addScorePoints(8); //plante valid + jardiniere x2
+    ihm.addScorePoints( plants * 4); //plante valid + jardiniere x2
 
     placePlants(POI::y1, RobotCompass::BC, TableCompass::WEST, false);
     //ihm.addScorePoints(8); We don't know the plant type here
@@ -223,8 +227,9 @@ void matchYellow(){
     async motion.go(2800,300); // Possitionnement face bordure
     probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
     async motion.go(2890,612); // Dégagement latéral des pots
+    plants = actuators.howManyPlant(RobotCompass::AB);
     placePlants(POI::planterYellowNorth, RobotCompass::AB, TableCompass::NORTH);
-    ihm.addScorePoints(8); //plante valid + jardiniere x2
+    ihm.addScorePoints( plants * 4); //plante valid + jardiniere x2
     // Dégagement de zone
     //async motion.go(POI::plantSupplySW);
     async motion.go(2113,1000);
