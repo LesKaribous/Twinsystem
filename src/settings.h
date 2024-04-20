@@ -35,8 +35,8 @@ namespace Settings{
         YELLOW  = true;
 
         constexpr unsigned long 
-        DURATION = 90*1000,        //100s
-        NEARLY_FINISH = 5 * 1000,       //10s before the end
+        DURATION = 90*1000,        //90s
+        NEARLY_FINISH = 5 * 1000,       //5s before the end
         ENDMATCH = 200;             //200ms before the end
         
         constexpr float 

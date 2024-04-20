@@ -16,7 +16,6 @@ IHM::IHM() : Service(ServiceID::ID_IHM),
 
 void IHM::onAttach(){
     Console::info() << "IHM activated" << Console::endl;
-
     screen.begin();
     starter.setInverted(true);
     teamSwitch.setInverted(true);

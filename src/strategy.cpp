@@ -353,7 +353,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	//bool m_probing = true;
     //motion.setSync();
     //Console::println("Recalling");
-
+    //motion.resetCompass();
     motion.setFeedrate(0.3);
 	async motion.align(rc, getCompassOrientation(tc));
 
@@ -368,26 +368,21 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	if(tc == TableCompass::NORTH){
 		position.a = 3000.0 - _offset; //We hit Xmax
 		//_probedX = true;
-		motion.setAbsPosition(position);
 	}else if(tc == TableCompass::SOUTH){
 		position.a = 0.0 + _offset; //We hit Xmin
 		//_probedX = true;
-		motion.setAbsPosition(position);
 	}else if(tc == TableCompass::EAST){
 		position.b = 2000.0 - _offset; //We hit Ymax
 		//_probedY = true;
-		motion.setAbsPosition(position);
 	}else if(tc == TableCompass::WEST){
 		position.b = 0.0 + _offset; //We hit Ymin
 		//_probedY = true;
-		motion.setAbsPosition(position);
 	}
-
-	//motion.setAbsPosition(position);
+    position.c = DEG_TO_RAD * (getCompassOrientation(tc) - getCompassOrientation(rc));
+	Console::println(position.c * RAD_TO_DEG);
+    motion.setAbsPosition(position);
 
 	async motion.goPolar(getCompassOrientation(rc),-clearance);
-
 	if(wasAbsolute) motion.setAbsolute();
     motion.setFeedrate(currentFeedrate);
-	//_probing = false;
 }

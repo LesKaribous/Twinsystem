@@ -4,6 +4,13 @@
 #include "utils/job.h"
 #include "utils/geometry.h"
 
+//BNO
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+#include <SPI.h>
+
 #include <TeensyStep.h>
 class Motion : public Service, public Job{
 public:
@@ -61,6 +68,10 @@ public:
     float getTargetDirection() const;
     float getAbsoluteTargetDirection() const;
 
+    void resetCompass(); //zero orientation
+    float getOrientation();
+    void setOrientation(float angle);
+    
     bool isAbsolute() const;
     bool isRelative() const;
     bool isRotating() const;
@@ -88,6 +99,10 @@ private :
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
 
+    float compassReference = 0;
+    float compassOffset = 0;
+    bool _useBNO = false;
+
     Stepper _sA, _sB, _sC;
     StepControl _steppers;
 
@@ -97,6 +112,8 @@ private :
     bool _absolute = true;
     bool _optimizeRotation = true;
     bool _debug = true;
+
+    Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire2);
 
     SERVICE(Motion);
 };

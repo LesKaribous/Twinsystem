@@ -4,6 +4,7 @@
 #include "settings.h"
 #include "os/console.h"
 #include "motion.h"
+#include "utils/timer/timer.h"
 
 INSTANTIATE_SERVICE(Motion, motion)
 
@@ -12,7 +13,6 @@ Motion::Motion() : Service(ID_MOTION),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
     _sC(Pin::Stepper::stepC, Pin::Stepper::dirC){
 }
-
 
 void Motion::onAttach(){
     Console::info() << "Motion activated" << Console::endl;
@@ -52,11 +52,15 @@ void Motion::onAttach(){
     _sC.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
 
     /* Initialise the sensor */
-    /*while(!bno.begin()){
-        Console::error("MotionPID") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << Console::endl;
+    if(!bno.begin()){
+        Console::error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << Console::endl;
+        _useBNO = false;
+    }else{
+        _useBNO = true;
+        bno.setExtCrystalUse(true);
     }
-    bno.setExtCrystalUse(true);
-    */
+    
+    
 }
 
 void Motion::onUpdate(){
@@ -65,6 +69,12 @@ void Motion::onUpdate(){
             complete();
         }
         estimatePosition();
+    }
+
+    if(_useBNO){
+        RUN_EVERY(
+            _position.c = getOrientation();
+        ,100)
     }
 }
 
@@ -182,6 +192,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
+
     if(m_async)_steppers.moveAsync(_sA, _sB, _sC);
     else{
         _steppers.move(_sA, _sB, _sC);
@@ -226,7 +237,6 @@ void Motion::cancel() {
         _steppers.stopAsync();
     }
     estimatePosition();
-
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
@@ -265,7 +275,6 @@ void Motion::forceCancel() {
     _sC.setTargetAbs(0);
 }
 
-
 Vec3 Motion::toRelativeTarget(Vec3 absTarget){
     absTarget.sub(_position); 		 //Convert  target relativeto Absolute
     absTarget.rotateZ(_position.c);
@@ -300,7 +309,13 @@ void  Motion::estimatePosition(){ //We are not using the estimated velocity to p
 
     //Calculate XYZ delta
     Vec3 del = fk(linearDelta);
-    del.rotateZ((_position.c + del.c)); //Transform to workd space
+
+    float orientation = _position.c;
+    if(!_useBNO){
+        orientation += del.c;
+    }
+
+    del.rotateZ(orientation); //Transform to workd space
 
     _position += del/_calibration;
 }
@@ -317,6 +332,33 @@ Vec3 Motion::targetToSteps(Vec3 relTarget){
     return Vec3(int(f_res.a), int(f_res.b), int(f_res.c));
 }
 
+
+
+void Motion::resetCompass(){
+    sensors_event_t eventAngular;
+    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+    compassReference = (-DEG_TO_RAD * eventAngular.orientation.x);
+
+}
+
+void Motion::setOrientation(float orientation){
+    if(!_useBNO) return;
+    while(orientation > PI) orientation-= 2.0f*PI;
+    while(orientation <= -PI) orientation += 2.0f*PI;
+    compassOffset -= getOrientation() - orientation;
+    Console::println(compassOffset*RAD_TO_DEG);
+}
+
+float Motion::getOrientation(){
+    if(!_useBNO) return _position.c;
+    sensors_event_t eventAngular;
+    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+    float orientation = (- DEG_TO_RAD * eventAngular.orientation.x) - compassReference + compassOffset;
+
+    while(orientation > PI) orientation-= 2.0f*PI;
+    while(orientation <= -PI) orientation += 2.0f*PI;
+    return  orientation;
+}
 
 // -------------------------------
 // ----- Setters and Getters -----
@@ -368,8 +410,9 @@ bool Motion::isMoving() const{
 
 
 void  Motion::setAbsPosition(Vec3 newPos){
-    // THROW(newPos);
+    THROW(newPos);
     _position = newPos; 
+    if(_useBNO) setOrientation(newPos.c);
 }
 
 void Motion::setStepsVelocity(float v){
