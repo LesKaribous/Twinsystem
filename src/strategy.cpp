@@ -173,9 +173,9 @@ void matchBlue(){
     //ihm.addScorePoints(8); We don't know the plant type here
 
     // Dégagement des pots
-    async motion.go(200,300); // Possitionnement face bordure
+    async motion.go(200,300); // Positionnement face bordure
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
-    async motion.go(110,612); // Dégagement latéral des pots
+    async motion.go(110,750); // Dégagement latéral des pots
 
     plants = actuators.howManyPlant(RobotCompass::CA);
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
@@ -231,7 +231,7 @@ void matchYellow(){
     //ihm.addScorePoints(8); We don't know the plant type here
 
     // Dégagement des pots
-    async motion.go(2800,300); // Possitionnement face bordure
+    async motion.go(2800,750); // Positionnement face bordure
     probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
     async motion.go(2890,612); // Dégagement latéral des pots
     plants = actuators.howManyPlant(RobotCompass::AB);
