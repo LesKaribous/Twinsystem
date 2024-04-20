@@ -31,9 +31,9 @@ void recalage(){
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
         async motion.go(POI::b1);
         async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
+        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
     else{
         motion.setAbsPosition({-1,-1,PI});
@@ -41,9 +41,9 @@ void recalage(){
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
         async motion.go(POI::y1);
         async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
+        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
 }
 
@@ -194,10 +194,17 @@ void matchBlue(){
     actuators.close(RobotCompass::AB);
     waitMs(800);
     // S'approcher et tourner les panneaux
+    motion.setFeedrate(0.7);
     async motion.go(POI::solarPanelBlue_1);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelBlue_3);
-    async motion.go(850,1670); // Dégagement
-    ihm.addScorePoints(15); //3 panneaux retournés
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
+    //async motion.go(850,1670); // Dégagement Bleu
+    async motion.go(POI::solarPanelOther_1);
+    ihm.addScorePoints(5); //1 panneaux gris retournés
+    async motion.go(POI::solarPanelOther_3);
+    ihm.addScorePoints(10); //2 panneaux gris retournés
+    async motion.go(1850,1670); // Dégagement Gris
 
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
@@ -242,11 +249,20 @@ void matchYellow(){
     waitMs(800);
     actuators.close(RobotCompass::CA);
     waitMs(800);
+
     // S'approcher et tourner les panneaux
+    motion.setFeedrate(0.7);
     async motion.go(POI::solarPanelYellow_1);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelYellow_3);
-    async motion.go(2150,1670); // Dégagement
-    ihm.addScorePoints(15); //3x panneaux
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
+    //async motion.go(2150,1670); // Dégagement
+    async motion.go(POI::solarPanelOther_3);
+    ihm.addScorePoints(5); //1 panneaux gris retournés
+    async motion.go(POI::solarPanelOther_1);
+    ihm.addScorePoints(10); //2 panneaux gris retournés
+    async motion.go(1150,1670); // Dégagement Gris
+
     
     // Ranger les bras
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
