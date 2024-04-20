@@ -200,11 +200,11 @@ void matchBlue(){
     async motion.go(POI::solarPanelBlue_3);
     ihm.addScorePoints(10); //2 panneaux couleur retournés
     //async motion.go(850,1670); // Dégagement Bleu
-    async motion.go(POI::solarPanelOther_1);
+    /*async motion.go(POI::solarPanelOther_1);
     ihm.addScorePoints(5); //1 panneaux gris retournés
     async motion.go(POI::solarPanelOther_3);
     ihm.addScorePoints(10); //2 panneaux gris retournés
-    async motion.go(1850,1670); // Dégagement Gris
+    async motion.go(1850,1670); // Dégagement Gris*/
 
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
@@ -257,11 +257,11 @@ void matchYellow(){
     async motion.go(POI::solarPanelYellow_3);
     ihm.addScorePoints(10); //2 panneaux couleur retournés
     //async motion.go(2150,1670); // Dégagement
-    async motion.go(POI::solarPanelOther_3);
+    /*async motion.go(POI::solarPanelOther_3);
     ihm.addScorePoints(5); //1 panneaux gris retournés
     async motion.go(POI::solarPanelOther_1);
     ihm.addScorePoints(10); //2 panneaux gris retournés
-    async motion.go(1150,1670); // Dégagement Gris
+    async motion.go(1150,1670); // Dégagement Gris*/
 
     
     // Ranger les bras
