@@ -167,8 +167,8 @@ void onMatchNearEnd(){
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
     waitMs(800);
-    if(ihm.isColorBlue()) async motion.go(POI::b2);
-    else async motion.go(POI::y2);
+    if(ihm.isColorBlue()) async motion.go(POI::blueArrival);
+    else async motion.go(POI::yellowArrival);
     ihm.addScorePoints(10); //zone d'arrivée
     chrono.onMatchFinished();
 }

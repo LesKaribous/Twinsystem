@@ -211,7 +211,7 @@ void matchBlue(){
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
     actuators.open(RobotCompass::AB);
     // Aller en zone de recharge 
-    async motion.go(POI::b2);
+    async motion.go(POI::blueArrival);
     ihm.addScorePoints(10); //zone d'arrivée
     // Fin de match
     motion.disengage();
@@ -277,7 +277,7 @@ void matchYellow(){
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.open(RobotCompass::CA);
     // Aller en zone de recharge 
-    async motion.go(POI::y2);
+    async motion.go(POI::yellowArrival);
     ihm.addScorePoints(10); //zone d'arrivée*/
     
     chrono.onMatchNearlyFinished();
