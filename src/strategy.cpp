@@ -31,9 +31,9 @@ void recalage(){
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
         async motion.go(POI::b1);
         async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
+        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
     else{
         motion.setAbsPosition({-1,-1,PI});
@@ -41,9 +41,9 @@ void recalage(){
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
         async motion.go(POI::y1);
         async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::DOWN);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
+        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
 }
 
@@ -59,7 +59,7 @@ void takePlants(Vec2 target, RobotCompass rc, TableCompass tc){
     float newTargetY = target.y;
 
     // Ralentir
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(0.7);
 
     // Mettre les bras en position Grab
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
@@ -109,7 +109,7 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
 
     float clearance = 200.0;
     // Ralentir
-    motion.setFeedrate(0.6);
+    motion.setFeedrate(0.8);
     // Vérifier que le bras est en position UP
     actuators.moveElevator(rc,ElevatorPose::UP);
     // S'orienter vers la position de placement
@@ -173,9 +173,9 @@ void matchBlue(){
     //ihm.addScorePoints(8); We don't know the plant type here
 
     // Dégagement des pots
-    async motion.go(200,300); // Possitionnement face bordure
+    async motion.go(200,300); // Positionnement face bordure
     probeBorder(TableCompass::SOUTH, RobotCompass::CA,0,100,50); // Approche de la bordure
-    async motion.go(110,612); // Dégagement latéral des pots
+    async motion.go(110,750); // Dégagement latéral des pots
 
     plants = actuators.howManyPlant(RobotCompass::CA);
     placePlants(POI::planterBlueSouth, RobotCompass::CA, TableCompass::SOUTH);
@@ -194,10 +194,17 @@ void matchBlue(){
     actuators.close(RobotCompass::AB);
     waitMs(800);
     // S'approcher et tourner les panneaux
+    motion.setFeedrate(1.0);
     async motion.go(POI::solarPanelBlue_1);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelBlue_3);
-    async motion.go(850,1670); // Dégagement
-    ihm.addScorePoints(15); //3 panneaux retournés
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
+    async motion.go(850,1670); // Dégagement Bleu
+    /*async motion.go(POI::solarPanelOther_1);
+    ihm.addScorePoints(5); //1 panneaux gris retournés
+    async motion.go(POI::solarPanelOther_3);
+    ihm.addScorePoints(10); //2 panneaux gris retournés
+    async motion.go(1850,1670); // Dégagement Gris*/
 
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
@@ -224,9 +231,10 @@ void matchYellow(){
     //ihm.addScorePoints(8); We don't know the plant type here
 
     // Dégagement des pots
-    async motion.go(2800,300); // Possitionnement face bordure
+    async motion.go(2800,300); // Positionnement face bordure
     probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
-    async motion.go(2890,612); // Dégagement latéral des pots
+    async motion.go(2890,750); // Dégagement latéral des pots
+
     plants = actuators.howManyPlant(RobotCompass::AB);
     placePlants(POI::planterYellowNorth, RobotCompass::AB, TableCompass::NORTH);
     ihm.addScorePoints( plants * 4); //plante valid + jardiniere x2
@@ -242,11 +250,20 @@ void matchYellow(){
     waitMs(800);
     actuators.close(RobotCompass::CA);
     waitMs(800);
+
     // S'approcher et tourner les panneaux
+    motion.setFeedrate(1.0);
     async motion.go(POI::solarPanelYellow_1);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelYellow_3);
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
     async motion.go(2150,1670); // Dégagement
-    ihm.addScorePoints(15); //3x panneaux
+    /*async motion.go(POI::solarPanelOther_3);
+    ihm.addScorePoints(5); //1 panneaux gris retournés
+    async motion.go(POI::solarPanelOther_1);
+    ihm.addScorePoints(10); //2 panneaux gris retournés
+    async motion.go(1150,1670); // Dégagement Gris*/
+
     
     // Ranger les bras
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
