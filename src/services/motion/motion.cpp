@@ -56,7 +56,7 @@ void Motion::onAttach(){
         Console::error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << Console::endl;
         _useBNO = false;
     }else{
-        _useBNO = true;
+        _useBNO = false;
         bno.setExtCrystalUse(true);
     }
     

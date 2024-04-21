@@ -160,7 +160,7 @@ void onIntercomRequestReply(Request& req){
 }
 
 void onMatchNearEnd(){
-    motion.cancel();
+    if(motion.isPending())motion.cancel();
     motion.setFeedrate(1.0);
     motion.setAbsolute();
     actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
@@ -170,7 +170,7 @@ void onMatchNearEnd(){
     if(ihm.isColorBlue()) async motion.go(POI::b2);
     else async motion.go(POI::y2);
     ihm.addScorePoints(10); //zone d'arrivée
-    onMatchEnd();
+    chrono.onMatchFinished();
 }
 
 void onMatchEnd(){

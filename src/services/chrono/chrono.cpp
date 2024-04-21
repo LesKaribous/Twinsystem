@@ -11,12 +11,10 @@ void Chrono::onAttach(){
 
 void Chrono::onUpdate(){
     if(!nearlyFinished && getTimeLeft() <= Settings::Match::NEARLY_FINISH && getTimeLeft() >= Settings::Match::ENDMATCH){
-        nearlyFinished = true;
         onMatchNearlyFinished();
     }
 
     if(!finished && getTimeLeft() <= Settings::Match::ENDMATCH){
-        finished = true;
         onMatchFinished();
     }
 
@@ -24,10 +22,12 @@ void Chrono::onUpdate(){
 }
 
 void Chrono::onMatchNearlyFinished(){
+    nearlyFinished = true;
     if(m_matchNearEnd_callback != nullptr)m_matchNearEnd_callback();
 }
 
 void Chrono::onMatchFinished(){
+    finished = true;
     if(m_matchEnd_callback != nullptr)m_matchEnd_callback();
 }
 

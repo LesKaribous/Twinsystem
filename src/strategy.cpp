@@ -206,6 +206,7 @@ void matchBlue(){
     ihm.addScorePoints(10); //2 panneaux gris retournés
     async motion.go(1850,1670); // Dégagement Gris*/
 
+    /*
     // Ranger les bras
     actuators.moveElevator(RobotCompass::AB,ElevatorPose::UP);
     actuators.open(RobotCompass::AB);
@@ -215,17 +216,25 @@ void matchBlue(){
     // Fin de match
     motion.disengage();
     actuators.disable();
+    */
+
+    chrono.onMatchNearlyFinished();
+    chrono.onMatchFinished();
 }
 
 void matchYellow(){
     motion.setFeedrate(1.0);
     async motion.go(2000,400);
-    // Macro to take plants
+    // Macro to take as much plant as possible
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
-    // Macro place plants
-    int plants = actuators.howManyPlant(RobotCompass::CA);
+
+    // Macro place plants of CA side
+    int plantsAB = actuators.howManyPlant(RobotCompass::AB);
+    int plantsBC = actuators.howManyPlant(RobotCompass::BC);
+    int plantsCA = actuators.howManyPlant(RobotCompass::CA);
+
     placePlants(POI::planterYellowWest, RobotCompass::CA, TableCompass::WEST);
-    ihm.addScorePoints( plants * 4); //plante valid + jardiniere x2
+    ihm.addScorePoints( plantsCA * 4); //plante valid + jardiniere x2
 
     placePlants(POI::y1, RobotCompass::BC, TableCompass::WEST, false);
     //ihm.addScorePoints(8); We don't know the plant type here
@@ -235,9 +244,8 @@ void matchYellow(){
     probeBorder(TableCompass::NORTH, RobotCompass::AB,0,100,50); // Approche de la bordure
     async motion.go(2890,750); // Dégagement latéral des pots
 
-    plants = actuators.howManyPlant(RobotCompass::AB);
     placePlants(POI::planterYellowNorth, RobotCompass::AB, TableCompass::NORTH);
-    ihm.addScorePoints( plants * 4); //plante valid + jardiniere x2
+    ihm.addScorePoints( plantsAB * 4); //plante valid + jardiniere x2
     // Dégagement de zone
     //async motion.go(POI::plantSupplySW);
     async motion.go(2113,1000);
@@ -264,16 +272,16 @@ void matchYellow(){
     ihm.addScorePoints(10); //2 panneaux gris retournés
     async motion.go(1150,1670); // Dégagement Gris*/
 
-    
+    /*
     // Ranger les bras
     actuators.moveElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.open(RobotCompass::CA);
     // Aller en zone de recharge 
     async motion.go(POI::y2);
-    ihm.addScorePoints(10); //zone d'arrivée
-    // Fin de match
-    motion.disengage();
-    actuators.disable();
+    ihm.addScorePoints(10); //zone d'arrivée*/
+    
+    chrono.onMatchNearlyFinished();
+    chrono.onMatchFinished();
 }
 
 void secondaryMatchBlue(){
