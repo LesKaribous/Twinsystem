@@ -124,7 +124,7 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
         probeBorder(tc, rc, 0, 100, 40);
     }
     else{
-        async motion.go(target);
+        async motion.go(target.x, target.y + 20);
     }
     // Poser les plantes
     if(planter)actuators.moveElevator(rc,ElevatorPose::PLANTER);
