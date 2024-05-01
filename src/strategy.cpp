@@ -132,14 +132,14 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
     
     waitMs(800);
     // Ouvrir les bras
-    slowOpennig(rc, 50);
+    actuators.open(rc, 50);
     if(planter){
         // Se reculer un peu (ATTENTION ON EST DE L'AUTRE COTE DE LA BORDURE)
         motion.setRelative();
         async motion.goPolar(getCompassOrientation(rc),-10);
         motion.setAbsolute();
         // Lever l'ascensceur
-        SlowElevatorBorder(rc, 10);
+        actuators.moveElevator(rc, ElevatorPose::BORDER, 50); //SlowElevatorBorder(rc, 10);
         // Se reculer
         motion.setRelative();
         async motion.goPolar(getCompassOrientation(rc),-150);
@@ -313,6 +313,8 @@ void waitMs(unsigned long time){
     //delay(time);
 }
 
+
+/*
 void SlowElevatorUp(RobotCompass rc, int speed){
     //convert %speed into ms
     speed = constrain(speed, 0, 100);
@@ -361,6 +363,7 @@ void slowOpennig(RobotCompass rc, int speed){
     int ms = map(speed, 0, 100, 50, 0);
     while(!actuators.runOpening(rc)) waitMs(ms);
 }
+/**/
 
 RobotCompass nextActuator(RobotCompass rc){
     int RobotCompassSize = 6;

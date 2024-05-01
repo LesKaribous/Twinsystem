@@ -68,7 +68,10 @@ void onRobotBoot(){
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10); 
-    
+    ihm.onUpdate(); // Read inputs
+
+    delay(500);
+
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
 

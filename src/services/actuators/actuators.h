@@ -48,22 +48,26 @@ public:
     void disableTraco();
 private:
     ActuatorGroup& getActuatorGroup(RobotCompass rc);
-
+    
 
 
 
 //primary methods
 public:
-    void close  (RobotCompass rc);
-    void open   (RobotCompass rc);
-    void grab   (RobotCompass rc);
-    void applause(RobotCompass rc);
+    void close  (RobotCompass rc, int speed = 100);
+    void open   (RobotCompass rc, int speed = 100);
+    void grab   (RobotCompass rc, int speed = 100);
+    //void applause(RobotCompass rc, int speed = 100);
     
-    void moveElevatorAngle(RobotCompass rc, int angle);
-    void moveElevator(RobotCompass rc, ElevatorPose poseIndex);
+    void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
+    void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
     bool readSensor(RobotCompass rc, Side gs);
     void testSensors();
     int howManyPlant(RobotCompass rc);
+
+    void registerPrimaryPoses(); //Register all servos poses
+
+    /*
     bool runGrabbing(RobotCompass rc, Side gs = Side::BOTH);
     bool runOpening(RobotCompass rc, Side gs = Side::BOTH);
     bool runClosing(RobotCompass rc, Side gs = Side::BOTH);
@@ -72,9 +76,11 @@ public:
     bool runElevatorGrab(RobotCompass rc);
     bool runElevatorBorder(RobotCompass rc);
     bool runElevatorPlanter(RobotCompass rc);
+    /**/
 private : 
-    bool moveGripper(SmartServo& servo, GripperPose pose);
-    bool moveElevator(SmartServo& servo, ElevatorPose pose);
+    bool moveGripperDual(SmartServo& a,SmartServo& b, GripperPose pose, int speed = 100);
+    bool moveGripper(SmartServo& servo, GripperPose pose, int speed = 100);
+    bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
     void createFingerGroup(RobotCompass, FingerGroupProperty);
 
 
@@ -83,10 +89,12 @@ private :
 
 //secondary methods   
 public :
-    void forkUp   (RobotCompass rc);
-    void forkDown (RobotCompass rc);
-    void forkGrab (RobotCompass rc);
-    void moveForkElevator(RobotCompass rc, ElevatorPose pose);
+    void forkUp   (RobotCompass rc, int speed = 100);
+    void forkDown (RobotCompass rc, int speed = 100);
+    void forkGrab (RobotCompass rc, int speed = 100);
+    void moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed = 100);
+
+    void registerSecondaryPoses(); //Register all servos poses
 
 private :
     void createForkGroup(RobotCompass, ForkGroupProperty);

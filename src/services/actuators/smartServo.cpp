@@ -29,7 +29,7 @@ bool SmartServo::moveToDefault(int speed, bool runAsync){
     return moveTo(m_defaultPos, speed, runAsync);
 }
 
-bool SmartServo::moveTo(int target, int speed, bool runAsync){
+bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non blocking mode
     if(!m_enabled) return;
     if(m_sleeping) wakeUp(); //Wake
 
@@ -40,20 +40,33 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){
     m_speed = speed;
 
     int ms = map(speed, 0, 100, 50, 0);
-    do{
-        delay(ms);
-        int currrentPos = getPosition();
-        int delta = abs(currrentPos - m_target);
-        if(delta > 2) delta = 2;
+    int currrentPos = 0;
 
-        if (currrentPos < target - delta){
-            m_servo.write(currrentPos + delta);
+    do{
+        if(!runAsync) delay(ms);
+        else if(millis() - m_lastUpdate < ms){
+            return false;
+        }
+
+        m_lastUpdate = millis();
+        currrentPos = getPosition();
+
+        if(abs(currrentPos - m_target) < 2){
+            currrentPos = m_target;
+            m_servo.write(m_target);
+            return true;
+        }
+
+        if (currrentPos < target){
+            m_servo.write(currrentPos + 2);
             if(runAsync) return false;
-        }else if (currrentPos > target + delta){
-            m_servo.write(currrentPos - delta);
+        }else if (currrentPos > target){
+            m_servo.write(currrentPos - 2);
             if(runAsync) return false;
-        }else return true;
-    }while(!runAsync);
+        }else{
+            if(runAsync) return true;
+        }
+    }while(!runAsync && currrentPos != m_target);
     return true;
 }
 

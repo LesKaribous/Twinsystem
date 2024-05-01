@@ -31,6 +31,7 @@ public:
 //private:
 public:
     Servo m_servo;
+    long m_lastUpdate = 0;
     int m_speed;
     int m_position;
     int m_target;
