@@ -39,7 +39,7 @@ void ActuatorGroup::createServo(int pin, int defaultPos, int minPos, int maxPos)
 }
 
 SmartServo& ActuatorGroup::getServo(int id){
-    if(id < 0 || id >= m_servos.size()) Console::error("ActuatorGroup") << "servo " << id << " does not exist " << Console::endl; 
+    if(id < 0 || size_t(id) >= m_servos.size()) Console::error("ActuatorGroup") << "servo " << id << " does not exist " << Console::endl; 
     return m_servos[id];
 }
 
@@ -50,7 +50,7 @@ void ActuatorGroup::createDigitalSensor(int pin, bool inverted){
 }
 
 DigitalSensor& ActuatorGroup::getDigitalSensor(int id){
-    if(id < 0 || id >= m_dsensors.size()) Console::error("ActuatorGroup") << "sensor" << id << " does not exist " << Console::endl; 
+    if(id < 0 || size_t(id) >= m_dsensors.size()) Console::error("ActuatorGroup") << "sensor" << id << " does not exist " << Console::endl; 
     return m_dsensors[id];
 }
 
@@ -61,6 +61,6 @@ void ActuatorGroup::createAnalogSensor(int pin){
 }
 
 AnalogSensor& ActuatorGroup::getAnalogSensor(int id){
-    if(id < 0 || id >= m_asensors.size()) Console::error("ActuatorGroup") << "sensor " << id << " does not exist " << Console::endl; 
+    if(id < 0 || size_t(id) >= m_asensors.size()) Console::error("ActuatorGroup") << "sensor " << id << " does not exist " << Console::endl; 
     return m_asensors[id];
 }

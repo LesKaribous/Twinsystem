@@ -3,7 +3,7 @@
 
 Sensor::Sensor(int pin) : m_pin(pin){}
 AnalogSensor::AnalogSensor(int pin) : Sensor(pin){}
-DigitalSensor::DigitalSensor(int pin) : Sensor(pin){}
+DigitalSensor::DigitalSensor(int pin, bool inverted) : Sensor(pin), m_inverted(inverted){}
 
 void DigitalSensor::attach() const{
     pinMode(m_pin, INPUT_PULLUP);

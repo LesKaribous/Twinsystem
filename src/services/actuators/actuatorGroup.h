@@ -2,7 +2,10 @@
 #include "sensor.h"
 #include <vector>
 
+#ifndef MAX_SERVOS
 #define MAX_SERVOS 12
+#endif
+
 #define MAX_SENSORS 24
 
 class ActuatorGroup{

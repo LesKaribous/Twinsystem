@@ -1,6 +1,8 @@
 #include "smartServo.h"
 #include "os/console.h"
 
+#define MAX_ITERATIONS 1000
+
 SmartServo::SmartServo() :
     m_position(0), m_enabled(false), m_sleeping(false), m_pin(-1), m_minPos(0), m_maxPos(0), m_defaultPos(0)
 {}
@@ -11,7 +13,7 @@ SmartServo::SmartServo(int pin, int defaultPos, int minPos, int maxPos) :
     m_poses.reserve(MAX_POSES);
 }
 
-SmartServo::SmartServo(SmartServo& cpy) : m_pin(cpy.m_pin), 
+SmartServo::SmartServo(const SmartServo& cpy) : m_pin(cpy.m_pin), 
     m_minPos(cpy.m_minPos),
     m_maxPos(cpy.m_maxPos),
     m_defaultPos(cpy.m_defaultPos),
@@ -23,22 +25,40 @@ SmartServo::SmartServo(SmartServo& cpy) : m_pin(cpy.m_pin),
 {}
 
 
-void SmartServo::moveToDefault(){
-    moveTo(m_defaultPos);
+bool SmartServo::moveToDefault(int speed, bool runAsync){
+    return moveTo(m_defaultPos, speed, runAsync);
 }
 
-void SmartServo::moveTo(int _pos){
-    if(m_enabled){
-        if(m_sleeping) wakeUp(); //Wake
-        // Limite _pos à l'intervalle [0, 180]
-        if(_pos < m_minPos) _pos = m_minPos;
-        else if(_pos > m_maxPos) _pos = m_maxPos;
-        m_servo.write(_pos);
-    }
+bool SmartServo::moveTo(int target, int speed, bool runAsync){
+    if(!m_enabled) return;
+    if(m_sleeping) wakeUp(); //Wake
+
+    constrain(target, m_minPos, m_maxPos);
+    constrain(speed, 0, 100);
+
+    m_target = target;
+    m_speed = speed;
+
+    int ms = map(speed, 0, 100, 50, 0);
+    do{
+        delay(ms);
+        int currrentPos = getPosition();
+        int delta = abs(currrentPos - m_target);
+        if(delta > 2) delta = 2;
+
+        if (currrentPos < target - delta){
+            m_servo.write(currrentPos + delta);
+            if(runAsync) return false;
+        }else if (currrentPos > target + delta){
+            m_servo.write(currrentPos - delta);
+            if(runAsync) return false;
+        }else return true;
+    }while(!runAsync);
+    return true;
 }
 
-void SmartServo::moveToPose(int index){
-    moveTo(getPose(index));
+bool SmartServo::moveToPose(int index,  int speed, bool runAsync){
+    return moveTo(getPose(index), speed, runAsync);
 }
 
 int SmartServo::getPosition(){

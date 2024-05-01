@@ -3,10 +3,11 @@
 #include "os/console.h"
 #include "services/ihm/ihm.h"
 
+#define CAST_POSE(x) static_cast<int>(x)
+
 INSTANTIATE_SERVICE(Actuators, actuators)
 
 Actuators::Actuators() : Service(ID_ACTUATORS){}
-
 
 void Actuators::onAttach(){
     Console::info() << "Actuators activated" << Console::endl;
@@ -119,18 +120,18 @@ void Actuators::close(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::CLOSE);
-        groupAB.getServo(GRIPPER_LEFT).moveToPose(GripperPose::CLOSE);
+        groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE));
+        groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::CLOSE);
-        groupBC.getServo(GRIPPER_LEFT).moveToPose(GripperPose::CLOSE);
+        groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE));
+        groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::CLOSE);
-        groupCA.getServo(GRIPPER_LEFT).moveToPose(GripperPose::CLOSE);
+        groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE));
+        groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
     
     default:
@@ -143,18 +144,18 @@ void Actuators::open(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::OPEN);
-        groupAB.getServo(GRIPPER_LEFT).moveToPose(GripperPose::OPEN);
+        groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN));
+        groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::OPEN);
-        groupBC.getServo(GRIPPER_LEFT).moveToPose(GripperPose::OPEN);
+        groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN));
+        groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::OPEN);
-        groupCA.getServo(GRIPPER_LEFT).moveToPose(GripperPose::OPEN);
+        groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN));
+        groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
     
     default:
@@ -167,18 +168,18 @@ void Actuators::grab(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::GRAB);
-        groupAB.getServo(GRIPPER_LEFT).moveToPose(GripperPose::GRAB);
+        groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB));
+        groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::GRAB);
-        groupBC.getServo(GRIPPER_LEFT).moveToPose(GripperPose::GRAB);
+        groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB));
+        groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(GRIPPER_RIGHT).moveToPose(GripperPose::GRAB);
-        groupCA.getServo(GRIPPER_LEFT).moveToPose(GripperPose::GRAB);
+        groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB));
+        groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
     
     default:
@@ -191,15 +192,15 @@ void Actuators::forkUp(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(FORK_SERVO).moveToPose(GripperPose::CLOSE);
+        groupAB.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(FORK_SERVO).moveToPose(GripperPose::CLOSE);
+        groupBC.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(FORK_SERVO).moveToPose(GripperPose::CLOSE);
+        groupCA.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::CLOSE));
         break;
 
     default:
@@ -212,15 +213,15 @@ void Actuators::forkDown(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(FORK_SERVO).moveToPose(GripperPose::OPEN);
+        groupAB.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(FORK_SERVO).moveToPose(GripperPose::OPEN);
+        groupBC.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(FORK_SERVO).moveToPose(GripperPose::OPEN);
+        groupCA.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::OPEN));
         break;
     default:
         break;
@@ -232,15 +233,15 @@ void Actuators::forkGrab(RobotCompass rc){
     switch (rc)
     {
     case RobotCompass::AB :
-        groupAB.getServo(FORK_SERVO).moveToPose(GripperPose::GRAB);
+        groupAB.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
 
     case RobotCompass::BC :
-        groupBC.getServo(FORK_SERVO).moveToPose(GripperPose::GRAB);
+        groupBC.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
 
     case RobotCompass::CA :
-        groupCA.getServo(FORK_SERVO).moveToPose(GripperPose::GRAB);
+        groupCA.getServo(FORK_SERVO).moveToPose(CAST_POSE(GripperPose::GRAB));
         break;
     default:
         break;
@@ -248,26 +249,23 @@ void Actuators::forkGrab(RobotCompass rc){
 }
 
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose){
-    getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(static_cast<int>(pose));
+    getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose));
+}
+
+void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose){
+    getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose));
 }
 
 void Actuators::moveElevatorAngle(RobotCompass rc, int angle){
     getActuatorGroup(rc).getServo(ELEVATOR).moveTo(angle);
 }
 
-bool Actuators::moveGripper(SmartServo& gripper, int target){
-    int pos = gripper.getPosition();
-    if (pos < target - 2)
-    {
-        gripper.moveTo(pos + 2);
-        return false; // Not arrived
-    }
-    else if (pos > target + 2)
-    {
-        gripper.moveTo(pos - 2);
-        return false; // Not arrived
-    }
-    return true; // Arrived
+bool Actuators::moveGripper(SmartServo& servo, GripperPose pose){
+    return servo.moveToPose(CAST_POSE(pose), true);
+}
+
+bool Actuators::moveElevator(SmartServo& servo, ElevatorPose pose){
+    return servo.moveToPose(CAST_POSE(pose), true);
 }
 
 ActuatorGroup &Actuators::getActuatorGroup(RobotCompass rc)
@@ -305,30 +303,34 @@ void Actuators::testSensors()
 
 
 bool Actuators::runGrabbing(RobotCompass rc, Side gs){
-    if(ihm.isPrimary()) return;
+    if(ihm.isPrimary()) return true;
     ActuatorGroup &group = getActuatorGroup(rc);
+    GripperPose pose = GripperPose::GRAB;
+
     if (gs == Side::LEFT)
-        return moveGripper(group.getServo(GRIPPER_LEFT), group.leftGripper.getGrabPosition());
+        return moveGripper(group.getServo(GRIPPER_LEFT), pose);
     else if (gs == Side::RIGHT)
-        return moveGripper(group.rightGripper, group.rightGripper.getGrabPosition());
+        return moveGripper(group.getServo(GRIPPER_RIGHT), pose);
     else if (gs == Side::BOTH){
-        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getGrabPosition());
-        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getGrabPosition());
+        bool leftArrived = moveGripper(group.getServo(GRIPPER_LEFT), pose);
+        bool rightArrived = moveGripper(group.getServo(GRIPPER_RIGHT), pose);
         return leftArrived && rightArrived;
     }
     return true;
 }
 
 bool Actuators::runOpening(RobotCompass rc, Side gs){
-    if(ihm.isPrimary()) return;
+    if(ihm.isPrimary()) return true;
     ActuatorGroup &group = getActuatorGroup(rc);
+    GripperPose pose = GripperPose::OPEN;
+
     if (gs == Side::LEFT)
-        return moveGripper(group.leftGripper, group.leftGripper.getOpenPosition());
+        return moveGripper(group.getServo(GRIPPER_LEFT), pose);
     else if (gs == Side::RIGHT)
-        return moveGripper(group.rightGripper, group.rightGripper.getOpenPosition());
+        return moveGripper(group.getServo(GRIPPER_RIGHT), pose);
     else if (gs == Side::BOTH){
-        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getOpenPosition());
-        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getOpenPosition());
+        bool leftArrived = moveGripper(group.getServo(GRIPPER_LEFT), pose);
+        bool rightArrived = moveGripper(group.getServo(GRIPPER_RIGHT), pose);
         return leftArrived && rightArrived;
     }
     return true;
@@ -336,13 +338,15 @@ bool Actuators::runOpening(RobotCompass rc, Side gs){
 
 bool Actuators::runClosing(RobotCompass rc, Side gs){
     ActuatorGroup &group = getActuatorGroup(rc);
+    GripperPose pose = GripperPose::CLOSE;
+
     if (gs == Side::LEFT)
-        return moveGripper(group.leftGripper, group.leftGripper.getClosePosition());
+        return moveGripper(group.getServo(GRIPPER_LEFT), pose);
     else if (gs == Side::RIGHT)
-        return moveGripper(group.rightGripper, group.rightGripper.getClosePosition());
+        return moveGripper(group.getServo(GRIPPER_RIGHT), pose);
     else if (gs == Side::BOTH){
-        bool leftArrived = moveGripper(group.leftGripper, group.leftGripper.getClosePosition());
-        bool rightArrived = moveGripper(group.rightGripper, group.rightGripper.getClosePosition());
+        bool leftArrived = moveGripper(group.getServo(GRIPPER_LEFT), pose);
+        bool rightArrived = moveGripper(group.getServo(GRIPPER_RIGHT), pose);
         return leftArrived && rightArrived;
     }
     return true;
@@ -350,27 +354,27 @@ bool Actuators::runClosing(RobotCompass rc, Side gs){
 
 bool Actuators::runElevatorUp(RobotCompass rc){
     ActuatorGroup &group = getActuatorGroup(rc);
-    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::UP)));
+    return moveElevator(group.getServo(ELEVATOR), ElevatorPose::UP);
 }
 
 bool Actuators::runElevatorDown(RobotCompass rc){
     ActuatorGroup &group = getActuatorGroup(rc);
-    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::DOWN)));
+    return moveElevator(group.getServo(ELEVATOR), ElevatorPose::DOWN);
 }
 
 bool Actuators::runElevatorGrab(RobotCompass rc){
     ActuatorGroup &group = getActuatorGroup(rc);
-    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::GRAB)));
+    return moveElevator(group.getServo(ELEVATOR), ElevatorPose::GRAB);
 }
 
 bool Actuators::runElevatorBorder(RobotCompass rc){
     ActuatorGroup &group = getActuatorGroup(rc);
-    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::BORDER)));
+    return moveElevator(group.getServo(ELEVATOR), ElevatorPose::BORDER);
 }
 
 bool Actuators::runElevatorPlanter(RobotCompass rc){
     ActuatorGroup &group = getActuatorGroup(rc);
-    return moveGripper(group.elevator, group.elevator.getPose(static_cast<int>(ElevatorPose::PLANTER)));
+    return moveElevator(group.getServo(ELEVATOR), ElevatorPose::PLANTER);
 }
 
 
@@ -441,13 +445,7 @@ void Actuators::applause(RobotCompass rc){
 }
 
 void Actuators::sleep(){
-    gripperAB.elevator.sleep();
-    gripperAB.leftGripper.sleep();
-    gripperAB.rightGripper.sleep();
-    gripperBC.elevator.sleep();
-    gripperBC.leftGripper.sleep();
-    gripperBC.rightGripper.sleep();
-    gripperCA.elevator.sleep();
-    gripperCA.leftGripper.sleep();
-    gripperCA.rightGripper.sleep();
+    groupAB.sleep();
+    groupBC.sleep();
+    groupCA.sleep();
 }

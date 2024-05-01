@@ -18,7 +18,7 @@ private:
 
 class DigitalSensor : public Sensor{
 public:
-    DigitalSensor(int pin);
+    DigitalSensor(int pin, bool inverted = false);
     bool read() const;
     void attach() const;
 private:
