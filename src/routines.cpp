@@ -47,7 +47,9 @@ void robotIdleProgram(){
         
         if(ihm.isColorBlue()) motion.setOrientation(0);
         else if(ihm.isColorYellow()) motion.setOrientation(180);
-        recalage();
+        
+        if(ihm.isPrimary()) recalage();
+        else if(ihm.isSecondary()) recalageSecondary();
         return;
     }
 

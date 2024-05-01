@@ -35,8 +35,8 @@ const int
     elevatorFork_Up,
     elevatorFork_Down,
     elevatorFork_Border,
-    fork_Close,
-    fork_Open,
+    fork_Up,
+    fork_Down,
     fork_Grab;
 };
 
@@ -116,8 +116,8 @@ namespace SecondaryPreset{
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        120,     //FORK - fork_Close
-        12,     //FORK - fork_Open
+        110,     //FORK - fork_Up
+        12,     //FORK - fork_Down
         60      //FORK - fork_Grab
     };
         
@@ -129,8 +129,8 @@ namespace SecondaryPreset{
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        120,     //FORK - fork_Close
-        12,     //FORK - fork_Open
+        110,     //FORK - fork_Up
+        12,     //FORK - fork_Down
         60      //FORK - fork_Grab
     };
 
@@ -142,8 +142,8 @@ namespace SecondaryPreset{
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
         10,     //FORK - elevatorFork_Border
-        120,     //FORK - fork_Close
-        12,     //FORK - fork_Open
+        110,     //FORK - fork_Up
+        12,     //FORK - fork_Down
         60      //FORK - fork_Grab
     };
 }

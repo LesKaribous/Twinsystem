@@ -84,9 +84,6 @@ private :
     void createFingerGroup(RobotCompass, FingerGroupProperty);
 
 
-
-
-
 //secondary methods   
 public :
     void forkUp   (RobotCompass rc, int speed = 100);
@@ -99,8 +96,6 @@ public :
 private :
     void createForkGroup(RobotCompass, ForkGroupProperty);
 
-    
-    
     
 
     SERVICE(Actuators)

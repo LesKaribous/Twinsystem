@@ -130,7 +130,27 @@ void Actuators::registerPrimaryPoses(){
 }
 
 void Actuators::registerSecondaryPoses(){
+    // --- AB ---
+    //Fork
+    setServoPos(groupAB.getServo(FORK_SERVO), GripperPose::CLOSE, SecondaryPreset::AB.fork_Up);
+    setServoPos(groupAB.getServo(FORK_SERVO), GripperPose::OPEN, SecondaryPreset::AB.fork_Down);
+    setServoPos(groupAB.getServo(FORK_SERVO), GripperPose::GRAB, SecondaryPreset::AB.fork_Grab);
 
+    //Elevator
+    setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::UP, SecondaryPreset::AB.elevatorFork_Up);
+    setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::DOWN, SecondaryPreset::AB.elevatorFork_Down);
+    setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::BORDER, SecondaryPreset::AB.elevatorFork_Border);
+
+    // --- CA ---
+    //Left
+    setServoPos(groupCA.getServo(FORK_SERVO), GripperPose::CLOSE, SecondaryPreset::CA.fork_Up);
+    setServoPos(groupCA.getServo(FORK_SERVO), GripperPose::OPEN, SecondaryPreset::CA.fork_Down);
+    setServoPos(groupCA.getServo(FORK_SERVO), GripperPose::GRAB, SecondaryPreset::CA.fork_Grab);
+
+    //Elevator
+    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::UP, SecondaryPreset::CA.elevatorFork_Up);
+    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::DOWN, SecondaryPreset::CA.elevatorFork_Down);
+    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::BORDER, SecondaryPreset::CA.elevatorFork_Border);
 }
 
 
@@ -156,20 +176,18 @@ void Actuators::createFingerGroup(RobotCompass rc, FingerGroupProperty props){
 
 void Actuators::createForkGroup(RobotCompass rc, ForkGroupProperty props){
     if(rc == RobotCompass::AB){
-        groupAB.createServo(props.forkServoPin, props.fork_Open);
+        groupAB.createServo(props.forkServoPin, props.fork_Up);
         groupAB.createServo(props.forkElevatorPin, props.elevatorFork_Down);
 
     }else if(rc == RobotCompass::BC){
-        groupBC.createServo(props.forkServoPin, props.fork_Open);
+        groupBC.createServo(props.forkServoPin, props.fork_Up);
         groupBC.createServo(props.forkElevatorPin, props.elevatorFork_Down);
 
     }else if(rc == RobotCompass::CA){
-        groupCA.createServo(props.forkServoPin, props.fork_Open);
+        groupCA.createServo(props.forkServoPin, props.fork_Up);
         groupCA.createServo(props.forkElevatorPin, props.elevatorFork_Down);
     }
 }
-
-
 
 void Actuators::enableTraco(){
     digitalWrite(Pin::Outputs::enTraco, HIGH);

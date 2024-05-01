@@ -47,6 +47,24 @@ void recalage(){
     }
 }
 
+void recalageSecondary(){
+    //motion.setSync();
+    waitMs(800);
+    if(ihm.isColorBlue()){
+        probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
+        probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
+        async motion.go(POI::b1);
+        async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
+    }
+    else{
+        motion.setAbsPosition({-1,-1,PI});
+        probeBorder(TableCompass::NORTH, RobotCompass::BC,100);
+        probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
+        async motion.go(POI::y1);
+        async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+    }
+}
+
 void testEvitemment(){
     motion.setAsync();
     async motion.go(2775, 225 + 500) || async motion.go(2775, 225 + 250) || async motion.go(2775, 225);
@@ -285,27 +303,39 @@ void matchYellow(){
 }
 
 void secondaryMatchBlue(){
-    Serial.println("Start Match Secondary");
-    //while(1){
-        actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
-        actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
-        actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
-        actuators.forkDown(RobotCompass::AB);
-        //actuators.forkDown(RobotCompass::BC);
-        actuators.forkDown(RobotCompass::CA);
-        waitMs(2000);
-        actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
-        actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
-        actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
-        actuators.forkGrab(RobotCompass::AB);
-        //actuators.forkUp(RobotCompass::BC);
-        actuators.forkUp(RobotCompass::CA);
-        waitMs(2000);
-    //}
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
+    actuators.forkDown(RobotCompass::AB);
+    actuators.forkDown(RobotCompass::CA);
+    waitMs(2000);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
+    actuators.forkGrab(RobotCompass::AB);
+    actuators.forkGrab(RobotCompass::CA);
+    waitMs(2000);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
+    actuators.forkUp(RobotCompass::AB);
+    actuators.forkUp(RobotCompass::CA);
+    waitMs(2000);
 }
 
 void secondaryMatchYellow(){
-
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
+    actuators.forkDown(RobotCompass::AB);
+    actuators.forkDown(RobotCompass::CA);
+    waitMs(2000);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
+    actuators.forkGrab(RobotCompass::AB);
+    actuators.forkGrab(RobotCompass::CA);
+    waitMs(2000);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
+    actuators.forkUp(RobotCompass::AB);
+    actuators.forkUp(RobotCompass::CA);
+    waitMs(2000);
 }
 
 void waitMs(unsigned long time){

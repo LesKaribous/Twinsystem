@@ -2,6 +2,7 @@
 #include "utils/geometry.h"
 
 void recalage();
+void recalageSecondary();
 void match();
 
 void matchBlue();
