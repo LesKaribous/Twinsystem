@@ -101,7 +101,9 @@ private :
 
     float compassReference = 0;
     float compassOffset = 0;
+    //float m_angular_error = 0;
     bool _useBNO = false;
+    long lastBNOCheck = 0;
 
     Stepper _sA, _sB, _sC;
     StepControl _steppers;
@@ -110,6 +112,8 @@ private :
 
     bool _engaged, _sleeping;
     bool _absolute = true;
+    bool _isMoving = false;
+    bool _isRotating = false;
     bool _optimizeRotation = true;
     bool _debug = true;
 

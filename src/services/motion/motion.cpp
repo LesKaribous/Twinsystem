@@ -6,6 +6,8 @@
 #include "motion.h"
 #include "utils/timer/timer.h"
 
+#include <cmath>
+
 INSTANTIATE_SERVICE(Motion, motion)
 
 Motion::Motion() : Service(ID_MOTION),         
@@ -51,16 +53,18 @@ void Motion::onAttach(){
     _sB.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
     _sC.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
 
+    _useBNO = false;
     /* Initialise the sensor */
-    if(!bno.begin()){
-        Console::error("Motion") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << Console::endl;
-        _useBNO = false;
-    }else{
-        _useBNO = false;
-        bno.setExtCrystalUse(true);
+    for(int i = 0; i < 10; i++){
+        if(bno.begin()){
+            _useBNO = false;
+            bno.setExtCrystalUse(true);
+            break;
+        }
     }
-    
-    
+    if(!_useBNO) 
+        Console::error("Motion") << "Ooops, no BNO055 detected ... It may be unplugged... Tanpis" << Console::endl;
+
 }
 
 void Motion::onUpdate(){
@@ -69,12 +73,6 @@ void Motion::onUpdate(){
             complete();
         }
         estimatePosition();
-    }
-
-    if(_useBNO){
-        RUN_EVERY(
-            _position.c = getOrientation();
-        ,100)
     }
 }
 
@@ -117,12 +115,14 @@ void Motion::sleep(){
 
 Motion& Motion::go(float x, float y){
     setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
     go(Vec2(x, y));
     return *this;
 }
 
 Motion& Motion::goPolar(float heading, float dist){
     setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
     PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
     if (_absolute){
         Vec2 target = _position + poltarget.toVec2();
@@ -136,7 +136,12 @@ Motion& Motion::goPolar(float heading, float dist){
 }
 
 Motion& Motion::turn(float angle){
+    if(_useBNO){
+        _position.c = getOrientation();
+    }
     setStepsVelocity(Settings::Motion::TURN_SPEED);
+    _isMoving = true;
+    _isRotating = true;
     if (_absolute) move(Vec3(_position.a, _position.b, angle));
     else move(Vec3(0, 0, angle));
     return *this;
@@ -144,6 +149,7 @@ Motion& Motion::turn(float angle){
   
 Motion& Motion::go(Vec2 target){
     setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
     if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
     else move(Vec3(target.a, target.b, 0));
     return *this;
@@ -237,6 +243,8 @@ void Motion::cancel() {
         _steppers.stopAsync();
     }
     estimatePosition();
+    _isMoving = false;
+    _isRotating = false;
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
@@ -250,6 +258,8 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
+    _isMoving = false;
+    _isRotating = false;
     _startPosition = _position;// = _target;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
@@ -265,6 +275,8 @@ void Motion::forceCancel() {
     Job::cancel();
     _steppers.emergencyStop(); // set new speed
     estimatePosition();
+    _isMoving = false;
+    _isRotating = false;
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
     _sA.setPosition(0);
@@ -311,9 +323,7 @@ void  Motion::estimatePosition(){ //We are not using the estimated velocity to p
     Vec3 del = fk(linearDelta);
 
     float orientation = _position.c;
-    if(!_useBNO){
-        orientation += del.c;
-    }
+    orientation += del.c;
 
     del.rotateZ(orientation); //Transform to workd space
 
@@ -351,13 +361,18 @@ void Motion::setOrientation(float orientation){
 
 float Motion::getOrientation(){
     if(!_useBNO) return _position.c;
-    sensors_event_t eventAngular;
-    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-    float orientation = (- DEG_TO_RAD * eventAngular.orientation.x) - compassReference + compassOffset;
 
-    while(orientation > PI) orientation-= 2.0f*PI;
-    while(orientation <= -PI) orientation += 2.0f*PI;
-    return  orientation;
+    if(millis() - lastBNOCheck > 50){
+        sensors_event_t eventAngular;
+        bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+        float orientation = (- DEG_TO_RAD * eventAngular.orientation.x) - compassReference + compassOffset;
+
+        orientation = fmod(orientation, TWO_PI);
+        if(orientation < 0) orientation += 2.0f*PI;
+        return  orientation;
+    }else return _position.c;
+    
+
 }
 
 // -------------------------------
@@ -400,11 +415,11 @@ bool  Motion::isRelative() const{
 
 
 bool Motion::isRotating() const{
-    return (Job::isPending() && (_target.c - _position.c) != 0);
+    return (Job::isPending() &&  _isRotating);
 }
 
 bool Motion::isMoving() const{
-    return (Job::isPending() &&_target != _position);
+    return (Job::isPending() && _isMoving);
 }
 
 
