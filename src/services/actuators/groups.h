@@ -115,7 +115,7 @@ namespace SecondaryPreset{
         //position servo
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
-        10,     //FORK - elevatorFork_Border
+        140,     //FORK - elevatorFork_Border
         110,     //FORK - fork_Up
         12,     //FORK - fork_Down
         60      //FORK - fork_Grab
@@ -126,11 +126,11 @@ namespace SecondaryPreset{
         Pin::ServoFork::ServoBC_Elevator,
         Pin::ServoFork::ServoBC_Fork,
         //position servo
-        100,     //FORK - elevatorFork_Up
-        180,     //FORK - elevatorFork_Down
-        10,     //FORK - elevatorFork_Border
-        110,     //FORK - fork_Up
-        12,     //FORK - fork_Down
+        80,     //FORK - elevatorFork_Up
+        160,     //FORK - elevatorFork_Down
+        110,     //FORK - elevatorFork_Border
+        105,     //FORK - fork_Up
+        10,     //FORK - fork_Down
         60      //FORK - fork_Grab
     };
 
@@ -141,7 +141,7 @@ namespace SecondaryPreset{
         //position servo
         100,     //FORK - elevatorFork_Up
         180,     //FORK - elevatorFork_Down
-        10,     //FORK - elevatorFork_Border
+        140,     //FORK - elevatorFork_Border
         110,     //FORK - fork_Up
         12,     //FORK - fork_Down
         60      //FORK - fork_Grab

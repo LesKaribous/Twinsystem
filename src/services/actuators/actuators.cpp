@@ -141,6 +141,17 @@ void Actuators::registerSecondaryPoses(){
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::DOWN, SecondaryPreset::AB.elevatorFork_Down);
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::BORDER, SecondaryPreset::AB.elevatorFork_Border);
 
+    // --- BC ---
+    //Fork
+    setServoPos(groupBC.getServo(FORK_SERVO), GripperPose::CLOSE, SecondaryPreset::BC.fork_Up);
+    setServoPos(groupBC.getServo(FORK_SERVO), GripperPose::OPEN, SecondaryPreset::BC.fork_Down);
+    setServoPos(groupBC.getServo(FORK_SERVO), GripperPose::GRAB, SecondaryPreset::BC.fork_Grab);
+
+    //Elevator
+    setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::UP, SecondaryPreset::BC.elevatorFork_Up);
+    setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::DOWN, SecondaryPreset::BC.elevatorFork_Down);
+    setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::BORDER, SecondaryPreset::BC.elevatorFork_Border);
+
     // --- CA ---
     //Left
     setServoPos(groupCA.getServo(FORK_SERVO), GripperPose::CLOSE, SecondaryPreset::CA.fork_Up);

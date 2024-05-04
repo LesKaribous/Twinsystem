@@ -49,6 +49,7 @@ void recalage(){
 
 void recalageSecondary(){
     //motion.setSync();
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
     waitMs(800);
     if(ihm.isColorBlue()){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
@@ -63,6 +64,7 @@ void recalageSecondary(){
         async motion.go(POI::y1);
         async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
     }
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
 }
 
 void testEvitemment(){
@@ -303,39 +305,107 @@ void matchYellow(){
 }
 
 void secondaryMatchBlue(){
+    /*
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::BORDER);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
     actuators.forkDown(RobotCompass::AB);
+    actuators.forkDown(RobotCompass::BC);
     actuators.forkDown(RobotCompass::CA);
     waitMs(2000);
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.forkGrab(RobotCompass::AB);
     actuators.forkGrab(RobotCompass::CA);
     waitMs(2000);
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
     actuators.forkUp(RobotCompass::AB);
+    actuators.forkUp(RobotCompass::BC);
     actuators.forkUp(RobotCompass::CA);
     waitMs(2000);
+    */
+
+    // Dégagement de zone
+    //async motion.go(POI::plantSupplySW);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
+    async motion.go(887,1000);
+    async motion.go(POI::b2);
+    probeBorder(TableCompass::SOUTH, RobotCompass::AB,100);
+    probeBorder(TableCompass::EAST, RobotCompass::BC,100);
+    async motion.go(POI::b2);
+    // Ajuster le bras pour le panneaux
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::BORDER);
+    waitMs(800);
+    actuators.forkDown(RobotCompass::BC);
+    waitMs(800);
+    // S'approcher et tourner les panneaux
+    motion.setFeedrate(1.0);
+    async motion.go(POI::solarPanelBlue_1.x,POI::solarPanelBlue_1.y+40.0);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
+    async motion.go(POI::solarPanelBlue_3.x+50.0,POI::solarPanelBlue_3.y+40.0);
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
+    async motion.go(850,1670); // Dégagement Bleu
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
+    actuators.forkUp(RobotCompass::BC);
+
+    chrono.onMatchNearlyFinished();
+    chrono.onMatchFinished();
 }
 
 void secondaryMatchYellow(){
+    /*
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::BORDER);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
     actuators.forkDown(RobotCompass::AB);
+    actuators.forkDown(RobotCompass::BC);
     actuators.forkDown(RobotCompass::CA);
     waitMs(2000);
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::UP);
     actuators.forkGrab(RobotCompass::AB);
     actuators.forkGrab(RobotCompass::CA);
     waitMs(2000);
     actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
     actuators.moveForkElevator(RobotCompass::CA,ElevatorPose::DOWN);
     actuators.forkUp(RobotCompass::AB);
+    actuators.forkUp(RobotCompass::BC);
     actuators.forkUp(RobotCompass::CA);
     waitMs(2000);
+    */
+
+    // Dégagement de zone
+    //async motion.go(POI::plantSupplySW);
+    actuators.moveForkElevator(RobotCompass::AB,ElevatorPose::UP);
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::UP);
+    async motion.go(2113,1000);
+    async motion.go(POI::y2);
+    probeBorder(TableCompass::NORTH, RobotCompass::AB,100);
+    probeBorder(TableCompass::EAST, RobotCompass::BC,100);
+    async motion.go(POI::y2);
+    // Ajuster le bras pour le panneaux
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::BORDER);
+    waitMs(800);
+    actuators.forkDown(RobotCompass::BC);
+    waitMs(800);
+    // S'approcher et tourner les panneaux
+    motion.setFeedrate(1.0);
+    async motion.go(POI::solarPanelYellow_1.x,POI::solarPanelYellow_1.y+40.0);
+    ihm.addScorePoints(5); //1 panneaux couleur retournés
+    async motion.go(POI::solarPanelYellow_3.x-50.0,POI::solarPanelYellow_3.y+40.0);
+    ihm.addScorePoints(10); //2 panneaux couleur retournés
+    async motion.go(2150,1670); // Dégagement
+    actuators.moveForkElevator(RobotCompass::BC,ElevatorPose::DOWN);
+    actuators.forkUp(RobotCompass::BC);
+
+    chrono.onMatchNearlyFinished();
+    chrono.onMatchFinished();
 }
 
 void waitMs(unsigned long time){
