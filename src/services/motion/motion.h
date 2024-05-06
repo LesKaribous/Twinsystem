@@ -67,6 +67,7 @@ public:
     Vec3 getLastSteps() const;
     float getTargetDirection() const;
     float getAbsoluteTargetDirection() const;
+    float getTargetDistance() const;
 
     void resetCompass(); //zero orientation
     float getOrientation();

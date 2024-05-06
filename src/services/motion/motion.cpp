@@ -273,12 +273,15 @@ void Motion::complete() {
 
 void Motion::forceCancel() {
     Job::cancel();
-    _steppers.emergencyStop(); // set new speed
+    if(Job::m_state == JobState::CANCELLED){
+        _steppers.emergencyStop();
+    }
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
+
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
@@ -402,7 +405,11 @@ void Motion::resetSteps(){
 }
 
 float Motion::getAbsoluteTargetDirection() const{
-    return Vec2(_target - _position).heading();// - _position.c;
+    return Vec2(_target - _position).heading();
+}
+
+float Motion::getTargetDistance() const{
+    return Vec2(_target - _position).mag();
 }
 
 bool  Motion::isAbsolute() const{

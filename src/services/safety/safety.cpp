@@ -40,12 +40,15 @@ void Safety::onUpdate(){
     RUN_EVERY(
         if(!motion.hasFinished()){
             int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
+            int distanceToGo = motion.getTargetDistance() + 350;
+            if(distanceToGo > 500) distanceToGo = 500;
+            if(distanceToGo < 350) distanceToGo = 350;
             //intercom.sendRequest("getDistance("+ String(streer) +")", 100, getDistanceCallback);
             //Console::println( String("streer:") + String(streer));
-            intercom.sendRequest("checkObstacle("+ String(streer) +")", 100, getDistanceCallback);
+            intercom.sendRequest("checkObstacle("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
             //CONSOLE_SERIAL.println(m_obstacleDetected);
         }
-    , 100)
+    , 50)
 
     
     if(m_obstacleDetected/*m_currentDistance <= 350*/){

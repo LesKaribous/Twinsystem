@@ -165,7 +165,7 @@ void onIntercomRequestReply(Request& req){
 }
 
 void onMatchNearEnd(){
-    if(motion.isPending())motion.cancel();
+    if(motion.isPending())motion.forceCancel();
     motion.setFeedrate(1.0);
     motion.setAbsolute();
     actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);

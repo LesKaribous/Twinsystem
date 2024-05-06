@@ -36,7 +36,7 @@ namespace Settings{
 
         constexpr unsigned long 
         DURATION = 90*1000,        //90s
-        NEARLY_FINISH = 5 * 1000,       //5s before the end
+        NEARLY_FINISH = 10 * 1000,       //10s before the end
         ENDMATCH = 200;             //200ms before the end
         
         constexpr float 
