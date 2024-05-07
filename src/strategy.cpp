@@ -3,11 +3,6 @@
 #include "robot.h"
 #include "routines.h"
 
-/*
-void testConditionnal(){
-    async motion.go(1200,300) || async motion.go(500,1500);
-}
-*/
 
 void match(){
     //start match
@@ -343,7 +338,7 @@ void secondaryMatchBlue(){
     actuators.forkDown(RobotCompass::BC);
     waitMs(800);
     // S'approcher et tourner les panneaux
-    motion.setFeedrate(1.0);
+    motion.setFeedrate(0.5);
     async motion.go(POI::solarPanelBlue_1.x,POI::solarPanelBlue_1.y+40.0);
     ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelBlue_3.x+50.0,POI::solarPanelBlue_3.y+40.0);
@@ -395,7 +390,7 @@ void secondaryMatchYellow(){
     actuators.forkDown(RobotCompass::BC);
     waitMs(800);
     // S'approcher et tourner les panneaux
-    motion.setFeedrate(1.0);
+    motion.setFeedrate(0.5);
     async motion.go(POI::solarPanelYellow_1.x,POI::solarPanelYellow_1.y+40.0);
     ihm.addScorePoints(5); //1 panneaux couleur retournés
     async motion.go(POI::solarPanelYellow_3.x-50.0,POI::solarPanelYellow_3.y+40.0);
