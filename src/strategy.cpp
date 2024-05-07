@@ -176,7 +176,7 @@ void placePlants(Vec2 target, RobotCompass rc, TableCompass tc, bool planter){
 
 void matchBlue(){
     motion.setFeedrate(1.0);
-    async motion.go(1000,400);
+    async motion.go(1000,300);
     // Macro to take plants
     takePlants(POI::plantSupplySW, RobotCompass::CA, TableCompass::EAST);
     // Macro place plants
@@ -239,7 +239,7 @@ void matchBlue(){
 
 void matchYellow(){
     motion.setFeedrate(1.0);
-    async motion.go(2000,400);
+    async motion.go(2000,300);
     // Macro to take as much plant as possible
     takePlants(POI::plantSupplyNW, RobotCompass::AB, TableCompass::EAST);
 
