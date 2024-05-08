@@ -90,7 +90,8 @@ namespace Settings{
         //0.28 ok
         //old values 0.0004
         const uint32_t 
-        ACCEL = 1000, // equivalent fullsteps/s^2
+        STOP_DECCEL = 5000, // equivalent fullsteps/s^2
+        ACCEL = 900, // equivalent fullsteps/s^2
         SPEED = 600, // equivalent fullsteps/s
         TURN_SPEED = 500, // Old : 5000
         PULLIN = 20,
@@ -122,7 +123,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.052, -1.052f, 0.671f} //Cartesian : XYROT
+            { 1.052, -1.052f, 0.6750f} //Cartesian : XYROT
         };
     }
 }

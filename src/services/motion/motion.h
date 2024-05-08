@@ -37,6 +37,7 @@ public:
     
     //void setFeedrate(int); //0-100%
     void setCalibration(CalibrationProfile c);
+    void setAcceleration(int accel);
 
     void run()override;
     void pause() override;
@@ -82,7 +83,6 @@ public:
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
     void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
 
-    
 
 private :
     bool m_async = true; //non blocking by default

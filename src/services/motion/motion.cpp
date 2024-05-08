@@ -49,9 +49,7 @@ void Motion::onAttach(){
     _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
 
-    _sA.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
-    _sB.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
-    _sC.setAcceleration(Settings::Motion::ACCEL*Settings::Stepper::STEP_MODE);
+    setAcceleration(Settings::Motion::ACCEL);
 
     _useBNO = false;
     /* Initialise the sensor */
@@ -211,18 +209,25 @@ void Motion::setCalibration(CalibrationProfile c){
     _calibration = c.Cartesian;
 }
 
+void Motion::setAcceleration(int accel){
+    _sA.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    _sB.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    _sC.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+}
+
 void Motion::run(){
     onUpdate();
 }
 
 void Motion::pause(){
     Job::pause();
+    setAcceleration(Settings::Motion::STOP_DECCEL);
     _steppers.stopAsync(); // set new speed
-
 }
 
 void Motion::resume(){
     Job::resume();
+    setAcceleration(Settings::Motion::ACCEL);
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
@@ -240,6 +245,7 @@ bool Motion::hasFinished() {
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
+
         _steppers.stopAsync();
     }
     estimatePosition();
