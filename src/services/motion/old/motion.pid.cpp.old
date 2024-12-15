@@ -1,9 +1,9 @@
 #include "settings.h"
-#include "motion_pid.h"
+#include "motion.h"
 #include "kinematics.h"
 #include "os/console.h"
 
-MotionPID::MotionPID() : Service(ID_MOTION_PID),         
+Motion::Motion() : Service(ID_MOTION),         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
     _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)
@@ -53,96 +53,99 @@ MotionPID::MotionPID() : Service(ID_MOTION_PID),
     _sBController.overrideSpeed(0);
     _sCController.overrideSpeed(0);
 
-    /* Initialise the sensor */
-    /*while(!bno.begin()){
-        Console::error("MotionPID") << "Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!" << Console::endl;
+    int trials = 0;
+    while(!myOtos.begin() && trials < 4){
+        trials++;
+        Console::error("Motion") << "Ooops, OTOS not connected, check your wiring and I2C address!" << Console::endl;
+        delay(500);
     }
-    bno.setExtCrystalUse(true);
-    */
-    Console::info("MotionPID") << "Calibration settings : " << accelCorr << "\n";
+    Console::success("Motion") << "OTOS connected" << Console::endl;
+    
+    
+    Console::info("Motion") << "Calibration settings : " << accelCorr << "\n";
 }
 
-void MotionPID::enable(){
+void Motion::enable(){
     Service::enable();
     engage();
     sleep();
 }
 
-void MotionPID::disable(){
+void Motion::disable(){
     Service::disable();
     disengage();
 }
 
-void MotionPID::engage(){
+void Motion::engage(){
     _engaged = true;
     _sleeping = false;
     digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
 
 }
 
-void MotionPID::disengage(){
+void Motion::disengage(){
     _engaged = false;
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
 }
 
-void MotionPID::wakeUp(){
+void Motion::wakeUp(){
     if(_sleeping){
         digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
         _sleeping = false;
     }
     delay(10);
 }
-
-void MotionPID::sleep(){
+ 
+void Motion::sleep(){
     if(isPending()) cancel();
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
     _sleeping = true;
 }
 
-void  MotionPID::go(float x, float y){
+void  Motion::go(float x, float y){
     Vec2 target = {x, y};
     go(target);
 }
 
-void  MotionPID::go(Vec2 target){
+void  Motion::go(Vec2 target){
     if (_absolute) move({target.a, target.b, _position.c*RAD_TO_DEG});
     else move({target.a, target.b, 0});
 }
 
-void  MotionPID::goTurn(float x, float y, float angle){
+void  Motion::goTurn(float x, float y, float angle){
     go({x, y});
     turn(angle);
 }
 
-void  MotionPID::turn(float angle){
+void  Motion::turn(float angle){
     if (_absolute) move({_position.a, _position.b, angle });
     else move({0, 0, angle});
 }
 
-void  MotionPID::align(RobotCompass rc, float orientation){
+void  Motion::align(RobotCompass rc, float orientation){
     turn((orientation - getCompassOrientation(rc)));
 }
 
-void MotionPID::goAlign(Vec2 target, RobotCompass rc, float orientation){
+void Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
     float rotation = (orientation - getCompassOrientation(rc));
 
     if (_absolute) move({target.a, target.b, rotation});
     else move({target.a, target.b, rotation - _position.c*RAD_TO_DEG});
 }
 
-void MotionPID::setFeedrate(int p){
+void Motion::setFeedrate(int p){
 
 }
 
-void MotionPID::setCalibration(CalibrationProfile c){
+void Motion::setCalibration(CalibrationProfile c){
     _calibration = c.Cartesian;
 }
 
-void MotionPID::run(){
+void Motion::run(){
     onUpdate();
 }
 
-void MotionPID::pause(){
+void Motion::pause(){
     Job::pause();
     _sAController.overrideSpeed(0); // set new speed
     _sBController.overrideSpeed(0); // set new speed
@@ -150,11 +153,11 @@ void MotionPID::pause(){
     _targetWheelVelocity = Vec3(0);
 }
 
-void MotionPID::resume(){
+void Motion::resume(){
     Job::resume();
 }
 
-void MotionPID::onUpdate(){
+void Motion::onUpdate(){
     if(enabled() && !_sleeping && !isPaused()){
 
         if(Settings::Motion::USE_GYROSCOPE) _position.c = getOrientation();
@@ -165,7 +168,7 @@ void MotionPID::onUpdate(){
     }
 }
 
-void MotionPID::cancel() {
+void Motion::cancel() {
     Job::cancel();
     _sAController.overrideSpeed(0); // set new speed
     _sBController.overrideSpeed(0); // set new speed
@@ -179,13 +182,13 @@ void MotionPID::cancel() {
         Console::plot("tvc",fabs(_targetWheelVelocity.c));
     }
         
-    Console::info("MotionPID") << "Start position : " << _startPosition << Console::endl;
-    Console::info("MotionPID") << "Position : " << _position << Console::endl;
-    Console::info("MotionPID") << "Target was : " << _target << Console::endl;
+    Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Position : " << _position << Console::endl;
+    Console::info("Motion") << "Target was : " << _target << Console::endl;
     _startPosition = _position;
 }
 
-void MotionPID::complete() {
+void Motion::complete() {
     Job::complete();
 
     _sAController.overrideSpeed(0); // set new speed
@@ -199,15 +202,15 @@ void MotionPID::complete() {
         Console::plot("tvc",fabs(_targetWheelVelocity.c));
     }
 
-    //Console::info("MotionPID") << "Start position : " << _startPosition << Console::endl;
-    //Console::info("MotionPID") << "Position : " << _position << Console::endl;
-    //Console::info("MotionPID") << "Target was : " << _target << Console::endl;
+    //Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    //Console::info("Motion") << "Position : " << _position << Console::endl;
+    //Console::info("Motion") << "Target was : " << _target << Console::endl;
 
     _position = _target;
     _startPosition = _position;
 }
 
-void MotionPID::forceCancel() {
+void Motion::forceCancel() {
     Job::cancel();
     _sAController.emergencyStop(); // set new speed
     _sBController.emergencyStop(); // set new speed
@@ -229,13 +232,13 @@ void MotionPID::forceCancel() {
         Console::plot("tvc",fabs(_targetWheelVelocity.c));
     }
 
-    Console::info("MotionPID") << "Start position : " << _startPosition << Console::endl;
-    Console::info("MotionPID") << "Position : " << _position << Console::endl;
-    Console::info("MotionPID") << "Target was : " << _target << Console::endl;
+    Console::info("Motion") << "Start position : " << _startPosition << Console::endl;
+    Console::info("Motion") << "Position : " << _position << Console::endl;
+    Console::info("Motion") << "Target was : " << _target << Console::endl;
     _startPosition = _position;
 }
 
-void MotionPID::control(){
+void Motion::control(){
     if(enabled() && !_sleeping && !isPaused()){
         if(isPending()){
             estimatePosition();
@@ -245,10 +248,10 @@ void MotionPID::control(){
 }
 
 //https://link.springer.com/article/10.1007/s40313-019-00439-0
-void MotionPID::positionControl(){
-    Vec3 kP = Vec3(4.0, 4.0, 5.5); //Settings::MotionPID::kP;
-    Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::MotionPID::kI;
-    Vec3 kD = Vec3( 40.0, 40.0, 4.5);//Settings::MotionPID::kD;
+void Motion::positionControl(){
+    Vec3 kP = Vec3(4.0, 4.0, 5.5); //Settings::Motion::kP;
+    Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kI;
+    Vec3 kD = Vec3( 40.0, 40.0, 4.5);//Settings::Motion::kD;
 
     //correction
     Vec3 error =  _target - _position;
@@ -288,7 +291,7 @@ void MotionPID::positionControl(){
 }
 
 
-Vec3 MotionPID::computeStaturedSpeed(Vec3 targetSpeed){
+Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
     // Maximum speed constraints (in mm/s or similar units)
     float maxSpeed = Settings::Motion::SPEED;
 
@@ -308,7 +311,7 @@ Vec3 MotionPID::computeStaturedSpeed(Vec3 targetSpeed){
 }
 
 
-void  MotionPID::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
+void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
     Vec3 steps = getLastSteps(); //Read steps counter
     resetSteps(); //Reset counter
 
@@ -325,13 +328,13 @@ void  MotionPID::estimatePosition(){ //We are not using the estimated velocity t
 }
 
 
-Vec3 MotionPID::optmizeRelTarget(Vec3 relTarget){
+Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
     while(relTarget.c > PI) relTarget.c -= 2.0f*PI;
     while(relTarget.c <= -PI) relTarget.c += 2.0f*PI;
     return relTarget;
 }
 
-Vec3 MotionPID::targetToSteps(Vec3 relTarget){
+Vec3 Motion::targetToSteps(Vec3 relTarget){
     Vec3 angularSpeed = relTarget / Settings::Geometry::WHEEL_RADIUS;
     Vec3 stepsSpeed = (angularSpeed / (PI/100.0) ) * float(Settings::Stepper::STEP_MODE);
     
@@ -340,9 +343,9 @@ Vec3 MotionPID::targetToSteps(Vec3 relTarget){
 
 
 //Raw relative move request
-void  MotionPID::move(Vec3 target){ //target is in world frame of reference
+void  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
-        Console::error("MotionPID") << "MotionPID not enabled" << Console::endl;
+        Console::error("Motion") << "Motion not enabled" << Console::endl;
         return;
     }
     Job::reset();//Start a new job
@@ -350,22 +353,22 @@ void  MotionPID::move(Vec3 target){ //target is in world frame of reference
     target.c *= DEG_TO_RAD; //Convert to rotation to radian
     if(isRelative()){
         if(target.magSq() == 0){ //Test if move is 0 length
-            Console::error("MotionPID") << "Move is null" << Console::endl;
+            Console::error("Motion") << "Move is null" << Console::endl;
             Job::cancel();
             return;
         }
         target = toAbsoluteTarget(target); //convert to ABS target
     }else{
         if(target == _position){
-            Console::error("MotionPID") << "Move is null" << Console::endl;
+            Console::error("Motion") << "Move is null" << Console::endl;
             Job::cancel();
             return;
         }
         //target = target;
     }
 
-    //Console::info("MotionPID") << "Current position : " << getAbsPosition() << Console::endl;
-    //Console::info("MotionPID") << "Current target   : " << getAbsTarget() << Console::endl;
+    //Console::info("Motion") << "Current position : " << getAbsPosition() << Console::endl;
+    //Console::info("Motion") << "Current target   : " << getAbsTarget() << Console::endl;
      
 
     _lastError = _integral = Vec3(0); //Absolute mm, mm, rad
@@ -379,50 +382,65 @@ void  MotionPID::move(Vec3 target){ //target is in world frame of reference
 }
 
 
-Vec3 MotionPID::toRelativeTarget(Vec3 absTarget){
+Vec3 Motion::toRelativeTarget(Vec3 absTarget){
     absTarget.sub(_position); 		 //Convert  target relativeto Absolute
     return absTarget;
 }
 
-Vec3 MotionPID::toAbsoluteTarget(Vec3 relTarget){
+Vec3 Motion::toAbsoluteTarget(Vec3 relTarget){
     relTarget.add(_position); 		 //Convert  target relativeto Absolute
     return relTarget;
 }
 
 
 
-bool MotionPID::isSleeping() const{
+bool Motion::isSleeping() const{
     return _sleeping;
 }
 
-void MotionPID::enableOptimization(){// Use rotation optimization (see optmizeRelTarget)
+void Motion::enableOptimization(){// Use rotation optimization (see optmizeRelTarget)
     _optimizeRotation = true;
 } 
-void MotionPID::disableOptimization(){
+void Motion::disableOptimization(){
     // disable rotation optimization (see optmizeRelTarget)
     _optimizeRotation = false;
 }
 
-float MotionPID::getOrientation(){
-    sensors_event_t eventAngular;
-    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-    float orientation = compassOffset - DEG_TO_RAD * eventAngular.orientation.x;
 
+
+void Motion::calibrateIMU(){
+    Serial.println("Ensure the OTOS is flat and stationary, then enter any key to calibrate the IMU");
+    Serial.println("Calibrating IMU...");
+
+    // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+    myOtos.calibrateImu();
+    Serial.println("Calibrated IMU.");
+}
+
+void Motion::autoCalibration(){
+    Serial.println("Calibrating IMU scales...");
+    Serial.println("Warning robot will move during this sequence...");
+    delay(2000);
+
+
+    // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
+    myOtos.calibrateImu();
+    Serial.println("Calibrated IMU.");
+}
+
+
+void Motion::readIMU(){
+    sfe_otos_pose2d_t myPosition;
+    myOtos.getPosition(myPosition);
+
+    _unsafePosition.x = myPosition.x;
+    _unsafePosition.y = myPosition.y;
+
+    float orientation = compassOffset - DEG_TO_RAD * myPosition.h;
     while(orientation > PI) orientation-= 2.0f*PI;
     while(orientation <= -PI) orientation += 2.0f*PI;
-    return  orientation;
+    _unsafePosition.z = orientation;
 }
-
-void MotionPID::resetCompass(){
-    sensors_event_t eventAngular;
-    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-    compassOffset = -DEG_TO_RAD * eventAngular.orientation.x;
-}
-
-
-
-
-
 
 
 
@@ -430,15 +448,15 @@ void MotionPID::resetCompass(){
 // ----- Setters and Getters -----
 // -------------------------------
 
-Vec3 MotionPID::getAbsPosition() const{
+Vec3 Motion::getAbsPosition() const{
     return _position;
 }
 
-Vec3  MotionPID::getAbsTarget() const{
+Vec3  Motion::getAbsTarget() const{
     return _target;
 }
 
-Vec3 MotionPID::getLastSteps() const{
+Vec3 Motion::getLastSteps() const{
     Vec3 lastSteps = Vec3(  _sA.getPosition(), 
                             _sB.getPosition(), 
                             _sC.getPosition() );
@@ -446,49 +464,49 @@ Vec3 MotionPID::getLastSteps() const{
     return lastSteps;
 }
 
-void MotionPID::resetSteps(){
+void Motion::resetSteps(){
     _sA.setPosition(0); 
     _sB.setPosition(0); 
     _sC.setPosition(0);//reset steps history
 }
 
-float MotionPID::getAbsoluteTargetDirection() const{
+float Motion::getAbsoluteTargetDirection() const{
     return Vec2(_target - _position).heading() - _position.c;
 }
 
-bool  MotionPID::isAbsolute() const{
+bool  Motion::isAbsolute() const{
     return _absolute;
 }
 
-bool  MotionPID::isRelative() const{
+bool  Motion::isRelative() const{
     return !_absolute;
 }
 
 
-bool MotionPID::isRotating() const{
+bool Motion::isRotating() const{
     return (Job::isPending() && (_target.c - _position.c) != 0);
 }
 
-bool MotionPID::isMoving() const{
+bool Motion::isMoving() const{
     return (Job::isPending() &&_target != _position);
 }
 
 
 
-void  MotionPID::setAbsPosition(Vec3 newPos){
+void  Motion::setAbsPosition(Vec3 newPos){
     _position = newPos; 
 }
 
-void  MotionPID::setAbsTarget(Vec3 newTarget){
+void  Motion::setAbsTarget(Vec3 newTarget){
     _target = newTarget;
 }
 
 
-void  MotionPID::setAbsolute(){
+void  Motion::setAbsolute(){
     _absolute = true;
 }
 
-void  MotionPID::setRelative(){
+void  Motion::setRelative(){
     _absolute = false;
 }
 

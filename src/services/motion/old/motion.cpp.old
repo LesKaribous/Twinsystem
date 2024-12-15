@@ -51,25 +51,20 @@ void Motion::onAttach(){
 
     setAcceleration(Settings::Motion::ACCEL);
 
-    _IMU = false;
+    _useBNO = false;
     /* Initialise the sensor */
     for(int i = 0; i < 10; i++){
-        if(myOtos.begin()){
-            _IMU = true;           
+        if(bno.begin()){
+            _useBNO = false;
+            bno.setExtCrystalUse(true);
             break;
         }
     }
+    if(!_useBNO) 
+        Console::error("Motion") << "Ooops, no BNO055 detected ... It may be unplugged... Tanpis" << Console::endl;
 
-    if(!_IMU) Console::error("Motion") << "Ooops, no OTOS detected ... It may be unplugged... Tanpis ?" << Console::endl;
-    else{
-        myOtos.setLinearUnit(kSfeOtosLinearUnitMeters);
-        myOtos.setAngularUnit(kSfeOtosAngularUnitRadians);
-        myOtos.resetTracking();
-        Console::success("Motion") << "OTOS connected" << Console::endl;
-    }
 }
 
-// Main loop
 void Motion::onUpdate(){
     if(enabled() && !_sleeping && !isPaused() && isPending()){
         if(hasFinished()){
@@ -79,7 +74,7 @@ void Motion::onUpdate(){
     }
 }
 
-// Service routines
+
 void Motion::enable(){
     Service::enable();
     engage();
@@ -91,7 +86,6 @@ void Motion::disable(){
     disengage();
 }
 
-// Power routines
 void Motion::engage(){
     _engaged = true;
     _sleeping = false;
@@ -117,8 +111,6 @@ void Motion::sleep(){
     _sleeping = true;
 }
 
-
-// Movements routines
 Motion& Motion::go(float x, float y){
     setStepsVelocity(Settings::Motion::SPEED);
     _isMoving = true;
@@ -142,9 +134,9 @@ Motion& Motion::goPolar(float heading, float dist){
 }
 
 Motion& Motion::turn(float angle){
-    //if(_useBNO){
-    //    _position.c = getOrientation();
-    //}
+    if(_useBNO){
+        _position.c = getOrientation();
+    }
     setStepsVelocity(Settings::Motion::TURN_SPEED);
     _isMoving = true;
     _isRotating = true;
@@ -361,132 +353,36 @@ Vec3 Motion::targetToSteps(Vec3 relTarget){
 
 
 
-
-
-// IMU and PID
-void Motion::control(){
-    estimatePosition();
-
-    Vec3 kP = Vec3(4.0, 4.0, 5.5); //Settings::Motion::kP;
-    Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3( 40.0, 40.0, 4.5);//Settings::Motion::kD;
-
-    //correction
-    Vec3 error =  _target - _position;
-
-    _integral += error; //mm, mm, rad
-    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = error; //mm, mm, rad
-
-    _targetWheelVelocity = corr.rotateZ(-_position.c);
-    _targetWheelVelocity = ik(_targetWheelVelocity);
-    _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
-    _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
-    //_targetWheelVelocity = computeStaturedSpeed(Vec3(500,0,3).rotateZ(-_position.c));
-
-    _sAController.overrideSpeed(_targetWheelVelocity.a / float(Settings::Motion::SPEED)); // set new speed %
-    _sBController.overrideSpeed(_targetWheelVelocity.b / float(Settings::Motion::SPEED)); // set new speed %
-    _sCController.overrideSpeed(_targetWheelVelocity.c / float(Settings::Motion::SPEED)); // set new speed %
-    
-if(true){
-        Console::plot("px",_position.x);
-        Console::plot("tx",_target.x);
-        Console::plot("py",_position.y);
-        Console::plot("ty",_target.y);
-        //Console::plot("pa",_position.c);
-        //Console::plot("ta",_target.c);
-
-        /*
-        Console::plot("tva",fabs(_targetWheelVelocity.a));
-        Console::plot("tvb",fabs(_targetWheelVelocity.b));
-        Console::plot("tvc",fabs(_targetWheelVelocity.c));
-        
-        Console::plot("va",_sAController.getCurrentSpeed());
-        Console::plot("vb",_sBController.getCurrentSpeed());
-        Console::plot("vc",_sCController.getCurrentSpeed());*/
-    }
-}
-
-
-Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
-    // Maximum speed constraints (in mm/s or similar units)
-    float maxSpeed = Settings::Motion::SPEED;
-
-    
-    if(fabs(targetSpeed.a) < 100) targetSpeed.a = 0;
-    if(fabs(targetSpeed.b) < 100) targetSpeed.b = 0;
-    if(fabs(targetSpeed.c) < 100) targetSpeed.c = 0;
-    
-
-    //staturation
-    float M = std::max(std::max(targetSpeed.x, targetSpeed.y), targetSpeed.z);
-    if(M > maxSpeed){
-        targetSpeed *= maxSpeed/M;
-    }
-
-    return targetSpeed;
-}
-
-
-
-
-
-
-void Motion::openLoop(){
-    _closeLoop = false;
-}
-void Motion::closeLoop(){
-    _closeLoop = _IMU; //activate only if IMU available
-}
-
-void Motion::autoCalibration(){
-    Serial.println("Calibrating IMU scales...");
-    Serial.println("Warning robot will move during this sequence...");
-    delay(2000);
-    Serial.println("Not implemented...");
+void Motion::resetCompass(){
+    sensors_event_t eventAngular;
+    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+    compassReference = (-DEG_TO_RAD * eventAngular.orientation.x);
 
 }
 
-void Motion::readIMU(){
-    sfe_otos_pose2d_t myPosition;
-    myOtos.getPosition(myPosition);
-
-    _unsafePosition.x = myPosition.x * 1000.0; //to millimeters
-    _unsafePosition.y = myPosition.y * 1000.0; //to millimeters
-
-    float orientation = myPosition.h;
+void Motion::setOrientation(float orientation){
+    if(!_useBNO) return;
     while(orientation > PI) orientation-= 2.0f*PI;
     while(orientation <= -PI) orientation += 2.0f*PI;
-    _unsafePosition.z = orientation;
+    compassOffset -= getOrientation() - orientation;
+    Console::println(compassOffset*RAD_TO_DEG);
 }
 
-void Motion::calibrateIMU(){
-    Serial.println("Ensure the OTOS is flat and stationary, then enter any key to calibrate the IMU");
-    Serial.println("Calibrating IMU...");
+float Motion::getOrientation(){
+    if(!_useBNO) return _position.c;
 
-    // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    myOtos.calibrateImu();
-    Serial.println("Calibrated IMU.");
-    _IMU_calibrated = true;
+    if(millis() - lastBNOCheck > 50){
+        sensors_event_t eventAngular;
+        bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
+        float orientation = (- DEG_TO_RAD * eventAngular.orientation.x) - compassReference + compassOffset;
+
+        orientation = fmod(orientation, TWO_PI);
+        if(orientation < 0) orientation += 2.0f*PI;
+        return  orientation;
+    }else return _position.c;
+    
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // -------------------------------
 // ----- Setters and Getters -----
@@ -544,7 +440,7 @@ bool Motion::isMoving() const{
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
-    //if(_useBNO) setOrientation(newPos.c);
+    if(_useBNO) setOrientation(newPos.c);
 }
 
 void Motion::setStepsVelocity(float v){
