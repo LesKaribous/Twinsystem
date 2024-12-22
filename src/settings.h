@@ -9,6 +9,12 @@
 #define CONSOLE_SERIAL Serial
 #define CONSOLE_BAUDRATE 14400
 
+
+#define TW_STRAT1 CHERRY
+#define TW_STRAT2 CAKE
+#define TW_STRAT_OPT1 BROWN
+#define TW_STRAT_OPT2 NOBROWN
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,
@@ -20,19 +26,20 @@ namespace Settings{
 
     namespace Match{
         constexpr bool 
-        AVOIDANCE = 1,
-        NO_AVOIDANCE = 0,
+        AVOIDANCE = true,
+        NO_AVOIDANCE = !AVOIDANCE,
 
         PRIMARY   = false,
-        SECONDARY = true,
+        SECONDARY = !PRIMARY,
 
-        CHERRY = false,
-        CAKE = true,
-        BROWN = true,
-        NOBROWN = false,
+        COLOR_A  = false,
+        COLOR_B  = !COLOR_A;
 
-        BLUE   = false,
-        YELLOW  = true;
+        constexpr short
+        STRAT_PRIMARY_A = false,
+        STRAT_PRIMARY_B = !STRAT_PRIMARY_A,
+        STRAT_SECONDARY_A = false,
+        STRAT_SECONDARY_B = !STRAT_SECONDARY_A;
 
         constexpr unsigned long 
         DURATION = 90*1000,        //90s
@@ -44,18 +51,7 @@ namespace Settings{
     }
 
     namespace Inputs{
-        namespace Turbine{
-            constexpr bool
-            LOW_MODE = true,
-            HIGH_MODE = true,
-            STANDBY = false;
-        }
 
-        namespace Trap{
-            constexpr bool
-            UP = true,
-            DOWN = true;
-        }
     }
 
     namespace Actuators{
@@ -82,13 +78,10 @@ namespace Settings{
 
         //https://en.wikipedia.org/wiki/PID_controller
         //const Vec3 kP = Vec3(3.0, 3.0, 3.5);
-        const Vec3 vkP = Vec3(1.0, 1.0, 1.5);
         const Vec3 kP = Vec3(1.0, 1.0, 1.5);
         const Vec3 kI = Vec3(0.0, 0.0, 0.0);
         const Vec3 kD = Vec3(0.0, 0.0, 0.0);
 
-        //0.28 ok
-        //old values 0.0004
         const uint32_t 
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
         ACCEL = 900, // equivalent fullsteps/s^2

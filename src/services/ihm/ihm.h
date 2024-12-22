@@ -36,8 +36,8 @@ public:
     bool starterPlaced() const;
     bool buttonReleased() const;
     bool starterCancelled() const;
-    bool isColorBlue() const;
-    bool isColorYellow() const;
+    bool isColorA() const;
+    bool isColorB() const;
     bool isPrimary() const;
     bool isSecondary() const;
     bool getRobotType() const;

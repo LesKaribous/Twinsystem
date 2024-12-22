@@ -1,5 +1,6 @@
 #include "ihm.h"
 #include "settings.h"
+#include "text.h"
 #include "os/console.h"
 
 INSTANTIATE_SERVICE(IHM, ihm)
@@ -42,7 +43,7 @@ void IHM::onAttach(){
     needDraw = true;
     lastDraw = 0;
     bootProgress = 0;
-    drawBootProgress("SystemBoot");
+    drawBootProgress("System Booting...");
 }
 
 void IHM::onUpdate(){
@@ -230,17 +231,17 @@ void IHM::updateTeamColor(bool team){
     screen.setTextSize(4);
     screen.setCursor(60,230);
     screen.setTextColor(ILI9341_WHITE);
-    if(team == Settings::Match::YELLOW)
+    if(team == Settings::Match::COLOR_A)
     {
         screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_YELLOW);
         screen.fillRoundRect(15, 218, 210, 57, 15, ILI9341_BLACK);
-        screen.println("Yellow");
+        screen.println(Text::COLOR_A);
     }
     else
     {
         screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_BLUE);
         screen.fillRoundRect(15, 218, 210, 57, 15, ILI9341_BLACK);
-        screen.println("Blue");
+        screen.println(Text::COLOR_B);
     }
     
 }
@@ -252,16 +253,16 @@ void IHM::updateInitState() {
 
     if(!probed.getState() && !probing.getState()){
         screen.setTextColor(ILI9341_RED);
-        screen.println("Not probed");
+        screen.println(Text::PROBE_NOT);
     }else if(probing.getState()){
         screen.setTextColor(ILI9341_BLUE);
-        screen.println("Probing ...");
+        screen.println(Text::PROBING);
     }else if(probed.getState()){
         screen.setTextColor(ILI9341_GREEN);
-        screen.println("Probed.");
+        screen.println(Text::PROBED);
     }else{
         screen.setTextColor(ILI9341_RED);
-        screen.println("?");
+        screen.println(Text::PROBE_UNKNOWN);
     }
 }
 
@@ -300,13 +301,13 @@ void IHM::updateStrategyState(bool stratState) {
     screen.setTextColor(ILI9341_WHITE);
     screen.setTextSize(2);
     screen.setCursor(100, 10);
-    if(!twinSwitch.getState()){
-        if(stratState==Settings::Match::CAKE) screen.println("CAKE");
-        else screen.println("CHERRY");
+    if(isPrimary()){
+        if(stratState==Settings::Match::STRAT_PRIMARY_A) screen.println(Text::STRAT_PRIMARY_A);
+        else screen.println(Text::STRAT_PRIMARY_B);
     }
     else{
-        if(stratState==Settings::Match::BROWN) screen.println("BROWN");
-        else screen.println("NOBROWN"); 
+        if(stratState==Settings::Match::STRAT_SECONDARY_A) screen.println(Text::STRAT_SECONDARY_A);
+        else screen.println(Text::STRAT_SECONDARY_B);
     }
 
     
@@ -319,10 +320,10 @@ void IHM::updateLidarState(bool lidarState) {
 
     if (!lidarState) {
         screen.setTextColor(ILI9341_RED);
-        screen.println("Waiting...");
+        screen.println(Text::LIDAR_DISCONNECTED);
     } else {
         screen.setTextColor(ILI9341_GREEN);
-        screen.println("Connected");
+        screen.println(Text::LIDAR_CONNECTED);
     }
 }
 
@@ -333,10 +334,10 @@ void IHM::updateTiretteState(bool tiretteState) {
 
     if(tiretteState){
         screen.setTextColor(ILI9341_GREEN);
-        screen.println("armed !");
+        screen.println(Text::STARTER_ARMED);
     }else{
         screen.setTextColor(ILI9341_RED);
-        screen.println("unarmed !");
+        screen.println(Text::STARTER_UNARMED);
     }
 }
 
@@ -445,11 +446,11 @@ bool IHM::isPrimary() const{
 bool IHM::isSecondary() const{
 	return twinSwitch.getState() == Settings::Match::SECONDARY;
 }
-bool IHM::isColorBlue() const{
-	return teamSwitch.getState() == Settings::Match::BLUE;
+bool IHM::isColorA() const{
+	return teamSwitch.getState() == Settings::Match::COLOR_A;
 }
-bool IHM::isColorYellow() const{
-	return teamSwitch.getState() == Settings::Match::YELLOW;
+bool IHM::isColorB() const{
+	return teamSwitch.getState() == Settings::Match::COLOR_B;
 }
 
 bool IHM::getStrategyState() const{

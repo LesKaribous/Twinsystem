@@ -44,12 +44,7 @@ void robotIdleProgram(){
     } 
 
     if(ihm.buttonPressed() && !buttonWasPressed && !hadStarter && !ihm.hasStarter()){
-        
-        //if(ihm.isColorBlue()) motion.setOrientation(0);
-        //else if(ihm.isColorYellow()) motion.setOrientation(180);
-        
-        if(ihm.isPrimary()) recalage();
-        else if(ihm.isSecondary()) recalageSecondary();
+        recalage();
         return;
     }
 
@@ -172,8 +167,8 @@ void onMatchNearEnd(){
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
     waitMs(800);
-    if(ihm.isColorBlue()) async motion.go(POI::blueArrival);
-    else async motion.go(POI::yellowArrival);
+    if(ihm.isColorA()) async motion.go(POI::yellowArrival);
+    else async motion.go(POI::blueArrival);
     ihm.addScorePoints(10); //zone d'arrivée
     chrono.onMatchFinished();
 }
