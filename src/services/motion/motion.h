@@ -16,7 +16,6 @@
 #include <TwinsyStep.h>
 #endif
 
-
 class Motion : public Service, public Job{
 public:
 

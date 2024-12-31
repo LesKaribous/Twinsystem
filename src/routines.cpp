@@ -7,7 +7,7 @@
 #include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
 
-void robotProgram(){
+void robotProgramAuto(){
     Console::println("Started match");
     lidar.enable();
     safety.enable();
@@ -16,7 +16,7 @@ void robotProgram(){
     motion.disable();
 }
 
-void robotIdleProgram(){
+void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
@@ -129,11 +129,11 @@ void onRobotBoot(){
     
 }
 
-void onRobotIdle(){
+void onRobotManual(){
     ihm.setRobotPosition(motion.getAbsPosition());
 }
 
-void onRobotRun(){
+void onRobotAuto(){
     ihm.setRobotPosition(motion.getAbsPosition());
     //lidar.setLidarPosition(motion.getAbsPosition());
 }

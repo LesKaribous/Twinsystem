@@ -2,12 +2,12 @@
 #include "os/console.h"
 #include "services/intercom/intercom.h"
 
-void robotIdleProgram();//Execute infinetly before match (onRobotIdle will be executed in parallel (when possible) during this program)
-void robotProgram();//Execute once (onRobotRun will be executed in parallel (when possible) during this program)
+void robotProgramManual();//Execute infinetly before match (onRobotIdle will be executed in parallel (when possible) during this program)
+void robotProgramAuto();//Execute once (onRobotRun will be executed in parallel (when possible) during this program)
 
 void onRobotBoot(); //Execute once at boot
-void onRobotIdle(); //Execute before robotProgram (idle loop)
-void onRobotRun();  //Execute during robotProgram (run loop)
+void onRobotManual(); //Execute before robotProgram (idle loop)
+void onRobotAuto();  //Execute during robotProgram (run loop)
 void onRobotStop(); //Execute while robot stopped (stop loop)
 
 void onTerminalCommand();

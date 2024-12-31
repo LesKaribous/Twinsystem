@@ -11,11 +11,11 @@ class OS{
 public:
     enum SystemState{
         BOOT,    // booting
-        IDLE,    // running services but no programs running
-        RUNNING, // running services and a program is running
+        MANUAL,    // running services but no programs running
+        AUTO, // running services and a program is running
         STOPPED, // stopped services and programs are stopped
-        PROGRAM, // main program (not really a state since Running will be executed during program)
-        IDLE_PROGRAM, // idle program (not really a state since IDLE will be executed during program)
+        AUTO_PROGRAM, // main program (not really a state since Running will be executed during program)
+        MANUAL_PROGRAM, // idle program (not really a state since IDLE will be executed during program)
     };
 
     void start();
@@ -42,10 +42,10 @@ public:
 
 private:
     void boot_routine();
-    void idle_routine();
-    void run_routine();
-    void program_routine();
-    void idle_program_routine();
+    void manual_routine();
+    void auto_routine();
+    void auto_program_routine();
+    void manual_program_routine();
     void stop_routine();
     void executeRoutine(routine_ptr routine);
 
@@ -55,11 +55,11 @@ private:
 
     std::map<ServiceID, Service*> m_services;
     routine_ptr m_bootRoutine = nullptr; 
-    routine_ptr m_idleRoutine = nullptr; 
-    routine_ptr m_runRoutine = nullptr; 
+    routine_ptr m_manualRoutine = nullptr; 
+    routine_ptr m_autoRoutine = nullptr; 
     routine_ptr m_stopRoutine = nullptr; 
-    routine_ptr m_programRoutine = nullptr; 
-    routine_ptr m_idleProgramRoutine = nullptr; 
+    routine_ptr m_auto_programRoutine = nullptr; 
+    routine_ptr m_manual_programRoutine = nullptr; 
     SystemState m_state = BOOT;
 
     Timer m_timer;

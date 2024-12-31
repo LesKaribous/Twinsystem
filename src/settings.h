@@ -9,7 +9,6 @@
 #define CONSOLE_SERIAL Serial
 #define CONSOLE_BAUDRATE 14400
 
-
 #define TW_STRAT1 CHERRY
 #define TW_STRAT2 CAKE
 #define TW_STRAT_OPT1 BROWN

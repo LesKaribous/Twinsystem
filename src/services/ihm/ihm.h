@@ -4,7 +4,15 @@
 #include "services/ihm/button.h"
 #include "utils/geometry.h"
 #include "pin.h"
+
+#ifdef TEENSY35
 #include <ILI9341_t3n.h>
+#endif
+#ifdef TEENSY41
+#include <ILI9341_t3.h>
+#endif
+
+
 
 typedef ILI9341_t3n TFTScreen;
 

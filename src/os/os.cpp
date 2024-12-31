@@ -10,17 +10,17 @@ void OS::run(){
         case BOOT:
             boot_routine();
             break;
-        case IDLE:
-            idle_routine();
+        case MANUAL:
+            manual_routine();
             break;
-        case IDLE_PROGRAM:
-            idle_program_routine();
+        case MANUAL_PROGRAM:
+            manual_program_routine();
             break;
-        case PROGRAM:
-            program_routine();
+        case AUTO_PROGRAM:
+            auto_program_routine();
             break;
-        case RUNNING:
-            run_routine();
+        case AUTO:
+            auto_routine();
             break;
         case STOPPED:
             stop_routine();
@@ -31,7 +31,7 @@ void OS::run(){
 }
 
 void OS::start(){
-    m_state = PROGRAM;
+    m_state = AUTO_PROGRAM;
 }
 
 void OS::stop(){
@@ -40,39 +40,39 @@ void OS::stop(){
 
 void OS::boot_routine(){
     executeRoutine(m_bootRoutine);
-    m_state = IDLE_PROGRAM;
+    m_state = MANUAL_PROGRAM;
     //Console::println(m_state);
 }
 
-void OS::idle_routine(){
+void OS::manual_routine(){
     updateServices();
-    executeRoutine(m_idleRoutine);
+    executeRoutine(m_manualRoutine);
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
         else currentJob()->run();
     }
 }
 
-void OS::run_routine(){
+void OS::auto_routine(){
     updateServices();
-    executeRoutine(m_runRoutine);
+    executeRoutine(m_autoRoutine);
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
         else currentJob()->run();
     }
 }
 
-void OS::program_routine(){
-    m_state = RUNNING;
-    executeRoutine(m_programRoutine);
+void OS::auto_program_routine(){
+    m_state = AUTO;
+    executeRoutine(m_auto_programRoutine);
     m_state = STOPPED;
 }
 
-void OS::idle_program_routine(){
-    m_state = IDLE;
+void OS::manual_program_routine(){
+    m_state = MANUAL;
     updateServices();
-    executeRoutine(m_idleProgramRoutine);
-    if(m_state == IDLE) m_state = IDLE_PROGRAM;
+    executeRoutine(m_manual_programRoutine);
+    if(m_state == MANUAL) m_state = MANUAL_PROGRAM;
 }
 
 void OS::stop_routine(){
@@ -85,17 +85,17 @@ void OS::setRountine(SystemState state, routine_ptr func_ptr){
         case BOOT:
             m_bootRoutine = func_ptr;
             break;
-        case IDLE:
-            m_idleRoutine = func_ptr;
+        case MANUAL:
+            m_manualRoutine = func_ptr;
             break;
-        case RUNNING:
-            m_runRoutine = func_ptr;
+        case AUTO:
+            m_autoRoutine = func_ptr;
             break;
-        case IDLE_PROGRAM:
-            m_idleProgramRoutine = func_ptr;
+        case MANUAL_PROGRAM:
+            m_manual_programRoutine = func_ptr;
         break;
-        case PROGRAM:
-            m_programRoutine = func_ptr;
+        case AUTO_PROGRAM:
+            m_auto_programRoutine = func_ptr;
             break;
         case STOPPED:
             m_stopRoutine = func_ptr;
