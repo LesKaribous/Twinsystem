@@ -9,7 +9,7 @@ void setup(){
 	os.setRountine(OS::BOOT, onRobotBoot);   // - - - - - - - Execute once  - - - - - - - - - - (setup)
 	os.setRountine(OS::MANUAL, onRobotManual); // - - - - - - - Execute during preparation phase 	(loop)
 	os.setRountine(OS::AUTO, onRobotAuto);    // - - - - - - - Execute during match  - - - - - - (loop)
-	os.setRountine(OS::STOPPED, onRobot_Stop);// - - - - - - - Execute after match - - - - - - - (loop)
+	os.setRountine(OS::STOPPED, onRobotStop);// - - - - - - - Execute after match - - - - - - - (loop)
 	os.setRountine(OS::AUTO_PROGRAM, robotProgramAuto);// - - - - Execute after match - - - - - - - (loop)
 	os.setRountine(OS::MANUAL_PROGRAM, robotProgramManual);// - Execute after match - - - - - - - (loop)
 }

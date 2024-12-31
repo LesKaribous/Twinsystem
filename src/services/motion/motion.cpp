@@ -10,11 +10,13 @@
 
 INSTANTIATE_SERVICE(Motion, motion)
 
-Motion::Motion() : Service(ID_MOTION),         
-    _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
+Motion::Motion() : Service(ID_MOTION)
+    #ifdef TEENSY35
+   ,_sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC){
-}
+    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)
+    #endif
+{}
 
 void Motion::onAttach(){
     Console::info() << "Motion activated" << Console::endl;
@@ -33,6 +35,7 @@ void Motion::onAttach(){
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
 
+    #ifdef TEENSY35
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
@@ -48,6 +51,7 @@ void Motion::onAttach(){
     _sA.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
+    #endif
 
     setAcceleration(Settings::Motion::ACCEL);
 
@@ -201,13 +205,21 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     wakeUp();
     resetSteps();
 
+    #ifdef TEENSY35
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
+    #endif
 
-    if(m_async)_steppers.moveAsync(_sA, _sB, _sC);
+    if(m_async){
+        #ifdef TEENSY35
+        _steppers.moveAsync(_sA, _sB, _sC);
+        #endif
+    }
     else{
+        #ifdef TEENSY35
         _steppers.move(_sA, _sB, _sC);
+        #endif
         complete();
     }
     return *this;
@@ -218,9 +230,11 @@ void Motion::setCalibration(CalibrationProfile c){
 }
 
 void Motion::setAcceleration(int accel){
+    #ifdef TEENSY35
     _sA.setAcceleration(accel*Settings::Stepper::STEP_MODE);
     _sB.setAcceleration(accel*Settings::Stepper::STEP_MODE);
     _sC.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    #endif
 }
 
 void Motion::run(){
@@ -230,16 +244,21 @@ void Motion::run(){
 void Motion::pause(){
     Job::pause();
     setAcceleration(Settings::Motion::STOP_DECCEL);
+
+    #ifdef TEENSY35
     _steppers.stopAsync(); // set new speed
+    #endif
 }
 
 void Motion::resume(){
     Job::resume();
     setAcceleration(Settings::Motion::ACCEL);
+    #ifdef TEENSY35
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
     _steppers.moveAsync(_sA, _sB, _sC); // set new speed
+    #endif
 }
 
 bool Motion::hasFinished() {
@@ -247,14 +266,19 @@ bool Motion::hasFinished() {
     // THROW(_sB.getPosition());
     // THROW(_sC.getPosition());
     // THROW(_stepsTarget);
+    #ifdef TEENSY35
     return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
+    #else
+    return true;
+    #endif
 }
 
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-
+        #ifdef TEENSY35
         _steppers.stopAsync();
+        #endif
     }
     estimatePosition();
     _isMoving = false;
@@ -262,12 +286,14 @@ void Motion::cancel() {
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
+    #ifdef TEENSY35
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
+    #endif
 }
 
 void Motion::complete() {
@@ -276,19 +302,24 @@ void Motion::complete() {
     _isRotating = false;
     _startPosition = _position;// = _target;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
+
+    #ifdef TEENSY35
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
+    #endif
     //Console::println("complete");
 }
 
 void Motion::forceCancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
+        #ifdef TEENSY35
         _steppers.emergencyStop();
+        #endif
     }
     estimatePosition();
     _isMoving = false;
@@ -296,12 +327,14 @@ void Motion::forceCancel() {
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
+    #ifdef TEENSY35
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
+    #endif
 }
 
 Vec3 Motion::toRelativeTarget(Vec3 absTarget){
@@ -384,9 +417,11 @@ void Motion::control(){
     _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
     //_targetWheelVelocity = computeStaturedSpeed(Vec3(500,0,3).rotateZ(-_position.c));
 
+    #ifdef TEENSY35
     _sAController.overrideSpeed(_targetWheelVelocity.a / float(Settings::Motion::SPEED)); // set new speed %
     _sBController.overrideSpeed(_targetWheelVelocity.b / float(Settings::Motion::SPEED)); // set new speed %
     _sCController.overrideSpeed(_targetWheelVelocity.c / float(Settings::Motion::SPEED)); // set new speed %
+    #endif
     
 if(true){
         Console::plot("px",_position.x);
@@ -501,17 +536,23 @@ Vec3  Motion::getAbsTarget() const{
 }
 
 Vec3 Motion::getLastSteps() const{
+    #ifdef TEENSY35
     Vec3 lastSteps = Vec3(  _sA.getPosition(), 
                             _sB.getPosition(), 
                             _sC.getPosition() );
+    #else
+    Vec3 lastSteps = Vec3(0,0,0);
+    #endif
 
     return lastSteps;
 }
 
 void Motion::resetSteps(){
+    #ifdef TEENSY35
     _sA.setPosition(0); 
     _sB.setPosition(0); 
     _sC.setPosition(0);
+    #endif
 }
 
 float Motion::getAbsoluteTargetDirection() const{
@@ -548,9 +589,11 @@ void  Motion::setAbsPosition(Vec3 newPos){
 }
 
 void Motion::setStepsVelocity(float v){
+    #ifdef TEENSY35
     _sA.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
     _sB.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
     _sC.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    #endif
 }
 
 void Motion::setAbsTarget(Vec3 newTarget)

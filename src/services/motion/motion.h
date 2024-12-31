@@ -123,11 +123,13 @@ private :
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
 
+    #ifdef TEENSY35
     Stepper _sA, _sB, _sC;
     StepControl _steppers;
     RotateControl _sAController,
                   _sBController,
                   _sCController;
+    #endif
 
     // Settings
     float m_feedrate = 1.0;

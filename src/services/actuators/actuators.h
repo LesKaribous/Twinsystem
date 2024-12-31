@@ -61,9 +61,9 @@ public:
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
-    bool readSensor(RobotCompass rc, Side gs);
-    void testSensors();
-    int howManyPlant(RobotCompass rc);
+    //bool readSensor(RobotCompass rc, Side gs);
+    //void testSensors();
+    //int howManyPlant(RobotCompass rc);
 
     void registerPrimaryPoses(); //Register all servos poses
 
@@ -86,15 +86,15 @@ private :
 
 //secondary methods   
 public :
-    void forkUp   (RobotCompass rc, int speed = 100);
-    void forkDown (RobotCompass rc, int speed = 100);
-    void forkGrab (RobotCompass rc, int speed = 100);
-    void moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed = 100);
+    //void forkUp   (RobotCompass rc, int speed = 100);
+    //void forkDown (RobotCompass rc, int speed = 100);
+    //void forkGrab (RobotCompass rc, int speed = 100);
+    //void moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed = 100);
 
-    void registerSecondaryPoses(); //Register all servos poses
+    //void registerSecondaryPoses(); //Register all servos poses
 
 private :
-    void createForkGroup(RobotCompass, ForkGroupProperty);
+    //void createForkGroup(RobotCompass, ForkGroupProperty);
 
     
 

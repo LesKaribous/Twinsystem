@@ -23,12 +23,15 @@ void Actuators::onAttach(){
         registerPrimaryPoses();
 
     }else{
+        Console::error() << "Secondary robot actuators groups are not defined !" << Console::endl;
+        /*
         Console::info() << "Building fork actuators groups" << Console::endl;
         createForkGroup(RobotCompass::AB, SecondaryPreset::AB);
         createForkGroup(RobotCompass::BC, SecondaryPreset::BC);
         createForkGroup(RobotCompass::CA, SecondaryPreset::CA);
-
+        
         registerSecondaryPoses();
+        /**/
     }
 
     groupAB.enable();
@@ -45,6 +48,7 @@ void Actuators::onAttach(){
         moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 
     }else{
+        /*
         forkUp(RobotCompass::AB);
         forkUp(RobotCompass::BC);
         forkUp(RobotCompass::CA);
@@ -52,6 +56,7 @@ void Actuators::onAttach(){
         moveForkElevator(RobotCompass::AB, ElevatorPose::DOWN);
         moveForkElevator(RobotCompass::BC, ElevatorPose::DOWN);
         moveForkElevator(RobotCompass::CA, ElevatorPose::DOWN);
+        /**/
     }
 
     delay(1000);
@@ -129,6 +134,7 @@ void Actuators::registerPrimaryPoses(){
     setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::PLANTER, PrimaryPresets::CA.elevator_Planter);
 }
 
+/*
 void Actuators::registerSecondaryPoses(){
     // --- AB ---
     //Fork
@@ -163,7 +169,7 @@ void Actuators::registerSecondaryPoses(){
     setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::DOWN, SecondaryPreset::CA.elevatorFork_Down);
     setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::BORDER, SecondaryPreset::CA.elevatorFork_Border);
 }
-
+/**/
 
 void Actuators::createFingerGroup(RobotCompass rc, FingerGroupProperty props){
     
@@ -185,6 +191,7 @@ void Actuators::createFingerGroup(RobotCompass rc, FingerGroupProperty props){
     }
 }
 
+/*
 void Actuators::createForkGroup(RobotCompass rc, ForkGroupProperty props){
     if(rc == RobotCompass::AB){
         groupAB.createServo(props.forkServoPin, props.fork_Up);
@@ -199,6 +206,7 @@ void Actuators::createForkGroup(RobotCompass rc, ForkGroupProperty props){
         groupCA.createServo(props.forkElevatorPin, props.elevatorFork_Down);
     }
 }
+/**/
 
 void Actuators::enableTraco(){
     digitalWrite(Pin::Outputs::enTraco, HIGH);
@@ -321,6 +329,7 @@ void Actuators::grab(RobotCompass rc, int speed){
     }
 }
 
+/*
 void Actuators::forkUp(RobotCompass rc, int speed){
     if(ihm.isPrimary()) return;
     switch (rc)
@@ -341,7 +350,9 @@ void Actuators::forkUp(RobotCompass rc, int speed){
         break;
     }
 }
+/**/
 
+/*
 void Actuators::forkDown(RobotCompass rc, int speed){
     if(ihm.isPrimary()) return;
     switch (rc)
@@ -361,7 +372,9 @@ void Actuators::forkDown(RobotCompass rc, int speed){
         break;
     }
 }
+/**/
 
+/*
 void Actuators::forkGrab(RobotCompass rc, int speed){
     if(ihm.isPrimary()) return;
     switch (rc)
@@ -381,14 +394,17 @@ void Actuators::forkGrab(RobotCompass rc, int speed){
         break;
     }
 }
+/**/
 
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose, int speed){
     getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose), speed);
 }
 
+/*
 void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed){
     getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose), speed);
 }
+/**/
 
 void Actuators::moveElevatorAngle(RobotCompass rc, int angle, int speed){
     getActuatorGroup(rc).getServo(ELEVATOR).moveTo(angle, speed);
@@ -423,6 +439,7 @@ ActuatorGroup &Actuators::getActuatorGroup(RobotCompass rc)
     }
 }
 
+/*
 void Actuators::testSensors()
 {
     CONSOLE_SERIAL.println("Sensors:");
@@ -439,6 +456,7 @@ void Actuators::testSensors()
     CONSOLE_SERIAL.print(" | L -  ");
     CONSOLE_SERIAL.println(readSensor(RobotCompass::CA, Side::LEFT));
 }
+/**/
 
 /*
 bool Actuators::runGrabbing(RobotCompass rc, Side gs){
@@ -518,6 +536,7 @@ bool Actuators::runElevatorPlanter(RobotCompass rc){
 }
 /**/
 
+/*
 bool Actuators::readSensor(RobotCompass rc, Side gs){
     switch (rc)
     {
@@ -548,7 +567,9 @@ bool Actuators::readSensor(RobotCompass rc, Side gs){
     }
     return false;
 }
+/**/
 
+/*
 int Actuators::howManyPlant(RobotCompass rc){
     int count = 0;
     switch (rc)
@@ -574,6 +595,7 @@ int Actuators::howManyPlant(RobotCompass rc){
     }
     return count;
 }
+/**/
 
 /*
 void Actuators::applause(RobotCompass rc){

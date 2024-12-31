@@ -7,14 +7,13 @@
 
 #ifdef TEENSY35
 #include <ILI9341_t3n.h>
+typedef ILI9341_t3n TFTScreen;
 #endif
 #ifdef TEENSY41
 #include <ILI9341_t3.h>
+typedef ILI9341_t3 TFTScreen;
 #endif
 
-
-
-typedef ILI9341_t3n TFTScreen;
 
 class IHM : public Service{
     IHM();

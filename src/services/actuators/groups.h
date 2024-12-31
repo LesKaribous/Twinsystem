@@ -6,9 +6,7 @@ struct FingerGroupProperty{
 const int 
     rightServoPin,
     leftServoPin,
-    elevatorServoPin,
-    rightSensorPin,
-    leftSensorPin;
+    elevatorServoPin;
 
 //position servo
 const int 
@@ -25,29 +23,12 @@ const int
     elevator_Planter;
 };
 
-struct ForkGroupProperty{
-const int 
-    forkElevatorPin,
-    forkServoPin;
-
-//position servo
-const int 
-    elevatorFork_Up,
-    elevatorFork_Down,
-    elevatorFork_Border,
-    fork_Up,
-    fork_Down,
-    fork_Grab;
-};
-
 namespace PrimaryPresets{
     const FingerGroupProperty AB = {
         //pins
         Pin::Servo::ServoB3, //rightServoPin
         Pin::Servo::ServoB2, //leftServoPin
         Pin::Servo::ServoB1, //elevatorServoPin
-        Pin::Sensor::SensorRight_AB, 
-        Pin::Sensor::SensorLeft_AB,
         //position servo
         100, //right_Close
         10,  //right_Open   
@@ -67,8 +48,6 @@ namespace PrimaryPresets{
         Pin::Servo::ServoA3, //rightServoPin
         Pin::Servo::ServoA2, //leftServoPin
         Pin::Servo::ServoA1, //elevatorServoPin
-        Pin::Sensor::SensorRight_BC, 
-        Pin::Sensor::SensorLeft_BC,
         //position servo
         80, //right_Close
         10,  //right_Open   
@@ -88,8 +67,6 @@ namespace PrimaryPresets{
         Pin::Servo::ServoC3, //rightServoPin
         Pin::Servo::ServoC2, //leftServoPin
         Pin::Servo::ServoC1, //elevatorServoPin
-        Pin::Sensor::SensorRight_CA, 
-        Pin::Sensor::SensorLeft_CA,
         //position servo
         100, //right_Close
         10,  //right_Open   
@@ -102,48 +79,5 @@ namespace PrimaryPresets{
         18,   //elevator_Grab
         53,   //elevator_Border
         30   //elevator_Planter
-    };
-}
-
-
-
-namespace SecondaryPreset{
-    const ForkGroupProperty AB = {
-        //pins
-        Pin::ServoFork::ServoAB_Elevator,
-        Pin::ServoFork::ServoAB_Fork,
-        //position servo
-        100,     //FORK - elevatorFork_Up
-        180,     //FORK - elevatorFork_Down
-        140,     //FORK - elevatorFork_Border
-        110,     //FORK - fork_Up
-        12,     //FORK - fork_Down
-        60      //FORK - fork_Grab
-    };
-        
-    const ForkGroupProperty BC = {
-        //pins
-        Pin::ServoFork::ServoBC_Elevator,
-        Pin::ServoFork::ServoBC_Fork,
-        //position servo
-        80,     //FORK - elevatorFork_Up
-        160,     //FORK - elevatorFork_Down
-        110,     //FORK - elevatorFork_Border
-        105,     //FORK - fork_Up
-        10,     //FORK - fork_Down
-        60      //FORK - fork_Grab
-    };
-
-    const ForkGroupProperty CA = {
-        //pins
-        Pin::ServoFork::ServoCA_Elevator,
-        Pin::ServoFork::ServoCA_Fork,
-        //position servo
-        100,     //FORK - elevatorFork_Up
-        180,     //FORK - elevatorFork_Down
-        140,     //FORK - elevatorFork_Border
-        110,     //FORK - fork_Up
-        12,     //FORK - fork_Down
-        60      //FORK - fork_Grab
     };
 }

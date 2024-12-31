@@ -11,7 +11,10 @@
 #include <utility/imumaths.h>
 #include <SPI.h>
 
+#ifdef TEENSY35
 #include <TeensyStep.h>
+#endif
+
 class Motion : public Service, public Job{
 public:
 
