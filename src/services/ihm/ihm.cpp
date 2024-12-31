@@ -1,6 +1,7 @@
 #include "ihm.h"
 #include "settings.h"
 #include "text.h"
+#include "notes.h"
 #include "os/console.h"
 
 INSTANTIATE_SERVICE(IHM, ihm)
@@ -92,6 +93,48 @@ void IHM::setRobotPosition(Vec3 pos){
     y.setValue(pos.y);
     z.setValue(pos.z);
 }
+
+
+#ifndef OLD_BOARD
+void IHM::playTone(int frequency, int duration) {
+  if (frequency > 0) {
+    tone(Pin::Outputs::buzzer, frequency, duration);
+  } else {
+    tone(Pin::Outputs::buzzer, 0, duration);
+  }
+}
+
+// Fonction pour jouer une mélodie avec un tempo spécifique
+void IHM::playMelody(int *notes, int *durations, int length, int tempo) {
+  for (int i = 0; i < length; i++) {
+    int noteDuration = (tempo * 4) / durations[i]; // Calculer la durée réelle de la note
+    playTone(notes[i], noteDuration);       // Jouer chaque note
+    delay(noteDuration * 0.1);              // Petite pause entre les notes (10% de la durée)
+  }
+  tone(Pin::Outputs::buzzer, 0);
+}
+
+void IHM::playStartupMelody() {
+   // Tempo spécifique pour cette mélodie (durée d'une noire en ms)
+  int tempo = 400;
+
+  // Notes du riff "We will rock you"
+  int melody[] = {
+    NOTE_G4, NOTE_F4, NOTE_REST, NOTE_E4, NOTE_D4, NOTE_REST, NOTE_E4, NOTE_E4, NOTE_REST
+  };
+
+  // Durées des notes : 2 = blanche, 4 = noire, 8 = croche
+  int noteDurations[] = {
+    4, 8, 8, 4, 8, 8, 8, 8, 4 // Dernière note prolongée
+  };
+
+  // Longueur de la mélodie
+  int length = sizeof(melody) / sizeof(melody[0]);
+
+  // Jouer la mélodie avec le tempo spécifique
+  playMelody(melody, noteDurations, length, tempo);
+}
+#endif
 
 void IHM::drawBootProgress(String msg){
     if (currentPage == Page::BOOT){

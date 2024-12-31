@@ -37,6 +37,12 @@ public:
     void freezeSettings();
     void unfreezeSettings();
 
+    #ifndef OLD_BOARD
+    void playTone(int freq, int duration);
+    void playMelody(int* notes, int* durations, int len, int tempo);
+    void playStartupMelody();
+    #endif
+
     bool hasStarter() const;
     bool buttonPressed() const;
     bool starterPulled() const;

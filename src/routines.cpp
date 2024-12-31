@@ -126,7 +126,9 @@ void onRobotBoot(){
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
     
-    
+    #ifndef OLD_BOARD
+    ihm.playStartupMelody();
+    #endif
 }
 
 void onRobotManual(){
