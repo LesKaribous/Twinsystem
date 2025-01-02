@@ -35,6 +35,8 @@ void Motion::onAttach(){
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
 
+    THROW(1)
+
     #ifdef TEENSY35
     _sA.setPosition(0);
     _sB.setPosition(0);
@@ -53,22 +55,27 @@ void Motion::onAttach(){
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     #endif
 
+    THROW(1)
+
     setAcceleration(Settings::Motion::ACCEL);
+    Wire.begin();
 
     _IMU = false;
-    /* Initialise the sensor */
     for(int i = 0; i < 10; i++){
-        if(myOtos.begin()){
+
+        if(!otos.begin()){
             _IMU = true;           
             break;
         }
+
     }
 
+    THROW(1)
     if(!_IMU) Console::error("Motion") << "Ooops, no OTOS detected ... It may be unplugged... Tanpis ?" << Console::endl;
     else{
-        myOtos.setLinearUnit(kSfeOtosLinearUnitMeters);
-        myOtos.setAngularUnit(kSfeOtosAngularUnitRadians);
-        myOtos.resetTracking();
+        otos.setLinearUnit(kSfeOtosLinearUnitMeters);
+        otos.setAngularUnit(kSfeOtosAngularUnitRadians);
+        otos.resetTracking();
         Console::success("Motion") << "OTOS connected" << Console::endl;
     }
 }
@@ -423,7 +430,8 @@ void Motion::control(){
     _sCController.overrideSpeed(_targetWheelVelocity.c / float(Settings::Motion::SPEED)); // set new speed %
     #endif
     
-if(true){
+    //Console::info() << "Time : " << int(millis()) << Console::endl;
+if(debug()){
         Console::plot("px",_position.x);
         Console::plot("tx",_target.x);
         Console::plot("py",_position.y);
@@ -484,7 +492,7 @@ void Motion::autoCalibration(){
 
 void Motion::readIMU(){
     sfe_otos_pose2d_t myPosition;
-    myOtos.getPosition(myPosition);
+    otos.getPosition(myPosition);
 
     _unsafePosition.x = myPosition.x * 1000.0; //to millimeters
     _unsafePosition.y = myPosition.y * 1000.0; //to millimeters
@@ -500,7 +508,7 @@ void Motion::calibrateIMU(){
     Serial.println("Calibrating IMU...");
 
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    myOtos.calibrateImu();
+    otos.calibrateImu();
     Serial.println("Calibrated IMU.");
     _IMU_calibrated = true;
 }

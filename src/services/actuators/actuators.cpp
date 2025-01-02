@@ -79,59 +79,75 @@ void Actuators::registerPrimaryPoses(){
 
     // --- AB ---
     //Left
-    setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::OPEN, PrimaryPresets::AB.left_Open);
-    setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::GRAB, PrimaryPresets::AB.left_Grab);
-    setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::CLOSE, PrimaryPresets::AB.left_Close);
+    if(groupAB.hasServo(GRIPPER_LEFT)){
+        setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::OPEN, PrimaryPresets::AB.left_Open);
+        setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::GRAB, PrimaryPresets::AB.left_Grab);
+        setServoPos(groupAB.getServo(GRIPPER_LEFT), GripperPose::CLOSE, PrimaryPresets::AB.left_Close);
+    }
 
     //Right
+    if(groupAB.hasServo(GRIPPER_RIGHT)){
     setServoPos(groupAB.getServo(GRIPPER_RIGHT), GripperPose::OPEN, PrimaryPresets::AB.right_Open);
     setServoPos(groupAB.getServo(GRIPPER_RIGHT), GripperPose::GRAB, PrimaryPresets::AB.right_Grab);
     setServoPos(groupAB.getServo(GRIPPER_RIGHT), GripperPose::CLOSE, PrimaryPresets::AB.right_Close);
+    }
 
     //Elevator
+    if(groupAB.hasServo(ELEVATOR)){
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::UP, PrimaryPresets::AB.elevator_Up);
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::DOWN, PrimaryPresets::AB.elevator_Down);
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::GRAB, PrimaryPresets::AB.elevator_Grab);
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::BORDER, PrimaryPresets::AB.elevator_Border);
     setServoPos(groupAB.getServo(ELEVATOR), ElevatorPose::PLANTER, PrimaryPresets::AB.elevator_Planter);
-
+    }
 
     // --- BC ---
     //Left
+    if(groupBC.hasServo(GRIPPER_LEFT)){
     setServoPos(groupBC.getServo(GRIPPER_LEFT), GripperPose::OPEN, PrimaryPresets::BC.left_Open);
     setServoPos(groupBC.getServo(GRIPPER_LEFT), GripperPose::GRAB, PrimaryPresets::BC.left_Grab);
     setServoPos(groupBC.getServo(GRIPPER_LEFT), GripperPose::CLOSE, PrimaryPresets::BC.left_Close);
+    }
 
     //Right
+    if(groupBC.hasServo(GRIPPER_RIGHT)){
     setServoPos(groupBC.getServo(GRIPPER_RIGHT), GripperPose::OPEN, PrimaryPresets::BC.right_Open);
     setServoPos(groupBC.getServo(GRIPPER_RIGHT), GripperPose::GRAB, PrimaryPresets::BC.right_Grab);
     setServoPos(groupBC.getServo(GRIPPER_RIGHT), GripperPose::CLOSE, PrimaryPresets::BC.right_Close);
-
+    }
+    
     //Elevator
+    if(groupBC.hasServo(ELEVATOR)){
     setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::UP, PrimaryPresets::BC.elevator_Up);
     setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::DOWN, PrimaryPresets::BC.elevator_Down);
     setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::GRAB, PrimaryPresets::BC.elevator_Grab);
     setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::BORDER, PrimaryPresets::BC.elevator_Border);
     setServoPos(groupBC.getServo(ELEVATOR), ElevatorPose::PLANTER, PrimaryPresets::BC.elevator_Planter);
-
+    }
 
     // --- CA ---
     //Left
+    if(groupCA.hasServo(GRIPPER_LEFT)){
     setServoPos(groupCA.getServo(GRIPPER_LEFT), GripperPose::OPEN, PrimaryPresets::CA.left_Open);
     setServoPos(groupCA.getServo(GRIPPER_LEFT), GripperPose::GRAB, PrimaryPresets::CA.left_Grab);
     setServoPos(groupCA.getServo(GRIPPER_LEFT), GripperPose::CLOSE, PrimaryPresets::CA.left_Close);
+    }
 
     //Right
-    setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::OPEN, PrimaryPresets::CA.right_Open);
-    setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::GRAB, PrimaryPresets::CA.right_Grab);
-    setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::CLOSE, PrimaryPresets::CA.right_Close);
+    if(groupCA.hasServo(GRIPPER_RIGHT)){
+        setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::OPEN, PrimaryPresets::CA.right_Open);
+        setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::GRAB, PrimaryPresets::CA.right_Grab);
+        setServoPos(groupCA.getServo(GRIPPER_RIGHT), GripperPose::CLOSE, PrimaryPresets::CA.right_Close);
+    }
 
     //Elevator
-    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::UP, PrimaryPresets::CA.elevator_Up);
-    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::DOWN, PrimaryPresets::CA.elevator_Down);
-    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::GRAB, PrimaryPresets::CA.elevator_Grab);
-    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::BORDER, PrimaryPresets::CA.elevator_Border);
-    setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::PLANTER, PrimaryPresets::CA.elevator_Planter);
+    if(groupCA.hasServo(ELEVATOR)){
+        setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::UP, PrimaryPresets::CA.elevator_Up);
+        setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::DOWN, PrimaryPresets::CA.elevator_Down);
+        setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::GRAB, PrimaryPresets::CA.elevator_Grab);
+        setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::BORDER, PrimaryPresets::CA.elevator_Border);
+        setServoPos(groupCA.getServo(ELEVATOR), ElevatorPose::PLANTER, PrimaryPresets::CA.elevator_Planter);
+    }
 }
 
 /*
@@ -232,30 +248,50 @@ void Actuators::disable(){
 
 void Actuators::close(RobotCompass rc, int speed){
     if(!ihm.isPrimary()) return;
-    switch (rc)
-    {
+    switch (rc){
     case RobotCompass::AB :
         if(speed == 100){
-            groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-            groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-        }else
-            while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            groupAB.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::CLOSE), speed);
+
+            groupAB.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::CLOSE), speed);
+        }else{
+            if(groupAB.hasServo(GRIPPER_RIGHT) && groupAB.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            else{
+                groupAB.getServo(GRIPPER_RIGHT); //just to display error
+                groupAB.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::BC :
         if(speed == 100){
-            groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-            groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-        }else
-            while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            groupBC.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::CLOSE), speed);
+
+            groupBC.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::CLOSE), speed);
+        }else{
+            if(groupBC.hasServo(GRIPPER_RIGHT) && groupBC.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            else{
+                groupBC.getServo(GRIPPER_RIGHT); //just to display error
+                groupBC.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::CA :
         if(speed == 100){
-            groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-            groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::CLOSE), speed);
-        }else
-            while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            groupCA.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::CLOSE), speed);
+
+            groupCA.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::CLOSE), speed);
+        }else{
+            if(groupCA.hasServo(GRIPPER_RIGHT) && groupCA.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::CLOSE, speed));
+            else{
+                groupCA.getServo(GRIPPER_RIGHT); //just to display error
+                groupCA.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
     
     default:
@@ -269,26 +305,47 @@ void Actuators::open(RobotCompass rc, int speed){
     {
     case RobotCompass::AB :
         if(speed == 100){
-            groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-            groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-        }else
-            while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            groupAB.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::OPEN), speed);
+
+            groupAB.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::OPEN), speed);
+        }else{
+            if(groupAB.hasServo(GRIPPER_RIGHT) && groupAB.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            else{
+                groupAB.getServo(GRIPPER_RIGHT); //just to display error
+                groupAB.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::BC :
         if(speed == 100){
-            groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-            groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-        }else
-            while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            groupBC.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::OPEN), speed);
+
+            groupBC.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::OPEN), speed);
+        }else{
+            if(groupBC.hasServo(GRIPPER_RIGHT) && groupBC.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            else{
+                groupBC.getServo(GRIPPER_RIGHT); //just to display error
+                groupBC.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::CA :
         if(speed == 100){
-            groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-            groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::OPEN), speed);
-        }else
-            while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            groupCA.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::OPEN), speed);
+
+            groupCA.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::OPEN), speed);
+        }else{
+            if(groupCA.hasServo(GRIPPER_RIGHT) && groupCA.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::OPEN, speed));
+            else{
+                groupCA.getServo(GRIPPER_RIGHT); //just to display error
+                groupCA.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
     
     default:
@@ -302,26 +359,47 @@ void Actuators::grab(RobotCompass rc, int speed){
     {
     case RobotCompass::AB :
         if(speed == 100){
-            groupAB.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-            groupAB.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-        }else
-            while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            groupAB.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::GRAB), speed);
+
+            groupAB.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::GRAB), speed);
+        }else{
+            if(groupAB.hasServo(GRIPPER_RIGHT) && groupAB.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupAB.getServo(GRIPPER_RIGHT), groupAB.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            else{
+                groupAB.getServo(GRIPPER_RIGHT); //just to display error
+                groupAB.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::BC :
         if(speed == 100){
-            groupBC.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-            groupBC.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-        }else
-            while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            groupBC.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::GRAB), speed);
+
+            groupBC.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::GRAB), speed);
+        }else{
+            if(groupBC.hasServo(GRIPPER_RIGHT) && groupBC.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupBC.getServo(GRIPPER_RIGHT), groupBC.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            else{
+                groupBC.getServo(GRIPPER_RIGHT); //just to display error
+                groupBC.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
 
     case RobotCompass::CA :
         if(speed == 100){
-            groupCA.getServo(GRIPPER_RIGHT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-            groupCA.getServo(GRIPPER_LEFT).moveToPose(CAST_POSE(GripperPose::GRAB), speed);
-        }else
-            while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            groupCA.moveServoToPose(GRIPPER_RIGHT, CAST_POSE(GripperPose::GRAB), speed);
+
+            groupCA.moveServoToPose(GRIPPER_LEFT, CAST_POSE(GripperPose::GRAB), speed);
+        }else{
+            if(groupCA.hasServo(GRIPPER_RIGHT) && groupCA.hasServo(GRIPPER_LEFT))
+                while(!moveGripperDual(groupCA.getServo(GRIPPER_RIGHT), groupCA.getServo(GRIPPER_LEFT), GripperPose::GRAB, speed));
+            else{
+                groupCA.getServo(GRIPPER_RIGHT); //just to display error
+                groupCA.getServo(GRIPPER_LEFT); //just to display error
+            }
+        }
         break;
     
     default:
@@ -397,7 +475,10 @@ void Actuators::forkGrab(RobotCompass rc, int speed){
 /**/
 
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose, int speed){
-    getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+    THROW(1)
+    if(getActuatorGroup(rc).hasServo(ELEVATOR))
+        getActuatorGroup(rc).getServo(ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+     THROW(1)
 }
 
 /*
@@ -407,7 +488,8 @@ void Actuators::moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed){
 /**/
 
 void Actuators::moveElevatorAngle(RobotCompass rc, int angle, int speed){
-    getActuatorGroup(rc).getServo(ELEVATOR).moveTo(angle, speed);
+    if(getActuatorGroup(rc).hasServo(ELEVATOR))
+        getActuatorGroup(rc).getServo(ELEVATOR).moveTo(angle, speed);
 }
 
 bool Actuators::moveGripperDual(SmartServo &a, SmartServo &b, GripperPose pose, int speed){

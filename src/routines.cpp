@@ -7,6 +7,11 @@
 #include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
 
+// -------------------------------------
+//           Main programs
+// -------------------------------------
+
+
 void robotProgramAuto(){
     Console::println("Started match");
     lidar.enable();
@@ -59,6 +64,31 @@ void robotProgramManual(){
     }
 
 }
+
+
+// -------------------------------------
+//           CONTROL LOOP
+// -------------------------------------
+
+void control() {
+    static const unsigned long CONTROL_PERIOD_MS = 10;
+    unsigned long lastCall = millis(); 
+
+    while (true) {
+        motion.control();
+        unsigned long now = millis();
+        unsigned long elapsed = now - lastCall;
+        if (elapsed < CONTROL_PERIOD_MS) {
+            threads.delay(CONTROL_PERIOD_MS - elapsed);
+        }
+        lastCall = millis();
+        threads.yield();
+    }
+}
+
+// -------------------------------------
+//              EVENTS
+// -------------------------------------
 
 void onRobotBoot(){
 
@@ -143,6 +173,14 @@ void onRobotAuto(){
 void onRobotStop(){
     ihm.onUpdate();
 }
+
+
+
+
+// -------------------------------------
+//           MODULES EVENTS
+// -------------------------------------
+
 
 void onIntercomConnected(){
     ihm.setIntercomState(true);

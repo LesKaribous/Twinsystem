@@ -38,6 +38,16 @@ void ActuatorGroup::createServo(int pin, int defaultPos, int minPos, int maxPos)
     else Console::error("ActuatorGroup") << "Max servo limit reached, ActuatorGroup can handle up to " << MAX_POSES << " poses" << Console::endl;
 }
 
+bool ActuatorGroup::hasServo(int id){
+    return !(id < 0 || size_t(id) >= m_servos.size());
+}
+
+void ActuatorGroup:: moveServoToPose(int servo, int pose, int speed){
+    if(hasServo(servo))
+        getServo(servo).moveTo(pose, speed);
+    else Console::error("ActuatorGroup") << "servo " << servo << " does not exist " << Console::endl; 
+}
+
 SmartServo& ActuatorGroup::getServo(int id){
     if(id < 0 || size_t(id) >= m_servos.size()) Console::error("ActuatorGroup") << "servo " << id << " does not exist " << Console::endl; 
     return m_servos[id];

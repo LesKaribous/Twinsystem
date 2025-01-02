@@ -143,7 +143,7 @@ private :
     bool _IMU = false;
     bool _IMU_calibrated = false;
 
-    QwiicOTOS myOtos;
+    QwiicOTOS otos;
 
     SERVICE(Motion);
 };

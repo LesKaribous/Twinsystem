@@ -18,6 +18,7 @@ void recalage(){
     //motion.setSync();
     actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
     waitMs(800);
+    THROW(1)
     if(ihm.isColorA()){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);

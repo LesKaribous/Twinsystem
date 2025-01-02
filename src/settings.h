@@ -105,7 +105,7 @@ namespace Settings{
         DIR_C_POLARITY = true;
 
         constexpr u_int8_t 
-        STEP_MODE = 4;
+        STEP_MODE = 2;
     }
 
     namespace Lidar{

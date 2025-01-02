@@ -8,9 +8,9 @@ namespace Text{
     COLOR_B[] = "Blue",
 
     //Strategy
-    STRAT_PRIMARY_A[] = "HOMOLOGATION",
+    STRAT_PRIMARY_A[] = "HOMOLOGATI-",
     STRAT_PRIMARY_B[] = "MATCH",
-    STRAT_SECONDARY_A[] = "HOMOLOGATION",
+    STRAT_SECONDARY_A[] = "HOMOLOGATI-",
     STRAT_SECONDARY_B[] = "MATCH",
 
     //Lidar

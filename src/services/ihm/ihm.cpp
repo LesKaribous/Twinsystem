@@ -343,6 +343,7 @@ void IHM::updateStrategyState(bool stratState) {
     screen.fillRect(100, 10, 140, 15, ILI9341_BLACK);
     screen.setTextColor(ILI9341_WHITE);
     screen.setTextSize(2);
+
     screen.setCursor(100, 10);
     if(isPrimary()){
         if(stratState==Settings::Match::STRAT_PRIMARY_A) screen.println(Text::STRAT_PRIMARY_A);

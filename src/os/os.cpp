@@ -205,3 +205,108 @@ void OS::executeRoutine(routine_ptr routine){
         Console::error("OS") << "Routine is nullptr" << Console::endl;
     }
 }
+
+int OS::runThreadedRoutine(routine_ptr func_ptr, 
+                           int stack_size, 
+                           const std::string& threadName)
+{
+    if (!func_ptr) {
+        // Invalid function pointer
+        return -1;
+    }
+
+    // Create a new thread. The TeensyThreads call returns a thread ID >= 0 on success, -1 on failure.
+    // Note: The library also supports a form: addThread(func_ptr, arg, stack_size), 
+    // but here we assume 'func_ptr' is void(*)(), so no extra arg is needed.
+    int threadID = threads.addThread(func_ptr, stack_size);
+
+    if (threadID < 0) {
+        // Thread creation failed
+        return -1;
+    }
+
+    // Store thread info in our registry
+    ThreadInfo tinfo;
+    tinfo.threadID = threadID;
+    tinfo.funcPtr  = func_ptr;
+    tinfo.name     = threadName;
+
+    m_threadRegistry[threadID] = tinfo;
+
+    return threadID;
+}
+
+bool OS::killThread(int threadID) {
+    auto it = m_threadRegistry.find(threadID);
+    if (it == m_threadRegistry.end()) {
+        // Not found
+        return false;
+    }
+
+    // threads.kill() returns 0 on success, -1 on error
+    int result = threads.kill(threadID);
+    if (result == 0) {
+        // Remove from registry
+        m_threadRegistry.erase(it);
+        return true;
+    }
+
+    return false;
+}
+
+bool OS::suspendThread(int threadID) {
+    auto it = m_threadRegistry.find(threadID);
+    if (it == m_threadRegistry.end()) {
+        // Thread not found
+        return false;
+    }
+
+    // threads.suspend() returns 0 on success, -1 on error
+    int result = threads.suspend(threadID);
+    return (result == 0);
+}
+
+bool OS::resumeThread(int threadID) {
+    auto it = m_threadRegistry.find(threadID);
+    if (it == m_threadRegistry.end()) {
+        return false;
+    }
+
+    // threads.restart() returns 0 on success, -1 on error
+    int result = threads.restart(threadID);
+    return (result == 0);
+}
+
+bool OS::waitThread(int threadID, unsigned long timeout_ms) {
+    auto it = m_threadRegistry.find(threadID);
+    if (it == m_threadRegistry.end()) {
+        // Invalid thread
+        return false;
+    }
+
+    // threads.wait(threadID, timeout_ms)
+    //   Waits until the thread ends or until 'timeout_ms' elapses
+    //   If 0, wait indefinitely. The return is the "state" of the thread.
+    //   Typical states: RUNNING, ENDED, SUSPENDED, etc.
+    int finalState = threads.wait(threadID, timeout_ms);
+
+    // If finalState == Threads::ENDED, we can assume the thread is done.
+    // Let's check if that means we should remove from the registry.
+    if (finalState == Threads::ENDED) {
+        m_threadRegistry.erase(it);
+        return true; // The thread ended successfully
+    }
+
+    // If it times out or is still running, return false
+    return false;
+}
+
+std::vector<OS::ThreadInfo> OS::listThreads() const {
+    // Collect current threads in a vector
+    std::vector<ThreadInfo> out;
+    out.reserve(m_threadRegistry.size());
+    for (auto& kv : m_threadRegistry) {
+        out.push_back(kv.second);
+    }
+    return out;
+}

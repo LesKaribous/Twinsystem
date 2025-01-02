@@ -23,6 +23,8 @@ public:
 
     void createServo(int pin, int defaultPos = 90, int minPos = 0, int maxPos = 180);
     SmartServo& getServo(int id);
+    bool hasServo(int id);
+    void moveServoToPose(int servo, int pose, int speed);
 
     void createAnalogSensor(int pin);
     AnalogSensor& getAnalogSensor(int id);
