@@ -14,7 +14,8 @@ Motion::Motion() : Service(ID_MOTION)
     #ifdef TEENSY35
    ,_sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)
+    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC),
+    controller(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD)
     #endif
 {}
 
@@ -58,12 +59,12 @@ void Motion::onAttach(){
     THROW(1)
 
     setAcceleration(Settings::Motion::ACCEL);
-    Wire.begin();
+    Wire2.begin();
 
     _IMU = false;
     for(int i = 0; i < 10; i++){
 
-        if(!otos.begin()){
+        if(otos.begin(Wire2) == true){
             _IMU = true;           
             break;
         }
@@ -76,12 +77,16 @@ void Motion::onAttach(){
         otos.setLinearUnit(kSfeOtosLinearUnitMeters);
         otos.setAngularUnit(kSfeOtosAngularUnitRadians);
         otos.resetTracking();
+        calibrateIMU();
         Console::success("Motion") << "OTOS connected" << Console::endl;
     }
 }
 
 // Main loop
 void Motion::onUpdate(){
+
+    readIMU();
+
     if(enabled() && !_sleeping && !isPaused() && isPending()){
         if(hasFinished()){
             complete();
@@ -413,11 +418,9 @@ void Motion::control(){
 
     //correction
     Vec3 error =  _target - _position;
-
-    _integral += error; //mm, mm, rad
-    Vec3 corr = (error * kP) + (_integral * kI) + (((error - _lastError)) * kD); // This implements a simple P regulator (can be extended to a PID if necessary)
-    _lastError = error; //mm, mm, rad
-
+    
+    
+    Vec3 corr = controller.compute(error);
     _targetWheelVelocity = corr.rotateZ(-_position.c);
     _targetWheelVelocity = ik(_targetWheelVelocity);
     _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
@@ -491,20 +494,30 @@ void Motion::autoCalibration(){
 }
 
 void Motion::readIMU(){
+    static long lastRead = 0;
+
+    if(millis() - lastRead < 300) return;
+    lastRead = millis();
+
     sfe_otos_pose2d_t myPosition;
     otos.getPosition(myPosition);
 
-    _unsafePosition.x = myPosition.x * 1000.0; //to millimeters
-    _unsafePosition.y = myPosition.y * 1000.0; //to millimeters
+    //Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
+
+    _unsafePosition.x = -myPosition.y * 1000.0; //to millimeters
+    _unsafePosition.y = -myPosition.x * 1000.0; //to millimeters
 
     float orientation = myPosition.h;
     while(orientation > PI) orientation-= 2.0f*PI;
     while(orientation <= -PI) orientation += 2.0f*PI;
     _unsafePosition.z = orientation;
+
+    Console::info() << _unsafePosition << Console::endl;
 }
 
 void Motion::calibrateIMU(){
-    Serial.println("Ensure the OTOS is flat and stationary, then enter any key to calibrate the IMU");
+    Serial.println("Ensure the OTOS is flat and stationary");
+    delay(1000);
     Serial.println("Calibrating IMU...");
 
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
@@ -593,6 +606,13 @@ bool Motion::isMoving() const{
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
+    if(_IMU){
+        sfe_otos_pose2d_t pos;
+        pos.x = -newPos.y/1000.0;
+        pos.y = -newPos.x/1000.0;
+        pos.h = newPos.z;
+        otos.setPosition(pos);
+    }
     //if(_useBNO) setOrientation(newPos.c);
 }
 

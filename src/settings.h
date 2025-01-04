@@ -81,6 +81,8 @@ namespace Settings{
         const Vec3 kI = Vec3(0.0, 0.0, 0.0);
         const Vec3 kD = Vec3(0.0, 0.0, 0.0);
 
+        const float MAX_PID_DELAY = 10;
+
         const uint32_t 
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
         ACCEL = 900, // equivalent fullsteps/s^2
@@ -105,7 +107,7 @@ namespace Settings{
         DIR_C_POLARITY = true;
 
         constexpr u_int8_t 
-        STEP_MODE = 2;
+        STEP_MODE = 8;
     }
 
     namespace Lidar{

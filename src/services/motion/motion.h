@@ -3,6 +3,7 @@
 #include "services/service.h"
 #include "utils/job.h"
 #include "utils/geometry.h"
+#include "pid.h"
 
 #include <deque>
 #include <Wire.h>
@@ -116,9 +117,8 @@ private :
     //Velocity
     Vec3 _targetWheelVelocity = { 0, 0, 0}; //steps/s
 
-    //PID
-    Vec3 _lastError 	  = { 0, 0, 0}; //XY, Theta
-    Vec3 _integral 	      = { 0, 0, 0}; //XY, Theta
+    PID<Vec3> controller;
+    
 
     Vec3 _calibration 	 = { 1, 1, 1};
     Vec2 _controlPoint   = { 0, 0};
