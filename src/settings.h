@@ -22,7 +22,11 @@ struct  CalibrationProfile{
 
 // Namespace
 namespace Settings{
-
+    namespace Threads{
+        constexpr long DEFAULT_REFRESH = 100; //ms 
+        constexpr int DEFAULT_STACKSIZE = 1024; //ms 
+    }
+    
     namespace Match{
         constexpr bool 
         AVOIDANCE = true,

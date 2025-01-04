@@ -1,12 +1,13 @@
 #pragma once
 #include "services/service.h"
 #include "utils/timer/timer.h"
+#include "tw_threads.h"
 #include <map>
 #include <queue>
 #include <string>
-#include <TeensyThreads.h>
 
 class Service;
+class ThreadedService;
 using routine_ptr = void (*)();
 using routine_arg = void*;
 
@@ -28,28 +29,6 @@ public:
 
     void setRountine(SystemState state, routine_ptr func_ptr);
     void setState(SystemState state);
-
-// ----------------------------------------------------------
-// Thread Management
-// ----------------------------------------------------------
-
-    struct ThreadInfo {
-        int threadID = -1;            // TeensyThreads thread ID
-        routine_ptr funcPtr = nullptr; 
-        std::string name;             // Optional: for debugging/logging
-    };
-
-
-    int runThreadedRoutine(routine_ptr func_ptr, int stack_size = 1024, const std::string& threadName = "");
-
-    // Control existing threads
-    bool killThread(int threadID);
-    bool suspendThread(int threadID);
-    bool resumeThread(int threadID);
-    bool waitThread(int threadID, unsigned long timeout_ms = 0);
-
-    std::vector<ThreadInfo> listThreads() const;
-
 
     void updateServices();
     void enable(ServiceID);
@@ -89,7 +68,7 @@ private:
 
     Timer m_timer;
     std::queue<Job*> m_jobs;
-    std::map<int, ThreadInfo> m_threadRegistry;
+
 
 //Singleton
 public:

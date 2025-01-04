@@ -1,5 +1,6 @@
 #include "planner.h"
 /*
-INSTANTIATE_SERVICE(Planner);
+INSTANTIATE_SERVICE(Planner, planner);
+
 
 */

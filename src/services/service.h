@@ -1,7 +1,9 @@
 #pragma once
 #include <Arduino.h>
+#include "os/tw_threads.h"
 
 using callback_ptr = void (*)();
+using wrapper_ptr = void (*)();
 
 enum ServiceID{
     ID_LIDAR,
@@ -53,8 +55,9 @@ private: \
 #define EXTERN_DECLARATION(className, name) extern className& name;
 
 class Service{
-private:
+protected:
     bool m_enabled = false;
+    bool m_threaded = false;
     bool m_debug = false;
     const ServiceID m_ID;
 
@@ -65,6 +68,8 @@ public:
     virtual void onAttach() = 0;
     virtual void onUpdate() = 0;
     
+    inline bool threaded(){return m_threaded;}
+
     inline virtual void enable(){m_enabled = true;}
     inline virtual void disable(){m_enabled = false;}
     
@@ -78,3 +83,19 @@ public:
 };
 
 
+
+class ThreadedService : public Service{
+protected:
+    std::thread *servicethread;
+	virtual void onUpdateThread(void *arg) = 0;
+public:    
+    ThreadedService(ServiceID id) : Service(id){
+        m_threaded = true;
+    };
+
+    static void runThread(void *arg)
+	{
+		ThreadedService *_runnable = static_cast<ThreadedService*> (arg);
+		_runnable->onUpdateThread(arg);
+	}
+};

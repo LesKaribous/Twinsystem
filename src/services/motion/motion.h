@@ -6,9 +6,8 @@
 #include "pid.h"
 
 #include <deque>
-#include <Wire.h>
-#include <SPI.h>
-#include <SparkFun_Qwiic_OTOS_Arduino_Library.h>
+
+
 
 #ifdef TEENSY35
 #include <TeensyStep.h>
@@ -35,12 +34,6 @@ public:
     void complete() override;
     void forceCancel();
 
-    // Power routines
-    void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
-    void disengage();// Disengaging motors turn them off. They cannot move at all.
-    void wakeUp(); //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
-    void sleep(); //Note : A move request will exit sleep mode and turn them on.
-
     // Movement routines
     Motion& go(Vec2);
     Motion& go(float x, float y);
@@ -48,6 +41,12 @@ public:
     Motion& turn(float w);
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
+
+    // Power routines
+    void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
+    void disengage();// Disengaging motors turn them off. They cannot move at all.
+    void wakeUp(); //Sleep mode is used to save battery or let the robot move freely. It disable both motors.
+    void sleep(); //Note : A move request will exit sleep mode and turn them on.
 
     void estimatePosition();
     void resetSteps();
@@ -64,7 +63,6 @@ public:
     void setAsync(); //Non blocking
     void setSync(); //Blocking
     void setFeedrate(float feed);
-
 
     //Getters
     Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
@@ -87,10 +85,6 @@ public:
     void openLoop();
     void closeLoop();
     void autoCalibration();
-
-    void readIMU();
-    void calibrateIMU();
-
     
     // Settings
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
@@ -140,10 +134,9 @@ private :
     bool _optimizeRotation = true;
     bool _debug = true;
     bool _closeLoop = false;
-    bool _IMU = false;
-    bool _IMU_calibrated = false;
 
-    QwiicOTOS otos;
+
+
 
     SERVICE(Motion);
 };

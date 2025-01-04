@@ -13,7 +13,7 @@ void setup(){
 	os.setRountine(OS::AUTO_PROGRAM, robotProgramAuto);// - - - - Execute after match - - - - - - - (loop)
 	os.setRountine(OS::MANUAL_PROGRAM, robotProgramManual);// - Execute after match - - - - - - - (loop)
 
-	os.runThreadedRoutine(control, 1024, "control");
+	tw_Thread::createThread(control, 1024, "control");
 }
 
 void loop(){

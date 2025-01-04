@@ -5,6 +5,7 @@
 #include "os/console.h"
 #include "motion.h"
 #include "utils/timer/timer.h"
+#include "services/localisation/localisation.h"
 
 #include <cmath>
 
@@ -56,37 +57,11 @@ void Motion::onAttach(){
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     #endif
 
-    THROW(1)
-
     setAcceleration(Settings::Motion::ACCEL);
-    Wire2.begin();
-
-    _IMU = false;
-    for(int i = 0; i < 10; i++){
-
-        if(otos.begin(Wire2) == true){
-            _IMU = true;           
-            break;
-        }
-
-    }
-
-    THROW(1)
-    if(!_IMU) Console::error("Motion") << "Ooops, no OTOS detected ... It may be unplugged... Tanpis ?" << Console::endl;
-    else{
-        otos.setLinearUnit(kSfeOtosLinearUnitMeters);
-        otos.setAngularUnit(kSfeOtosAngularUnitRadians);
-        otos.resetTracking();
-        calibrateIMU();
-        Console::success("Motion") << "OTOS connected" << Console::endl;
-    }
 }
 
 // Main loop
 void Motion::onUpdate(){
-
-    readIMU();
-
     if(enabled() && !_sleeping && !isPaused() && isPending()){
         if(hasFinished()){
             complete();
@@ -134,108 +109,6 @@ void Motion::sleep(){
 }
 
 
-// Movements routines
-Motion& Motion::go(float x, float y){
-    setStepsVelocity(Settings::Motion::SPEED);
-    _isMoving = true;
-    go(Vec2(x, y));
-    return *this;
-}
-
-Motion& Motion::goPolar(float heading, float dist){
-    setStepsVelocity(Settings::Motion::SPEED);
-    _isMoving = true;
-    PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
-    if (_absolute){
-        Vec2 target = _position + poltarget.toVec2();
-        move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
-    }
-    else{
-        Vec2 reltarget = poltarget.toVec2();
-        move(Vec3(reltarget.a, reltarget.b, 0));
-    }
-    return *this;
-}
-
-Motion& Motion::turn(float angle){
-    //if(_useBNO){
-    //    _position.c = getOrientation();
-    //}
-    setStepsVelocity(Settings::Motion::TURN_SPEED);
-    _isMoving = true;
-    _isRotating = true;
-    if (_absolute) move(Vec3(_position.a, _position.b, angle));
-    else move(Vec3(0, 0, angle));
-    return *this;
-}
-  
-Motion& Motion::go(Vec2 target){
-    setStepsVelocity(Settings::Motion::SPEED);
-    _isMoving = true;
-    if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
-    else move(Vec3(target.a, target.b, 0));
-    return *this;
-}
-
-Motion&  Motion::align(RobotCompass rc, float orientation){
-    turn((orientation - getCompassOrientation(rc)));
-    return *this;
-}
-
-//Raw relative move request
-Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
-    if(!enabled()) {
-        Console::error("Motion") << "Motion not enabled" << Console::endl;
-        return *this;
-    }
-    Job::reset();//Start a new job
-    
-    target.c *= DEG_TO_RAD; //Convert to rotation to radian
-    if(isRelative()){
-        if(target.magSq() == 0){ //Test if move is 0 length
-            Console::error("Motion") << "Move is null" << Console::endl;
-            complete();
-            return *this;
-        }
-        target = toAbsoluteTarget(target); //convert to ABS target
-    }else{
-        if(target == _position){
-            Console::error("Motion") << "Move is null" << Console::endl;
-            complete();
-            return *this;
-        }
-    }
-    _target = target; Console::trace("Motion") << "Target is " << _target << Console::endl;
-
-    //to relative step target 
-    Console::trace("Motion") << "Position is " << _position << Console::endl;
-    Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
-    if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
-    _stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
-    
-    Job::start(); //robot is moving from now
-    wakeUp();
-    resetSteps();
-
-    #ifdef TEENSY35
-    _sA.setTargetAbs(_stepsTarget.a);
-    _sB.setTargetAbs(_stepsTarget.b);
-    _sC.setTargetAbs(_stepsTarget.c);
-    #endif
-
-    if(m_async){
-        #ifdef TEENSY35
-        _steppers.moveAsync(_sA, _sB, _sC);
-        #endif
-    }
-    else{
-        #ifdef TEENSY35
-        _steppers.move(_sA, _sB, _sC);
-        #endif
-        complete();
-    }
-    return *this;
-}
 
 void Motion::setCalibration(CalibrationProfile c){
     _calibration = c.Cartesian;
@@ -269,7 +142,7 @@ void Motion::resume(){
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
-    _steppers.moveAsync(_sA, _sB, _sC); // set new speed
+    //_steppers.moveAsync(_sA, _sB, _sC); // set new speed
     #endif
 }
 
@@ -305,6 +178,14 @@ void Motion::cancel() {
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
+
+    _sAController.stop();
+    _sBController.stop();
+    _sCController.stop();
+
+    _sAController.overrideSpeed(0);
+    _sBController.overrideSpeed(0);
+    _sCController.overrideSpeed(0);
     #endif
 }
 
@@ -322,6 +203,14 @@ void Motion::complete() {
     _sA.setTargetAbs(0);
     _sB.setTargetAbs(0);
     _sC.setTargetAbs(0);
+
+    _sAController.stop();
+    _sBController.stop();
+    _sCController.stop();
+
+    _sAController.overrideSpeed(0);
+    _sBController.overrideSpeed(0);
+    _sCController.overrideSpeed(0);
     #endif
     //Console::println("complete");
 }
@@ -374,22 +263,27 @@ void Motion::disableOptimization(){
 }
 
 void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
-    Vec3 steps = getLastSteps(); //Read steps counter
-    Vec3 delta = steps - _lastSteps;
-    _lastSteps = steps;
 
-    Vec3 angularDelta = (delta / Settings::Stepper::STEP_MODE) * (PI/200);
-    Vec3 linearDelta = angularDelta * Settings::Geometry::WHEEL_RADIUS;
+    if(localisation.useIMU()){
+        _position = localisation.getPosition();
+    }else{
+        Vec3 steps = getLastSteps(); //Read steps counter
+        Vec3 delta = steps - _lastSteps;
+        _lastSteps = steps;
 
-    //Calculate XYZ delta
-    Vec3 del = fk(linearDelta);
+        Vec3 angularDelta = (delta / Settings::Stepper::STEP_MODE) * (PI/200);
+        Vec3 linearDelta = angularDelta * Settings::Geometry::WHEEL_RADIUS;
 
-    float orientation = _position.c;
-    orientation += del.c;
+        //Calculate XYZ delta
+        Vec3 del = fk(linearDelta);
 
-    del.rotateZ(orientation); //Transform to workd space
+        float orientation = _position.c;
+        orientation += del.c;
 
-    _position += del/_calibration;
+        del.rotateZ(orientation); //Transform to workd space
+
+        _position += del/_calibration;
+    }
 }
 
 Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
@@ -476,13 +370,11 @@ Vec3 Motion::computeStaturedSpeed(Vec3 targetSpeed){
 
 
 
-
-
 void Motion::openLoop(){
     _closeLoop = false;
 }
 void Motion::closeLoop(){
-    _closeLoop = _IMU; //activate only if IMU available
+    _closeLoop = localisation.useIMU(); //activate only if IMU available
 }
 
 void Motion::autoCalibration(){
@@ -493,45 +385,88 @@ void Motion::autoCalibration(){
 
 }
 
-void Motion::readIMU(){
-    static long lastRead = 0;
 
-    if(millis() - lastRead < 300) return;
-    lastRead = millis();
 
-    sfe_otos_pose2d_t myPosition;
-    otos.getPosition(myPosition);
 
-    //Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
 
-    _unsafePosition.x = -myPosition.y * 1000.0; //to millimeters
-    _unsafePosition.y = -myPosition.x * 1000.0; //to millimeters
-
-    float orientation = myPosition.h;
-    while(orientation > PI) orientation-= 2.0f*PI;
-    while(orientation <= -PI) orientation += 2.0f*PI;
-    _unsafePosition.z = orientation;
-
-    Console::info() << _unsafePosition << Console::endl;
+// Movements routines
+Motion& Motion::go(float x, float y){
+    setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
+    go(Vec2(x, y));
+    return *this;
 }
 
-void Motion::calibrateIMU(){
-    Serial.println("Ensure the OTOS is flat and stationary");
-    delay(1000);
-    Serial.println("Calibrating IMU...");
-
-    // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    otos.calibrateImu();
-    Serial.println("Calibrated IMU.");
-    _IMU_calibrated = true;
+Motion& Motion::goPolar(float heading, float dist){
+    setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
+    PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
+    if (_absolute){
+        Vec2 target = _position + poltarget.toVec2();
+        move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
+    }
+    else{
+        Vec2 reltarget = poltarget.toVec2();
+        move(Vec3(reltarget.a, reltarget.b, 0));
+    }
+    return *this;
 }
 
+Motion& Motion::turn(float angle){
+    //if(_useBNO){
+    //    _position.c = getOrientation();
+    //}
+    setStepsVelocity(Settings::Motion::TURN_SPEED);
+    _isMoving = true;
+    _isRotating = true;
+    if (_absolute) move(Vec3(_position.a, _position.b, angle));
+    else move(Vec3(0, 0, angle));
+    return *this;
+}
+  
+Motion& Motion::go(Vec2 target){
+    setStepsVelocity(Settings::Motion::SPEED);
+    _isMoving = true;
+    if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
+    else move(Vec3(target.a, target.b, 0));
+    return *this;
+}
 
+Motion&  Motion::align(RobotCompass rc, float orientation){
+    turn((orientation - getCompassOrientation(rc)));
+    return *this;
+}
 
+//Raw relative move request
+Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
+    if(!enabled()) {
+        Console::error("Motion") << "Motion not enabled" << Console::endl;
+        return *this;
+    }
+    Job::reset();//Start a new job
+    target.c *= DEG_TO_RAD; //Convert to rotation to radian
 
+    if(isRelative()){
+        if(target.magSq() == 0){ //Test if move is 0 length
+            Console::error("Motion") << "Move is null" << Console::endl;
+            complete();
+            return *this;
+        }
+        target = toAbsoluteTarget(target); //convert to ABS target
+    }else{
+        if(target == _position){
+            Console::error("Motion") << "Move is null" << Console::endl;
+            complete();
+            return *this;
+        }
+    }
+    _target = target; 
+    Console::trace("Motion") << "Target is " << _target << Console::endl;
 
-
-
+    //todo
+    
+    return *this;
+}
 
 
 
@@ -606,14 +541,8 @@ bool Motion::isMoving() const{
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
-    if(_IMU){
-        sfe_otos_pose2d_t pos;
-        pos.x = -newPos.y/1000.0;
-        pos.y = -newPos.x/1000.0;
-        pos.h = newPos.z;
-        otos.setPosition(pos);
-    }
-    //if(_useBNO) setOrientation(newPos.c);
+    if(localisation.useIMU())
+        localisation.setPosition(newPos);
 }
 
 void Motion::setStepsVelocity(float v){
