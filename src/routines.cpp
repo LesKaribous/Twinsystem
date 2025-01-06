@@ -117,6 +117,9 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking Localisation...");
     os.attachService(&localisation); ihm.addBootProgress(10);
 
+    ihm.drawBootProgress("Linking Navigation...");
+    os.attachService(&nav); ihm.addBootProgress(10);
+
     ihm.drawBootProgress("Linking intercom");
     intercom.setConnectLostCallback(onIntercomDisconnected);
     intercom.setConnectionSuccessCallback(onIntercomConnected);

@@ -4,6 +4,7 @@
 #include "services/intercom/intercom.h"
 #include "services/lidar/lidar.h"
 #include "services/motion/motion.h"
+#include "services/navigation/navigation.h"
 #include "services/localisation/localisation.h"
 #include "services/chrono/chrono.h"
 #include "services/safety/safety.h"

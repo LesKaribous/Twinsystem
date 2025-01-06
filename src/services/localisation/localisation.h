@@ -16,10 +16,14 @@ public:
     void read();
     void calibrate();
 
+    bool isRotating() const;
+    bool isMoving() const;
+
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
     Localisation(): ThreadedService(ID_LOCALISATION){};
     SERVICE(Localisation)
+
 
 
 private : 
@@ -27,7 +31,8 @@ private :
     bool m_use_IMU = false;
     bool m_connected = false;
     bool m_calibrated = false;
-
+    bool m_isMoving = false;
+    bool m_isRotating = false;
     long m_refresh = 300;
 
     Vec3 _unsafePosition = {0,0,0};
