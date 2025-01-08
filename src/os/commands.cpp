@@ -96,53 +96,63 @@ void command_lidarMode(const args_t& args){
 
 //Motion
 void command_go(const args_t& args){
+    /*
     if(args.size() != 2) return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     async motion.go(x, y);
+    */
 }
 
 //Motion
 void command_goPolar(const args_t& args){
+    /*
     if(args.size() != 2) return;
     float angle = args[0].toFloat();
     float dist = args[1].toFloat();
     async motion.goPolar(angle, dist);
+    */
 }
 
 void command_move(const args_t& args){
+    /*
     if(args.size() != 3) return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     float z = args[3].toFloat();
     async motion.move({x, y, z});
+    */
 }
 
 
 void command_turn(const args_t& args){
+    /*
     if(args.size() != 1)return;
     float x = args[0].toFloat();
     async motion.turn(x);
+    */
 }
 
 void command_rawTurn(const args_t& args){
+    /*
     if(args.size() != 1)return;
     float x = args[0].toFloat();
     motion.disableOptimization();
     async motion.turn(x);
     motion.enableOptimization();
+    */
 }
 
 void command_pause(const args_t& args){
-    motion.pause();
+    //motion.pause();
 }
 
 void command_resume(const args_t& args){
-    motion.resume();
+    //motion.resume();
 }
 
 void command_cancel(const args_t& args){
-    motion.cancel();
+    //motion.cancel();
 }
 
 void command_sleep(const args_t& args){
@@ -154,6 +164,7 @@ void command_wake(const args_t& args){
 }
 
 void command_align(const args_t& args){
+    /*
     if(args.size() != 2)return;
     String side = args[0];
     float orientation = args[1].toFloat();
@@ -163,25 +174,33 @@ void command_align(const args_t& args){
     else if(side.equalsIgnoreCase("BC"))   async motion.align(RobotCompass::BC, orientation);
     else if(side.equalsIgnoreCase("C"))    async motion.align(RobotCompass::C, orientation);
     else if(side.equalsIgnoreCase("CA"))   async motion.align(RobotCompass::CA, orientation);
+    */
 }
 
 
+
 void command_setAbsolute(const args_t& args){
+    /*
     motion.setAbsolute();
+    */
 }
 
 
 void command_setRelative(const args_t& args){
+    /*
     motion.setRelative();
+    */
 }
 
 
 void command_setAbsPosition(const args_t& args){
+    /*
     if(args.size() != 3)return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     float angle = args[2].toFloat() * DEG_TO_RAD;
     motion.setAbsPosition({x, y, angle});
+    */
 }
 
 

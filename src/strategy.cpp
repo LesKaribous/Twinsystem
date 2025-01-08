@@ -22,29 +22,23 @@ void recalage(){
     if(ihm.isColorA()){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        async motion.go(POI::b1);
-        async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
+        //async motion.go(POI::b1);
+        //async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
         actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
     else{
-        motion.setAbsPosition({-1,-1,PI});
+        //motion.setAbsPosition({-1,-1,PI});
         probeBorder(TableCompass::NORTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        async motion.go(POI::y1);
-        async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+        //async motion.go(POI::y1);
+        //async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
         actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
 }
-
-void testEvitemment(){
-    motion.setAsync();
-    async motion.go(2775, 225 + 500) || async motion.go(2775, 225 + 250) || async motion.go(2775, 225);
-}
-
 
 void matchA(){
     //do Match
@@ -78,6 +72,8 @@ RobotCompass previousActuator(RobotCompass rc){
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist){
+    /*
+
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
 	//bool m_probing = true;
@@ -115,4 +111,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	async motion.goPolar(getCompassOrientation(rc),-clearance);
 	if(wasAbsolute) motion.setAbsolute();
     motion.setFeedrate(currentFeedrate);
+
+
+    */
 }

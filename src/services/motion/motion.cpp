@@ -21,22 +21,9 @@ Motion::Motion() : Service(ID_MOTION)
 
 void Motion::onAttach(){
     Console::info() << "Motion activated" << Console::endl;
-    
-    _absolute = Settings::Motion::ABSOLUTE;
-
-    Job::reset();
-    _startPosition  = {0,0,0};
-    _position       = {-1,-1,0};
-    _target 	     = {0,0,0};
-
-    _calibration 	= Settings::Calibration::Primary.Cartesian;
-    _controlPoint   = {0,0};
-	_absolute = true;
 
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
-
-    THROW(1)
 
     #ifdef TEENSY35
     _sA.setPosition(0);
@@ -55,18 +42,19 @@ void Motion::onAttach(){
     _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     #endif
-
     setAcceleration(Settings::Motion::ACCEL);
 }
 
 // Main loop
 void Motion::onUpdate(){
+    /*
     if(enabled() && !_sleeping && !isPaused() && isPending()){
         if(hasFinished()){
             complete();
         }
         estimatePosition();
     }
+    */
 }
 
 // Service routines
@@ -105,12 +93,6 @@ void Motion::sleep(){
     //if(isPending()) cancel();
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
     _sleeping = true;
-}
-
-
-
-void Motion::setCalibration(CalibrationProfile c){
-    _calibration = c.Cartesian;
 }
 
 void Motion::setAcceleration(int accel){
@@ -238,54 +220,9 @@ void Motion::forceCancel() {
 
 
 
-
-
-
 // IMU and PID
 void Motion::control(){
-    /*
-    estimatePosition();
-
-    Vec3 kP = Vec3(4.0, 4.0, 5.5); //Settings::Motion::kP;
-    Vec3 kI = Vec3( 0.0, 0.0, 0.0);//Settings::Motion::kI;
-    Vec3 kD = Vec3( 40.0, 40.0, 4.5);//Settings::Motion::kD;
-
-    //correction
-    Vec3 error =  _target - _position;
     
-    
-    Vec3 corr = controller.compute(error);
-    _targetWheelVelocity = corr.rotateZ(-_position.c);
-    _targetWheelVelocity = ik(_targetWheelVelocity);
-    _targetWheelVelocity = targetToSteps(_targetWheelVelocity);
-    _targetWheelVelocity = computeStaturedSpeed(_targetWheelVelocity);
-    //_targetWheelVelocity = computeStaturedSpeed(Vec3(500,0,3).rotateZ(-_position.c));
-
-    #ifdef TEENSY35
-    _sAController.overrideSpeed(_targetWheelVelocity.a / float(Settings::Motion::SPEED)); // set new speed %
-    _sBController.overrideSpeed(_targetWheelVelocity.b / float(Settings::Motion::SPEED)); // set new speed %
-    _sCController.overrideSpeed(_targetWheelVelocity.c / float(Settings::Motion::SPEED)); // set new speed %
-    #endif
-    
-    //Console::info() << "Time : " << int(millis()) << Console::endl;
-if(debug()){
-        Console::plot("px",_position.x);
-        Console::plot("tx",_target.x);
-        Console::plot("py",_position.y);
-        Console::plot("ty",_target.y);
-        //Console::plot("pa",_position.c);
-        //Console::plot("ta",_target.c);
-
-        
-        Console::plot("tva",fabs(_targetWheelVelocity.a));
-        Console::plot("tvb",fabs(_targetWheelVelocity.b));
-        Console::plot("tvc",fabs(_targetWheelVelocity.c));
-        
-        Console::plot("va",_sAController.getCurrentSpeed());
-        Console::plot("vb",_sBController.getCurrentSpeed());
-        Console::plot("vc",_sCController.getCurrentSpeed());
-    }
-    */
 }
 
 

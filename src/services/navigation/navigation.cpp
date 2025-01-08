@@ -10,6 +10,51 @@ INSTANTIATE_SERVICE(Navigation, nav);
 //     Movements
 //-------------------------
 
+// Service class methods
+void Navigation::onAttach() {
+
+}
+
+void Navigation::onUpdate() {
+
+}
+
+
+void Navigation::enable() {
+
+}
+
+
+void Navigation::disable() {
+
+}
+
+// Job class methods
+void Navigation::run() {
+
+}
+
+void Navigation::pause() {
+
+}
+
+void Navigation::resume() {
+
+}
+
+void Navigation::cancel() {
+
+}
+
+void Navigation::complete() {
+
+}
+
+void Navigation::forceCancel() {
+
+}
+
+
 
 Navigation& Navigation::begin(){
     m_chainning = true;
@@ -42,35 +87,20 @@ Navigation& Navigation::goPolar(float heading, float dist){
 }
 
 Navigation& Navigation::turn(float angle){
-    //if(_useBNO){
-    //    _position.c = getOrientation();
-    //}
-    //setStepsVelocity(Settings::Motion::TURN_SPEED);
-    //m_isMoving = true;
-    //m_isRotating = true;
+
     if (m_absolute) move(Vec3(m_position.a, m_position.b, angle));
     else move(Vec3(0, 0, angle));
     return *this;
 }
   
-Navigation& Navigation::go(Vec2 target){
+Navigation& Navigation::go(Vec2 dest){
     if(!m_chainning) m_moves.clear();
 
     Vec3 target;
-    if (m_absolute) target = Vec3(target.a, target.b, m_position.c*RAD_TO_DEG);
-    else target = Vec3(target.a, target.b, 0);
+    if (m_absolute) target = Vec3(dest.a, dest.b, m_position.c*RAD_TO_DEG);
+    else target = Vec3(dest.a, dest.b, 0);
 
-    if (m_controlMode == OPEN_LOOP) {
-        Vec2 startPos = m_position; 
-        m_moves.push_back(std::make_unique<Translation>(startPos, target));
-    } else {
-        Vec3 startPose = m_position;
-        Vec3 endPose(target.x, target.y, startPose.z);
-        m_moves.push_back(std::make_unique<Translation>(startPose, endPose));
-    }
-        
-    //setVelocity(Settings::Motion::SPEED);
-    //m_isMoving = true;
+
     return *this;
 }
 
@@ -141,7 +171,9 @@ Vec3 Navigation::toAbsoluteTarget(Vec3 relTarget){
     return relTarget;
 }
 
-
+void Navigation::setCalibration(CalibrationProfile c){
+    m_calibration = c.Cartesian;
+}
 /*
 void  Navigation::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
 

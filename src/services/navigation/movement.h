@@ -6,8 +6,6 @@
 class Movement{
 public:
     Movement(){};
-
-
 };
 
 class Translation : public Movement{
@@ -30,9 +28,9 @@ private:
 
 };
 
-class LinearMove : public Movement{
+class PlannarMove : public Movement{
 public:
-    LinearMove(Vec3 a, Vec3 b){};
+    PlannarMove(Vec3 a, Vec3 b){};
 
 
 private:

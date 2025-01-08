@@ -17,8 +17,8 @@ ServiceID Service::toID(String str){
     if(str.equalsIgnoreCase("MOTION"))
         return ID_MOTION;
 
-    if(str.equalsIgnoreCase("PLANNER"))
-        return ID_PLANNER;
+    if(str.equalsIgnoreCase("NAVIGATION"))
+        return ID_NAVIGATION;
 
     if(str.equalsIgnoreCase("NEOPIXEL"))
         return ID_NEOPIXEL;
@@ -54,8 +54,8 @@ ServiceID Service::toID(String str){
     if(id ==  ID_MOTION)
         return "MOTION";
 
-    if(id ==  ID_PLANNER)
-        return "PLANNER";
+    if(id ==  ID_NAVIGATION)
+        return "NAVIGATION";
 
     if(id ==  ID_NEOPIXEL)
         return "NEOPIXEL";

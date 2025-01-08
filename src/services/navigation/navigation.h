@@ -3,6 +3,7 @@
 #include "utils/job.h"
 #include "utils/geometry.h"
 #include "movement.h"
+#include "settings.h"
 #include <vector>
 #include <memory>
 
@@ -56,6 +57,8 @@ public:
 
     void setPosition(Vec3);  //mm, mm, rad : Absolute
     Vec3 getPosition() const;//mm, mm, rad : Absolute
+
+    void setCalibration(CalibrationProfile c);
 
     /*
     float getTargetDirection() const;

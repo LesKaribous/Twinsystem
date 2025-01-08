@@ -25,7 +25,7 @@ void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    ihm.setRobotPosition(motion.getAbsPosition());
+    ihm.setRobotPosition(nav.getPosition());
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -168,12 +168,12 @@ void onRobotBoot(){
 }
 
 void onRobotManual(){
-    ihm.setRobotPosition(motion.getAbsPosition());
+    ihm.setRobotPosition(nav.getPosition());
 }
 
 void onRobotAuto(){
-    ihm.setRobotPosition(motion.getAbsPosition());
-    //lidar.setLidarPosition(motion.getAbsPosition());
+    //ihm.setRobotPosition(motion.getAbsPosition());
+    //lidar.setLidarPosition(nav.getPosition());
 }
 
 void onRobotStop(){
@@ -206,15 +206,15 @@ void onIntercomRequestReply(Request& req){
 }
 
 void onMatchNearEnd(){
-    if(motion.isPending())motion.forceCancel();
-    motion.setFeedrate(1.0);
-    motion.setAbsolute();
+    //if(motion.isPending())motion.forceCancel();
+    //motion.setFeedrate(1.0);
+    //nav.setAbsolute();
     actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
     waitMs(800);
-    if(ihm.isColorA()) async motion.go(POI::yellowArrival);
-    else async motion.go(POI::blueArrival);
+    //if(ihm.isColorA()) async motion.go(POI::yellowArrival);
+    //else async motion.go(POI::blueArrival);
     ihm.addScorePoints(10); //zone d'arrivée
     chrono.onMatchFinished();
 }
@@ -222,7 +222,7 @@ void onMatchNearEnd(){
 void onMatchEnd(){
     safety.disable();
     lidar.disable();
-    motion.pause(); //pause the program if possible
+    //motion.pause(); //pause the program if possible
     motion.disable();
     actuators.disable();
     actuators.disable();

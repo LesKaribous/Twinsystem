@@ -36,7 +36,7 @@ void Safety::onAttach(){
 
 void Safety::onUpdate(){
     if(!enabled()){return;}
-
+/*
     RUN_EVERY(
         if(!motion.hasFinished()){
             int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
@@ -49,12 +49,12 @@ void Safety::onUpdate(){
             //CONSOLE_SERIAL.println(m_obstacleDetected);
         }
     , 50)
-
+*/
     
-    if(m_obstacleDetected/*m_currentDistance <= 350*/){
-        if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
-        if(!motion.isRotating()) m_lastSeen = millis();
-    }
+    //if(m_obstacleDetected/*m_currentDistance <= 350*/){
+    //    if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
+    //    if(!motion.isRotating()) m_lastSeen = millis();
+    //}
 /*
     if(m_obstacleDetected && !motion.hasFinished() && motion.isPaused() && motion.pauseDuration() > 1000){
         motion.cancel();
@@ -66,9 +66,9 @@ void Safety::onUpdate(){
         m_obstacleDetected = false;
     }
     
-    if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
-        motion.resume();
-    }
+    //if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
+    //    motion.resume();
+    //}
 
 
 
