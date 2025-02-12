@@ -15,25 +15,25 @@ void match(){
 }
 
 void recalage(){
-    //motion.setSync();
+    motion.setSync();
     actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
     waitMs(800);
     THROW(1)
     if(ihm.isColorA()){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        //async motion.go(POI::b1);
-        //async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
+        async motion.go(POI::b1);
+        async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
         actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
     else{
-        //motion.setAbsPosition({-1,-1,PI});
+        motion.setAbsPosition({-1,-1,PI});
         probeBorder(TableCompass::NORTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        //async motion.go(POI::y1);
-        //async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+        async motion.go(POI::y1);
+        async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
         actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
@@ -42,14 +42,17 @@ void recalage(){
 
 void matchA(){
     //do Match
-
+    motion.disableOptimization();
+    async motion.turn(3600);
     chrono.onMatchNearlyFinished();
     chrono.onMatchFinished();
 }
 
 void matchB(){
     //do Match
-
+    motion.disableOptimization();
+    async motion.turn(-3600);
+    
     chrono.onMatchNearlyFinished();
     chrono.onMatchFinished();
 }
@@ -72,7 +75,7 @@ RobotCompass previousActuator(RobotCompass rc){
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist){
-    /*
+    
 
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
@@ -113,5 +116,5 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     motion.setFeedrate(currentFeedrate);
 
 
-    */
+    
 }

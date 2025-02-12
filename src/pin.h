@@ -115,7 +115,7 @@
         }
         
         namespace Led{
-            const int neopixel = 57;
+            const int neopixel = 37;
         }
         
         // TFT pinout
@@ -127,20 +127,18 @@
                 MOSI = 11,
                 SCK = 13,
                 MISO = 12;
-
-            const int T_CS_PIN = 51, T_IRQ_PIN = 52;
         }
         
         // Stepper Pinout
         namespace Stepper{
             const int
             enable = 24,
-            dirA  = 4,
-            dirB  = 25, 
-            dirC  = 26, 
-            stepA = 6,
-            stepB = 27, 
-            stepC = 5;
+            dirA  = 25,
+            dirB  = 4, 
+            dirC  = 5, 
+            stepA = 27,
+            stepB = 6, 
+            stepC = 26;
         }
         
         // Actuator Pinout

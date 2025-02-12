@@ -6,8 +6,8 @@
 #define INTERCOM_SERIAL Serial1
 #define INTERCOM_BAUDRATE 31250
 
-#define CONSOLE_SERIAL Serial
-#define CONSOLE_BAUDRATE 14400
+#define CONSOLE_SERIAL Serial2
+#define CONSOLE_BAUDRATE 9600
 
 #define TW_STRAT1 CHERRY
 #define TW_STRAT2 CAKE
@@ -121,7 +121,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.052, -1.052f, 0.6750f} //Cartesian : XYROT
+            { 0.525, -0.525f, 0.3895f} //Cartesian : XYROT
         };
     }
 }

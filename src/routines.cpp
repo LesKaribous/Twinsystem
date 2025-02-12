@@ -18,14 +18,15 @@ void robotProgramAuto(){
     safety.enable();
     chrono.start();
     match();
-    motion.disable();
+    //motion.disable();
 }
 
 void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    ihm.setRobotPosition(nav.getPosition());
+    ihm.setRobotPosition(motion.getAbsPosition());
+    //ihm.setRobotPosition(nav.getPosition());
 
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
@@ -69,7 +70,7 @@ void robotProgramManual(){
 // -------------------------------------
 //           CONTROL LOOP
 // -------------------------------------
-
+/*
 void control() {
     static const unsigned long CONTROL_PERIOD_MS = 10;
     unsigned long lastCall = millis(); 
@@ -85,6 +86,8 @@ void control() {
         threads.yield();
     }
 }
+*/
+
 
 // -------------------------------------
 //              EVENTS
@@ -114,11 +117,12 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
 
+    /*
     ihm.drawBootProgress("Linking Localisation...");
     os.attachService(&localisation); ihm.addBootProgress(10);
-
-    ihm.drawBootProgress("Linking Navigation...");
-    os.attachService(&nav); ihm.addBootProgress(10);
+    */
+    //ihm.drawBootProgress("Linking Navigation...");
+    //os.attachService(&nav); ihm.addBootProgress(10);
 
     ihm.drawBootProgress("Linking intercom");
     intercom.setConnectLostCallback(onIntercomDisconnected);
@@ -163,12 +167,13 @@ void onRobotBoot(){
     ihm.setPage(IHM::Page::INIT);
     
     #ifndef OLD_BOARD
-    ihm.playStartupMelody();
+    //ihm.playStartupMelody();
     #endif
 }
 
 void onRobotManual(){
-    ihm.setRobotPosition(nav.getPosition());
+    //ihm.setRobotPosition(nav.getPosition());
+    ihm.setRobotPosition(motion.getAbsPosition());
 }
 
 void onRobotAuto(){
@@ -209,9 +214,9 @@ void onMatchNearEnd(){
     //if(motion.isPending())motion.forceCancel();
     //motion.setFeedrate(1.0);
     //nav.setAbsolute();
-    actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
-    actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
-    actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
+    //actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
+    //actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
+    //actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
     waitMs(800);
     //if(ihm.isColorA()) async motion.go(POI::yellowArrival);
     //else async motion.go(POI::blueArrival);
@@ -223,8 +228,7 @@ void onMatchEnd(){
     safety.disable();
     lidar.disable();
     //motion.pause(); //pause the program if possible
-    motion.disable();
-    actuators.disable();
+    //motion.disable();
     actuators.disable();
     os.stop();
 }

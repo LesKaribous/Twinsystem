@@ -6,20 +6,26 @@
 
 INSTANTIATE_SERVICE(Localisation, localisation);
 
+#ifdef OLD_BOARD
+#define I2C_OTOS I2C_OTOS
+#else
+#define I2C_OTOS Wire
+#endif
+
 void Localisation::onAttach(){
     
     Console::info() << "Localisation activated" << Console::endl;
-    Wire2.begin();
+    I2C_OTOS.begin();
 
     m_connected = false;
     for(int i = 0; i < 10; i++){
-        if(otos.begin(Wire2) == true){
+        if(otos.begin(I2C_OTOS) == true){
             m_connected = true;           
             break;
         }
     }
 
-    if(!m_connected) Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use Wire2" << Console::endl;
+    if(!m_connected) Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use I2C_OTOS" << Console::endl;
     else{
         otos.setLinearUnit(kSfeOtosLinearUnitMeters);
         otos.setAngularUnit(kSfeOtosAngularUnitRadians);
@@ -86,7 +92,7 @@ void Localisation::read()
     while(orientation <= -PI) orientation += 2.0f*PI;
     _unsafePosition.z = orientation;
 
-    Console::info() << _unsafePosition << Console::endl;
+    //Console::info() << _unsafePosition << Console::endl;
 }
 
 void Localisation::calibrate() {
