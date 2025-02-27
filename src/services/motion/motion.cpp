@@ -10,10 +10,10 @@
 
 INSTANTIATE_SERVICE(Motion, motion)
 
-Motion::Motion() : Service(ID_MOTION),         
+Motion::Motion() : Service(ID_MOTION)/*,         
     _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
     _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC){
+    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)*/{
 }
 
 void Motion::onAttach(){
@@ -32,7 +32,7 @@ void Motion::onAttach(){
 
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
-
+    /*
     _sA.setPosition(0);
     _sB.setPosition(0);
     _sC.setPosition(0);
@@ -48,7 +48,7 @@ void Motion::onAttach(){
     _sA.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
     _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
-
+    */
     setAcceleration(Settings::Motion::ACCEL);
 
 
@@ -206,6 +206,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     wakeUp();
     resetSteps();
 
+    /*
     _sA.setTargetAbs(_stepsTarget.a);
     _sB.setTargetAbs(_stepsTarget.b);
     _sC.setTargetAbs(_stepsTarget.c);
@@ -215,6 +216,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         _steppers.move(_sA, _sB, _sC);
         complete();
     }
+    */
     return *this;
 }
 
@@ -223,9 +225,11 @@ void Motion::setCalibration(CalibrationProfile c){
 }
 
 void Motion::setAcceleration(int accel){
-    _sA.setAcceleration(accel*Settings::Stepper::STEP_MODE);
-    _sB.setAcceleration(accel*Settings::Stepper::STEP_MODE);
-    _sC.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    
+    // _sA.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    // _sB.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    // _sC.setAcceleration(accel*Settings::Stepper::STEP_MODE);
+    
 }
 
 void Motion::run(){
@@ -235,16 +239,16 @@ void Motion::run(){
 void Motion::pause(){
     Job::pause();
     setAcceleration(Settings::Motion::STOP_DECCEL);
-    _steppers.stopAsync(); // set new speed
+    //_steppers.stopAsync(); // set new speed
 }
 
 void Motion::resume(){
     Job::resume();
     setAcceleration(Settings::Motion::ACCEL);
-    _sA.setTargetAbs(_stepsTarget.a);
-    _sB.setTargetAbs(_stepsTarget.b);
-    _sC.setTargetAbs(_stepsTarget.c);
-    _steppers.moveAsync(_sA, _sB, _sC); // set new speed
+    // _sA.setTargetAbs(_stepsTarget.a);
+    // _sB.setTargetAbs(_stepsTarget.b);
+    // _sC.setTargetAbs(_stepsTarget.c);
+    // _steppers.moveAsync(_sA, _sB, _sC); // set new speed
 }
 
 bool Motion::hasFinished() {
@@ -252,14 +256,15 @@ bool Motion::hasFinished() {
     // THROW(_sB.getPosition());
     // THROW(_sC.getPosition());
     // THROW(_stepsTarget);
-    return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
+    // return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
+    return true;
 }
 
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
 
-        _steppers.stopAsync();
+        //_steppers.stopAsync();
     }
     estimatePosition();
     _isMoving = false;
@@ -267,12 +272,12 @@ void Motion::cancel() {
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
-    _sA.setPosition(0);
-    _sB.setPosition(0);
-    _sC.setPosition(0);
-    _sA.setTargetAbs(0);
-    _sB.setTargetAbs(0);
-    _sC.setTargetAbs(0);
+    // _sA.setPosition(0);
+    // _sB.setPosition(0);
+    // _sC.setPosition(0);
+    // _sA.setTargetAbs(0);
+    // _sB.setTargetAbs(0);
+    // _sC.setTargetAbs(0);
 }
 
 void Motion::complete() {
@@ -281,19 +286,19 @@ void Motion::complete() {
     _isRotating = false;
     _startPosition = _position;// = _target;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
-    _sA.setPosition(0);
-    _sB.setPosition(0);
-    _sC.setPosition(0);
-    _sA.setTargetAbs(0);
-    _sB.setTargetAbs(0);
-    _sC.setTargetAbs(0);
+    // _sA.setPosition(0);
+    // _sB.setPosition(0);
+    // _sC.setPosition(0);
+    // _sA.setTargetAbs(0);
+    // _sB.setTargetAbs(0);
+    // _sC.setTargetAbs(0);
     //Console::println("complete");
 }
 
 void Motion::forceCancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        _steppers.emergencyStop();
+        //_steppers.emergencyStop();
     }
     estimatePosition();
     _isMoving = false;
@@ -301,12 +306,12 @@ void Motion::forceCancel() {
     _startPosition = _position;
     _lastSteps = _stepsTarget = Vec3(0,0,0);
 
-    _sA.setPosition(0);
-    _sB.setPosition(0);
-    _sC.setPosition(0);
-    _sA.setTargetAbs(0);
-    _sB.setTargetAbs(0);
-    _sC.setTargetAbs(0);
+    // _sA.setPosition(0);
+    // _sB.setPosition(0);
+    // _sC.setPosition(0);
+    // _sA.setTargetAbs(0);
+    // _sB.setTargetAbs(0);
+    // _sC.setTargetAbs(0);
 }
 
 Vec3 Motion::toRelativeTarget(Vec3 absTarget){
@@ -412,17 +417,18 @@ Vec3  Motion::getAbsTarget() const{
 }
 
 Vec3 Motion::getLastSteps() const{
-    Vec3 lastSteps = Vec3(  _sA.getPosition(), 
-                            _sB.getPosition(), 
-                            _sC.getPosition() );
+    // Vec3 lastSteps = Vec3(  _sA.getPosition(), 
+    //                         _sB.getPosition(), 
+    //                         _sC.getPosition() );
 
-    return lastSteps;
+    // return lastSteps;
+    return Vec3(0,0,0);
 }
 
 void Motion::resetSteps(){
-    _sA.setPosition(0); 
-    _sB.setPosition(0); 
-    _sC.setPosition(0);
+    // _sA.setPosition(0); 
+    // _sB.setPosition(0); 
+    // _sC.setPosition(0);
 }
 
 float Motion::getAbsoluteTargetDirection() const{
@@ -459,9 +465,9 @@ void  Motion::setAbsPosition(Vec3 newPos){
 }
 
 void Motion::setStepsVelocity(float v){
-    _sA.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
-    _sB.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
-    _sC.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    // _sA.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    // _sB.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
+    // _sC.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
 }
 
 void Motion::setAbsTarget(Vec3 newTarget)

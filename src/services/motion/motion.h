@@ -109,9 +109,10 @@ private :
     bool _useBNO = false;
     long lastBNOCheck = 0;
 
+    /*
     Stepper _sA, _sB, _sC;
     StepControl _steppers;
-
+    */
     float m_feedrate = 1.0;
 
     bool _engaged, _sleeping;
