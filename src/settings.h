@@ -81,9 +81,9 @@ namespace Settings{
 
         //https://en.wikipedia.org/wiki/PID_controller
         //const Vec3 kP = Vec3(3.0, 3.0, 3.5);
-        const Vec3 kP = Vec3(1.0, 1.0, 1.5);
-        const Vec3 kI = Vec3(0.0, 0.0, 0.0);
-        const Vec3 kD = Vec3(0.0, 0.0, 0.0);
+        const float kP = 1.0f;
+        const float kI = 0.0;
+        const float kD = 0.0;
 
         const float MAX_PID_DELAY = 10;
 
@@ -109,6 +109,16 @@ namespace Settings{
         DIR_A_POLARITY = true,
         DIR_B_POLARITY = true,
         DIR_C_POLARITY = true;
+
+        constexpr int
+        PULSE_WIDTH = 20,
+        STEPS_PER_REVOLUTION = 200,
+        STOP_DECCEL = 5000, // equivalent fullsteps/s^2
+        MAX_ACCEL = 600000, // equivalent fullsteps/s^2
+        MAX_SPEED = 600000, // equivalent fullsteps/s
+        MIN_SPEED = 20,
+        STEPPER_DELAY = 200;//µs Steps every 1000 µs seconds
+
 
         constexpr u_int8_t 
         STEP_MODE = 8;
