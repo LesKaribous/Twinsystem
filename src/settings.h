@@ -6,8 +6,14 @@
 #define INTERCOM_SERIAL Serial1
 #define INTERCOM_BAUDRATE 31250
 
+
+#ifdef XBEE
 #define CONSOLE_SERIAL Serial3
 #define CONSOLE_BAUDRATE 9600
+#else
+#define CONSOLE_SERIAL Serial
+#define CONSOLE_BAUDRATE 115200
+#endif
 
 #define TW_STRAT1 CHERRY
 #define TW_STRAT2 CAKE
@@ -106,18 +112,18 @@ namespace Settings{
         STEP_B_POLARITY = true,
         STEP_C_POLARITY = true,
 
-        DIR_A_POLARITY = true,
-        DIR_B_POLARITY = true,
-        DIR_C_POLARITY = true;
+        DIR_A_POLARITY = false,
+        DIR_B_POLARITY = false,
+        DIR_C_POLARITY = false;
 
         constexpr int
-        PULSE_WIDTH = 20,
+        PULSE_WIDTH = 10,
         STEPS_PER_REVOLUTION = 200,
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 600000, // equivalent fullsteps/s^2
-        MAX_SPEED = 600000, // equivalent fullsteps/s
+        MAX_ACCEL = 500, // equivalent fullsteps/s^2
+        MAX_SPEED = 500, // equivalent fullsteps/s
         MIN_SPEED = 20,
-        STEPPER_DELAY = 200;//µs Steps every 1000 µs seconds
+        STEPPER_DELAY = 100;//µs Steps every 1000 µs seconds
 
 
         constexpr u_int8_t 

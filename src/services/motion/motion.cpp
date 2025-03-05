@@ -32,35 +32,7 @@ void Motion::onAttach(){
 
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
-    /*
-    _sA.setPosition(0);
-    _sB.setPosition(0);
-    _sC.setPosition(0);
-
-    _sA.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
-    _sB.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
-    _sC.setPullInOutSpeed(Settings::Motion::PULLIN, Settings::Motion::PULLIN);
-
-    _sA.setInverseRotation(Settings::Stepper::DIR_A_POLARITY);
-    _sB.setInverseRotation(Settings::Stepper::DIR_B_POLARITY);
-    _sC.setInverseRotation(Settings::Stepper::DIR_C_POLARITY);
-
-    _sA.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
-    _sB.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
-    _sC.setMaxSpeed(Settings::Motion::SPEED*Settings::Stepper::STEP_MODE);
-    */
     setAcceleration(Settings::Motion::ACCEL);
-
-
-    /* //Test stepper
-    wakeUp();
-
-    _sA.setTargetAbs(50000);
-    _sB.setTargetAbs(5000);
-    _sC.setTargetAbs(500);
-    _steppers.moveAsync(_sA, _sB, _sC);
-    delay(300000);
-    /**/
 
     _useBNO = false;
     /* Initialise the sensor */

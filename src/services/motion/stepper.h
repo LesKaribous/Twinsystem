@@ -14,6 +14,10 @@ class Stepper {
     
     void setDirection(bool forward);
     void step();
+
+    void stepUp();
+    void stepDown();
+
     void enable();
     void disable();
     
@@ -25,19 +29,23 @@ class Stepper {
     float getTargetVelocity() const { return m_target_velocity; }
     long getPosition() const { return m_position; }
     void setPosition(long position) { m_position = position; }
+    int getStepTime();
 
     bool isRunning() const;
 
     void control();
     
     private:
-        bool m_enabled;
+        bool m_enabled = false;
         unsigned int m_pin_dir, m_pin_step;
         bool m_inverted_dir, m_dir;
+
+        long m_step_delay = 0;
+        long m_last_step_time = 0;
 
         long m_position;
         float m_target_velocity;
         float m_current_velocity;
         float m_accel;
-        float m_decel;
+        float m_deccel;
     };

@@ -2,9 +2,9 @@
 #include "services/motion/stepper.h"
 #include "utils/geometry.h"
 
-class TwinController {
+class VelocityController {
 public:
-TwinController();
+    VelocityController();
 
     void setTargetVelocity(const Vec3& targetVelocity);
     void setPIDGains(float kp, float ki, float kd);

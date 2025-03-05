@@ -3,6 +3,7 @@
 #include "services/service.h"
 #include "utils/job.h"
 #include "utils/geometry.h"
+#include "velocityController.h"
 
 //BNO
 #include <Wire.h>
@@ -95,7 +96,7 @@ private :
     Vec3 toAbsoluteTarget(Vec3 absTarget);
 
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _position       = {-1,-1, 0}; //Absolute mm, mm, rad
+    Vec3 _position       = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _stepsTarget 	 = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _lastSteps      = { 0, 0, 0}; //relative steps
@@ -109,10 +110,7 @@ private :
     bool _useBNO = false;
     long lastBNOCheck = 0;
 
-    /*
-    Stepper _sA, _sB, _sC;
-    StepControl _steppers;
-    */
+    VelocityController controller;
     float m_feedrate = 1.0;
 
     bool _engaged, _sleeping;
