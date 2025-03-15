@@ -1,8 +1,8 @@
 #include "Stepper.h"
 #include <Arduino.h>
 
-#include "Stepper.h"
-#include "Settings.h"
+#include "stepper.h"
+#include "settings.h"
 #include "os/console.h"
 
 Stepper::Stepper(int step, int dir, bool inverted)
@@ -62,7 +62,7 @@ void Stepper::control() {
     //if (!m_enabled) return;
 
     double dt = double(Settings::Stepper::STEPPER_DELAY) * 1.0e-6; // Convert µs to seconds
-
+    
     double direction = ((m_target_velocity > m_current_velocity) ? 1.0f : -1.0f);
     // Apply acceleration or deceleration
     if (fabs(m_target_velocity) > fabs(m_current_velocity)) {
@@ -73,12 +73,17 @@ void Stepper::control() {
         m_current_velocity -= decrement * direction;
     }
 
+    if(m_target_velocity - m_current_velocity < Settings::Stepper::PULLIN){
+        m_current_velocity = m_target_velocity;
+    }
+
     // Prevent overshooting the target velocity
     if ((m_target_velocity > 0 && m_current_velocity > m_target_velocity) ||
         (m_target_velocity < 0 && m_current_velocity < m_target_velocity)) {
         m_current_velocity = m_target_velocity;
     }
 
+    
     // Compute step delay in microseconds (prevent divide by zero)
     m_step_delay = 1.0e6 / fabs(m_current_velocity * Settings::Stepper::STEP_MODE);
 
@@ -88,31 +93,15 @@ void Stepper::control() {
 
 void Stepper::step() {
     //if (!m_enabled) return;
+    if(m_step_delay == 0) return;
+
     if (micros() - m_last_step_time >= m_step_delay) {
-        digitalWriteFast(m_pin_step, HIGH);
-        delayMicroseconds(Settings::Stepper::PULSE_WIDTH);
-        digitalWriteFast(m_pin_step, LOW);
 
-        if (m_target_velocity >= 0)
-            m_position += 1;
-        else
-            m_position -= 1;
-
-        m_last_step_time = micros();
-    }
-}
-
-void Stepper::stepUp() {
-    //if (!m_enabled) return;
-    if (micros() - m_last_step_time >= m_step_delay) {
-        digitalWriteFast(m_pin_step, HIGH);
-    }
-}
-
-void Stepper::stepDown() {
-    //if (!m_enabled) return;
-    if (micros() - m_last_step_time >= m_step_delay) {
-        digitalWriteFast(m_pin_step, LOW);
+        if(fabs(m_current_velocity) > Settings::Stepper::PULLIN){
+            digitalWriteFast(m_pin_step, HIGH);
+            delayMicroseconds(Settings::Stepper::PULSE_WIDTH);
+            digitalWriteFast(m_pin_step, LOW);
+        }
 
         if (m_target_velocity >= 0)
             m_position += 1;

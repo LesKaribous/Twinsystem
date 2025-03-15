@@ -93,12 +93,17 @@ namespace Settings{
 
         const float MAX_PID_DELAY = 10;
 
+        const float 
+        MAX_ROT_ACCEL = 1.0, // rad/s^2
+        MAX_ROT_SPEED = 1.0, // rad/s
+        MIN_ANGLE = 0.05; // Target stop thresold //mm
+
         const uint32_t 
-        STOP_DECCEL = 5000, // equivalent fullsteps/s^2
-        ACCEL = 900, // equivalent fullsteps/s^2
-        SPEED = 600, // equivalent fullsteps/s
-        TURN_SPEED = 500, // Old : 5000
-        PULLIN = 20,
+        STOP_DECCEL = 100, // mm/s^2
+        MAX_ACCEL = 10, // mm/s^2
+        MAX_SPEED = 10, // mm/s
+        MIN_DISTANCE = 1, // Target stop thresold //mm
+        TURN_SPEED = 1, // rad/s
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms
         PID_INTERVAL = 10000;//microseconds
@@ -120,11 +125,11 @@ namespace Settings{
         PULSE_WIDTH = 10,
         STEPS_PER_REVOLUTION = 200,
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 500, // equivalent fullsteps/s^2
-        MAX_SPEED = 500, // equivalent fullsteps/s
+        MAX_ACCEL = 1000, // equivalent fullsteps/s^2
+        MAX_SPEED = 1000, // equivalent fullsteps/s
         MIN_SPEED = 20,
-        STEPPER_DELAY = 100;//µs Steps every 1000 µs seconds
-
+        STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
+        PULLIN = 10; //fullsteps/s^2
 
         constexpr u_int8_t 
         STEP_MODE = 8;

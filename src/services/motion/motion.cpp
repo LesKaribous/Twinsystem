@@ -32,7 +32,7 @@ void Motion::onAttach(){
 
     pinMode(Pin::Stepper::enable, OUTPUT);
     disengage();
-    setAcceleration(Settings::Motion::ACCEL);
+    setAcceleration(Settings::Motion::MAX_ACCEL);
 
     _useBNO = false;
     /* Initialise the sensor */
@@ -97,14 +97,14 @@ void Motion::sleep(){
 }
 
 Motion& Motion::go(float x, float y){
-    setStepsVelocity(Settings::Motion::SPEED);
+    setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     go(Vec2(x, y));
     return *this;
 }
 
 Motion& Motion::goPolar(float heading, float dist){
-    setStepsVelocity(Settings::Motion::SPEED);
+    setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
     if (_absolute){
@@ -131,7 +131,7 @@ Motion& Motion::turn(float angle){
 }
   
 Motion& Motion::go(Vec2 target){
-    setStepsVelocity(Settings::Motion::SPEED);
+    setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
     else move(Vec3(target.a, target.b, 0));
@@ -216,7 +216,7 @@ void Motion::pause(){
 
 void Motion::resume(){
     Job::resume();
-    setAcceleration(Settings::Motion::ACCEL);
+    setAcceleration(Settings::Motion::MAX_ACCEL);
     // _sA.setTargetAbs(_stepsTarget.a);
     // _sB.setTargetAbs(_stepsTarget.b);
     // _sC.setTargetAbs(_stepsTarget.c);

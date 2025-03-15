@@ -90,9 +90,9 @@ float Vec3::dot(const Vec3& a) const{
 Vec3& Vec3::normalize(){
     if(mag() != 0){
         float cMag = mag();
-        a /= cMag * a > 0 ? 1 : -1;
-        b /= cMag * b > 0 ? 1 : -1;
-        c /= cMag * c > 0 ? 1 : -1;
+        a /= cMag;
+        b /= cMag;
+        c /= cMag;
     }
     return *this;
 }

@@ -141,8 +141,8 @@ Vec2& Vec2::setHeading(float head){
 Vec2& Vec2::normalize(){
     if(mag() != 0){
         float cMag = mag();
-        a /= cMag * a > 0 ? 1 : -1;
-        b /= cMag * b > 0 ? 1 : -1;
+        a /= cMag;
+        b /= cMag;
     }
     return *this;
 }

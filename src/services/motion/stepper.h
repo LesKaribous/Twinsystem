@@ -15,9 +15,6 @@ class Stepper {
     void setDirection(bool forward);
     void step();
 
-    void stepUp();
-    void stepDown();
-
     void enable();
     void disable();
     

@@ -37,7 +37,7 @@ void setup() {
 	Console::init();
 	Console::setLevel(ConsoleLevel::INFO);
 
-	robot.setTarget(Vec2(100,0));
+	robot.setTarget(Vec3(0,0,120.0*DEG_TO_RAD));
 }
 
 long lastTime = 0;
@@ -45,7 +45,7 @@ long lastTime = 0;
 void loop() {
 	if(micros() - lastTime > Settings::Stepper::STEPPER_DELAY) {
 		lastTime = micros();
-    	robot.control(Settings::Stepper::STEPPER_DELAY);
+    	robot.control();
 	}
 }
 

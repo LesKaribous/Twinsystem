@@ -41,16 +41,21 @@ void VelocityController::disable(){
 
 void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
     // Saturate speeds if necessary
-    float maxSpeed = Settings::Stepper::MAX_SPEED;;
-    float M = std::max(std::max(fabs(targetVelocity.a), fabs(targetVelocity.b)), fabs(targetVelocity.c));
-
-    if (M > maxSpeed) {
-        m_target_velocity = targetVelocity * (maxSpeed / M);
-    } else {
-        m_target_velocity = targetVelocity;
+    if(targetVelocity.a == 0 && targetVelocity.b == 0 && targetVelocity.c == 0){
+        m_target_velocity = Vec3(0);
+        return;
     }
 
-    m_target_velocity=ik(m_target_velocity);
+    Vec3 target = ik(targetVelocity);
+
+    float maxSpeed = Settings::Stepper::MAX_SPEED;;
+    float M = std::max(std::max(fabs(target.a), fabs(target.b)), fabs(target.c));
+    
+    if (M > maxSpeed) {
+        m_target_velocity = target * (maxSpeed / M);
+    } else {
+        m_target_velocity = target;
+    }    
 }
 
 
@@ -58,12 +63,24 @@ void VelocityController::control() {
     float dt = float(Settings::Stepper::STEPPER_DELAY) * 1e-6f; // Convert ms to seconds
     
     Vec3 error = (m_target_velocity - m_current_velocity);
+
+    if(error.a + error.b + error.c < Settings::Stepper::PULLIN*3){
+        m_current_velocity = m_target_velocity;
+        m_sA.setTargetVelocity(0);
+        m_sB.setTargetVelocity(0);
+        m_sC.setTargetVelocity(0);
+        return;
+    }
+
+
     m_pid_integral += error * dt;
     Vec3 derivative = (error - m_pid_last_error) / dt;
 
     Vec3 pid_output = (error * m_kp) + (m_pid_integral * m_ki) + (derivative * m_kd);
     m_pid_last_error = error;
 
+    
+    
     // Apply PID-controlled velocity commands to steppers
     m_sA.setTargetVelocity(pid_output.a);
     m_sB.setTargetVelocity(pid_output.b);
@@ -95,9 +112,9 @@ void VelocityController::control() {
 }
 
 Vec3 VelocityController::getCurrentVelocity() const {
-    return m_current_velocity;
+    return fk(m_current_velocity);
 }
 
 Vec3 VelocityController::getTargetVelocity() const {
-    return m_target_velocity;
+    return fk(m_target_velocity);
 }
