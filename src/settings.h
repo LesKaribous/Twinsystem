@@ -100,8 +100,8 @@ namespace Settings{
 
         const int 
         STOP_DECCEL = 100, // mm/s^2
-        MAX_ACCEL = 50, // mm/s^2
-        MAX_SPEED = 200, // mm/s
+        MAX_ACCEL = 80, // mm/s^2
+        MAX_SPEED = 300, // mm/s
         MIN_DISTANCE = 1, // Target stop thresold //mm
         TURN_SPEED = 1, // rad/s
         PID_MAX_PERIOD = 10,//ms
@@ -128,7 +128,8 @@ namespace Settings{
         MAX_ACCEL = 10000, // equivalent fullsteps/s^2
         MAX_SPEED = 3000, // equivalent fullsteps/s
         MIN_SPEED = 20,
-        STEPPER_DELAY = 300,//µs Steps every 1000 µs seconds
+        STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
+        STEPPER_COMPUTE_DELAY = 1000,//µs Steps every 1000 µs seconds
         PULLIN = 10; //fullsteps/s
 
         constexpr u_int8_t 

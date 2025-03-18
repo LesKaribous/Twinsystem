@@ -60,9 +60,8 @@ bool Stepper::isRunning() const
 
 void Stepper::control() {
     //if (!m_enabled) return;
+    double dt = double(Settings::Stepper::STEPPER_COMPUTE_DELAY) * 1.0e-6; // Convert µs to seconds
 
-    double dt = double(Settings::Stepper::STEPPER_DELAY) * 1.0e-6; // Convert µs to seconds
-    
     double direction = ((m_target_velocity > m_current_velocity) ? 1.0f : -1.0f);
     // Apply acceleration or deceleration
     if (fabs(m_target_velocity) > fabs(m_current_velocity)) {
@@ -90,6 +89,7 @@ void Stepper::control() {
 
     // Update direction
     setDirection(m_current_velocity > 0);
+
 }
 
 void Stepper::step() {

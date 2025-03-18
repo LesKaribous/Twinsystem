@@ -72,19 +72,19 @@ void robotProgramManual(){
 
 void control() {
     static const unsigned long CONTROL_PERIOD_MS = Settings::Stepper::STEPPER_DELAY;
-    unsigned long lastCall = micros(); 
-
+    unsigned long lastCall = micros();  
     while (true) {
         unsigned long now = micros();
         unsigned long elapsed = now - lastCall;
 
-        motion.control();
-
         if (elapsed < CONTROL_PERIOD_MS) {
             threads.delay_us(CONTROL_PERIOD_MS - elapsed);
         }
+
+        motion.control();
         lastCall = micros();
-        //threads.yield();
+    
+        threads.yield();
     }
 }
 

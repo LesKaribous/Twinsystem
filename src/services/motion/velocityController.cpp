@@ -70,38 +70,24 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
 
 
 void VelocityController::control() {
-    float dt = float(Settings::Stepper::STEPPER_DELAY) * 1e-6f; // Convert ms to seconds
-    
-    /*
-    Vec3 error = (m_target_velocity - m_current_velocity);
-    error.a = int(error.a);
-    error.b = int(error.b);
-    error.c = int(error.c);
-
-    //Console::println(m_target_velocity);
-    //Console::println(m_current_velocity);
-
-    m_pid_integral += error * dt;
-    Vec3 derivative = (error - m_pid_last_error) / dt;
-
-    Vec3 pid_output = (error * m_kp) + (m_pid_integral * m_ki) + (derivative * m_kd);
-    m_pid_last_error = error;
-    
-    if(pid_output.mag() > Settings::Stepper::PULLIN){
-        
-        // Apply PID-controlled velocity commands to steppers
-        m_sA.setTargetVelocity(pid_output.a);
-        m_sB.setTargetVelocity(pid_output.b);
-        m_sC.setTargetVelocity(pid_output.c);
-    }
-    */
-
 
     // Update each stepper's velocity state
-    m_sA.control();
-    m_sB.control();
-    m_sC.control();
+    static long last_compute = micros();
+    if(micros() - last_compute > Settings::Stepper::STEPPER_COMPUTE_DELAY){
+        m_sA.control();
+        m_sB.control();
+        m_sC.control();
+        last_compute = micros();
 
+        // Read actual velocities for feedback control
+        m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
+    }
+
+    m_sA.step();
+    m_sB.step();
+    m_sC.step();
+
+    /*
     m_sA.stepUp();
     m_sB.stepUp();
     m_sC.stepUp();
@@ -111,22 +97,7 @@ void VelocityController::control() {
     m_sA.stepDown();
     m_sB.stepDown();
     m_sC.stepDown();
-    /*
-    static float lastTime = millis();
-    if(millis() - lastTime > 10){
-        lastTime = millis();
-        Console::info() << "==========================================" << Console::endl;
-        Console::info() << "m_target_velocity : " << m_target_velocity << Console::endl;
-        Console::info() << "m_current_velocity : "  << m_current_velocity << Console::endl;
-        //Console::info() << "PID Output : " << pid_output << Console::endl;
-        //Console::info() << "Error : " << error << Console::endl;
-        Console::info() << "==========================================" << Console::endl;
-    }
-    */
-
-
-    // Read actual velocities for feedback control
-    m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
+    /**/
 }
 
 Vec3 VelocityController::getCurrentVelocity() const {
