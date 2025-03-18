@@ -2,6 +2,7 @@
 #include "positionController.h"
 #include "settings.h"
 #include "os/console.h"
+#include "services/localisation/localisation.h"
 
 #define NORMALIZE(x) (x > 0 ? 1.0 : (x < 0 ? -1.0 : 0.0))
 
@@ -13,9 +14,10 @@ PositionController::PositionController()
     newTarget(0.0f, 0.0f)
 {
     controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
-    controller.enable();
+    //controller.enable();
     controller.setTargetVelocity(Vec3(0));
 }
+
 
 void PositionController::run() {
     
@@ -24,12 +26,14 @@ void PositionController::run() {
         //THROW(position);
 		lastTime = micros();
     	float dt = Settings::Motion::PID_INTERVAL * 1e-6;
-
+        
+        // Update acceleration.
         // Compute the relative target vector and its distance.
         Vec2 relDistance = target - position;
         float angle = target.c - position.c;
         float distance = relDistance.mag();
-
+        relDistance *= Vec2(Settings::Calibration::Primary.Cartesian);
+        angle *= Settings::Calibration::Primary.Cartesian.c;
 
         if(isPaused()) {
             if(velocity.mag() > 0) deccelerate();
@@ -39,7 +43,6 @@ void PositionController::run() {
             if(velocity.mag() > 0) deccelerate();
             else complete();
         }
-
 
         // Stop if close enough to the target.
         if(isPending() && !isPaused()){
@@ -52,16 +55,14 @@ void PositionController::run() {
             }
         }
 
-        velocity = velocity + (acceleration * dt);
-
-        position = position + ( velocity * dt);
-        //position = position + ( controller.getCurrentVelocity() * dt);
+        velocity = velocity + ( acceleration * dt);
+        //position = position + ( velocity * dt);
 
         if(velocity.mag() > 0.1){
             controller.setTargetVelocity(velocity);
         }else controller.setTargetVelocity(Vec3(0));
 
-        //Console::info() << position << " / " << target << " | " << velocity << " | " << acceleration << Console::endl; 
+        Console::info() << position << " / " << target << " | " << velocity << " | " << acceleration << Console::endl; 
     }
 }
 
@@ -73,13 +74,15 @@ void PositionController::reset() {
     acceleration = Vec3(0.0f);
     target= Vec3(0.0f);
     newTarget= Vec3(0.0f);
+    m_uncertainty = 0.0;
+    last_otos_time = micros();
 }
 
 void PositionController::start() {
     Job::start();
     // Update target if a new one has been set. 
     if (!(newTarget == target)) {
-        target = newTarget * Settings::Calibration::Primary.Cartesian;
+        target = newTarget;
     }
 }
 
@@ -170,35 +173,35 @@ void PositionController::controlRotation(float dt, float rotationError) {
     float targetVel = direction * Settings::Motion::MAX_ROT_SPEED;
 
     // Compute time needed to decelerate and estimated travel time.
+    float decelTime = fabs(velocity.c) / (Settings::Motion::MAX_ROT_ACCEL + 1e-5f); // Ensure positive time
+    float travelTime = fabs(rotationError) / (fabs(velocity.c) + 1e-5f); // Avoid division instability
 
-    float decelTime = velocity.c / (Settings::Motion::MAX_ROT_ACCEL + 1e-5f); // Small offset to avoid division by zero.
-    float travelTime = rotationError / (velocity.c + 1e-5f);
-   
     // Compute the velocity error.
     float velError = targetVel - velocity.c;
+
     // Decide control strategy based on current state.
-    if (decelTime >= travelTime) { // Deceleration phase.
-        //Serial.println("Decelerating");
-        if (velocity.c > 0) {
+    if (decelTime >= travelTime) {  // Deceleration phase.
+        if (fabs(velocity.c) > 1e-5f) {
             acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL);
         } else {
             acceleration.c = 0;
         }
-    } else if (fabs(velError) > 0.05f) { // Acceleration phase.
-        //Serial.println("Accelerating");
+    } else if (fabs(velError) > 0.01f * Settings::Motion::MAX_ROT_SPEED) {  // Adaptive threshold
         acceleration.c = NORMALIZE(velError) * Settings::Motion::MAX_ROT_ACCEL;
-
-    } else { // Maintain constant speed.
+    } else {  // Maintain constant speed.
         acceleration.c = 0;
     }
 
     // Enforce acceleration limit.
-    if (acceleration.c > Settings::Motion::MAX_ROT_ACCEL) {
-        acceleration.c = (acceleration.c > 0 ? 1.0 : -1.0) * Settings::Motion::MAX_ROT_ACCEL;
-    }
+    acceleration.c = std::clamp(acceleration.c, -Settings::Motion::MAX_ROT_ACCEL, Settings::Motion::MAX_ROT_ACCEL);
 }
 
 
-void PositionController::setTarget(const Vec3 &t) {
+void PositionController::setPosition(const Vec3 &t){
+    position = t;
+}
+
+void PositionController::setTarget(const Vec3 &t)
+{
     newTarget = t;
 }

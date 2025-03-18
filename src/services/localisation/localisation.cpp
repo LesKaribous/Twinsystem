@@ -36,7 +36,7 @@ void Localisation::onAttach(){
 
 // Main loop
 void Localisation::onUpdate(){ 
-    THROW(1)
+    //THROW(1)
 
     static long elapsed = 0;
     if(millis() - elapsed > m_refresh){
@@ -47,13 +47,14 @@ void Localisation::onUpdate(){
 
 // Service routines
 void Localisation::enable(){
-    
+    Service::enable();
     //servicethread = new std::thread(&Localisation::runThread, this);
  	//servicethread->detach();
     m_use_IMU = true;
 }
 
 void Localisation::disable(){
+    Service::disable();
     //delete servicethread;
     m_use_IMU = false;
 }
@@ -64,6 +65,7 @@ void Localisation::setPosition(Vec3 newPos){
     pos.y = -newPos.x/1000.0;
     pos.h = newPos.z;
     otos.setPosition(pos);
+    _unsafePosition = newPos;
 }
 
 Vec3 Localisation::getPosition(){
@@ -75,17 +77,21 @@ void Localisation::read()
     sfe_otos_pose2d_t myPosition;
     otos.getPosition(myPosition);
 
-    Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
+    //Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
 
     _unsafePosition.x = -myPosition.y * 1000.0; //to millimeters
     _unsafePosition.y = -myPosition.x * 1000.0; //to millimeters
 
+
     float orientation = myPosition.h;
+    /*
     while(orientation > PI) orientation-= 2.0f*PI;
     while(orientation <= -PI) orientation += 2.0f*PI;
-    _unsafePosition.z = orientation;
+    
+    */
 
-    Console::info() << _unsafePosition << Console::endl;
+    _unsafePosition.z = orientation;
+    //Console::info() << _unsafePosition << Console::endl;
 }
 
 void Localisation::calibrate() {

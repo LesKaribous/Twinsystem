@@ -173,8 +173,7 @@ float Vec3::angleBetween(const Vec3& a, const Vec3& b){
 
 
 Vec3::operator Vec2() const{
-    Vec2 v = Vec2(a, b);
-    return v;
+    return Vec2(a, b);
 }
 
 Vec3::operator String() const{

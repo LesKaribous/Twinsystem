@@ -5,7 +5,7 @@
 #include "os/console.h"
 #include "motion.h"
 #include "utils/timer/timer.h"
-
+#include "services/localisation/localisation.h"
 #include <cmath>
 
 INSTANTIATE_SERVICE(Motion, motion)
@@ -32,11 +32,16 @@ void Motion::onAttach(){
 }
 
 void Motion::onUpdate(){
+    localisation.onUpdate();
+    _position = localisation.getPosition();
+        
     if(enabled() && isPending()){
         if(hasFinished()){
             complete();
         }
         estimatePosition();
+        
+        controller.setPosition(localisation.getPosition());
         controller.run();
     }
 }
@@ -129,21 +134,20 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
 
     //to relative step target 
     Console::trace("Motion") << "Position is " << _position << Console::endl;
-    Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
-    if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
+    //Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
+    //if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
     //_stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
     
     Console::println("start");
     Job::start(); //robot is moving from now
 
     //resetSteps();
-
+    controller.setPosition(_position);
+    controller.setTarget(_target);
     if(m_async){ 
-        controller.setTarget(_relTarget);
         controller.start();
     }
     else{
-        controller.setTarget(_relTarget);
         controller.start();
         while (controller.isPending()){
             controller.run();
@@ -185,7 +189,9 @@ void Motion::cancel() {
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position = _startPosition + controller.getPosition();
+    //_startPosition = _position = _startPosition + controller.getPosition();
+    localisation.onUpdate();
+    _startPosition = _position = localisation.getPosition();
     controller.reset();
 
     // _sA.setPosition(0);
@@ -201,7 +207,10 @@ void Motion::complete() {
     controller.complete();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position = _startPosition + controller.getPosition();
+
+    //_startPosition = _position = _startPosition + controller.getPosition();
+    localisation.onUpdate();
+    _startPosition = _position = localisation.getPosition();
     controller.reset();
     // _sA.setPosition(0);
     // _sB.setPosition(0);
@@ -220,7 +229,9 @@ void Motion::forceCancel() {
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position = _startPosition + controller.getPosition();
+    //_startPosition = _position = _startPosition + controller.getPosition();
+    localisation.onUpdate();
+    _startPosition = _position = localisation.getPosition();
     controller.reset();
 
     // _sA.setPosition(0);
@@ -355,6 +366,7 @@ bool Motion::isMoving() const{
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
+    localisation.setPosition(newPos);
     //if(_useBNO) setOrientation(newPos.c);
 }
 

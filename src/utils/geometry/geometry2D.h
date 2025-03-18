@@ -59,7 +59,9 @@ struct Vec2 {
     Vec2& operator+=(float u);
     Vec2& operator-=(float u);
     Vec2& operator*=(float u);
+    Vec2& operator*=(const Vec2& u);
     Vec2& operator/=(float u);
+    Vec2& operator/=(const Vec2& u);
     //conversion operator
     operator String() const;
 };

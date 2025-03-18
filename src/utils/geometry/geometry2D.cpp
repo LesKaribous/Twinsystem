@@ -370,7 +370,23 @@ Vec2& Vec2::operator*=(float u){
     b *= u;
     return *this;
 }
-Vec2& Vec2::operator/=(float u ){
+
+Vec2 &Vec2::operator*=(const Vec2 &u)
+{
+    a *= u.a;
+    b *= u.b;
+    return *this;
+}
+
+Vec2 &Vec2::operator/=(const Vec2 &u)
+{
+    a /= u.a;
+    b /= u.b;
+    return *this;
+}
+
+Vec2 &Vec2::operator/=(float u)
+{
     a /= u;
     b /= u;
     return *this;

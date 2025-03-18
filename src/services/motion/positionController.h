@@ -19,6 +19,7 @@ public:
     void complete() override;//Set to COMPLETED
 
     // Set a new target position (in world coordinates)
+    void setPosition(const Vec3 &t);
     void setTarget(const Vec3 &t);
 
     // Getters for debugging or further processing
@@ -33,6 +34,12 @@ private:
 
     void controlPosition(float dt, Vec2 positionError);
     void controlRotation(float dt, float rotationError);
+
+    float m_physics_noise = 0.01;
+    float m_uncertainty = 0.0;
+
+    Vec3 last_otos_position;      // Current position
+    long last_otos_time;      // Current position
 
     Vec3 position;      // Current position
     Vec3 velocity;      // Current velocity
