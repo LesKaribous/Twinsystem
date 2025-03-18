@@ -100,8 +100,8 @@ namespace Settings{
 
         const int 
         STOP_DECCEL = 100, // mm/s^2
-        MAX_ACCEL = 80, // mm/s^2
-        MAX_SPEED = 300, // mm/s
+        MAX_ACCEL = 200, // mm/s^2
+        MAX_SPEED = 500, // mm/s
         MIN_DISTANCE = 1, // Target stop thresold //mm
         TURN_SPEED = 1, // rad/s
         PID_MAX_PERIOD = 10,//ms

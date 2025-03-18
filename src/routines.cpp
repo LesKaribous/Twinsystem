@@ -118,10 +118,10 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
 
-    /*
     ihm.drawBootProgress("Linking Localisation...");
     os.attachService(&localisation); ihm.addBootProgress(10);
-    */
+    localisation.calibrate();
+    
     //ihm.drawBootProgress("Linking Navigation...");
     //os.attachService(&nav); ihm.addBootProgress(10);
 
@@ -155,6 +155,7 @@ void onRobotBoot(){
     Expression::registerVariables("CHRONO", "CHRONO");
     Expression::registerVariables("IHM", "IHM");
     Expression::registerVariables("INTERCOM", "INTERCOM");
+    Expression::registerVariables("LOCALISATION", "LOCALISATION");
     Expression::registerVariables("LIDAR", "LIDAR");
     Expression::registerVariables("TERMINAL", "TERMINAL");
 
@@ -206,6 +207,7 @@ void onIntercomDisconnected(){
 void onIntercomRequest(Request& req){
 
 }
+
 
 void onIntercomRequestReply(Request& req){
 
