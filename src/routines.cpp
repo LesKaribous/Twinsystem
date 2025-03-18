@@ -11,7 +11,6 @@
 //           Main programs
 // -------------------------------------
 
-
 void robotProgramAuto(){
     Console::println("Started match");
     lidar.enable();
@@ -70,23 +69,25 @@ void robotProgramManual(){
 // -------------------------------------
 //           CONTROL LOOP
 // -------------------------------------
-/*
+
 void control() {
-    static const unsigned long CONTROL_PERIOD_MS = 10;
-    unsigned long lastCall = millis(); 
+    static const unsigned long CONTROL_PERIOD_MS = Settings::Stepper::STEPPER_DELAY;
+    unsigned long lastCall = micros(); 
 
     while (true) {
-        motion.control();
-        unsigned long now = millis();
+        unsigned long now = micros();
         unsigned long elapsed = now - lastCall;
+
+        motion.control();
+
         if (elapsed < CONTROL_PERIOD_MS) {
-            threads.delay(CONTROL_PERIOD_MS - elapsed);
+            threads.delay_us(CONTROL_PERIOD_MS - elapsed);
         }
-        lastCall = millis();
-        threads.yield();
+        lastCall = micros();
+        //threads.yield();
     }
 }
-*/
+
 
 
 // -------------------------------------

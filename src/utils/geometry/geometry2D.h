@@ -32,6 +32,7 @@ struct Vec2 {
     Vec2& setMagnitude(float);
     Vec2& setHeading(float);
     Vec2& normalize();
+    static Vec2 normalize(Vec2);
 
     Vec2& div(float);
     Vec2& mult(Matrix2x2);

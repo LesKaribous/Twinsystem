@@ -20,8 +20,8 @@ void command_rawTurn(const args_t& args); //turn without optimization (without m
 void command_pause(const args_t& args);
 void command_resume(const args_t& args);
 void command_cancel(const args_t& args);
-void command_sleep(const args_t& args);
-void command_wake(const args_t& args);
+//void command_sleep(const args_t& args);
+//void command_wake(const args_t& args);
 void command_align(const args_t& args);
 void command_setAbsolute(const args_t& args);
 void command_setRelative(const args_t& args);

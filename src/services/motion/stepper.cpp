@@ -70,11 +70,7 @@ void Stepper::control() {
         m_current_velocity += increment * direction;
     } else if (fabs(m_target_velocity) < fabs(m_current_velocity)) {
         double decrement = double(m_deccel) * dt;
-        m_current_velocity -= decrement * direction;
-    }
-
-    if(m_target_velocity - m_current_velocity < Settings::Stepper::PULLIN){
-        m_current_velocity = m_target_velocity;
+        m_current_velocity += decrement * direction;
     }
 
     // Prevent overshooting the target velocity
@@ -83,9 +79,14 @@ void Stepper::control() {
         m_current_velocity = m_target_velocity;
     }
 
+    if(fabs(m_current_velocity) < Settings::Stepper::PULLIN){
+        m_current_velocity = m_target_velocity;
+        m_step_delay = 0;
+        return;
+    }
     
     // Compute step delay in microseconds (prevent divide by zero)
-    m_step_delay = 1.0e6 / fabs(m_current_velocity * Settings::Stepper::STEP_MODE);
+    m_step_delay = 1.0e6f / fabs(m_current_velocity);
 
     // Update direction
     setDirection(m_current_velocity > 0);
@@ -95,13 +96,38 @@ void Stepper::step() {
     //if (!m_enabled) return;
     if(m_step_delay == 0) return;
 
-    if (micros() - m_last_step_time >= m_step_delay) {
+    if (micros() - m_last_step_time > m_step_delay) {
 
         if(fabs(m_current_velocity) > Settings::Stepper::PULLIN){
             digitalWriteFast(m_pin_step, HIGH);
             delayMicroseconds(Settings::Stepper::PULSE_WIDTH);
             digitalWriteFast(m_pin_step, LOW);
         }
+
+        if (m_target_velocity >= 0)
+            m_position += 1;
+        else
+            m_position -= 1;
+
+        m_last_step_time = micros();
+    }
+}
+
+void Stepper::stepUp() {
+     if(m_step_delay == 0) return;
+
+    //if (!m_enabled) return;
+    if (micros() - m_last_step_time >= m_step_delay) {
+        if(fabs(m_current_velocity) > Settings::Stepper::PULLIN)
+            digitalWriteFast(m_pin_step, HIGH);
+    }
+}
+
+void Stepper::stepDown() {
+    //if (!m_enabled) return;
+    if (micros() - m_last_step_time >= m_step_delay) {
+        if(fabs(m_current_velocity) > Settings::Stepper::PULLIN)
+        digitalWriteFast(m_pin_step, LOW);
 
         if (m_target_velocity >= 0)
             m_position += 1;

@@ -138,15 +138,29 @@ Vec2& Vec2::setHeading(float head){
     return *this;
 }
 
-Vec2& Vec2::normalize(){
-    if(mag() != 0){
-        float cMag = mag();
-        a /= cMag;
-        b /= cMag;
+Vec2& Vec2::normalize() {
+    float length = std::sqrt(x * x + y * y);
+    if (length > 1e-6) { // Avoid division by zero
+        x /= length;
+        y /= length;
+    } else {
+        x = y = 0; // Handle zero-length case
     }
     return *this;
 }
 
+Vec2 Vec2::normalize(Vec2 a) {
+    float x = a.x, y = a.y;
+
+    float length = std::sqrt(x * x + y * y);
+    if (length > 1e-6) { // Avoid division by zero
+        x /= length;
+        y /= length;
+    } else {
+        x = y = 0; // Handle zero-length case
+    }
+    return Vec2(x, y);
+}
 
 Vec2& Vec2::mult(float v){
     a*=v; 

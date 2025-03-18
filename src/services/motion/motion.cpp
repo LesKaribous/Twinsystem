@@ -26,74 +26,32 @@ void Motion::onAttach(){
     _position       = {-1,-1,0};
     _target 	     = {0,0,0};
 
-    _calibration 	= Settings::Calibration::Primary.Cartesian;
     _controlPoint   = {0,0};
 	_absolute = true;
-
-    pinMode(Pin::Stepper::enable, OUTPUT);
-    disengage();
-    setAcceleration(Settings::Motion::MAX_ACCEL);
-
-    _useBNO = false;
-    /* Initialise the sensor */
-    /*
-    for(int i = 0; i < 10; i++){
-        if(bno.begin()){
-            _useBNO = false;
-            bno.setExtCrystalUse(true);
-            break;
-        }
-    }
-    if(!_useBNO) 
-        Console::error("Motion") << "Ooops, no BNO055 detected ... It may be unplugged... Tanpis" << Console::endl;
-    */
 
 }
 
 void Motion::onUpdate(){
-    if(enabled() && !_sleeping && !isPaused() && isPending()){
+    if(enabled() && isPending()){
         if(hasFinished()){
             complete();
         }
         estimatePosition();
+        controller.run();
     }
 }
 
+void Motion::control(){
+    if(enabled())
+        controller.control();
+}
 
 void Motion::enable(){
     Service::enable();
-    engage();
-    sleep();
 }
 
 void Motion::disable(){
     Service::disable();
-    disengage();
-}
-
-void Motion::engage(){
-    _engaged = true;
-    _sleeping = false;
-    digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
-}
-
-void Motion::disengage(){
-    _engaged = false;
-    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
-}
-
-void Motion::wakeUp(){
-    if(_sleeping){
-        digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
-        _sleeping = false;
-    }
-    delay(1000);
-}
-
-void Motion::sleep(){
-    if(isPending()) cancel();
-    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
-    _sleeping = true;
 }
 
 Motion& Motion::go(float x, float y){
@@ -119,9 +77,10 @@ Motion& Motion::goPolar(float heading, float dist){
 }
 
 Motion& Motion::turn(float angle){
+    /*
     if(_useBNO){
         _position.c = getOrientation();
-    }
+    }*/
     setStepsVelocity(Settings::Motion::TURN_SPEED);
     _isMoving = true;
     _isRotating = true;
@@ -172,37 +131,29 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     Console::trace("Motion") << "Position is " << _position << Console::endl;
     Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
     if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
-    _stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
+    //_stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
     
+    Console::println("start");
     Job::start(); //robot is moving from now
-    wakeUp();
-    resetSteps();
 
-    /*
-    _sA.setTargetAbs(_stepsTarget.a);
-    _sB.setTargetAbs(_stepsTarget.b);
-    _sC.setTargetAbs(_stepsTarget.c);
+    //resetSteps();
 
-    if(m_async)_steppers.moveAsync(_sA, _sB, _sC);
+    if(m_async){ 
+        controller.setTarget(_relTarget);
+        controller.start();
+    }
     else{
-        _steppers.move(_sA, _sB, _sC);
+        controller.setTarget(_relTarget);
+        controller.start();
+        while (controller.isPending()){
+            controller.run();
+        }
         complete();
     }
-    */
+    
     return *this;
 }
 
-void Motion::setCalibration(CalibrationProfile c){
-    _calibration = c.Cartesian;
-}
-
-void Motion::setAcceleration(int accel){
-    
-    // _sA.setAcceleration(accel*Settings::Stepper::STEP_MODE);
-    // _sB.setAcceleration(accel*Settings::Stepper::STEP_MODE);
-    // _sC.setAcceleration(accel*Settings::Stepper::STEP_MODE);
-    
-}
 
 void Motion::run(){
     onUpdate();
@@ -210,39 +161,32 @@ void Motion::run(){
 
 void Motion::pause(){
     Job::pause();
-    setAcceleration(Settings::Motion::STOP_DECCEL);
-    //_steppers.stopAsync(); // set new speed
+    controller.pause();
 }
 
 void Motion::resume(){
     Job::resume();
-    setAcceleration(Settings::Motion::MAX_ACCEL);
-    // _sA.setTargetAbs(_stepsTarget.a);
-    // _sB.setTargetAbs(_stepsTarget.b);
-    // _sC.setTargetAbs(_stepsTarget.c);
-    // _steppers.moveAsync(_sA, _sB, _sC); // set new speed
+    controller.resume();
 }
 
 bool Motion::hasFinished() {
-    // THROW(_sA.getPosition());
-    // THROW(_sB.getPosition());
-    // THROW(_sC.getPosition());
-    // THROW(_stepsTarget);
-    // return (_sA.getPosition() == _stepsTarget.a && _sB.getPosition() == _stepsTarget.b && _sC.getPosition() == _stepsTarget.c);
-    return true;
+    return controller.isCompleted();
 }
 
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-
-        //_steppers.stopAsync();
+        controller.cancel();
+        while (!controller.isCompleted())
+        {
+            controller.run();
+        }
     }
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position;
-    _lastSteps = _stepsTarget = Vec3(0,0,0);
+    _startPosition = _position = _startPosition + controller.getPosition();
+    controller.reset();
 
     // _sA.setPosition(0);
     // _sB.setPosition(0);
@@ -254,29 +198,30 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
+    controller.complete();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position;// = _target;
-    _lastSteps = _stepsTarget = Vec3(0,0,0);
+    _startPosition = _position = _startPosition + controller.getPosition();
+    controller.reset();
     // _sA.setPosition(0);
     // _sB.setPosition(0);
     // _sC.setPosition(0);
     // _sA.setTargetAbs(0);
     // _sB.setTargetAbs(0);
     // _sC.setTargetAbs(0);
-    //Console::println("complete");
+    Console::println("complete");
 }
 
 void Motion::forceCancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        //_steppers.emergencyStop();
+        controller.complete();
     }
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
-    _startPosition = _position;
-    _lastSteps = _stepsTarget = Vec3(0,0,0);
+    _startPosition = _position = _startPosition + controller.getPosition();
+    controller.reset();
 
     // _sA.setPosition(0);
     // _sB.setPosition(0);
@@ -311,6 +256,7 @@ void Motion::disableOptimization(){
 }
 
 void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
+    /*
     Vec3 steps = getLastSteps(); //Read steps counter
     Vec3 delta = steps - _lastSteps;
     _lastSteps = steps;
@@ -327,6 +273,7 @@ void  Motion::estimatePosition(){ //We are not using the estimated velocity to p
     del.rotateZ(orientation); //Transform to workd space
 
     _position += del/_calibration;
+    */
 }
 
 Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
@@ -335,33 +282,22 @@ Vec3 Motion::optmizeRelTarget(Vec3 relTarget){
     return relTarget;
 }
 
-Vec3 Motion::targetToSteps(Vec3 relTarget){
-    Vec3 angularTarget = ik(relTarget*_calibration) / Settings::Geometry::WHEEL_RADIUS;
-    Vec3 f_res = (angularTarget / (PI/200.0) ) * Settings::Stepper::STEP_MODE;
-    return Vec3(int(f_res.a), int(f_res.b), int(f_res.c));
-}
-
-
-
 void Motion::resetCompass(){
-    /*
-    sensors_event_t eventAngular;
-    bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-    compassReference = (-DEG_TO_RAD * eventAngular.orientation.x);
-    */
 
 }
 
 void Motion::setOrientation(float orientation){
+    /*
     if(!_useBNO) return;
     while(orientation > PI) orientation-= 2.0f*PI;
     while(orientation <= -PI) orientation += 2.0f*PI;
     compassOffset -= getOrientation() - orientation;
     Console::println(compassOffset*RAD_TO_DEG);
+    */
 }
 
 float Motion::getOrientation(){
-    if(!_useBNO) return _position.c;
+    //if(!_useBNO) return _position.c;
     /*
     if(millis() - lastBNOCheck > 50){
         sensors_event_t eventAngular;
@@ -373,7 +309,7 @@ float Motion::getOrientation(){
         return  orientation;
     }else return _position.c;
     */
-
+    return 0;
 }
 
 // -------------------------------
@@ -388,20 +324,6 @@ Vec3  Motion::getAbsTarget() const{
     return _target;
 }
 
-Vec3 Motion::getLastSteps() const{
-    // Vec3 lastSteps = Vec3(  _sA.getPosition(), 
-    //                         _sB.getPosition(), 
-    //                         _sC.getPosition() );
-
-    // return lastSteps;
-    return Vec3(0,0,0);
-}
-
-void Motion::resetSteps(){
-    // _sA.setPosition(0); 
-    // _sB.setPosition(0); 
-    // _sC.setPosition(0);
-}
 
 float Motion::getAbsoluteTargetDirection() const{
     return Vec2(_target - _position).heading();
@@ -433,7 +355,7 @@ bool Motion::isMoving() const{
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
-    if(_useBNO) setOrientation(newPos.c);
+    //if(_useBNO) setOrientation(newPos.c);
 }
 
 void Motion::setStepsVelocity(float v){

@@ -87,7 +87,7 @@ namespace Settings{
 
         //https://en.wikipedia.org/wiki/PID_controller
         //const Vec3 kP = Vec3(3.0, 3.0, 3.5);
-        const float kP = 1.0f;
+        const float kP = 0.8f;
         const float kI = 0.0;
         const float kD = 0.0;
 
@@ -98,10 +98,10 @@ namespace Settings{
         MAX_ROT_SPEED = 1.0, // rad/s
         MIN_ANGLE = 0.05; // Target stop thresold //mm
 
-        const uint32_t 
+        const int 
         STOP_DECCEL = 100, // mm/s^2
-        MAX_ACCEL = 10, // mm/s^2
-        MAX_SPEED = 10, // mm/s
+        MAX_ACCEL = 50, // mm/s^2
+        MAX_SPEED = 200, // mm/s
         MIN_DISTANCE = 1, // Target stop thresold //mm
         TURN_SPEED = 1, // rad/s
         PID_MAX_PERIOD = 10,//ms
@@ -122,14 +122,14 @@ namespace Settings{
         DIR_C_POLARITY = false;
 
         constexpr int
-        PULSE_WIDTH = 10,
+        PULSE_WIDTH = 14, //https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf   page 63
         STEPS_PER_REVOLUTION = 200,
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 1000, // equivalent fullsteps/s^2
-        MAX_SPEED = 1000, // equivalent fullsteps/s
+        MAX_ACCEL = 10000, // equivalent fullsteps/s^2
+        MAX_SPEED = 3000, // equivalent fullsteps/s
         MIN_SPEED = 20,
-        STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
-        PULLIN = 10; //fullsteps/s^2
+        STEPPER_DELAY = 300,//µs Steps every 1000 µs seconds
+        PULLIN = 10; //fullsteps/s
 
         constexpr u_int8_t 
         STEP_MODE = 8;
@@ -142,7 +142,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 0.525, -0.525f, 0.3895f} //Cartesian : XYROT
+            { 1.1f, -1.1f, 1.705f} //Cartesian : XYROT
         };
     }
 }

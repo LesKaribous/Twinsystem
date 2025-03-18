@@ -16,8 +16,8 @@ void registerCommands() {
     CommandHandler::registerCommand("pause", "Pause motion", command_pause);
     CommandHandler::registerCommand("resume", "Resume motion", command_resume);
     CommandHandler::registerCommand("cancel", "Cancel motion", command_cancel);
-    CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
-    CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
+    //CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
+    //CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
     CommandHandler::registerCommand("align(side,angle)", "Align to a specific side and angle", command_align);
     CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode", command_setAbsolute);
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode", command_setRelative);
@@ -155,13 +155,6 @@ void command_cancel(const args_t& args){
     motion.cancel();
 }
 
-void command_sleep(const args_t& args){
-    motion.sleep();
-}
-
-void command_wake(const args_t& args){
-    motion.wakeUp();
-}
 
 void command_align(const args_t& args){
     /**/
