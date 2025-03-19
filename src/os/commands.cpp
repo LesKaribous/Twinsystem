@@ -119,7 +119,8 @@ void command_move(const args_t& args){
     if(args.size() != 3) return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
-    float z = args[3].toFloat();
+    float z = args[2].toFloat();
+    Console::info("Interpreter") << "Move to (" << x << ", " << y << ", " << z << ")" << Console::endl;
     async motion.move({x, y, z});
     /**/
 }

@@ -55,7 +55,9 @@ void PositionController::run() {
             }
         }
 
-        velocity = velocity + ( acceleration * dt);
+        velocity = 0.98*velocity + ( acceleration * dt);
+        //velocity.rotateZ(velocity.c*dt*30.0);
+        
         //position = position + ( velocity * dt);
 
         if(velocity.mag() > 0.1){
