@@ -40,8 +40,6 @@ void Motion::onUpdate(){
             complete();
         }
         estimatePosition();
-        
-        controller.setPosition(localisation.getPosition());
         controller.run();
     }
 }
@@ -267,6 +265,13 @@ void Motion::disableOptimization(){
 }
 
 void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
+
+    localisation.onUpdate();
+    Vec3 position = localisation.getPosition();
+    if(position != _position){
+        _position = position;
+        controller.setPosition(localisation.getPosition());
+    }
     /*
     Vec3 steps = getLastSteps(); //Read steps counter
     Vec3 delta = steps - _lastSteps;

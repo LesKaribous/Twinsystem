@@ -33,6 +33,7 @@ public:
 	static ConsoleStream success(const ServiceID& origin = ID_NOT_A_SERVICE);
 
 	static void plot(const String& name, String s);
+	static void plotXY(const String& n, String x, String y);
 
 	static void print(const String& s);
 	static void println(const String& s);

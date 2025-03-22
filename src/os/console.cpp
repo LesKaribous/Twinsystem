@@ -79,6 +79,10 @@ void Console::plot(const String& n, String s){
 	print(">" + n + ":"); println(s);
 }
 
+void Console::plotXY(const String& n, String x, String y){
+	println(">" + n + ":" + x + ":" + y + "|xy"); 
+}
+
 void Console::print(const String& s){
 	CONSOLE_SERIAL.print(s);
 }
