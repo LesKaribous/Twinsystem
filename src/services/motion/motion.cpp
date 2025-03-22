@@ -84,7 +84,7 @@ Motion& Motion::turn(float angle){
     if(_useBNO){
         _position.c = getOrientation();
     }*/
-    setStepsVelocity(Settings::Motion::TURN_SPEED);
+    //setStepsVelocity(Settings::Motion::TURN_SPEED);
     _isMoving = true;
     _isRotating = true;
     if (_absolute) move(Vec3(_position.a, _position.b, angle));
@@ -93,7 +93,7 @@ Motion& Motion::turn(float angle){
 }
   
 Motion& Motion::go(Vec2 target){
-    setStepsVelocity(Settings::Motion::MAX_SPEED);
+    //setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     if (_absolute) move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
     else move(Vec3(target.a, target.b, 0));

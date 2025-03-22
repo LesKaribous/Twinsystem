@@ -20,7 +20,6 @@ PositionController::PositionController()
 
 
 void PositionController::run() {
-    
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
         //THROW(position);
@@ -55,16 +54,23 @@ void PositionController::run() {
             }
         }
 
-        velocity = 0.98*velocity + ( acceleration * dt);
-        //velocity.rotateZ(velocity.c*dt*30.0);
-        
-        //position = position + ( velocity * dt);
+        target_velocity = Vec3(0.999 * target_velocity.x, 0.999 *target_velocity.y, target_velocity.c) + ( acceleration * dt);
 
-        if(velocity.mag() > 0.1){
-            controller.setTargetVelocity(velocity);
+        Vec3 newVelocity = controller.getCurrentVelocity();
+
+        velocity.x = newVelocity.x / Settings::Calibration::Primary.Cartesian.x;
+        velocity.y = newVelocity.y / Settings::Calibration::Primary.Cartesian.y;
+        velocity.c = newVelocity.c / Settings::Calibration::Primary.Cartesian.c;
+
+        position = position + ( velocity * dt);
+
+        if(Vec2(target_velocity).mag() > 0.01 || fabs(target_velocity.c) > 0.01){
+            controller.setTargetVelocity(target_velocity);
         }else controller.setTargetVelocity(Vec3(0));
 
-        Console::info() << position << " / " << target << " | " << velocity << " | " << acceleration << Console::endl; 
+        Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
+        //Console::plotXY("pos", String(position.x), String(position.y));
+        //Console::plotXY("target", String(target.x), String(target.y));
     }
 }
 
@@ -135,29 +141,45 @@ void PositionController::deccelerate(){
 void PositionController::controlPosition(float dt, Vec2 positionError) {
 
     float distance = positionError.mag();
+    if(distance < Settings::Motion::MIN_DISTANCE) return;
     // Compute the desired velocity toward the target.
-    Vec2 direction = positionError.normalize();
-    Vec2 targetVel = direction * Settings::Motion::MAX_SPEED;
+    Vec2 direction = Vec2::normalize(positionError);
     
-    // Compute time needed to decelerate and estimated travel time.
-    float currentSpeed = velocity.mag();
-    float decelTime = currentSpeed / (Settings::Motion::MAX_ACCEL + 1e-5f); // Small offset to avoid division by zero.
-    float travelTime = distance / (currentSpeed + 1e-5f);
+    float speed = Settings::Motion::MAX_SPEED;
+    if (distance < 200.0f) {
+        speed *= (distance / 200.0f);  // Linearly scale speed down
+    }
+
+    Vec2 targetVel = direction * speed;
 
     // Compute the velocity error.
     Vec2 velError = targetVel - velocity;
+    float velErrorMag = velError.mag();
+
+    float accel = Settings::Motion::MAX_ACCEL;
+    if (velErrorMag < 100.0f) {
+        accel *= (velErrorMag / 100.0f);  // Linearly scale speed down
+    }
+
+    // Compute time needed to decelerate and estimated travel time.
+    float currentSpeed = Vec2(velocity).mag();
+    float decelTime = currentSpeed / (accel + 1e-5f); // Small offset to avoid division by zero.
+    float travelTime = distance / (currentSpeed + 1e-5f);
+
+    if(fabs(positionError.x) < Settings::Motion::MIN_DISTANCE) velError.x = 0;
+    if(fabs(positionError.y) < Settings::Motion::MIN_DISTANCE) velError.y = 0;
 
     // Decide control strategy based on current state.
     if (decelTime >= travelTime) { // Deceleration phase.
         //THROW("Decelerating");
         if (currentSpeed > 0) {
-            acceleration = Vec2::normalize(velocity) * (-Settings::Motion::MAX_ACCEL);
+            acceleration = Vec2::normalize(velocity) * (-accel);
         } else {
             acceleration = Vec2(0);
         }
-    } else if (velError.mag() > 0.1f) { // Acceleration phase.
+    } else if (velError.mag() > 0.01f) { // Acceleration phase.
         //THROW("Accelerating");
-        acceleration = Vec2::normalize(velError) * Settings::Motion::MAX_ACCEL;
+        acceleration = Vec2::normalize(velError) * accel;
     } else { // Maintain constant speed.
         acceleration = Vec2(0);
     }
@@ -171,25 +193,38 @@ void PositionController::controlPosition(float dt, Vec2 positionError) {
 
 void PositionController::controlRotation(float dt, float rotationError) {
 
+    if(fabs(rotationError) < Settings::Motion::MIN_ANGLE) return;
+
     float direction = NORMALIZE(rotationError);
     float targetVel = direction * Settings::Motion::MAX_ROT_SPEED;
 
-    // Compute time needed to decelerate and estimated travel time.
-    float decelTime = fabs(velocity.c) / (Settings::Motion::MAX_ROT_ACCEL + 1e-5f); // Ensure positive time
-    float travelTime = fabs(rotationError) / (fabs(velocity.c) + 1e-5f); // Avoid division instability
+    if(fabs(rotationError) < PI*0.25){
+        targetVel *= fabs(rotationError)/PI*0.25;
+    }
+
+
 
     // Compute the velocity error.
     float velError = targetVel - velocity.c;
 
+    float accel = Settings::Motion::MAX_ROT_ACCEL;
+    if (velError < PI*0.01) {
+        accel *= (velError / PI*0.01);  // Linearly scale speed down
+    }
+
+    // Compute time needed to decelerate and estimated travel time.
+    float decelTime = fabs(velocity.c) / (accel + 1e-5f); // Ensure positive time
+    float travelTime = fabs(rotationError) / (fabs(velocity.c) + 1e-5f); // Avoid division instability
+
     // Decide control strategy based on current state.
     if (decelTime >= travelTime) {  // Deceleration phase.
         if (fabs(velocity.c) > 1e-5f) {
-            acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL);
+            acceleration.c = NORMALIZE(velocity.c) * (-accel);
         } else {
             acceleration.c = 0;
         }
-    } else if (fabs(velError) > 0.01f * Settings::Motion::MAX_ROT_SPEED) {  // Adaptive threshold
-        acceleration.c = NORMALIZE(velError) * Settings::Motion::MAX_ROT_ACCEL;
+    } else if (fabs(velError) > 0.005f) {  // Adaptive threshold
+        acceleration.c = NORMALIZE(velError) * accel;
     } else {  // Maintain constant speed.
         acceleration.c = 0;
     }

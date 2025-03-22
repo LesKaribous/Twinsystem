@@ -80,13 +80,13 @@ void VelocityController::control() {
         last_compute = micros();
 
         // Read actual velocities for feedback control
-        m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
+        
     }
 
     m_sA.step();
     m_sB.step();
     m_sC.step();
-
+    m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
     /*
     m_sA.stepUp();
     m_sB.stepUp();
@@ -101,9 +101,9 @@ void VelocityController::control() {
 }
 
 Vec3 VelocityController::getCurrentVelocity() const {
-    return fk(m_current_velocity/Settings::Calibration::Primary.Holonomic);
+    return fk(m_current_velocity/(Settings::Calibration::Primary.Holonomic * Settings::Stepper::STEP_MODE));
 }
 
 Vec3 VelocityController::getTargetVelocity() const {
-    return fk(m_target_velocity/Settings::Calibration::Primary.Holonomic);
+    return fk(m_target_velocity/(Settings::Calibration::Primary.Holonomic * Settings::Stepper::STEP_MODE));
 }

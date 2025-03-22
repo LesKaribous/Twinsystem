@@ -96,19 +96,18 @@ namespace Settings{
         const float MAX_PID_DELAY = 10;
 
         const float 
-        MAX_ROT_ACCEL = 10.0, // rad/s^2
-        MAX_ROT_SPEED = 10.0, // rad/s
+        MAX_ROT_ACCEL = 0.2, // rad/s^2
+        MAX_ROT_SPEED = 2.0, // rad/s
         MIN_ANGLE = 1.0*DEG_TO_RAD; // Target stop thresold //mm
 
         const int 
-        STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 500, // mm/s^2
-        MAX_SPEED = 3000, // mm/s
-        MIN_DISTANCE = 30, // Target stop thresold //mm
-        TURN_SPEED = 3, // rad/s
+        //STOP_DECCEL = 10000, // mm/s^2
+        MAX_ACCEL = 2000, // mm/s^2
+        MAX_SPEED = 7000, // mm/s
+        MIN_DISTANCE = 20, // Target stop thresold //mm
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms
-        PID_INTERVAL = 10000;//microseconds
+        PID_INTERVAL = 5000;//microseconds
     }
 
     namespace Stepper{
@@ -128,7 +127,7 @@ namespace Settings{
         STEPS_PER_REVOLUTION = 200,
         STOP_DECCEL = 5000, // equivalent fullsteps/s^2
         MAX_ACCEL = 10000, // equivalent fullsteps/s^2
-        MAX_SPEED = 3000, // equivalent fullsteps/s
+        MAX_SPEED = 8000, // equivalent fullsteps/s
         MIN_SPEED = 20,
         STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
         STEPPER_COMPUTE_DELAY = 1000,//µs Steps every 1000 µs seconds

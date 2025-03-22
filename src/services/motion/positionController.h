@@ -43,6 +43,7 @@ private:
 
     Vec3 position;      // Current position
     Vec3 velocity;      // Current velocity
+    Vec3 target_velocity;      // Current velocity
     Vec3 acceleration;  // Current acceleration
 
     VelocityController controller;
