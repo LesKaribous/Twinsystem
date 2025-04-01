@@ -32,11 +32,9 @@ private:
 
     void deccelerate();
 
-    void controlPosition(float dt, Vec2 positionError);
+    void controlPositionX(float dt, float positionErrorX);
+    void controlPositionY(float dt, float positionErrorY);
     void controlRotation(float dt, float rotationError);
-
-    float m_physics_noise = 0.01;
-    float m_uncertainty = 0.0;
 
     Vec3 last_otos_position;      // Current position
     long last_otos_time;      // Current position

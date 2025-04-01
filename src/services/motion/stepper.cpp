@@ -112,28 +112,3 @@ void Stepper::step() {
         m_last_step_time = micros();
     }
 }
-
-void Stepper::stepUp() {
-     if(m_step_delay == 0) return;
-
-    //if (!m_enabled) return;
-    if (micros() - m_last_step_time >= m_step_delay) {
-        if(fabs(m_current_velocity) > Settings::Stepper::PULLIN)
-            digitalWriteFast(m_pin_step, HIGH);
-    }
-}
-
-void Stepper::stepDown() {
-    //if (!m_enabled) return;
-    if (micros() - m_last_step_time >= m_step_delay) {
-        if(fabs(m_current_velocity) > Settings::Stepper::PULLIN)
-        digitalWriteFast(m_pin_step, LOW);
-
-        if (m_target_velocity >= 0)
-            m_position += 1;
-        else
-            m_position -= 1;
-
-        m_last_step_time = micros();
-    }
-}
