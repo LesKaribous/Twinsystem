@@ -51,7 +51,7 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
     }
 
     //Console::info() << "Target Robot velocity : " << targetVelocity << Console::endl;
-    Vec3 target = ik(targetVelocity) * Settings::Calibration::Primary.Holonomic * Settings::Stepper::STEP_MODE;
+    Vec3 target = ik(targetVelocity);
     //Console::info() << "Target Wheel velocity : " << target << Console::endl;
 
     float maxSpeed = Settings::Stepper::MAX_SPEED;
@@ -101,9 +101,9 @@ void VelocityController::control() {
 }
 
 Vec3 VelocityController::getCurrentVelocity() const {
-    return fk(m_current_velocity/(Settings::Calibration::Primary.Holonomic * Settings::Stepper::STEP_MODE));
+    return fk(m_current_velocity);
 }
 
 Vec3 VelocityController::getTargetVelocity() const {
-    return fk(m_target_velocity/(Settings::Calibration::Primary.Holonomic * Settings::Stepper::STEP_MODE));
+    return fk(m_target_velocity);
 }

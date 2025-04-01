@@ -39,11 +39,14 @@ float command(float dt,
     float velError = targetVel - velocity;
 
     // Scale acceleration proportionally based on velocity error.
+    
     float accel = maxAccel;
+    /**/
     if (fabs(velError) < proportionalVelocityThreshold)
     {
-        accel *= (fabs(velError) / proportionalVelocityThreshold);
+        accel = std::max(0.0f, maxAccel * (fabs(velError) / proportionalVelocityThreshold));
     }
+    /**/
 
     // Compute the required stopping distance from current velocity.
     float stoppingDistance = (velocity * velocity) / (2.0f * (maxAccel + EPSILON));
@@ -84,7 +87,7 @@ PositionController::PositionController()
     controller.setTargetVelocity(Vec3(0));
 }
 
-
+//[Info]p:[-15.2588,15.8691,-0.0035] | t:[0.0000,0.0000,-0.0119] | v:[0.0000,-0.0000,0.0000] | tv:[-0.0000,-0.0000,-0.0000] | a:[0.0000,0.0000,0.0000]
 void PositionController::run() {
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
@@ -94,8 +97,8 @@ void PositionController::run() {
         
         Vec2 error = target - position;
         float angle = target.c - position.c;
-        error *= Vec2(Settings::Calibration::Primary.Cartesian);
-        angle *= Settings::Calibration::Primary.Cartesian.c;
+        //error *= Vec2(Settings::Calibration::Primary.Cartesian);
+        //angle *= Settings::Calibration::Primary.Cartesian.c;
 
         if(isPaused()) {
             if(velocity.mag() > 0) deccelerate();
@@ -107,46 +110,43 @@ void PositionController::run() {
         }
 
         if(isPending() && !isPaused()){
-            acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 10 );
-            acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 10 );
-            acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL, 0.01, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE, 0.1, 0.05 );
+            acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
+            acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
+            acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL, 0.01, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
         }
 
         if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
             target_velocity.x += acceleration.x * dt;
         }else {
-            target_velocity.x = 0.9 * (target_velocity.x + acceleration.x * dt);
+            target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
         }
 
         if(fabs(error.y) > Settings::Motion::MIN_DISTANCE){
             target_velocity.y += acceleration.y * dt;
         }else {
-            target_velocity.y = 0.9 * (target_velocity.y + acceleration.y * dt);
+            target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
         }
 
         if(fabs(angle) > Settings::Motion::MIN_ANGLE)  
             target_velocity.c += acceleration.c * dt;
         else  
-            target_velocity.c = 0.98 * (target_velocity.c +  acceleration.c * dt);
+            target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
         
 
-        Vec3 newVelocity = controller.getCurrentVelocity();
-
-        velocity.x = newVelocity.x / Settings::Calibration::Primary.Cartesian.x;
-        velocity.y = newVelocity.y / Settings::Calibration::Primary.Cartesian.y;
-        velocity.c = newVelocity.c / Settings::Calibration::Primary.Cartesian.c;
-        
+        velocity = controller.getCurrentVelocity();
         position = position + ( velocity * dt);
 
         Vec3 final_target_velocity = target_velocity;
         if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
         if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
-        if(fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
+        if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
 
         if(final_target_velocity.magSq() > 0){
             controller.setTargetVelocity(final_target_velocity);
         }else{
-            if (error.mag() < Settings::Motion::MIN_DISTANCE && fabs(angle) < Settings::Motion::MIN_ANGLE) 
+            if (fabs(error.x) < Settings::Motion::MIN_DISTANCE && 
+                fabs(error.y) < Settings::Motion::MIN_DISTANCE && 
+                fabs(angle) < Settings::Motion::MIN_ANGLE) 
                 complete();
             controller.setTargetVelocity(Vec3(0));
         }
