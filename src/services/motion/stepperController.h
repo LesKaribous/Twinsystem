@@ -1,5 +1,7 @@
 
 #include "os/asyncExecutor.h"
+#include "stepper.h"
+
 
 #include <iostream>
 #include <cmath>
@@ -10,17 +12,18 @@
 
 struct StepperProfile {
     double distanceToGo;
+    double currentPosition;
     double acceleration;
     double velocity;
     double timeAccel;
     double timeFlat;
     double totalTime;
+    long lastStepTime;
 };
 
 class StepperController : public Job{
 public:
-
-    void computeSynchronizedProfiles();
+    StepperController();
 
     void run() override; 
     void reset() override;  //Set to IDLE
@@ -31,12 +34,29 @@ public:
     void complete() override;//Set to COMPLETED
     void control();
 
-    void setTarget(Vec3 target);
-    void setTarget(float a, float b, float c );
+    void setTarget(long a, long b, long c );
+    double computeMoveTime(long maxDistance);
 
 private:
-    StepperProfile steppers[STEPPER_COUNT];
+    double computeEffectiveAcceleration(long distance, double totalTime);
+    double computeProfileVelocity(long distance, double t, double totalTime);
 
-    double calcMinDuration(double distance, double maxVel, double maxAcc) const;
-    void computeProfile(StepperProfile &stepper, double targetDuration) const;
+private:
+    Stepper m_sA, m_sB, m_sC;
+
+    // Targets are in steps.
+    long targetA, targetB, targetC;
+        
+    // To compute a consistent synchronized trajectory, store the start positions.
+    long m_startA, m_startB, m_startC;
+
+    // And store the total distances (always positive) planned for each axis.
+    long m_totalDistanceA, m_totalDistanceB, m_totalDistanceC;
+
+    // The common move time (in seconds) for the longest trajectory.
+    double m_totalTime;
+
+    // The time (in seconds) when the move started.
+    double m_startTime;
+
 };

@@ -15,8 +15,8 @@ String  Job::toString() const {
 		case JobState::IDLE :
 			return "IDLE";
 		break;
-		case JobState::PENDING :
-			return "PENDING";
+		case JobState::RUNNNING :
+			return "RUNNNING";
 		break;
 		case JobState::PAUSED :
 			return "PAUSED";
@@ -42,8 +42,12 @@ bool Job::isIdle() const {
 	return m_state == JobState::IDLE;
 }
 
+bool Job::isRunning() const{
+	return m_state == JobState::RUNNNING;
+}
+
 bool Job::isPending() const{
-	return m_state == JobState::PENDING;
+	return m_state == JobState::RUNNNING || m_state == JobState::PAUSED ;
 }
 
 bool Job::isCancelled() const{
@@ -66,8 +70,7 @@ long Job::pauseDuration() const
     else return millis() - pauseTime;
 }
 
-void Job::reset()
-{
+void Job::reset(){
 	startTime = 0;
 	pauseTime = 0;
     m_state = JobState::IDLE;
@@ -76,12 +79,12 @@ void Job::reset()
 void  Job::start(){
 	if(m_state == JobState::IDLE){
 		startTime = millis();
-		m_state = JobState::PENDING;
+		m_state = JobState::RUNNNING;
 	}
 }
 
 void  Job::pause(){
-	if(m_state == JobState::PENDING){
+	if(m_state == JobState::RUNNNING){
 		pauseTime = millis();
 		m_state = JobState::PAUSED;
 	}
@@ -89,7 +92,7 @@ void  Job::pause(){
 
 void  Job::resume(){
 	if(m_state == JobState::PAUSED){
-		m_state = JobState::PENDING;
+		m_state = JobState::RUNNNING;
 	}
 }
 

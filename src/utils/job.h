@@ -5,7 +5,7 @@
 enum class JobState{
     IDLE,
     PAUSED,
-    PENDING,
+    RUNNNING,
     CANCELLED,
     COMPLETED
 };
@@ -21,6 +21,7 @@ public:
 
     bool isIdle()const;
     bool isPaused()const;
+    bool isRunning()const;
     bool isPending()const;
     bool isCompleted()const;
     bool isCancelled()const;

@@ -4,6 +4,7 @@
 #include "utils/job.h"
 #include "utils/geometry.h"
 #include "positionController.h"
+#include "stepperController.h"
 
 //BNO
 #include <Wire.h>
@@ -43,7 +44,7 @@ public:
     bool hasFinished();
 
     //Setters
-    void setStepsVelocity(float velocity); //feed rate will be appied automatically (see setFeedrate)
+    //void setStepsVelocity(float velocity); //feed rate will be appied automatically (see setFeedrate)
     void setAbsTarget(Vec3);    //mm, mm, rad
     void setAbsPosition(Vec3);  //mm, mm, rad
     void setAbsolute();
@@ -74,8 +75,13 @@ public:
     void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
     void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
 
+    void enableCruiseMode();
+    void disableCruiseMode();
+
 private :
     bool m_async = true; //non blocking by default
+    bool use_cruise_mode = false; //non blocking by default
+
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 absTarget);
@@ -86,7 +92,8 @@ private :
 
     Vec2 _controlPoint   = { 0, 0};
 
-    PositionController controller;
+    PositionController cruise_controller;
+    StepperController stepper_controller;
     float m_feedrate = 1.0;
 
     bool _engaged, _sleeping;

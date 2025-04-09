@@ -15,6 +15,7 @@ void match(){
 }
 
 void recalage(){
+    motion.engage();
     motion.setSync();
     actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
     waitMs(800);
@@ -38,21 +39,28 @@ void recalage(){
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
         actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
+    motion.disengage();
 }
 
 void matchA(){
     //do Match
     motion.disableOptimization();
-    async motion.turn(3600);
+    //async motion.turn(3600);
+    
+    for(int i = 0; i < 10; i++){
+        async motion.go(600,0);
+        async motion.go(0,0);
+    }
+
     chrono.onMatchNearlyFinished();
     chrono.onMatchFinished();
 }
 
 void matchB(){
     //do Match
-    motion.disableOptimization();
-    async motion.turn(-3600);
-    
+    //motion.disableOptimization();
+    //async motion.turn(-3600);
+
     chrono.onMatchNearlyFinished();
     chrono.onMatchFinished();
 }

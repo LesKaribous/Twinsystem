@@ -30,6 +30,7 @@ void robotProgramManual(){
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
         ihm.freezeSettings();
+        motion.engage();
         hadStarter = true;
         return;
     }
@@ -41,6 +42,7 @@ void robotProgramManual(){
     }
     
     if(!ihm.hasStarter() && hadStarter &&  ihm.buttonPressed()){
+        motion.disengage();
         ihm.unfreezeSettings();
         lidar.showStatusLED();
         hadStarter = false;
@@ -118,9 +120,11 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
 
+    motion.engage();
     ihm.drawBootProgress("Linking Localisation...");
     os.attachService(&localisation); ihm.addBootProgress(10);
     localisation.calibrate();
+    motion.disengage();
     
     //ihm.drawBootProgress("Linking Navigation...");
     //os.attachService(&nav); ihm.addBootProgress(10);
@@ -253,11 +257,13 @@ void onTerminalCommand(){
         Program prgm = in.processScript(rawcmd);
         if(prgm.isValid()){ //TODO Integrate that in OS
             Console::println("Starting program");
+            motion.engage();
             prgm.start();
             while(os.isBusy()) os.flush();
             while(prgm.step()){
                 while(os.isBusy()) os.flush();
             };
+            motion.disengage();
         }else {
             Console::println("Invalid program : Unknown error");
         }

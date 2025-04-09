@@ -1,190 +1,302 @@
 #include "stepperController.h"
 
-StepperController::StepperController(){
-    for(int i = 0; i < STEPPER_COUNT; i++){
-        steppers[i].acceleration = Settings::Stepper::MAX_ACCEL;
-        steppers[i].velocity = Settings::Stepper::MAX_SPEED;
-        steppers[i].timeAccel = 0;
-        steppers[i].timeFlat = 0;
-        steppers[i].totalTime = 0;
-    }
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+
+// Constructor.
+StepperController::StepperController() : 
+    m_sA(Pin::Stepper::stepA, Pin::Stepper::dirA, !Settings::Stepper::DIR_A_POLARITY),
+    m_sB(Pin::Stepper::stepB, Pin::Stepper::dirB, !Settings::Stepper::DIR_B_POLARITY),
+    m_sC(Pin::Stepper::stepC, Pin::Stepper::dirC, !Settings::Stepper::DIR_C_POLARITY),
+    targetA(0), targetB(0), targetC(0),
+    m_startA(0), m_startB(0), m_startC(0),
+    m_totalDistanceA(0), m_totalDistanceB(0), m_totalDistanceC(0),
+    m_totalTime(0), m_startTime(0)
+{
+    // Initialization of steppers acceleration parameters.
+    m_sA.setAcceleration(Settings::Stepper::MAX_ACCEL);
+    m_sB.setAcceleration(Settings::Stepper::MAX_ACCEL);
+    m_sC.setAcceleration(Settings::Stepper::MAX_ACCEL);
+    
+    m_sA.setDeceleration(Settings::Stepper::STOP_DECCEL);
+    m_sB.setDeceleration(Settings::Stepper::STOP_DECCEL);
+    m_sC.setDeceleration(Settings::Stepper::STOP_DECCEL);
 }
+    
+// Sets the target positions and computes the move parameters.
+void StepperController::setTarget(long posA, long posB, long posC) {
+    targetA = posA;
+    targetB = posB;
+    targetC = posC;
+    
+    // Record the current positions as the starting positions.
+    m_startA = m_sA.getPosition();
+    m_startB = m_sB.getPosition();
+    m_startC = m_sC.getPosition();
+    
+    // Compute absolute distances for each axis.
+    m_totalDistanceA = std::abs(targetA - m_startA);
+    m_totalDistanceB = std::abs(targetB - m_startB);
+    m_totalDistanceC = std::abs(targetC - m_startC);
+    
+    // Use the longest distance to compute the overall move time.
+    long maxDistance = std::max({m_totalDistanceA, m_totalDistanceB, m_totalDistanceC});
+    m_totalTime = computeMoveTime(maxDistance);
+    
+    // Record the starting time (in seconds).
+    m_startTime = micros() * 1e-6;
+    
+    Console::info() << "total time:" << m_totalTime << Console::endl;
 
-void StepperController::computeSynchronizedProfiles() {
-    std::vector<double> durations;
-    for (auto& stepper : steppers) {
-        durations.push_back(calcMinDuration(stepper.distanceToGo, Settings::Stepper::MAX_SPEED, Settings::Stepper::MAX_ACCEL));
-    }
-    double maxDuration = *std::max_element(durations.begin(), durations.end());
+    Console::info() << "m_totalDistanceA:" << m_totalDistanceA << Console::endl;
+    Console::info() << "m_totalDistanceB:" << m_totalDistanceB << Console::endl;
+    Console::info() << "m_totalDistanceC:" << m_totalDistanceC << Console::endl;
 
-    for (auto& stepper : steppers) {
-        computeProfile(stepper, maxDuration);
-    }
-}
-
-
-
-
-// Run: Called from the main loop to update the stepping profiles.
-// This function simulates one update interval where positions are recalculated
-// based on the motion profile. In a real system, this might update step delay values
-// or compute new positions using an incremental algorithm like Bresenham.
-void StepperController::run() {
-    // Static variable to simulate elapsed time in seconds.
-    static double elapsedTime = 0.0;
-    double dt = 0.01; // simulation time step (10ms) — for real implementation use precise timers
-    elapsedTime += dt;
-
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        StepperProfile &stepper = steppers[i];
-        if (elapsedTime >= stepper.totalTime) {
-            // If the motion time has elapsed, set the current position to the target.
-            stepper.currentPosition = stepper.distanceToGo;
-        } else {
-            double pos = 0.0;
-            if (elapsedTime < stepper.timeAccel) {
-                // Accelerating phase: s = 0.5 * a * t^2.
-                pos = 0.5 * stepper.acceleration * elapsedTime * elapsedTime;
-            } else if (elapsedTime < (stepper.timeAccel + stepper.timeFlat)) {
-                // Constant speed phase: s = s_accel + velocity * t.
-                double t = elapsedTime - stepper.timeAccel;
-                pos = 0.5 * stepper.acceleration * stepper.timeAccel * stepper.timeAccel + stepper.velocity * t;
-            } else {
-                // Deceleration phase: symmetric to acceleration.
-                double t = elapsedTime - stepper.timeAccel - stepper.timeFlat;
-                pos = stepper.distanceToGo - 0.5 * stepper.acceleration * (stepper.totalTime - elapsedTime) * (stepper.totalTime - elapsedTime);
-            }
-            stepper.currentPosition = pos;
-        }
-        // In an actual implementation, here you would use the difference between
-        // calculated position and the last step position to generate step pulses.
-    }
-}
-
-// Reset the controller and all steppers to their initial states.
-void StepperController::reset() {
+    // Clear any previous state.
     Job::reset();
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        steppers[i].distanceToGo = 0;
-        steppers[i].currentPosition = 0;
-        steppers[i].timeAccel = 0;
-        steppers[i].timeFlat = 0;
-        steppers[i].totalTime = 0;
-        steppers[i].lastStepTime = 0;
-    }
 }
-
-// Start the job and initialize any additional parameters.
+    
+// start() – Enable steppers, then begin the move.
 void StepperController::start() {
     Job::start();
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        // Reset the current position and last step time.
-        steppers[i].currentPosition = 0;
-        steppers[i].lastStepTime = 0;
+    m_sA.enable();
+    m_sB.enable();
+    m_sC.enable();
+    m_startTime = micros() * 1e-6;
+}
+
+// run() is called periodically (every STEPPER_COMPUTE_DELAY µs) to update the trajectory.
+// It computes the elapsed time and calculates desired instantaneous velocity based on a
+// synchronized profile. When paused, it checks for complete stop to recompute parameters.
+void StepperController::run() {
+    double currentTime = micros() * 1e-6;
+    double t = currentTime - m_startTime;
+    const int POSITION_THRESHOLD = 2;    // Acceptable error in steps
+    const double updateInterval = 0.05;    // Update profile every 50ms
+
+    if (isRunning()) {
+        // Only update the profile at discrete control points.
+
+            // --- Update each motor's desired velocity using the synchronous profile ---
+            // Motor A:
+            long deltaA = targetA - m_startA;
+            double signA = (deltaA >= 0) ? 1.0 : -1.0;
+            double v_desA = computeProfileVelocity(m_totalDistanceA, t, m_totalTime);
+            double a_effA = computeEffectiveAcceleration(m_totalDistanceA, m_totalTime);
+            m_sA.setAcceleration(a_effA);
+            m_sA.setDeceleration(a_effA);
+            m_sA.setTargetVelocity(signA * static_cast<float>(v_desA));
+
+            // Motor B:
+            long deltaB = targetB - m_startB;
+            double signB = (deltaB >= 0) ? 1.0 : -1.0;
+            double v_desB = computeProfileVelocity(m_totalDistanceB, t, m_totalTime);
+            double a_effB = computeEffectiveAcceleration(m_totalDistanceB, m_totalTime);
+            m_sB.setAcceleration(a_effB);
+            m_sB.setDeceleration(a_effB);
+            m_sB.setTargetVelocity(signB * static_cast<float>(v_desB));
+
+            // Motor C:
+            long deltaC = targetC - m_startC;
+            double signC = (deltaC >= 0) ? 1.0 : -1.0;
+            double v_desC = computeProfileVelocity(m_totalDistanceC, t, m_totalTime);
+            double a_effC = computeEffectiveAcceleration(m_totalDistanceC, m_totalTime);
+            m_sC.setAcceleration(a_effC);
+            m_sC.setDeceleration(a_effC);
+            m_sC.setTargetVelocity(signC * static_cast<float>(v_desC));
+
+
+        // Check if the current segment should be closed.
+        if ((currentTime - m_startTime) >= m_totalTime) {
+            long remA = std::abs(targetA - m_sA.getPosition());
+            long remB = std::abs(targetB - m_sB.getPosition());
+            long remC = std::abs(targetC - m_sC.getPosition());
+
+            if (remA < POSITION_THRESHOLD &&
+                remB < POSITION_THRESHOLD &&
+                remC < POSITION_THRESHOLD)
+            {
+                // All motors have reached (or are very near) their target:
+                complete();
+            }
+            else {
+                // Not finished: update the starting positions to the actual positions,
+                // recalc the remaining distances and segment time.
+                m_startA = m_sA.getPosition();
+                m_startB = m_sB.getPosition();
+                m_startC = m_sC.getPosition();
+
+                m_totalDistanceA = std::abs(targetA - m_startA);
+                m_totalDistanceB = std::abs(targetB - m_startB);
+                m_totalDistanceC = std::abs(targetC - m_startC);
+
+                long maxDistance = std::max({ m_totalDistanceA, m_totalDistanceB, m_totalDistanceC });
+                m_totalTime = computeMoveTime(maxDistance);
+                m_startTime = currentTime;
+            }
+        }
     }
-}
+    else if (isPaused()) {
+        // During pause, check until the steppers have nearly stopped, then reinitialize.
+        if (std::abs(m_sA.getVelocity()) < 10 &&
+            std::abs(m_sB.getVelocity()) < 10 &&
+            std::abs(m_sC.getVelocity()) < 10)
+        {
+            m_startA = m_sA.getPosition();
+            m_startB = m_sB.getPosition();
+            m_startC = m_sC.getPosition();
 
-// Pause the motion (for example, by disabling step pulse generation).
-void StepperController::pause() {
-    Job::pause();
-    // Here, disable any timers or motors if required.
-}
+            m_totalDistanceA = std::abs(targetA - m_startA);
+            m_totalDistanceB = std::abs(targetB - m_startB);
+            m_totalDistanceC = std::abs(targetC - m_startC);
 
-// Resume motion from a paused state.
-void StepperController::resume() {
-    Job::resume();
-    // Re-enable timers or reinitialize step counters as needed.
-}
-
-// Cancel the current motion: immediately stop the steppers.
-void StepperController::cancel() {
-    Job::cancel();
-    // For each stepper, stop motion and optionally reset the position.
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        // In hardware, you might disable the drivers; here we simply reset the position.
-        steppers[i].currentPosition = 0;
+            long maxDistance = std::max({ m_totalDistanceA, m_totalDistanceB, m_totalDistanceC });
+            m_totalTime = computeMoveTime(maxDistance);
+            m_startTime = currentTime;
+        }
     }
-}
-
-// Complete the job: finish motion, perform cleanup and reset state.
-void StepperController::complete() {
-    // Ensure each stepper has reached its target.
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        steppers[i].currentPosition = steppers[i].distanceToGo;
-        // Additional cleanup logic can be placed here.
-    }
-    // Optionally reset the controller state.
-}
-
-// The control function is meant to be called every ~10 microseconds (via a timer interrupt)
-// to generate actual step pulses for the motors. Here, we use a placeholder implementation.
-void StepperController::control() {
-    // In a real implementation, use a hardware timer to get the current time in microseconds.
-    static unsigned long lastControlTime = 0;
-    unsigned long currentTime = 0;  // Replace with actual hardware timer reading
-    unsigned long dt = currentTime - lastControlTime; // elapsed time in microseconds
-    if (dt < 10)
-        return;  // Ensure at least 10 microseconds have passed
-    lastControlTime = currentTime;
-
-    // Use a simple algorithm (or a Bresenham variant) to decide when to issue step pulses.
-    // Here, we use an error accumulator for each stepper.
-    static double error[STEPPER_COUNT] = {0.0, 0.0, 0.0};
-
-    for (int i = 0; i < STEPPER_COUNT; i++) {
-        StepperProfile &stepper = steppers[i];
-        // In a full implementation, targetPosition could be a step count computed from currentPosition.
-        double targetPosition = stepper.currentPosition;
-        // The following simulates an accumulator that increments to trigger a step.
-        error[i] += targetPosition - error[i];  // Update the error using a simplified model
-        if (error[i] >= 1.0) {
-            // Issue a step pulse here.
-            // In a real system, set the appropriate GPIO pin high then low.
-            error[i] -= 1.0;
-            // Optionally update a step counter or current hardware position.
+    else if (isCancelled()) {
+        if (std::abs(m_sA.getVelocity()) < 10 &&
+            std::abs(m_sB.getVelocity()) < 10 &&
+            std::abs(m_sC.getVelocity()) < 10) {
+            complete();
         }
     }
 }
 
-void StepperController::setTarget(Vec3 target){
-    steppers[0].distanceToGo = target.a;
-    steppers[1].distanceToGo = target.b;
-    steppers[2].distanceToGo = target.c;
-    computeSynchronizedProfiles();
+
+// control() is called at a higher frequency (every STEPPER_DELAY µs)
+// and simply delegates to each stepper's control() method.
+void StepperController::control() {
+    if(!isRunning()) return;
+    static long last_compute = micros();
+    if(micros() - last_compute > Settings::Stepper::STEPPER_COMPUTE_DELAY){
+        m_sA.control();
+        m_sB.control();
+        m_sC.control();
+        last_compute = micros();
+        
+    }
+
+    m_sA.step();
+    m_sB.step();
+    m_sC.step();
 }
-
-void StepperController::setTarget(float x, float y, float z ){
-    setTarget(Vec3(x,y,z));
-}
-
-double StepperController::calcMinDuration(double distance, double maxVel, double maxAcc) const {
-    double t_accel = maxVel / maxAcc;
-    double dist_accel = 0.5 * maxAcc * t_accel * t_accel;
-
-    if (2 * dist_accel >= distance) {
-        return 2 * sqrt(distance / maxAcc);
+    
+// computeMoveTime() – Using full acceleration and MAX_SPEED for the longest move.
+double StepperController::computeMoveTime(long maxDistance) {
+    double maxAccel = Settings::Stepper::MAX_ACCEL;
+    double maxSpeed = Settings::Stepper::MAX_SPEED;
+    double t_accel = maxSpeed / maxAccel;
+    double d_accel = 0.5 * maxAccel * t_accel * t_accel;
+    
+    if (maxDistance <= 2 * d_accel) {
+        // Triangular profile (never reaches MAX_SPEED)
+        return 2.0 * sqrt(static_cast<double>(maxDistance) / maxAccel);
     } else {
-        double dist_flat = distance - 2 * dist_accel;
-        double t_flat = dist_flat / maxVel;
-        return 2 * t_accel + t_flat;
+        // Trapezoidal profile.
+        double t_flat = (maxDistance - 2 * d_accel) / maxSpeed;
+        return 2.0 * t_accel + t_flat;
+    }
+}
+    
+// pause() – Set target velocities to zero and change state.
+void StepperController::pause() {
+    if (isRunning()) {
+        m_sA.setTargetVelocity(0);
+        m_sB.setTargetVelocity(0);
+        m_sC.setTargetVelocity(0);
+        Job::pause();
     }
 }
 
-void StepperController::computeProfile(StepperProfile &stepper, double targetDuration) const {
-    double acc = Settings::Stepper::MAX_ACCEL;
-    double vel = Settings::Stepper::MAX_SPEED;
-    double distance = stepper.distanceToGo;
-
-    if (distance < acc * targetDuration * targetDuration / 4) {
-        stepper.timeAccel = targetDuration / 2;
-        stepper.velocity = distance / stepper.timeAccel;
-        stepper.acceleration = stepper.velocity / stepper.timeAccel;
-        stepper.timeFlat = 0;
-    } else {
-        stepper.timeAccel = (acc * targetDuration - sqrt(acc * (acc * targetDuration * targetDuration - 4 * distance))) / (2 * acc);
-        stepper.velocity = acc * stepper.timeAccel;
-        stepper.acceleration = acc;
-        stepper.timeFlat = targetDuration - 2 * stepper.timeAccel;
+// resume() – When in Paused state, simply restart the move using new start time.
+void StepperController::resume() {
+    if (isPaused()) {
+        m_startTime = micros() * 1e-6;
+        Job::resume();
     }
-    stepper.totalTime = targetDuration;
 }
+
+// complete() – Immediately stop and reset the trajectory data, then disable the steppers.
+void StepperController::complete() {
+    m_sA.setTargetVelocity(0);
+    m_sB.setTargetVelocity(0);
+    m_sC.setTargetVelocity(0);
+    m_sA.disable();
+    m_sB.disable();
+    m_sC.disable();
+    // Reset internal move parameters.
+    m_startA = m_startB = m_startC = 0;
+    targetA = targetB = targetC = 0;
+    m_totalDistanceA = m_totalDistanceB = m_totalDistanceC = 0;
+    m_totalTime = 0;
+    m_startTime = 0;
+    Job::complete();
+}
+
+// cancel() – Decelerate (using pause) then complete the move.
+void StepperController::cancel() {
+    Job::cancel();
+    pause();
+}
+
+// reset() – If a move is running, cancel it; then reset all internal parameters.
+void StepperController::reset() {
+    if (isRunning()) {
+        cancel();
+    }
+    Job::reset();
+    m_startA = m_startB = m_startC = 0;
+    targetA = targetB = targetC = 0;
+    m_totalDistanceA = m_totalDistanceB = m_totalDistanceC = 0;
+    m_totalTime = 0;
+    m_startTime = 0;
+
+    m_sA.setPosition(0);
+    m_sB.setPosition(0);
+    m_sC.setPosition(0);
+}
+
+// Helper: computeEffectiveAcceleration()
+// For a given distance and total time, use a triangular profile if the ideal peak velocity is below MAX_SPEED;
+// otherwise, compute an effective acceleration that prolongs the move (trapezoidal profile).
+double StepperController::computeEffectiveAcceleration(long distance, double totalTime) {
+    double maxSpeed = Settings::Stepper::MAX_SPEED;
+    // If the ideal triangular peak velocity (2D/T) is lower than MAX_SPEED, use a triangular profile.
+    if (2.0 * distance / totalTime <= maxSpeed) {
+        return 4.0 * distance / (totalTime * totalTime);
+    } else {
+        // Trapezoidal: Determine the acceleration time (t1) needed to reach MAX_SPEED in this stretched move.
+        double t1 = totalTime - static_cast<double>(distance) / maxSpeed;
+        return maxSpeed / t1;
+    }
+}
+
+// Helper: computeProfileVelocity()
+// For a move of (absolute) distance D to be completed in totalTime seconds,
+// compute the desired instantaneous velocity at elapsed time t.
+double StepperController::computeProfileVelocity(long distance, double t, double totalTime) {
+    double maxSpeed = Settings::Stepper::MAX_SPEED;
+    if (2.0 * distance / totalTime <= maxSpeed) {
+        // Triangular profile.
+        double a_eff = 4.0 * distance / (totalTime * totalTime);
+        if (t < totalTime / 2.0)
+            return a_eff * t;
+        else
+            return a_eff * (totalTime - t);
+    } else {
+        // Trapezoidal profile.
+        double t1 = totalTime - static_cast<double>(distance) / maxSpeed;
+        double a_eff = maxSpeed / t1;
+        if (t < t1)
+            return a_eff * t;
+        else if (t <= (totalTime - t1))
+            return maxSpeed;
+        else
+            return a_eff * (totalTime - t);
+    }
+}
+
+

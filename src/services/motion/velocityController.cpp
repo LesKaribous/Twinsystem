@@ -12,8 +12,6 @@ VelocityController::VelocityController() :
     m_target_velocity(0, 0, 0), m_current_velocity(0, 0, 0),
     m_pid_integral(0, 0, 0), m_pid_last_error(0, 0, 0),
     m_kp(Settings::Motion::kP), m_ki(Settings::Motion::kI), m_kd(Settings::Motion::kD) { 
-
-    pinMode(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
 }
 
 void VelocityController::setPIDGains(float kp, float ki, float kd) {
@@ -22,9 +20,7 @@ void VelocityController::setPIDGains(float kp, float ki, float kd) {
     m_kd = kd;
 }
 
-void VelocityController::enable(){
-    digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
-   
+void VelocityController::enable(){   
     m_sA.enable();
     m_sB.enable();
     m_sC.enable();
@@ -32,8 +28,6 @@ void VelocityController::enable(){
 }
 
 void VelocityController::disable(){
-    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
-
     m_sA.disable();
     m_sB.disable();
     m_sC.disable();
@@ -44,9 +38,9 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
     if(targetVelocity.a == 0 && targetVelocity.b == 0 && targetVelocity.c == 0){
         m_target_velocity = Vec3(0);
 
-        m_sA.setTargetVelocity(0);
-        m_sB.setTargetVelocity(0);
-        m_sC.setTargetVelocity(0);
+        m_sA.setVelocity(0);
+        m_sB.setVelocity(0);
+        m_sC.setVelocity(0);
         return;
     }
 
@@ -63,9 +57,9 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
         m_target_velocity = target;
     }
 
-    m_sA.setTargetVelocity(m_target_velocity.a);
-    m_sB.setTargetVelocity(m_target_velocity.b);
-    m_sC.setTargetVelocity(m_target_velocity.c);
+    m_sA.setVelocity(m_target_velocity.a);
+    m_sB.setVelocity(m_target_velocity.b);
+    m_sC.setVelocity(m_target_velocity.c);
 }
 
 

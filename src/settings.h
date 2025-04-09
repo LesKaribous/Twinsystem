@@ -125,8 +125,8 @@ namespace Settings{
         constexpr int
         PULSE_WIDTH = 14, //https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf   page 63
         STEPS_PER_REVOLUTION = 200,
-        STOP_DECCEL = 5000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 10000, // equivalent fullsteps/s^2
+        STOP_DECCEL = 2000, // equivalent fullsteps/s^2
+        MAX_ACCEL = 2000, // equivalent fullsteps/s^2
         MAX_SPEED = 8000, // equivalent fullsteps/s
         MIN_SPEED = 20,
         STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds

@@ -10,10 +10,8 @@
 
 INSTANTIATE_SERVICE(Motion, motion)
 
-Motion::Motion() : Service(ID_MOTION)/*,         
-    _sA(Pin::Stepper::stepA, Pin::Stepper::dirA),
-    _sB(Pin::Stepper::stepB, Pin::Stepper::dirB),
-    _sC(Pin::Stepper::stepC, Pin::Stepper::dirC)*/{
+Motion::Motion() : Service(ID_MOTION){
+    disengage();
 }
 
 void Motion::onAttach(){
@@ -29,6 +27,8 @@ void Motion::onAttach(){
     _controlPoint   = {0,0};
 	_absolute = true;
 
+    pinMode(Pin::Stepper::enable, OUTPUT);
+
 }
 
 void Motion::onUpdate(){
@@ -40,13 +40,21 @@ void Motion::onUpdate(){
             complete();
         }
         estimatePosition();
-        controller.run();
+
+        if(use_cruise_mode)
+            cruise_controller.run();
+        else 
+            stepper_controller.run();
     }
 }
 
 void Motion::control(){
-    if(enabled())
-        controller.control();
+    if(enabled()){
+        if(use_cruise_mode)
+            cruise_controller.control();
+        else
+            stepper_controller.control();
+    }
 }
 
 void Motion::enable(){
@@ -57,15 +65,23 @@ void Motion::disable(){
     Service::disable();
 }
 
+void Motion::engage(){
+    digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
+}
+
+void Motion::disengage(){
+    digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
+}
+
 Motion& Motion::go(float x, float y){
-    setStepsVelocity(Settings::Motion::MAX_SPEED);
+    //setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     go(Vec2(x, y));
     return *this;
 }
 
 Motion& Motion::goPolar(float heading, float dist){
-    setStepsVelocity(Settings::Motion::MAX_SPEED);
+    //setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
     if (_absolute){
@@ -140,16 +156,42 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     Job::start(); //robot is moving from now
 
     //resetSteps();
-    controller.setPosition(_position);
-    controller.setTarget(_target);
-    if(m_async){ 
-        controller.start();
+    if(use_cruise_mode){
+        cruise_controller.reset();
+        cruise_controller.setPosition(_position);
+        cruise_controller.setTarget(_target);
+    }else{
+    Vec3 _relTarget = toRelativeTarget(_target);
+        if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
+        Vec3 steps = ik(_relTarget);
+        Console::println(steps);
+        Console::println(_target);
+        Console::println(_relTarget);
+        stepper_controller.reset();
+        stepper_controller.setTarget(steps.a, steps.b, steps.c);
+    }
+
+
+    if(m_async){
+        if(use_cruise_mode) cruise_controller.start();
+        else stepper_controller.start();
+        Console::println("start");
     }
     else{
-        controller.start();
-        while (controller.isPending()){
-            controller.run();
+        if(use_cruise_mode){
+            cruise_controller.start();
+            Console::println("start");
+            while (cruise_controller.isPending()){
+                cruise_controller.run();
+            }
+        }else{ 
+            stepper_controller.start();
+            Console::println("start");
+            while (stepper_controller.isPending()){
+                stepper_controller.run();
+            }
         }
+
         complete();
     }
     
@@ -163,34 +205,51 @@ void Motion::run(){
 
 void Motion::pause(){
     Job::pause();
-    controller.pause();
+    if(use_cruise_mode){
+        cruise_controller.pause();
+    }else{
+        stepper_controller.pause();
+    }
 }
 
 void Motion::resume(){
     Job::resume();
-    controller.resume();
+    if(use_cruise_mode){
+        cruise_controller.resume();
+    }else{
+        stepper_controller.resume();
+    }
 }
 
 bool Motion::hasFinished() {
-    return controller.isCompleted();
+    if(use_cruise_mode)
+        return cruise_controller.isCompleted();
+    else
+        return stepper_controller.isCompleted();
 }
 
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        controller.cancel();
-        while (!controller.isCompleted())
-        {
-            controller.run();
+        if(use_cruise_mode){
+            while (!cruise_controller.isCompleted()){
+                cruise_controller.run();
+            }
+        }else{
+            while (!stepper_controller.isCompleted()){
+                stepper_controller.run();
+            }
         }
     }
+
     estimatePosition();
     _isMoving = false;
     _isRotating = false;
     //_startPosition = _position = _startPosition + controller.getPosition();
     localisation.onUpdate();
     _startPosition = _position = localisation.getPosition();
-    controller.reset();
+    stepper_controller.reset();
+    cruise_controller.reset();
 
     // _sA.setPosition(0);
     // _sB.setPosition(0);
@@ -202,14 +261,21 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
-    controller.complete();
+    if(use_cruise_mode){
+        cruise_controller.complete();
+    }else{
+        stepper_controller.complete();
+    }
+
     _isMoving = false;
     _isRotating = false;
 
     //_startPosition = _position = _startPosition + controller.getPosition();
     localisation.onUpdate();
     _startPosition = _position = localisation.getPosition();
-    controller.reset();
+    stepper_controller.reset();
+    cruise_controller.reset();
+    
     // _sA.setPosition(0);
     // _sB.setPosition(0);
     // _sC.setPosition(0);
@@ -222,7 +288,8 @@ void Motion::complete() {
 void Motion::forceCancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        controller.complete();
+        cruise_controller.complete();
+        stepper_controller.complete();
     }
     estimatePosition();
     _isMoving = false;
@@ -230,7 +297,8 @@ void Motion::forceCancel() {
     //_startPosition = _position = _startPosition + controller.getPosition();
     localisation.onUpdate();
     _startPosition = _position = localisation.getPosition();
-    controller.reset();
+    cruise_controller.reset();
+    stepper_controller.reset();
 
     // _sA.setPosition(0);
     // _sB.setPosition(0);
@@ -264,13 +332,25 @@ void Motion::disableOptimization(){
     _optimizeRotation = false;
 }
 
+void Motion::enableCruiseMode(){
+    if(isMoving())
+        Console::error("Motion") << "Cruise mode cannot be toggled while moving" << Console::endl;
+    use_cruise_mode = true;
+}
+
+void Motion::disableCruiseMode(){
+    if(isMoving())
+        Console::error("Motion") << "Cruise mode cannot be toggled while moving" << Console::endl;
+    use_cruise_mode = false;
+}
+
 void  Motion::estimatePosition(){ //We are not using the estimated velocity to prevent error accumulation. We used last steps instead.
 
     localisation.onUpdate();
     Vec3 position = localisation.getPosition();
     if(position != _position){
         _position = position;
-        controller.setPosition(localisation.getPosition());
+        cruise_controller.setPosition(localisation.getPosition());
     }
     /*
     Vec3 steps = getLastSteps(); //Read steps counter
@@ -340,8 +420,13 @@ Vec3  Motion::getAbsTarget() const{
     return _target;
 }
 
+float Motion::getTargetDirection() const
+{
+    return 0.0f;
+}
 
-float Motion::getAbsoluteTargetDirection() const{
+float Motion::getAbsoluteTargetDirection() const
+{
     return Vec2(_target - _position).heading();
 }
 
@@ -357,7 +442,6 @@ bool  Motion::isRelative() const{
     return !_absolute;
 }
 
-
 bool Motion::isRotating() const{
     return (Job::isPending() &&  _isRotating);
 }
@@ -366,19 +450,11 @@ bool Motion::isMoving() const{
     return (Job::isPending() && _isMoving);
 }
 
-
-
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
     localisation.setPosition(newPos);
     //if(_useBNO) setOrientation(newPos.c);
-}
-
-void Motion::setStepsVelocity(float v){
-    // _sA.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
-    // _sB.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
-    // _sC.setMaxSpeed(min(max(m_feedrate * v*Settings::Stepper::STEP_MODE, Settings::Motion::PULLIN*Settings::Stepper::STEP_MODE), Settings::Motion::SPEED*Settings::Stepper::STEP_MODE));
 }
 
 void Motion::setAbsTarget(Vec3 newTarget)

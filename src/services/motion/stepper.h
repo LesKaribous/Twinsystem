@@ -18,6 +18,7 @@ class Stepper {
     void enable();
     void disable();
     
+    void setVelocity(float velocity);
     void setTargetVelocity(float velocity);
     void setAcceleration(float accel);
     void setDeceleration(float decel);

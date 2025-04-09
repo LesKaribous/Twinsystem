@@ -24,6 +24,7 @@ void Stepper::disable() {
     m_enabled = false;
     m_target_velocity = 0;
     m_current_velocity = 0;
+    m_step_delay = 0;
 }
 
 void Stepper::setDirection(bool forward) {
@@ -38,6 +39,12 @@ void Stepper::setDirection(bool forward) {
 
 void Stepper::setTargetVelocity(float velocity) {
     m_target_velocity = constrain(velocity, -Settings::Stepper::MAX_SPEED, Settings::Stepper::MAX_SPEED);
+    //m_step_delay = 1.0e6 / fabs(m_target_velocity * Settings::Stepper::STEP_MODE);
+}
+
+void Stepper::setVelocity(float velocity) {
+    m_target_velocity = m_current_velocity = constrain(velocity, -Settings::Stepper::MAX_SPEED, Settings::Stepper::MAX_SPEED);
+    m_step_delay = 1.0e6f / fabs(m_current_velocity);
     //m_step_delay = 1.0e6 / fabs(m_target_velocity * Settings::Stepper::STEP_MODE);
 }
 
@@ -59,7 +66,7 @@ bool Stepper::isRunning() const
 }
 
 void Stepper::control() {
-    //if (!m_enabled) return;
+    if (!m_enabled) return;
     double dt = double(Settings::Stepper::STEPPER_COMPUTE_DELAY) * 1.0e-6; // Convert µs to seconds
 
     double direction = ((m_target_velocity > m_current_velocity) ? 1.0f : -1.0f);
@@ -93,8 +100,11 @@ void Stepper::control() {
 }
 
 void Stepper::step() {
-    //if (!m_enabled) return;
-    if(m_step_delay == 0) return;
+    if (!m_enabled) return;
+    if(m_step_delay == 0){
+        //Console::println(0);
+        return;
+    }
 
     if (micros() - m_last_step_time > m_step_delay) {
 
