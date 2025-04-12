@@ -26,6 +26,8 @@ struct  CalibrationProfile{
          Cartesian;
 };
 
+typedef bool Color;
+
 // Namespace
 namespace Settings{
     namespace Threads{
@@ -33,16 +35,19 @@ namespace Settings{
         constexpr int DEFAULT_STACKSIZE = 1024; //ms 
     }
     
+    constexpr bool
+    PRIMARY   = false,
+    SECONDARY = !PRIMARY,
+
+    COLOR_A  = true,
+    COLOR_B  = !COLOR_A,
+    YELLOW = COLOR_A,
+    BLUE = COLOR_B;
+
     namespace Match{
         constexpr bool 
         AVOIDANCE = true,
-        NO_AVOIDANCE = !AVOIDANCE,
-
-        PRIMARY   = false,
-        SECONDARY = !PRIMARY,
-
-        COLOR_A  = false,
-        COLOR_B  = !COLOR_A;
+        NO_AVOIDANCE = !AVOIDANCE;
 
         constexpr short
         STRAT_PRIMARY_A = false,
@@ -126,12 +131,14 @@ namespace Settings{
         PULSE_WIDTH = 14, //https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf   page 63
         STEPS_PER_REVOLUTION = 200,
         STOP_DECCEL = 2000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 2000, // equivalent fullsteps/s^2
+        MAX_ACCEL = 1000, // equivalent fullsteps/s^2
         MAX_SPEED = 8000, // equivalent fullsteps/s
         MIN_SPEED = 20,
         STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
+        MIN_STEP_DELAY = 20,
         STEPPER_COMPUTE_DELAY = 1000,//µs Steps every 1000 µs seconds
-        PULLIN = 10; //fullsteps/s
+        PULL_IN = 100,//fullsteps/s
+        PULL_OUT = 100; //fullsteps/s
 
         constexpr u_int8_t 
         STEP_MODE = 8;

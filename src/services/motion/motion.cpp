@@ -144,10 +144,10 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
             return *this;
         }
     }
-    _target = target; Console::trace("Motion") << "Target is " << _target << Console::endl;
+    _target = target; Console::info("Motion") << "Target is " << _target << Console::endl;
 
     //to relative step target 
-    Console::trace("Motion") << "Position is " << _position << Console::endl;
+    Console::info("Motion") << "Position is " << _position << Console::endl;
     //Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
     //if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
     //_stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
@@ -383,29 +383,11 @@ void Motion::resetCompass(){
 }
 
 void Motion::setOrientation(float orientation){
-    /*
-    if(!_useBNO) return;
-    while(orientation > PI) orientation-= 2.0f*PI;
-    while(orientation <= -PI) orientation += 2.0f*PI;
-    compassOffset -= getOrientation() - orientation;
-    Console::println(compassOffset*RAD_TO_DEG);
-    */
+    _position.c = orientation;
 }
 
 float Motion::getOrientation(){
-    //if(!_useBNO) return _position.c;
-    /*
-    if(millis() - lastBNOCheck > 50){
-        sensors_event_t eventAngular;
-        bno.getEvent(&eventAngular, Adafruit_BNO055::VECTOR_EULER);
-        float orientation = (- DEG_TO_RAD * eventAngular.orientation.x) - compassReference + compassOffset;
-
-        orientation = fmod(orientation, TWO_PI);
-        if(orientation < 0) orientation += 2.0f*PI;
-        return  orientation;
-    }else return _position.c;
-    */
-    return 0;
+    return _position.c;
 }
 
 // -------------------------------

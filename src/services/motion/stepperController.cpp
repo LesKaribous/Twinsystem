@@ -4,6 +4,77 @@
 #include <cmath>
 #include <cstdlib>
 
+
+int32_t LinStepAccelerator::prepare(int32_t currentPos, int32_t targetPos, uint32_t targetSpeed, uint32_t vStart, uint32_t vEnd, uint32_t accel) {
+    vTarget = targetSpeed;
+    this->vStart = vStart;
+    this->vEnd = vEnd;
+    this->twoA = 2 * accel;
+
+    s0 = currentPos;
+    ds = std::abs(targetPos - currentPos);
+
+    vStart2 = (int64_t)vStart * vStart;
+    vEnd2   = (int64_t)vEnd   * vEnd;
+    vTarget2 = (int64_t)vTarget * vTarget;
+
+    int32_t sm = ((vEnd2 - vStart2) / twoA + ds) / 2;
+
+    if (sm >= 0 && sm <= ds) {
+        int32_t sa = (vTarget2 - vStart2) / twoA;
+        if (sa < sm) {
+            accEnd = sa;
+            decStart = sm + (sm - sa);
+        } else {
+            accEnd = decStart = sm;
+        }
+    } else {
+        // Bad input
+        Console::error("Planner") << "Planner return bad input" << Console::endl;
+        accEnd = decStart = ds;
+    }
+
+    return vStart;
+}
+
+int32_t LinStepAccelerator::updateSpeed(int32_t currentPos) {
+    int32_t s = std::abs(currentPos - s0);
+
+    if (s < accEnd)
+        return std::sqrt((float)(twoA * s + vStart2));
+    if (s < decStart)
+        return vTarget;
+    if (s < ds)
+        return std::sqrt((float)(twoA * (ds - s - 1) + vEnd2));
+    
+    return 0;
+}
+
+uint32_t LinStepAccelerator::initiateStop(int32_t currentPos) {
+    const int32_t s = std::abs(currentPos - s0);
+    const int32_t MIN_DECEL_STEPS = 4;
+
+    if (s < accEnd) {
+        // Still accelerating: symmetrically decelerate over same distance
+        accEnd = decStart = 0;
+        ds = 2 * s;
+        return std::max(s, MIN_DECEL_STEPS);
+    } 
+    else if (s < decStart) {
+        // Constant-speed segment: use acceleration to decelerate
+        decStart = 0;
+        ds = s + accEnd;
+        return std::max(accEnd, MIN_DECEL_STEPS);
+    } 
+    else {
+        // Already decelerating: return what's left
+        int32_t remaining = ds - s;
+        return (remaining > 0) ? std::max(remaining, MIN_DECEL_STEPS) : 0;
+    }
+}
+
+
+
 // Constructor.
 StepperController::StepperController() : 
     m_sA(Pin::Stepper::stepA, Pin::Stepper::dirA, !Settings::Stepper::DIR_A_POLARITY),
@@ -24,38 +95,20 @@ StepperController::StepperController() :
     m_sC.setDeceleration(Settings::Stepper::STOP_DECCEL);
 }
     
-// Sets the target positions and computes the move parameters.
+
 void StepperController::setTarget(long posA, long posB, long posC) {
     targetA = posA;
     targetB = posB;
     targetC = posC;
-    
-    // Record the current positions as the starting positions.
-    m_startA = m_sA.getPosition();
-    m_startB = m_sB.getPosition();
-    m_startC = m_sC.getPosition();
-    
-    // Compute absolute distances for each axis.
-    m_totalDistanceA = std::abs(targetA - m_startA);
-    m_totalDistanceB = std::abs(targetB - m_startB);
-    m_totalDistanceC = std::abs(targetC - m_startC);
-    
-    // Use the longest distance to compute the overall move time.
-    long maxDistance = std::max({m_totalDistanceA, m_totalDistanceB, m_totalDistanceC});
-    m_totalTime = computeMoveTime(maxDistance);
-    
-    // Record the starting time (in seconds).
-    m_startTime = micros() * 1e-6;
-    
-    Console::info() << "total time:" << m_totalTime << Console::endl;
 
-    Console::info() << "m_totalDistanceA:" << m_totalDistanceA << Console::endl;
-    Console::info() << "m_totalDistanceB:" << m_totalDistanceB << Console::endl;
-    Console::info() << "m_totalDistanceC:" << m_totalDistanceC << Console::endl;
+    // Save original target positions for resume support
+    m_finalTargetA = posA;
+    m_finalTargetB = posB;
+    m_finalTargetC = posC;
 
-    // Clear any previous state.
     Job::reset();
 }
+
     
 // start() – Enable steppers, then begin the move.
 void StepperController::start() {
@@ -63,167 +116,244 @@ void StepperController::start() {
     m_sA.enable();
     m_sB.enable();
     m_sC.enable();
+
+
+    m_startA = m_sA.getPosition();
+    m_startB = m_sB.getPosition();
+    m_startC = m_sC.getPosition();
+
+    m_deltaA = std::abs(targetA - m_startA);
+    m_deltaB = std::abs(targetB - m_startB);
+    m_deltaC = std::abs(targetC - m_startC);
+
+    // Determine lead motor
+    if (m_deltaA >= m_deltaB && m_deltaA >= m_deltaC) {
+        m_leadStepper = &m_sA;
+        m_leadDelta = m_deltaA;
+    } else if (m_deltaB >= m_deltaA && m_deltaB >= m_deltaC) {
+        m_leadStepper = &m_sB;
+        m_leadDelta = m_deltaB;
+    } else {
+        m_leadStepper = &m_sC;
+        m_leadDelta = m_deltaC;
+    }
+
+    uint32_t targetSpeed = Settings::Stepper::MAX_SPEED;
+    uint32_t vStart = Settings::Stepper::PULL_IN;
+    uint32_t vEnd = Settings::Stepper::PULL_OUT;
+    uint32_t accel = Settings::Stepper::MAX_ACCEL;
+
+    m_planner.prepare(m_leadStepper->getPosition(), m_leadStepper == &m_sA ? targetA : m_leadStepper == &m_sB ? targetB : targetC,
+                      targetSpeed, vStart, vEnd, accel);
+
+    m_errorB = 2 * m_deltaB - m_leadDelta;
+    m_errorC = 2 * m_deltaC - m_leadDelta;
+
+    m_stepsDoneA = m_stepsDoneB = m_stepsDoneC = 0;
     m_startTime = micros() * 1e-6;
+
+    if (m_leadStepper == &m_sA)      m_leadStepsDone = &m_stepsDoneA;
+    else if (m_leadStepper == &m_sB) m_leadStepsDone = &m_stepsDoneB;
+    else if (m_leadStepper == &m_sC) m_leadStepsDone = &m_stepsDoneC;
+
+
+
+
+    m_startTime = micros() * 1e-6;
+
+    m_stepsDoneA = m_stepsDoneB = m_stepsDoneC = 0;
+
+
+    if (m_leadStepper == nullptr || m_leadDelta == 0) {
+        Console::error("setTarget") << "Lead stepper not assigned properly!" << Console::endl;
+        complete(); // or throw an assert if critical
+    }
+    
 }
 
-// run() is called periodically (every STEPPER_COMPUTE_DELAY µs) to update the trajectory.
-// It computes the elapsed time and calculates desired instantaneous velocity based on a
-// synchronized profile. When paused, it checks for complete stop to recompute parameters.
 void StepperController::run() {
-    double currentTime = micros() * 1e-6;
-    double t = currentTime - m_startTime;
-    const int POSITION_THRESHOLD = 2;    // Acceptable error in steps
-    const double updateInterval = 0.05;    // Update profile every 50ms
+    if (!isPending()) return;
 
-    if (isRunning()) {
-        // Only update the profile at discrete control points.
+    int32_t speed = m_planner.updateSpeed(m_leadStepper->getPosition());
 
-            // --- Update each motor's desired velocity using the synchronous profile ---
-            // Motor A:
-            long deltaA = targetA - m_startA;
-            double signA = (deltaA >= 0) ? 1.0 : -1.0;
-            double v_desA = computeProfileVelocity(m_totalDistanceA, t, m_totalTime);
-            double a_effA = computeEffectiveAcceleration(m_totalDistanceA, m_totalTime);
-            m_sA.setAcceleration(a_effA);
-            m_sA.setDeceleration(a_effA);
-            m_sA.setTargetVelocity(signA * static_cast<float>(v_desA));
-
-            // Motor B:
-            long deltaB = targetB - m_startB;
-            double signB = (deltaB >= 0) ? 1.0 : -1.0;
-            double v_desB = computeProfileVelocity(m_totalDistanceB, t, m_totalTime);
-            double a_effB = computeEffectiveAcceleration(m_totalDistanceB, m_totalTime);
-            m_sB.setAcceleration(a_effB);
-            m_sB.setDeceleration(a_effB);
-            m_sB.setTargetVelocity(signB * static_cast<float>(v_desB));
-
-            // Motor C:
-            long deltaC = targetC - m_startC;
-            double signC = (deltaC >= 0) ? 1.0 : -1.0;
-            double v_desC = computeProfileVelocity(m_totalDistanceC, t, m_totalTime);
-            double a_effC = computeEffectiveAcceleration(m_totalDistanceC, m_totalTime);
-            m_sC.setAcceleration(a_effC);
-            m_sC.setDeceleration(a_effC);
-            m_sC.setTargetVelocity(signC * static_cast<float>(v_desC));
-
-
-        // Check if the current segment should be closed.
-        if ((currentTime - m_startTime) >= m_totalTime) {
-            long remA = std::abs(targetA - m_sA.getPosition());
-            long remB = std::abs(targetB - m_sB.getPosition());
-            long remC = std::abs(targetC - m_sC.getPosition());
-
-            if (remA < POSITION_THRESHOLD &&
-                remB < POSITION_THRESHOLD &&
-                remC < POSITION_THRESHOLD)
-            {
-                // All motors have reached (or are very near) their target:
-                complete();
-            }
-            else {
-                // Not finished: update the starting positions to the actual positions,
-                // recalc the remaining distances and segment time.
-                m_startA = m_sA.getPosition();
-                m_startB = m_sB.getPosition();
-                m_startC = m_sC.getPosition();
-
-                m_totalDistanceA = std::abs(targetA - m_startA);
-                m_totalDistanceB = std::abs(targetB - m_startB);
-                m_totalDistanceC = std::abs(targetC - m_startC);
-
-                long maxDistance = std::max({ m_totalDistanceA, m_totalDistanceB, m_totalDistanceC });
-                m_totalTime = computeMoveTime(maxDistance);
-                m_startTime = currentTime;
-            }
+    if (speed > 0) {
+        if (m_deltaA > 0) {
+            // Instead of computing µs delay:
+            float velA = speed * (m_deltaA / (float)m_leadDelta);
+            float final_vel = (targetA >= m_startA ? 1 : -1) * velA;
+            m_sA.setVelocity(final_vel);
+            //Console::info("StepperA") << final_vel << Console::endl;
         }
-    }
-    else if (isPaused()) {
-        // During pause, check until the steppers have nearly stopped, then reinitialize.
-        if (std::abs(m_sA.getVelocity()) < 10 &&
-            std::abs(m_sB.getVelocity()) < 10 &&
-            std::abs(m_sC.getVelocity()) < 10)
-        {
-            m_startA = m_sA.getPosition();
-            m_startB = m_sB.getPosition();
-            m_startC = m_sC.getPosition();
 
-            m_totalDistanceA = std::abs(targetA - m_startA);
-            m_totalDistanceB = std::abs(targetB - m_startB);
-            m_totalDistanceC = std::abs(targetC - m_startC);
+        if (m_deltaB > 0) {
+            float velB = speed * (m_deltaB / (float)m_leadDelta);
+            float final_vel = (targetB >= m_startB ? 1 : -1) * velB;
+            m_sB.setVelocity(final_vel);
+            //Console::info("StepperB") << final_vel << Console::endl;
+        }
 
-            long maxDistance = std::max({ m_totalDistanceA, m_totalDistanceB, m_totalDistanceC });
-            m_totalTime = computeMoveTime(maxDistance);
-            m_startTime = currentTime;
+        if (m_deltaC > 0) {
+            float velC = speed * (m_deltaC / (float)m_leadDelta);
+            float final_vel = (targetC >= m_startC ? 1 : -1) * velC;
+            m_sC.setVelocity(final_vel);
+            //Console::info("StepperC") << final_vel << Console::endl;
         }
-    }
-    else if (isCancelled()) {
-        if (std::abs(m_sA.getVelocity()) < 10 &&
-            std::abs(m_sB.getVelocity()) < 10 &&
-            std::abs(m_sC.getVelocity()) < 10) {
-            complete();
-        }
+
+    } else {
+        Console::success() << Console::microTimeStamp() << " : Motion complete (speed = 0)" << Console::endl;
+        complete();
     }
 }
 
 
-// control() is called at a higher frequency (every STEPPER_DELAY µs)
-// and simply delegates to each stepper's control() method.
-void StepperController::control() {
-    if(!isRunning()) return;
-    static long last_compute = micros();
-    if(micros() - last_compute > Settings::Stepper::STEPPER_COMPUTE_DELAY){
-        m_sA.control();
-        m_sB.control();
-        m_sC.control();
-        last_compute = micros();
-        
-    }
 
+
+void StepperController::control() {
+    if (!isPending()) return;
+
+    // --- Always step the motors (high-frequency) ---
     m_sA.step();
     m_sB.step();
     m_sC.step();
-}
-    
-// computeMoveTime() – Using full acceleration and MAX_SPEED for the longest move.
-double StepperController::computeMoveTime(long maxDistance) {
-    double maxAccel = Settings::Stepper::MAX_ACCEL;
-    double maxSpeed = Settings::Stepper::MAX_SPEED;
-    double t_accel = maxSpeed / maxAccel;
-    double d_accel = 0.5 * maxAccel * t_accel * t_accel;
-    
-    if (maxDistance <= 2 * d_accel) {
-        // Triangular profile (never reaches MAX_SPEED)
-        return 2.0 * sqrt(static_cast<double>(maxDistance) / maxAccel);
-    } else {
-        // Trapezoidal profile.
-        double t_flat = (maxDistance - 2 * d_accel) / maxSpeed;
-        return 2.0 * t_accel + t_flat;
+
+    // --- Run control logic less frequently ---
+    static unsigned long last_compute = micros();
+    if (micros() - last_compute < Settings::Stepper::STEPPER_COMPUTE_DELAY) return;
+    last_compute = micros();
+
+    bool steppedLead = false;
+
+    // --- Step lead stepper ---
+    if (*m_leadStepsDone < m_leadDelta && m_leadStepper->shouldStep()) {
+        m_leadStepper->step();
+        (*m_leadStepsDone)++;
+        steppedLead = true;
+        // Console::info("Lead stepper stepped. Total: ") << *m_leadStepsDone << Console::endl;
+    }
+
+    // --- Step B if not lead ---
+    if (&m_sB != m_leadStepper && m_stepsDoneB < m_deltaB && steppedLead) {
+        m_errorB += 2 * m_deltaB;
+        if (m_errorB >= m_leadDelta) {
+            m_sB.step();
+            m_stepsDoneB++;
+            m_errorB -= 2 * m_leadDelta;
+        }
+    }
+
+    // --- Step C if not lead ---
+    if (&m_sC != m_leadStepper && m_stepsDoneC < m_deltaC && steppedLead) {
+        m_errorC += 2 * m_deltaC;
+        if (m_errorC >= m_leadDelta) {
+            m_sC.step();
+            m_stepsDoneC++;
+            m_errorC -= 2 * m_leadDelta;
+        }
+    }
+
+    // --- Step A if not lead ---
+    if (&m_sA != m_leadStepper && m_stepsDoneA < m_deltaA && steppedLead) {
+        m_errorA += 2 * m_deltaA;
+        if (m_errorA >= m_leadDelta) {
+            m_sA.step();
+            m_stepsDoneA++;
+            m_errorA -= 2 * m_leadDelta;
+        }
+    }
+
+    // --- Check if all steppers are done ---
+    if (m_stepsDoneA >= m_deltaA &&
+        m_stepsDoneB >= m_deltaB &&
+        m_stepsDoneC >= m_deltaC)
+    {
+        Console::success() << Console::microTimeStamp() << " : All axes complete, calling complete()" << Console::endl;
+        complete();
     }
 }
+
+
+
+
     
 // pause() – Set target velocities to zero and change state.
 void StepperController::pause() {
-    if (isRunning()) {
-        m_sA.setTargetVelocity(0);
-        m_sB.setTargetVelocity(0);
-        m_sC.setTargetVelocity(0);
-        Job::pause();
+    if (!isRunning()) return;
+
+    Job::pause();
+
+    // --- Step 1: Ask planner for remaining steps to stop ---
+    int32_t stepsRemaining = m_planner.initiateStop(m_leadStepper->getPosition());
+
+    if (stepsRemaining <= 0) {
+        Console::error("pause") << "Planner returned zero steps. Completing immediately." << Console::endl;
+        complete();
+        return;
     }
+
+    // --- Step 2: Calculate new stop position along original motion ---
+    long currentLeadPos = m_leadStepper->getPosition();
+    int direction = (m_finalTargetA >= m_startA) ? 1 : -1;
+
+    long newLeadTarget = currentLeadPos + direction * stepsRemaining;
+    float leadProgress = (float)(newLeadTarget - m_startA) / (float)m_leadDelta;
+
+    long posA = m_sA.getPosition();
+    long posB = m_sB.getPosition();
+    long posC = m_sC.getPosition();
+
+    long tmpTargetA = posA + direction * round(m_deltaA * leadProgress);
+    long tmpTargetB = posB + direction * round(m_deltaB * leadProgress);
+    long tmpTargetC = posC + direction * round(m_deltaC * leadProgress);
+
+    Console::trace("pause") << "Remaining=" << stepsRemaining
+                            << ", New Targets: A=" << tmpTargetA
+                            << ", B=" << tmpTargetB
+                            << ", C=" << tmpTargetC << Console::endl;
+
+    // --- Step 3: Plan the short deceleration segment ---
+    setTarget(tmpTargetA, tmpTargetB, tmpTargetC);
+
+    // --- Step 4: Validate lead was set correctly ---
+    if (!m_leadStepper || !m_leadStepsDone) {
+        Console::error("pause") << "Lead stepper not set after replan." << Console::endl;
+        complete();
+        return;
+    }
+
+    start();  // continue execution with new short move
 }
+
+
 
 // resume() – When in Paused state, simply restart the move using new start time.
 void StepperController::resume() {
-    if (isPaused()) {
-        m_startTime = micros() * 1e-6;
-        Job::resume();
-    }
+    if (!isPaused()) return;
+
+    Console::trace("resume") << "Resuming to final targets: A=" << m_finalTargetA
+                             << ", B=" << m_finalTargetB
+                             << ", C=" << m_finalTargetC << Console::endl;
+
+    // Current position becomes new start
+    long posA = m_sA.getPosition();
+    long posB = m_sB.getPosition();
+    long posC = m_sC.getPosition();
+
+    m_startA = posA;
+    m_startB = posB;
+    m_startC = posC;
+
+    setTarget(m_finalTargetA, m_finalTargetB, m_finalTargetC);
+    start();
+
+    Job::resume();
 }
+
 
 // complete() – Immediately stop and reset the trajectory data, then disable the steppers.
 void StepperController::complete() {
-    m_sA.setTargetVelocity(0);
-    m_sB.setTargetVelocity(0);
-    m_sC.setTargetVelocity(0);
+    m_sA.setVelocity(0);
+    m_sB.setVelocity(0);
+    m_sC.setVelocity(0);
     m_sA.disable();
     m_sB.disable();
     m_sC.disable();
@@ -238,17 +368,54 @@ void StepperController::complete() {
 
 // cancel() – Decelerate (using pause) then complete the move.
 void StepperController::cancel() {
+    if (!isPending()) return;
+
+    Console::trace("cancel") << "Cancelling with deceleration." << Console::endl;
+
+    // Smooth deceleration to stop
     Job::cancel();
-    pause();
+
+    int32_t stepsRemaining = m_planner.initiateStop(m_leadStepper->getPosition());
+    if (stepsRemaining <= 0) {
+        Console::info("cancel") << "Nothing to decelerate — stopping immediately." << Console::endl;
+        complete();
+        return;
+    }
+
+    long currentLeadPos = m_leadStepper->getPosition();
+    int direction = (m_finalTargetA >= m_startA) ? 1 : -1;
+
+    long newLeadTarget = currentLeadPos + direction * stepsRemaining;
+    float leadProgress = (float)(newLeadTarget - m_startA) / (float)m_leadDelta;
+
+    long posA = m_sA.getPosition();
+    long posB = m_sB.getPosition();
+    long posC = m_sC.getPosition();
+
+    long tmpTargetA = posA + direction * round(m_deltaA * leadProgress);
+    long tmpTargetB = posB + direction * round(m_deltaB * leadProgress);
+    long tmpTargetC = posC + direction * round(m_deltaC * leadProgress);
+
+    setTarget(tmpTargetA, tmpTargetB, tmpTargetC);
+
+    if (!m_leadStepper || !m_leadStepsDone) {
+        Console::error("cancel") << "Invalid lead stepper state — forcing complete." << Console::endl;
+        complete();
+        return;
+    }
+
+    start();
 }
+
 
 // reset() – If a move is running, cancel it; then reset all internal parameters.
 void StepperController::reset() {
-    if (isRunning()) {
+    if (isPending()) {
         cancel();
     }
     Job::reset();
     m_startA = m_startB = m_startC = 0;
+    m_finalTargetA = m_finalTargetB = m_finalTargetC = 0;
     targetA = targetB = targetC = 0;
     m_totalDistanceA = m_totalDistanceB = m_totalDistanceC = 0;
     m_totalTime = 0;
@@ -257,46 +424,6 @@ void StepperController::reset() {
     m_sA.setPosition(0);
     m_sB.setPosition(0);
     m_sC.setPosition(0);
-}
-
-// Helper: computeEffectiveAcceleration()
-// For a given distance and total time, use a triangular profile if the ideal peak velocity is below MAX_SPEED;
-// otherwise, compute an effective acceleration that prolongs the move (trapezoidal profile).
-double StepperController::computeEffectiveAcceleration(long distance, double totalTime) {
-    double maxSpeed = Settings::Stepper::MAX_SPEED;
-    // If the ideal triangular peak velocity (2D/T) is lower than MAX_SPEED, use a triangular profile.
-    if (2.0 * distance / totalTime <= maxSpeed) {
-        return 4.0 * distance / (totalTime * totalTime);
-    } else {
-        // Trapezoidal: Determine the acceleration time (t1) needed to reach MAX_SPEED in this stretched move.
-        double t1 = totalTime - static_cast<double>(distance) / maxSpeed;
-        return maxSpeed / t1;
-    }
-}
-
-// Helper: computeProfileVelocity()
-// For a move of (absolute) distance D to be completed in totalTime seconds,
-// compute the desired instantaneous velocity at elapsed time t.
-double StepperController::computeProfileVelocity(long distance, double t, double totalTime) {
-    double maxSpeed = Settings::Stepper::MAX_SPEED;
-    if (2.0 * distance / totalTime <= maxSpeed) {
-        // Triangular profile.
-        double a_eff = 4.0 * distance / (totalTime * totalTime);
-        if (t < totalTime / 2.0)
-            return a_eff * t;
-        else
-            return a_eff * (totalTime - t);
-    } else {
-        // Trapezoidal profile.
-        double t1 = totalTime - static_cast<double>(distance) / maxSpeed;
-        double a_eff = maxSpeed / t1;
-        if (t < t1)
-            return a_eff * t;
-        else if (t <= (totalTime - t1))
-            return maxSpeed;
-        else
-            return a_eff * (totalTime - t);
-    }
 }
 
 

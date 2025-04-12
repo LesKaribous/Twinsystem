@@ -24,9 +24,20 @@ ConsoleStream Console::success(const ServiceID& origin) {
 	return ConsoleStream( ConsoleLevel::SUCCESS, origin);
 }
 
+String Console::timeStamp(){
+	String time = String(millis());
+	return String("[t=" + time + "ms]");
+}
 
-ConsoleStream Console::info(const String& origin) {
-	return ConsoleStream(ConsoleLevel::INFO, origin);
+String Console::microTimeStamp(){
+	String time = String(micros());
+	return String("[t=" + time + "us]");
+}
+
+
+ConsoleStream Console::info(const String &origin)
+{
+    return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const String& origin) {

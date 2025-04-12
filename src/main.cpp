@@ -1,4 +1,3 @@
-
 #include "os/console.h"
 
 #include "routines.h"
@@ -23,4 +22,3 @@ void setup(){
 void loop(){
 	os.run();	//update the services and run the current routine
 }
-

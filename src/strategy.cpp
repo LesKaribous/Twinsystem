@@ -7,7 +7,7 @@ void match(){
     //start match
     motion.setFeedrate(1.0);
 
-    if(ihm.isColorA()) 
+    if(ihm.isColor(Settings::BLUE)) 
         matchA();
     else 
         matchB();
@@ -16,40 +16,42 @@ void match(){
 
 void recalage(){
     motion.engage();
-    motion.setSync();
-    actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
+    //motion.setSync();
+    //actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
     waitMs(800);
-    THROW(1)
-    if(ihm.isColorA()){
+    //THROW(1)
+    motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD *90));
+    if(ihm.isColor(Settings::BLUE)){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
-        probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        async motion.go(POI::b1);
+        probeBorder(TableCompass::EAST,  RobotCompass::CA,100);
+        async motion.go(POI::b2);
         async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
-    }
-    else{
-        motion.setAbsPosition({-1,-1,PI});
-        probeBorder(TableCompass::NORTH, RobotCompass::BC,100);
-        probeBorder(TableCompass::WEST,  RobotCompass::BC,100);
-        async motion.go(POI::y1);
+        motion.setAbsPosition(Vec3(POI::b2, motion.getOrientation()));
+        //actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        //actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        //actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
+    }else{
+        //motion.setAbsPosition({-1,-1,PI});
+        probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
+        probeBorder(TableCompass::WEST,  RobotCompass::AB,100);
+        async motion.go(POI::y2);
         async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
-        actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
-        actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
+        motion.setAbsPosition(Vec3(POI::y2, motion.getOrientation()));
+        //actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
+        //actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
+        //actuators.moveElevator(RobotCompass::CA,ElevatorPose::GRAB);
     }
     motion.disengage();
 }
 
+//BLUE
 void matchA(){
     //do Match
-    motion.disableOptimization();
     //async motion.turn(3600);
     
     for(int i = 0; i < 10; i++){
-        async motion.go(600,0);
-        async motion.go(0,0);
+        async motion.go(POI::b2 + Vec2(0,-600));
+        async motion.go(POI::b2);
     }
 
     chrono.onMatchNearlyFinished();
@@ -58,9 +60,11 @@ void matchA(){
 
 void matchB(){
     //do Match
-    //motion.disableOptimization();
     //async motion.turn(-3600);
-
+    for(int i = 0; i < 10; i++){
+        async motion.go(POI::y2 + Vec2(0,-600));
+        async motion.go(POI::y2);
+    }
     chrono.onMatchNearlyFinished();
     chrono.onMatchFinished();
 }
@@ -83,14 +87,10 @@ RobotCompass previousActuator(RobotCompass rc){
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist){
-    
-
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
-	//bool m_probing = true;
-    //motion.setSync();
-    //Console::println("Recalling");
-    //motion.resetCompass();
+    motion.disableCruiseMode();
+	bool m_probing = true;
     motion.setFeedrate(0.3);
 	async motion.align(rc, getCompassOrientation(tc));
 
@@ -103,16 +103,16 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	Vec3 position = motion.getAbsPosition();
 
 	if(tc == TableCompass::NORTH){
-		position.a = 3000.0 - _offset; //We hit Xmax
+		position.y = 0.0 + _offset; //We hit Xmax
 		//_probedX = true;
 	}else if(tc == TableCompass::SOUTH){
-		position.a = 0.0 + _offset; //We hit Xmin
+		position.y = 2000.0 - _offset; //We hit Xmin
 		//_probedX = true;
 	}else if(tc == TableCompass::EAST){
-		position.b = 2000.0 - _offset; //We hit Ymax
+		position.x = 3000.0 - _offset; //We hit Ymax
 		//_probedY = true;
 	}else if(tc == TableCompass::WEST){
-		position.b = 0.0 + _offset; //We hit Ymin
+		position.x = 0.0 + _offset; //We hit Ymin
 		//_probedY = true;
 	}
     position.c = DEG_TO_RAD * (getCompassOrientation(tc) - getCompassOrientation(rc));
@@ -123,6 +123,4 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	if(wasAbsolute) motion.setAbsolute();
     motion.setFeedrate(currentFeedrate);
 
-
-    
 }

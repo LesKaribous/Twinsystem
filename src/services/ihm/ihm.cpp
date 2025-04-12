@@ -1,5 +1,4 @@
 #include "ihm.h"
-#include "settings.h"
 #include "text.h"
 #include "notes.h"
 #include "os/console.h"
@@ -44,6 +43,9 @@ void IHM::onAttach(){
     needDraw = true;
     lastDraw = 0;
     bootProgress = 0;
+
+    pinMode(Pin::Outputs::buzzer, OUTPUT);
+    //playStartupMelody();
     drawBootProgress("System Booting...");
 }
 
@@ -96,43 +98,54 @@ void IHM::setRobotPosition(Vec3 pos){
 
 
 #ifndef OLD_BOARD
-void IHM::playTone(int frequency, int duration) {
-  if (frequency > 0) {
-    tone(Pin::Outputs::buzzer, frequency, duration);
-  } else {
-    tone(Pin::Outputs::buzzer, 0, duration);
-  }
+
+void IHM::playTone(int frequency, int duration)
+{
+	if (frequency > 0)
+	{
+		tone(Pin::Outputs::buzzer, frequency);
+		delay(duration);
+		noTone(Pin::Outputs::buzzer);
+	}
+	else
+	{
+		noTone(Pin::Outputs::buzzer);
+	}
 }
 
+
+#ifndef OLD_BOARD
 // Fonction pour jouer une mélodie avec un tempo spécifique
-void IHM::playMelody(int *notes, int *durations, int length, int tempo) {
-  for (int i = 0; i < length; i++) {
-    int noteDuration = (tempo * 4) / durations[i]; // Calculer la durée réelle de la note
-    playTone(notes[i], noteDuration);       // Jouer chaque note
-    delay(noteDuration * 0.1);              // Petite pause entre les notes (10% de la durée)
-  }
-  tone(Pin::Outputs::buzzer, 0);
+void IHM::playMelody(const int *notes, const int *durations, const int length, const int tempo)
+{
+	for (int i = 0; i < length; i++)
+	{
+		int noteDuration = (tempo * 4) / durations[i]; // Calculer la durée réelle de la note
+		playTone(notes[i], noteDuration);			   // Jouer chaque note
+		delay(noteDuration * 0.1);					   // Petite pause entre les notes (10% de la durée)
+	}
+	noTone(Pin::Outputs::buzzer);
 }
 
-void IHM::playStartupMelody() {
-   // Tempo spécifique pour cette mélodie (durée d'une noire en ms)
-  int tempo = 400;
+void IHM::playStartupMelody()
+{
+	// Tempo spécifique pour cette mélodie (durée d'une noire en ms)
+	const int tempo = 400;
 
-  // Notes du riff "We will rock you"
-  int melody[] = {
-    NOTE_G4, NOTE_F4, NOTE_REST, NOTE_E4, NOTE_D4, NOTE_REST, NOTE_E4, NOTE_E4, NOTE_REST
-  };
+	// Notes du riff "We will rock you"
+	int melody[9] = {
+		NOTE_G4, NOTE_F4, NOTE_REST, NOTE_E4, NOTE_D4, NOTE_REST, NOTE_E4, NOTE_E4, NOTE_REST};
 
-  // Durées des notes : 2 = blanche, 4 = noire, 8 = croche
-  int noteDurations[] = {
-    4, 8, 8, 4, 8, 8, 8, 8, 4 // Dernière note prolongée
-  };
+	// Durées des notes : 2 = blanche, 4 = noire, 8 = croche
+	int noteDurations[9] = {
+		4, 8, 8, 4, 8, 8, 8, 8, 4 // Dernière note prolongée
+	};
 
-  // Longueur de la mélodie
-  int length = sizeof(melody) / sizeof(melody[0]);
+	// Longueur de la mélodie
+	const int length = 9;
 
-  // Jouer la mélodie avec le tempo spécifique
-  playMelody(melody, noteDurations, length, tempo);
+	// Jouer la mélodie avec le tempo spécifique
+	playMelody(melody, noteDurations, length, tempo);
 }
 #endif
 
@@ -169,6 +182,7 @@ void IHM::drawBootProgress(String msg){
         
     }
 }
+#endif
 
 
 void IHM::draw(){
@@ -274,7 +288,7 @@ void IHM::updateTeamColor(bool team){
     screen.setTextSize(4);
     screen.setCursor(60,230);
     screen.setTextColor(ILI9341_WHITE);
-    if(team == Settings::Match::COLOR_A)
+    if(team == Settings::COLOR_A)
     {
         screen.fillRoundRect(10, 213, 220, 67, 20, ILI9341_YELLOW);
         screen.fillRoundRect(15, 218, 210, 57, 15, ILI9341_BLACK);
@@ -485,16 +499,14 @@ bool IHM::starterCancelled() const{
 }
 
 bool IHM::isPrimary() const{
-	return twinSwitch.getState() == Settings::Match::PRIMARY;
+	return twinSwitch.getState() == Settings::PRIMARY;
 }
 bool IHM::isSecondary() const{
-	return twinSwitch.getState() == Settings::Match::SECONDARY;
+	return twinSwitch.getState() == Settings::SECONDARY;
 }
-bool IHM::isColorA() const{
-	return teamSwitch.getState() == Settings::Match::COLOR_A;
-}
-bool IHM::isColorB() const{
-	return teamSwitch.getState() == Settings::Match::COLOR_B;
+
+bool IHM::isColor(Color col) const{
+	return teamSwitch.getState() == col;
 }
 
 bool IHM::getStrategyState() const{

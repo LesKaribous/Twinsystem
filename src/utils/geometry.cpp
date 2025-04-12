@@ -3,19 +3,19 @@
 float getCompassOrientation(TableCompass tc){
     switch (tc){
     case TableCompass::NORTH:
-        return 0;
+        return 0 + 90;
         break;
     case TableCompass::SOUTH:
-        return 180;
+        return 180 + 90;
         break;
     case TableCompass::EAST:
-        return -90;
+        return -90 + 90;
         break;
     case TableCompass::WEST:
-        return 90;
+        return 90 + 90;
         break;
     default:
-        return 0;
+        return 0 + 90;
         break;
     }
     
@@ -69,22 +69,22 @@ float getBorderDistance(Vec2 pos, float angle){
 float getOffsets(RobotCompass rc){
     switch (rc){
     case RobotCompass::A:
-        return 126.00;
+        return 137.00;
         break;
     case RobotCompass::B:
-        return 126.00;
+        return 137.00;
         break;
     case RobotCompass::C:
-        return 126.00;
+        return 137.00;
         break;
     case RobotCompass::AB:
-        return 112.53; //With Bearings
+        return 107; //With Bearings
         break;
     case RobotCompass::BC:
-        return 112.53; //With Bearings
+        return 107; //With Bearings
         break;
     case RobotCompass::CA:
-        return 112.53; //With Bearings
+        return 107; //With Bearings
         break;
     default:
         return 0;

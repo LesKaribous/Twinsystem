@@ -26,11 +26,26 @@ void robotProgramManual(){
 
     ihm.setRobotPosition(motion.getAbsPosition());
     //ihm.setRobotPosition(nav.getPosition());
-
+    
     if(ihm.hasStarter() && !hadStarter){
         lidar.showRadarLED();
         ihm.freezeSettings();
         motion.engage();
+
+        ihm.playTone(440.00, 500);   // A4
+        noTone(Pin::Outputs::buzzer); delay(50);
+        ihm.playTone(440.00, 500);   // A4
+        noTone(Pin::Outputs::buzzer); delay(50);
+        ihm.playTone(440.00, 500);   // A4
+        noTone(Pin::Outputs::buzzer); delay(50);
+        ihm.playTone(349.23, 350);   // F4
+        noTone(Pin::Outputs::buzzer); delay(50);
+        ihm.playTone(523.25, 150);   // C5
+        ihm.playTone(440.00, 500);   // A4
+        ihm.playTone(349.23, 350);   // F4
+        ihm.playTone(523.25, 150);   // C5
+        ihm.playTone(440.00, 1000);  // A4
+
         hadStarter = true;
         return;
     }
@@ -50,8 +65,46 @@ void robotProgramManual(){
         return;
     } 
 
-    if(ihm.buttonPressed() && !buttonWasPressed && !hadStarter && !ihm.hasStarter()){
+    
+    static bool toneOK = false;
+    static bool toneOn = false;
+
+    
+    
+    if(ihm.buttonPressed() && ihm.resetButton.pressDuration() > 1500){ 
+        
+        if(!toneOK){
+            tone(Pin::Outputs::buzzer, 442);
+            toneOK = true;
+            toneOn = true;
+        }
+        if(ihm.resetButton.pressDuration() > 1950 && toneOn){
+            noTone(Pin::Outputs::buzzer);
+            toneOn = false;
+        }
+    }
+
+    if( (!ihm.buttonPressed()) &&
+        (ihm.resetButton.pressDuration() > 2000)  && (ihm.resetButton.pressDuration() < 6000) && 
+        (!buttonWasPressed) &&
+        (!hadStarter) && 
+        (!ihm.hasStarter())
+    ){
+        Console::println("Recalage :");
+        noTone(Pin::Outputs::buzzer);
+        ihm.resetButton.resetDuration();
+
+
+        ihm.playTone(523.25, 150);
+        ihm.playTone(659.25, 150);
+        ihm.playTone(783.99, 150);
+        ihm.playTone(880.00, 100);
+        ihm.playTone(783.99, 100);
+        ihm.playTone(659.25, 100);
+        ihm.playTone(987.77, 250);
+
         recalage();
+        toneOK = false;
         return;
     }
 
@@ -100,9 +153,9 @@ void onRobotBoot(){
 
     os.attachService(&ihm); 
     ihm.drawBootProgress("Linking ihm...");
-    ihm.addBootProgress(10); 
+    ihm.addBootProgress(10);
     ihm.onUpdate(); // Read inputs
-
+    
     delay(500);
 
     ihm.drawBootProgress("Linking motion...");
@@ -146,6 +199,8 @@ void onRobotBoot(){
     ihm.drawBootProgress("Registering Commands..."); 
     registerCommands(); ihm.addBootProgress(10);
 
+    ihm.resetButton.resetDuration();
+
     Expression::registerVariables("A", "A");
     Expression::registerVariables("AB", "AB");
     Expression::registerVariables("B", "B");
@@ -172,9 +227,6 @@ void onRobotBoot(){
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
     
-    #ifndef OLD_BOARD
-    //ihm.playStartupMelody();
-    #endif
 }
 
 void onRobotManual(){
@@ -251,7 +303,7 @@ void onOccupancyTimeout(){
 void onTerminalCommand(){
     Interpreter interpreter;
     if( terminal.commandAvailable() > 0){
-        Console::println("Received command. parsing...");
+        //Console::println("Received command. parsing...");
         String rawcmd = terminal.dequeCommand();
         Interpreter in;
         Program prgm = in.processScript(rawcmd);

@@ -87,7 +87,6 @@ PositionController::PositionController()
     controller.setTargetVelocity(Vec3(0));
 }
 
-//[Info]p:[-15.2588,15.8691,-0.0035] | t:[0.0000,0.0000,-0.0119] | v:[0.0000,-0.0000,0.0000] | tv:[-0.0000,-0.0000,-0.0000] | a:[0.0000,0.0000,0.0000]
 void PositionController::run() {
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {

@@ -21,29 +21,6 @@ struct StepperProfile {
     long lastStepTime;
 };
 
-class LinStepAccelerator {
-public:
-    LinStepAccelerator() = default;
-
-    // Must be called before movement begins
-    int32_t prepare(int32_t currentPos, int32_t targetPos, uint32_t targetSpeed, uint32_t vStart, uint32_t vEnd, uint32_t accel);
-
-    // Call this during movement to get the current speed
-    int32_t updateSpeed(int32_t currentPos);
-
-    // Call if a stop is requested mid-move
-    uint32_t initiateStop(int32_t currentPos);
-
-private:
-    int32_t s0 = 0, ds = 0;
-    int32_t accEnd = 0, decStart = 0;
-
-    uint32_t vStart = 0, vEnd = 0, vTarget = 0;
-    int64_t vStart2 = 0, vEnd2 = 0, vTarget2 = 0;
-    uint32_t twoA = 0;
-};
-
-
 class StepperController : public Job{
 public:
     StepperController();
@@ -58,17 +35,17 @@ public:
     void control();
 
     void setTarget(long a, long b, long c );
+    double computeMoveTime(long maxDistance);
+
+private:
+    double computeEffectiveAcceleration(long distance, double totalTime);
+    double computeProfileVelocity(long distance, double t, double totalTime);
 
 private:
     Stepper m_sA, m_sB, m_sC;
 
     // Targets are in steps.
     long targetA, targetB, targetC;
-
-    long m_finalTargetA = 0;
-    long m_finalTargetB = 0;
-    long m_finalTargetC = 0;
-
         
     // To compute a consistent synchronized trajectory, store the start positions.
     long m_startA, m_startB, m_startC;
@@ -81,19 +58,5 @@ private:
 
     // The time (in seconds) when the move started.
     double m_startTime;
-
-    LinStepAccelerator m_planner;
-
-    long m_deltaA = 0, m_deltaB = 0, m_deltaC = 0;
-    long m_stepsDoneA = 0, m_stepsDoneB = 0, m_stepsDoneC = 0;
-    long m_errorA = 0; long m_errorB = 0, m_errorC = 0;
-
-    Stepper* m_leadStepper = nullptr;
-    long m_leadDelta = 0;
-    long* m_leadStepsDone = nullptr;
-    unsigned long m_lastStepTime = 0;
-    unsigned long m_stepInterval = 0; // in microseconds
-
-
 
 };

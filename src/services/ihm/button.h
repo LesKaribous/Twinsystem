@@ -90,14 +90,35 @@ public:
     void init() override{
         pinMode(_pin, INPUT_PULLUP);
         value = !digitalRead(_pin);
+        _pressDuration = 0;
         lastValue = !digitalRead(_pin);
     }
+
     void read() override{
         if(!enabled) return;
         lastValue = value;
         value = digitalRead(_pin);
         _hasChanged = value != lastValue;
+
+        if(hasChanged()){
+            if(getState()){
+                _pressStart = millis();
+                _pressDuration = 0;
+            }else{
+                _pressDuration = millis() - _pressStart;
+            }
+        }
+        if(getState()) _pressDuration = millis() - _pressStart;
+    }
+    
+    void resetDuration(){
+        _pressDuration= 0;
+    }
+    int pressDuration() const {
+        return _pressDuration;
     }
 private:
     int _pin;
+    long _pressStart;
+    int _pressDuration;
 };

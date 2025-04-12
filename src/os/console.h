@@ -19,6 +19,9 @@ public:
 	//Use the current log level
 	static void init();
 	
+	static String timeStamp();
+	static String microTimeStamp();
+	
 	static ConsoleStream info(const String& origin);
 	static ConsoleStream warn(const String& origin);
 	static ConsoleStream error(const String& origin);

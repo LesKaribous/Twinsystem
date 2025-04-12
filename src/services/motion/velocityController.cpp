@@ -64,34 +64,11 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
 
 
 void VelocityController::control() {
-
-    // Update each stepper's velocity state
-    static long last_compute = micros();
-    if(micros() - last_compute > Settings::Stepper::STEPPER_COMPUTE_DELAY){
-        m_sA.control();
-        m_sB.control();
-        m_sC.control();
-        last_compute = micros();
-
-        // Read actual velocities for feedback control
-        
-    }
-
     m_sA.step();
     m_sB.step();
     m_sC.step();
     m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
-    /*
-    m_sA.stepUp();
-    m_sB.stepUp();
-    m_sC.stepUp();
 
-    delayMicroseconds(Settings::Stepper::PULSE_WIDTH);
-
-    m_sA.stepDown();
-    m_sB.stepDown();
-    m_sC.stepDown();
-    /**/
 }
 
 Vec3 VelocityController::getCurrentVelocity() const {
