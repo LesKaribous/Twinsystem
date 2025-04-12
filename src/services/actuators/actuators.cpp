@@ -16,9 +16,9 @@ void Actuators::onAttach(){
     
     if(ihm.isPrimary()){
         Console::info() << "Building fingers actuators groups" << Console::endl;
-        createFingerGroup(RobotCompass::AB, PrimaryPresets::AB);
+        //createFingerGroup(RobotCompass::AB, PrimaryPresets::AB);
         createFingerGroup(RobotCompass::BC, PrimaryPresets::BC);
-        createFingerGroup(RobotCompass::CA, PrimaryPresets::CA);
+        //createFingerGroup(RobotCompass::CA, PrimaryPresets::CA);
 
         registerPrimaryPoses();
 
@@ -34,18 +34,18 @@ void Actuators::onAttach(){
         /**/
     }
 
-    groupAB.enable();
+    //groupAB.enable();
     groupBC.enable();
-    groupCA.enable();
+    //groupCA.enable();
 
     if(ihm.isPrimary()){
-        open(RobotCompass::AB);
+        //open(RobotCompass::AB);
         open(RobotCompass::BC);
-        open(RobotCompass::CA);
+        //open(RobotCompass::CA);
 
-        moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
+        //moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
         moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
-        moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
+        //moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 
     }else{
         /*
@@ -234,16 +234,16 @@ void Actuators::disableTraco(){
 
 void Actuators::enable(){
     enableTraco();
-    groupAB.enable();
+    //groupAB.enable();
     groupBC.enable();
-    groupCA.enable();
+    //groupCA.enable();
 }
 
 void Actuators::disable(){
     disableTraco();
-    groupAB.disable();
+    //groupAB.disable();
     groupBC.disable();
-    groupCA.disable();
+    //groupCA.disable();
 }
 
 void Actuators::close(RobotCompass rc, int speed){
@@ -509,14 +509,14 @@ ActuatorGroup &Actuators::getActuatorGroup(RobotCompass rc)
 {
     switch (rc)
     {
-    case RobotCompass::AB:
-        return groupAB;
+    //case RobotCompass::AB:
+        //return groupAB;
     case RobotCompass::BC:
         return groupBC;
-    case RobotCompass::CA:
-        return groupCA;
+    //case RobotCompass::CA:
+        //return groupCA;
     default:
-        return groupAB;
+        return groupBC; //groupAB
         break;
     }
 }
@@ -690,7 +690,7 @@ void Actuators::applause(RobotCompass rc){
 }/**/
 
 void Actuators::sleep(){
-    groupAB.sleep();
+    //groupAB.sleep();
     groupBC.sleep();
-    groupCA.sleep();
+    //groupCA.sleep();
 }

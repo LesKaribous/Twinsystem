@@ -208,7 +208,7 @@ void Motion::pause(){
     if(use_cruise_mode){
         cruise_controller.pause();
     }else{
-        stepper_controller.pause();
+        stepper_controller.cancel();
     }
 }
 
@@ -217,7 +217,23 @@ void Motion::resume(){
     if(use_cruise_mode){
         cruise_controller.resume();
     }else{
-        stepper_controller.resume();
+        Vec3 _relTarget = toRelativeTarget(_target);
+        if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
+        Vec3 steps = ik(_relTarget);
+        stepper_controller.reset();
+        stepper_controller.setTarget(steps.a, steps.b, steps.c);
+
+        if(m_async){
+            stepper_controller.start();
+            Console::println("resume");
+        }else{
+            stepper_controller.start();
+            Console::println("resume");
+            while (stepper_controller.isPending()){
+                stepper_controller.run();
+            }
+            complete();
+        }
     }
 }
 

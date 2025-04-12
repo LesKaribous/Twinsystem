@@ -25,7 +25,7 @@ void recalage(){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::EAST,  RobotCompass::CA,100);
         async motion.go(POI::b2);
-        async motion.align(RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
+        async motion.align(RobotCompass::C, getCompassOrientation(TableCompass::SOUTH));
         motion.setAbsPosition(Vec3(POI::b2, motion.getOrientation()));
         //actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         //actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);
@@ -35,7 +35,7 @@ void recalage(){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::AB,100);
         async motion.go(POI::y2);
-        async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::EAST));
+        async motion.align(RobotCompass::C, getCompassOrientation(TableCompass::SOUTH));
         motion.setAbsPosition(Vec3(POI::y2, motion.getOrientation()));
         //actuators.moveElevator(RobotCompass::AB,ElevatorPose::GRAB);
         //actuators.moveElevator(RobotCompass::BC,ElevatorPose::GRAB);

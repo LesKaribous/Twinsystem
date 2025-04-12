@@ -38,7 +38,7 @@ void Stepper::setDirection(bool forward) {
 
 void Stepper::setVelocity(float velocity) {
     m_velocity = constrain(velocity, -Settings::Stepper::MAX_SPEED, Settings::Stepper::MAX_SPEED);
-    m_step_delay = 1.0e6f / fabs(m_velocity);
+    m_step_delay = (fabs(m_velocity) < 1e-4f) ? 0 : (1e6f / fabs(m_velocity));
 
     if (m_velocity == 0.0f) {
         m_step_delay = 0;
@@ -47,25 +47,15 @@ void Stepper::setVelocity(float velocity) {
 
     if (m_step_delay < Settings::Stepper::MIN_STEP_DELAY)
     m_step_delay = Settings::Stepper::MIN_STEP_DELAY;
-    //Console::info("Stepper") << m_step_delay << Console::endl;
+
     setDirection(m_velocity >= 0);
-    //m_step_delay = 1.0e6 / fabs(m_target_velocity * Settings::Stepper::STEP_MODE);
-}
-
-void Stepper::setAcceleration(float accel){
-    m_accel = fabs(accel);
-}
-
-void Stepper::setDeceleration(float decel) {
-    m_deccel = fabs(decel);
 }
 
 int Stepper::getStepTime(){
     return m_step_delay;
 }
 
-bool Stepper::isRunning() const
-{
+bool Stepper::isRunning() const{
     return m_enabled && fabs(m_velocity) > Settings::Stepper::PULL_IN;
 }
 

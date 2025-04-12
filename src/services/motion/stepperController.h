@@ -51,8 +51,6 @@ public:
     void run() override; 
     void reset() override;  //Set to IDLE
     void start() override;   //Set to PENDING
-    void pause() override;   //Set to PAUSED
-    void resume() override;  //Set to PENDING
     void cancel() override;  //Set to CANCELLED
     void complete() override;//Set to COMPLETED
     void control();
@@ -61,39 +59,15 @@ public:
 
 private:
     Stepper m_sA, m_sB, m_sC;
-
-    // Targets are in steps.
-    long targetA, targetB, targetC;
-
-    long m_finalTargetA = 0;
-    long m_finalTargetB = 0;
-    long m_finalTargetC = 0;
-
-        
-    // To compute a consistent synchronized trajectory, store the start positions.
-    long m_startA, m_startB, m_startC;
-
-    // And store the total distances (always positive) planned for each axis.
-    long m_totalDistanceA, m_totalDistanceB, m_totalDistanceC;
-
-    // The common move time (in seconds) for the longest trajectory.
-    double m_totalTime;
-
-    // The time (in seconds) when the move started.
-    double m_startTime;
+    double m_totalTime; // The common move time (in seconds) for the longest trajectory.
+    double m_startTime; // The time (in seconds) when the move started.
 
     LinStepAccelerator m_planner;
 
-    long m_deltaA = 0, m_deltaB = 0, m_deltaC = 0;
-    long m_stepsDoneA = 0, m_stepsDoneB = 0, m_stepsDoneC = 0;
-    long m_errorA = 0; long m_errorB = 0, m_errorC = 0;
 
     Stepper* m_leadStepper = nullptr;
     long m_leadDelta = 0;
     long* m_leadStepsDone = nullptr;
     unsigned long m_lastStepTime = 0;
     unsigned long m_stepInterval = 0; // in microseconds
-
-
-
 };

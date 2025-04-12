@@ -97,9 +97,7 @@ void  Job::resume(){
 }
 
 void  Job::cancel(){
-	if(m_state != JobState::COMPLETED){
-		m_state = JobState::CANCELLED;
-	}
+	m_state = JobState::CANCELLED;
 }
 
 void  Job::complete(){

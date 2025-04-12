@@ -32,6 +32,14 @@ void robotProgramManual(){
         ihm.freezeSettings();
         motion.engage();
 
+        ihm.playTone(329.2, 150);   // C5
+        ihm.playTone(349.2, 150);   // C5
+        ihm.playTone(440, 150);   // C5
+       
+        
+        noTone(Pin::Outputs::buzzer);
+
+        /*
         ihm.playTone(440.00, 500);   // A4
         noTone(Pin::Outputs::buzzer); delay(50);
         ihm.playTone(440.00, 500);   // A4
@@ -45,7 +53,7 @@ void robotProgramManual(){
         ihm.playTone(349.23, 350);   // F4
         ihm.playTone(523.25, 150);   // C5
         ihm.playTone(440.00, 1000);  // A4
-
+        */
         hadStarter = true;
         return;
     }
@@ -59,6 +67,12 @@ void robotProgramManual(){
     if(!ihm.hasStarter() && hadStarter &&  ihm.buttonPressed()){
         motion.disengage();
         ihm.unfreezeSettings();
+
+        ihm.playTone(440, 150);   // C5
+        ihm.playTone(349.2, 150);   // C5
+        ihm.playTone(329.2, 150);   // C5
+        noTone(Pin::Outputs::buzzer);
+
         lidar.showStatusLED();
         hadStarter = false;
         buttonWasPressed = true;
