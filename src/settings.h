@@ -107,8 +107,8 @@ namespace Settings{
 
         const int 
         //STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 500, // mm/s^2
-        MAX_SPEED = 3000, // mm/s
+        MAX_ACCEL = 300, // mm/s^2
+        MAX_SPEED = 1000, // mm/s
         MIN_DISTANCE = 20, // Target stop thresold //mm
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms

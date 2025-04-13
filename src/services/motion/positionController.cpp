@@ -106,6 +106,7 @@ void PositionController::run() {
         if(isCancelled()) {
             if(velocity.mag() > 0) deccelerate();
             else complete();
+            Job::cancel();
         }
 
         if(isPending() && !isPaused()){
@@ -133,6 +134,7 @@ void PositionController::run() {
         
 
         velocity = controller.getCurrentVelocity();
+        velocity.rotateZ(-position.c);
         position = position + ( velocity * dt);
 
         Vec3 final_target_velocity = target_velocity;
@@ -141,11 +143,12 @@ void PositionController::run() {
         if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
 
         if(final_target_velocity.magSq() > 0){
+            final_target_velocity.rotateZ(position.c);
             controller.setTargetVelocity(final_target_velocity);
         }else{
             if (fabs(error.x) < Settings::Motion::MIN_DISTANCE && 
                 fabs(error.y) < Settings::Motion::MIN_DISTANCE && 
-                fabs(angle) < Settings::Motion::MIN_ANGLE) 
+                fabs(angle) < Settings::Motion::MIN_ANGLE && isRunning()) 
                 complete();
             controller.setTargetVelocity(Vec3(0));
         }
@@ -176,22 +179,11 @@ void PositionController::reset() {
 
 void PositionController::start() {
     Job::start();
+    controller.enable();
     // Update target if a new one has been set. 
     if (!(newTarget == target)) {
         target = newTarget;
     }
-}
-
-void PositionController::pause() {
-    Job::pause();
-}
-
-void PositionController::resume() {
-    Job::resume();
-}
-
-void PositionController::cancel() {
-    Job::cancel();
 }
 
 void PositionController::complete() {
@@ -202,6 +194,7 @@ void PositionController::complete() {
     target_velocity= Vec3(0.0f);
     newTarget = target = position;  // Reset target to current position.
     controller.setTargetVelocity(Vec3(0));
+    controller.disable();
 }
 
 

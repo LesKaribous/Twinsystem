@@ -13,9 +13,6 @@ public:
     void run() override; 
     void reset() override;  //Set to IDLE
     void start() override;   //Set to PENDING
-    void pause() override;   //Set to PAUSED
-    void resume() override;  //Set to PENDING
-    void cancel() override;  //Set to CANCELLED
     void complete() override;//Set to COMPLETED
 
     // Set a new target position (in world coordinates)

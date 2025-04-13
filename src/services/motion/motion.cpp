@@ -206,7 +206,7 @@ void Motion::run(){
 void Motion::pause(){
     Job::pause();
     if(use_cruise_mode){
-        cruise_controller.pause();
+        cruise_controller.cancel();
     }else{
         stepper_controller.cancel();
     }
@@ -215,7 +215,24 @@ void Motion::pause(){
 void Motion::resume(){
     Job::resume();
     if(use_cruise_mode){
-        cruise_controller.resume();
+        cruise_controller.reset();
+        cruise_controller.setPosition(_position);
+        cruise_controller.setTarget(_target);
+
+        if(m_async){
+            cruise_controller.start();
+            Console::println("start");
+        }
+        else{
+            cruise_controller.start();
+            Console::println("start");
+            while (cruise_controller.isPending()){
+                cruise_controller.run();
+            }
+            complete();
+        }
+
+
     }else{
         Vec3 _relTarget = toRelativeTarget(_target);
         if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
