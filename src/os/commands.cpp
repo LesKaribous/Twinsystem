@@ -248,9 +248,9 @@ void command_move_elevator(const args_t& args){
 }
 
 void command_raise(const args_t& args){
-
     if(args.size() != 1)return;
     const String& side = args[0];
+
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
@@ -259,11 +259,11 @@ void command_raise(const args_t& args){
 void command_lower(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
+    
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 }
-
 
 //Routines 
 

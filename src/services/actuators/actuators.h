@@ -21,7 +21,7 @@ enum class ElevatorPose{
 
 enum class ManipulatorPose{
     DROP = 0,
-    GRAB = 1,
+    GRAB = 1
 };
 
 class Actuators : public Service, public Job{

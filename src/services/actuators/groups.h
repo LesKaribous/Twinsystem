@@ -46,7 +46,7 @@ namespace ActuatorPresets{
         170,    // left_Grab,
         0,      // left_Drop,
         30,     // right_Grab,
-        180,     // right_Drop,
+        180,    // right_Drop,
         130,    // planksUp,
         90,     // planksDrop,
         20,     // elevator_Up,
@@ -58,8 +58,8 @@ namespace ActuatorPresets{
         //pins
         Pin::Servo::Servo_BC_4,
         36,//elevator_Up,
-        17,//elevator_Drop,
-        26 //elevator_Border;
+        17,//elevator_Down,
+        26 //elevator_Drop;
     };
 
     const ManipulatorProperties CA = {

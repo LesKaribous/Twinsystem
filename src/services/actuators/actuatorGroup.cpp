@@ -34,7 +34,7 @@ bool ActuatorGroup::hasServo(int id){
 
 void ActuatorGroup:: moveServoToPose(int servo, int pose, int speed){
     if(hasServo(servo))
-        getServo(servo).moveTo(pose, speed);
+        getServo(servo).moveToPose(pose, speed);
     else Console::error("ActuatorGroup") << "servo " << servo << " does not exist " << Console::endl; 
 }
 

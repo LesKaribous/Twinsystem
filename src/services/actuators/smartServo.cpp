@@ -58,7 +58,7 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
         }
 
         if (currrentPos < target){
-            m_servo.write(currrentPos + 2);
+            m_servo.write(currrentPos + 2); //use multiple of two to avoid infinite loop an bricked
             if(runAsync) return false;
         }else if (currrentPos > target){
             m_servo.write(currrentPos - 2);
@@ -71,6 +71,8 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
 }
 
 bool SmartServo::moveToPose(int index,  int speed, bool runAsync){
+    THROW(index)
+    THROW(getPose(index))
     return moveTo(getPose(index), speed, runAsync);
 }
 
