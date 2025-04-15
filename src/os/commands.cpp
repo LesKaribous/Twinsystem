@@ -4,9 +4,14 @@
 #include "strategy.h"
 
 void registerCommands() {
+    CommandHandler::registerCommand("start", "Start Match", command_start);
+    CommandHandler::registerCommand("stop", "Stop Robot", command_stop);
+    CommandHandler::registerCommand("reboot", "Reboot Robot", command_reboot);
+
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
     CommandHandler::registerCommand("disable(service)", "Disable a specific service", command_disable);
     CommandHandler::registerCommand("status(service)", "Display single status", command_status);
+    CommandHandler::registerCommand("wait(duration)", "Wait a bit for duration", command_wait);
     CommandHandler::registerCommand("lidarMode(mode)", "Change neopixel display mode on lidar", command_lidarMode);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
@@ -95,7 +100,23 @@ void command_lidarMode(const args_t& args){
     else if(args[0].equalsIgnoreCase("intercom"))lidar.showStatusLED();
 }
 
+void command_wait(const args_t &args){
+    if(args.size() != 1) return;
+    float duration = args[0].toFloat();
+    async os.wait(duration);
+}
 
+void command_start(const args_t &args){
+    os.start();
+}
+
+void command_stop(const args_t &args){
+    os.stop();
+}
+
+void command_reboot(const args_t &args){
+    os.reboot();
+}
 
 //Motion
 void command_go(const args_t& args){

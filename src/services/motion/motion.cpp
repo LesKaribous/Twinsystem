@@ -41,7 +41,7 @@ void Motion::onUpdate(){
         }
         estimatePosition();
 
-        if(use_cruise_mode)
+        if(current_move_cruised)
             cruise_controller.run();
         else 
             stepper_controller.run();
@@ -50,7 +50,7 @@ void Motion::onUpdate(){
 
 void Motion::control(){
     if(enabled()){
-        if(use_cruise_mode)
+        if(current_move_cruised)
             cruise_controller.control();
         else
             stepper_controller.control();
@@ -151,17 +151,18 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     //Vec3 _relTarget = toRelativeTarget(_target); Console::trace("Motion") << "Relative target is " << _relTarget << Console::endl;
     //if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
     //_stepsTarget = targetToSteps(_relTarget); Console::trace("Motion") << "Steps Target is " << _stepsTarget << Console::endl;
-    
+    Vec3 _relTarget = toRelativeTarget(_target);
     Console::println("start");
     Job::start(); //robot is moving from now
 
     //resetSteps();
-    if(use_cruise_mode){
+    if(use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE){
         cruise_controller.reset();
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
+        current_move_cruised = true;
     }else{
-    Vec3 _relTarget = toRelativeTarget(_target);
+        current_move_cruised = false;
         if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
         Vec3 steps = ik(_relTarget);
         Console::println(steps);
@@ -173,12 +174,12 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
 
 
     if(m_async){
-        if(use_cruise_mode) cruise_controller.start();
+        if(current_move_cruised) cruise_controller.start();
         else stepper_controller.start();
         Console::println("start");
     }
     else{
-        if(use_cruise_mode){
+        if(current_move_cruised){
             cruise_controller.start();
             Console::println("start");
             while (cruise_controller.isPending()){
@@ -205,7 +206,7 @@ void Motion::run(){
 
 void Motion::pause(){
     Job::pause();
-    if(use_cruise_mode){
+    if(current_move_cruised){
         cruise_controller.cancel();
     }else{
         stepper_controller.cancel();
@@ -214,7 +215,7 @@ void Motion::pause(){
 
 void Motion::resume(){
     Job::resume();
-    if(use_cruise_mode){
+    if(current_move_cruised){
         cruise_controller.reset();
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
@@ -255,7 +256,7 @@ void Motion::resume(){
 }
 
 bool Motion::hasFinished() {
-    if(use_cruise_mode)
+    if(current_move_cruised)
         return cruise_controller.isCompleted();
     else
         return stepper_controller.isCompleted();
@@ -264,7 +265,7 @@ bool Motion::hasFinished() {
 void Motion::cancel() {
     Job::cancel();
     if(Job::m_state == JobState::CANCELLED){
-        if(use_cruise_mode){
+        if(current_move_cruised){
             while (!cruise_controller.isCompleted()){
                 cruise_controller.run();
             }
@@ -294,7 +295,7 @@ void Motion::cancel() {
 
 void Motion::complete() {
     Job::complete();
-    if(use_cruise_mode){
+    if(current_move_cruised){
         cruise_controller.complete();
     }else{
         stepper_controller.complete();

@@ -6,11 +6,12 @@
 #include "services/actuators/groups.h"
 
 
-#define MAGNET_RIGHT    0
-#define ELEVATOR        1
-#define MAGNET_LEFT     2
-#define PLANKS          3
-
+enum class ServoIDs : int{
+    MAGNET_RIGHT = 0,
+    ELEVATOR = 1,
+    MAGNET_LEFT = 2,
+    PLANKS = 3
+};
 
 enum class ElevatorPose{
     DROP = 0,

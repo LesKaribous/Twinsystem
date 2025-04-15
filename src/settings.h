@@ -84,7 +84,8 @@ namespace Settings{
         ABSOLUTE = true,
         USE_GYROSCOPE = true;
 
-        constexpr int VELOCITY_SAMPLES = 0;
+        constexpr int VELOCITY_SAMPLES = 0,
+        MIN_CRUISE_DISTANCE = 600;
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
@@ -102,8 +103,8 @@ namespace Settings{
 
         const float 
         MAX_ROT_ACCEL = 0.6, // rad/s^2
-        MAX_ROT_SPEED = 2.0, // rad/s
-        MIN_ANGLE = 1.0*DEG_TO_RAD; // Target stop thresold //mm
+        MAX_ROT_SPEED = 3.0, // rad/s
+        MIN_ANGLE = 3.0*DEG_TO_RAD; // Target stop thresold //mm
 
         const int 
         //STOP_DECCEL = 10000, // mm/s^2

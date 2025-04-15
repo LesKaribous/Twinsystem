@@ -165,7 +165,7 @@ void control() {
 
 void onRobotBoot(){
 
-    os.attachService(&ihm); 
+    os.attachService(&ihm);
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10);
     ihm.onUpdate(); // Read inputs
@@ -173,8 +173,6 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
     
-    delay(500);
-
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
 

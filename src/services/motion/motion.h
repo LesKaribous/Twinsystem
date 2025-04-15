@@ -81,6 +81,7 @@ public:
 private :
     bool m_async = true; //non blocking by default
     bool use_cruise_mode = true; //non blocking by default
+    bool current_move_cruised = false; //non blocking by default
 
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);

@@ -7,29 +7,29 @@ ActuatorGroup::ActuatorGroup(){
 
 void ActuatorGroup::enable(){
     for(auto i = m_servos.begin(); i != m_servos.end(); i++){
-        i->enable();
+        i->second.enable();
     }
 }
 
 void ActuatorGroup::disable(){
     for(auto i = m_servos.begin(); i != m_servos.end(); i++){
-        i->disable();
+        i->second.disable();
     }
 }
 
 void ActuatorGroup::sleep(){
     for(auto i = m_servos.begin(); i != m_servos.end(); i++){
-        i->sleep();
+        i->second.sleep();
     }
 }
 
-void ActuatorGroup::createServo(int pin, int defaultPos, int minPos, int maxPos){
-    if(m_servos.size() < MAX_SERVOS) m_servos.emplace_back(pin, defaultPos, minPos, maxPos);
+void ActuatorGroup::createServo(int id, int pin, int defaultPos, int minPos, int maxPos){
+    if(m_servos.size() < MAX_SERVOS) m_servos.emplace(id, SmartServo(pin, defaultPos, minPos, maxPos));
     else Console::error("ActuatorGroup") << "Max servo limit reached, ActuatorGroup can handle up to " << MAX_POSES << " poses" << Console::endl;
 }
 
 bool ActuatorGroup::hasServo(int id){
-    return !(id < 0 || size_t(id) >= m_servos.size());
+    return m_servos.find(id) != m_servos.end();
 }
 
 void ActuatorGroup:: moveServoToPose(int servo, int pose, int speed){

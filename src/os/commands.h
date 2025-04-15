@@ -10,6 +10,10 @@ void command_disable(const args_t& args);
 void command_status(const args_t& args); //Display all status
 void command_debug(const args_t& args); //Display all status
 void command_lidarMode(const args_t& args);
+void command_wait(const args_t& args);
+void command_start(const args_t& args); //Start match
+void command_stop(const args_t& args); //Start match
+void command_reboot(const args_t& args); //Start match
 
 //Motion
 void command_go(const args_t& args);

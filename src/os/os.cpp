@@ -34,6 +34,10 @@ void OS::start(){
     m_state = AUTO_PROGRAM;
 }
 
+void OS::reboot(){
+    CPU_RESTART
+}
+
 void OS::stop(){
     m_state = STOPPED;
 }
