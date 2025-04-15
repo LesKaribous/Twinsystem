@@ -33,6 +33,8 @@ void command_raise(const args_t& args);
 void command_lower(const args_t& args);
 void command_grab(const args_t& args);
 void command_drop(const args_t& args);
+void command_grabPlank(const args_t& args);
+void command_dropPlank(const args_t& args);
 //void command_close(const args_t& args);
 void command_elevator(const args_t& args);
 void command_move_elevator(const args_t& args);

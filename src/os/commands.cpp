@@ -30,6 +30,8 @@ void registerCommands() {
     CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
     CommandHandler::registerCommand("drop(side)", "Drop object using actuator", command_drop);
+    CommandHandler::registerCommand("grabPlank(side)", "Grab Plank using actuator", command_grabPlank);
+    CommandHandler::registerCommand("dropPlank(side)", "Drop Plank using actuator", command_dropPlank);
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
     CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
@@ -224,6 +226,22 @@ void command_grab(const args_t& args){
     else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
 }
 
+void command_dropPlank(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.dropPlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.dropPlank(RobotCompass::CA);
+}
+
+void command_grabPlank(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.grabPlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.grabPlank(RobotCompass::CA);
+}
+
 void command_elevator(const args_t& args){
     if(args.size() != 2)return;
     const String& side = args[0];
@@ -259,7 +277,7 @@ void command_raise(const args_t& args){
 void command_lower(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    
+
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::DOWN);

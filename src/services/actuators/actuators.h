@@ -53,6 +53,9 @@ private:
 public:
     void drop   (RobotCompass rc, int speed = 100);
     void grab   (RobotCompass rc, int speed = 100);
+
+    void dropPlank   (RobotCompass rc, int speed = 100);
+    void grabPlank   (RobotCompass rc, int speed = 100);
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
@@ -63,7 +66,7 @@ private :
     bool moveMagnet(SmartServo& servo, ManipulatorPose pose, int speed = 100);
     bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
     void createManipulator(RobotCompass, ManipulatorProperties);
-    void createManipulator(RobotCompass, BannerManipulatorProperties);
+    void createBannerManipulator(RobotCompass, BannerManipulatorProperties);
 
     SERVICE(Actuators)
 };

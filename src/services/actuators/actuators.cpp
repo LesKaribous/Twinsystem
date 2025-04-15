@@ -18,7 +18,7 @@ void Actuators::onAttach(){
         Console::info() << "Building fingers actuators groups" << Console::endl;
  
         createManipulator(RobotCompass::AB, ActuatorPresets::AB);
-        createManipulator(RobotCompass::BC, ActuatorPresets::BC);
+        createBannerManipulator(RobotCompass::BC, ActuatorPresets::BC);
         createManipulator(RobotCompass::CA, ActuatorPresets::CA);
         
         registerPoses();
@@ -144,7 +144,7 @@ void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
     }
 }
 
-void Actuators::createManipulator(RobotCompass rc, BannerManipulatorProperties props){
+void Actuators::createBannerManipulator(RobotCompass rc, BannerManipulatorProperties props){
     
     //WARNING : Order do matter !
     //See defines in the header
@@ -288,6 +288,58 @@ void Actuators::grab(RobotCompass rc, int speed){
         break;
     }
 }
+
+
+
+
+
+
+void Actuators::dropPlank(RobotCompass rc, int speed){
+    if(!ihm.isPrimary()) return;
+    switch (rc)
+    {
+    case RobotCompass::AB :
+            groupAB.moveServoToPose(PLANKS, CAST_POSE(ManipulatorPose::DROP), speed);
+        break;
+
+    // case RobotCompass::BC :
+    //     //groupBC.moveServoToPose(MAGNET_RIGHT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     //groupBC.moveServoToPose(MAGNET_LEFT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     break;
+
+    case RobotCompass::CA :
+            groupCA.moveServoToPose(PLANKS, CAST_POSE(ManipulatorPose::DROP), speed);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+
+void Actuators::grabPlank(RobotCompass rc, int speed){
+    if(!ihm.isPrimary()) return;
+    switch (rc)
+    {
+    case RobotCompass::AB :
+            groupAB.moveServoToPose(PLANKS, CAST_POSE(ManipulatorPose::GRAB), speed);
+        break;
+
+    // case RobotCompass::BC :
+    //     //groupBC.moveServoToPose(MAGNET_RIGHT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     //groupBC.moveServoToPose(MAGNET_LEFT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     break;
+
+    case RobotCompass::CA :
+            groupCA.moveServoToPose(PLANKS, CAST_POSE(ManipulatorPose::GRAB), speed);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+
 
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose, int speed){
     if(getActuatorGroup(rc).hasServo(ELEVATOR))

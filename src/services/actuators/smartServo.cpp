@@ -71,8 +71,6 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
 }
 
 bool SmartServo::moveToPose(int index,  int speed, bool runAsync){
-    THROW(index)
-    THROW(getPose(index))
     return moveTo(getPose(index), speed, runAsync);
 }
 
