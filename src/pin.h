@@ -145,17 +145,17 @@
         namespace Servo{
             // Connector Act 1
             // Bloç Servo 1 - BC
-            const int ServoA1 = 21; //P2
-            const int ServoA2 = 22; //A4
-            const int ServoA3 = 20; //D1
+            const int Servo_BC_4 = 17; //Elevator
             // Bloç Servo 2 - AB
-            const int ServoB1 = 23; //A2
-            const int ServoB2 = 16; //A1
-            const int ServoB3 = 39; //D2
+            const int Servo_AB_1 = 23; //Left Magnet
+            const int Servo_AB_2 = 16; //Right Magnet
+            const int Servo_AB_3 = 39; //Plank Gripper
+            const int Servo_AB_4 = 14; //Elevator
             // Bloç Servo 3 - CA
-            const int ServoC1 = 15; //D3
-            const int ServoC2 = 14; //A3
-            const int ServoC3 = 17; //P1
+            const int Servo_CA_1 = 21; //Left Magnet
+            const int Servo_CA_2 = 22; //Right Magnet
+            const int Servo_CA_3 = 20; //Plank Gripper
+            const int Servo_CA_4 = 15; //Elevator
         }
     }
 #endif

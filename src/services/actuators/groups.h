@@ -1,83 +1,80 @@
 #pragma once
-
 #include "pin.h"
 
-struct FingerGroupProperty{
-const int 
-    rightServoPin,
-    leftServoPin,
-    elevatorServoPin;
+struct ManipulatorProperties{
+    //Pins and IDs
+    const int 
+    magnetLeftPin, //hall magnet Left 
+    magnetRightPin, //hall magnet Right
+    planckPin, //plank manipulator
+    elevatorPin, //elevator
+    pump_ID,   //vacuum pump
+    EV_ID,     //electrovanne
 
-//position servo
-const int 
-    right_Close,
-    right_Open,
-    right_Grab,
-    left_Close,
-    left_Open,
+    //positions
     left_Grab,
-    elevator_Down,
+    left_Drop,
+    right_Grab,
+    right_Drop,
+    planksUp,
+    planksDrop,
     elevator_Up,
-    elevator_Grab,
-    elevator_Border,
-    elevator_Planter;
+    elevator_Down,
+    elevator_Drop;
 };
 
-namespace PrimaryPresets{
-    const FingerGroupProperty AB = {
+struct BannerManipulatorProperties{
+    const int 
+    servoPin, //elevator
+    elevator_Up,
+    elevator_Down,
+    elevator_Drop;
+};
+
+
+
+namespace ActuatorPresets{
+    const ManipulatorProperties AB = {
         //pins
-        Pin::Servo::ServoB3, //rightServoPin
-        Pin::Servo::ServoB2, //leftServoPin
-        Pin::Servo::ServoB1, //elevatorServoPin
+        Pin::Servo::Servo_AB_1,    //hall magnet Left
+        Pin::Servo::Servo_AB_2,    //hall magnet Right
+        Pin::Servo::Servo_AB_3,    //plank manipulator
+        Pin::Servo::Servo_AB_4,    //elevator
         //position servo
-        100, //right_Close
-        10,  //right_Open   
-        180, //right_Grab   
-        60, //left_Close   
-        0,  //left_Open    
-        150, //left_Grab    
-        15,  //elevator_Down
-        110, //elevator_Up  
-        25,   //elevator_Grab
-        60,   //elevator_Border
-        40,   //elevator_Planter
+        170,    // left_Grab,
+        0,      // left_Drop,
+        30,     // right_Grab,
+        180,     // right_Drop,
+        130,    // planksUp,
+        90,     // planksDrop,
+        20,     // elevator_Up,
+        120,    // elevator_Down,
+        80      // elevator_Drop;
     };
         
-    const FingerGroupProperty BC = {
+    const BannerManipulatorProperties BC = {
         //pins
-        Pin::Servo::ServoA3, //rightServoPin
-        Pin::Servo::ServoA2, //leftServoPin
-        Pin::Servo::ServoA1, //elevatorServoPin
-        //position servo
-        80, //right_Close
-        10,  //right_Open   
-        160, //right_Grab   
-        80, //left_Close   
-        10,  //left_Open    
-        160, //left_Grab    
-        0,   //elevator_Down
-        140, //elevator_Up  
-        20,   //elevator_Grab
-        70,   //elevator_Border
-        40   //elevator_Planter
+        Pin::Servo::Servo_BC_4,
+        36,//elevator_Up,
+        17,//elevator_Drop,
+        26 //elevator_Border;
     };
 
-    const FingerGroupProperty CA = {
+    const ManipulatorProperties CA = {
         //pins
-        Pin::Servo::ServoC3, //rightServoPin
-        Pin::Servo::ServoC2, //leftServoPin
-        Pin::Servo::ServoC1, //elevatorServoPin
+        Pin::Servo::Servo_CA_1, //rightServoPin
+        Pin::Servo::Servo_CA_2, //leftServoPin
+        Pin::Servo::Servo_CA_3, //elevatorServoPin
+        Pin::Servo::Servo_CA_4, //elevatorServoPin
         //position servo
-        100, //right_Close
-        10,  //right_Open   
-        180, //right_Grab   
-        100, //left_Close   
-        10,  //left_Open    
-        180, //left_Grab    
-        0,   //elevator_Down
-        105, //elevator_Up  
-        18,   //elevator_Grab
-        53,   //elevator_Border
-        30   //elevator_Planter
+        180,
+        0,
+        0, 
+        180,
+        130,
+        90,
+        20,
+        120, 
+        70
     };
 }

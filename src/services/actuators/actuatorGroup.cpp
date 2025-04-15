@@ -6,16 +6,6 @@ ActuatorGroup::ActuatorGroup(){
 }
 
 void ActuatorGroup::enable(){
-    /*
-    for(auto i = m_asensors.begin(); i != m_asensors.end(); i++){
-        i->second.enable();
-        
-    }*/
-
-    for(auto i = m_dsensors.begin(); i != m_dsensors.end(); i++){
-        i->attach();
-    }
-
     for(auto i = m_servos.begin(); i != m_servos.end(); i++){
         i->enable();
     }
@@ -53,7 +43,7 @@ SmartServo& ActuatorGroup::getServo(int id){
     return m_servos[id];
 }
 
-
+/*
 void ActuatorGroup::createDigitalSensor(int pin, bool inverted){
     if(m_dsensors.size() < MAX_SENSORS) m_dsensors.emplace_back(pin, inverted);
     else Console::error("ActuatorGroup") << "Max sensor limit reached, SmartServo can handle up to " << MAX_POSES << " poses" << Console::endl;
@@ -74,3 +64,4 @@ AnalogSensor& ActuatorGroup::getAnalogSensor(int id){
     if(id < 0 || size_t(id) >= m_asensors.size()) Console::error("ActuatorGroup") << "sensor " << id << " does not exist " << Console::endl; 
     return m_asensors[id];
 }
+*/

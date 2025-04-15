@@ -114,6 +114,7 @@ void SmartServo::wakeUp(){
 void SmartServo::enable(){
     if(m_pin == -1) return;
     m_servo.attach(m_pin);
+    moveToDefault();
     m_enabled = true;
     m_sleeping = false;
 }
