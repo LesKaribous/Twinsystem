@@ -16,7 +16,7 @@ struct ManipulatorProperties{
     left_Drop,
     right_Grab,
     right_Drop,
-    planksUp,
+    planksGrab,
     planksDrop,
     elevator_Up,
     elevator_Down,
@@ -40,6 +40,8 @@ namespace ActuatorPresets{
         Pin::Servo::Servo_AB_2,    //hall magnet Right
         Pin::Servo::Servo_AB_3,    //plank manipulator
         Pin::Servo::Servo_AB_4,    //elevator
+        Pin::PCA9685::PUMP_AB,
+        Pin::PCA9685::EV_AB,
         //position servo
         170,    // left_Grab,
         0,      // left_Drop,
@@ -66,6 +68,8 @@ namespace ActuatorPresets{
         Pin::Servo::Servo_CA_2, //leftServoPin
         Pin::Servo::Servo_CA_3, //elevatorServoPin
         Pin::Servo::Servo_CA_4, //elevatorServoPin
+        Pin::PCA9685::PUMP_CA,
+        Pin::PCA9685::EV_CA,
         //position servo
         180,
         0,

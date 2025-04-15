@@ -19,7 +19,7 @@ enum class ElevatorPose{
     //BORDER = 3,
 };
 
-enum class MagnetPose{
+enum class ManipulatorPose{
     DROP = 0,
     GRAB = 1,
 };
@@ -59,8 +59,8 @@ public:
     void registerPoses(); //Register all servos poses
 
 private : 
-    bool moveMagnetDual(SmartServo& a,SmartServo& b, MagnetPose pose, int speed = 100);
-    bool moveMagnet(SmartServo& servo, MagnetPose pose, int speed = 100);
+    bool moveMagnetDual(SmartServo& a,SmartServo& b, ManipulatorPose pose, int speed = 100);
+    bool moveMagnet(SmartServo& servo, ManipulatorPose pose, int speed = 100);
     bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
     void createManipulator(RobotCompass, ManipulatorProperties);
     void createManipulator(RobotCompass, BannerManipulatorProperties);

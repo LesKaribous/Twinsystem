@@ -169,6 +169,9 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10);
     ihm.onUpdate(); // Read inputs
+
+    ihm.drawBootProgress("Linking actuators...");
+    os.attachService(&actuators); ihm.addBootProgress(10);
     
     delay(500);
 
@@ -183,9 +186,6 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking safety...");
     os.attachService(&safety); ihm.addBootProgress(10);
     safety.disable();
-
-    ihm.drawBootProgress("Linking actuators...");
-    os.attachService(&actuators); ihm.addBootProgress(10);
 
     motion.engage();
     ihm.drawBootProgress("Linking Localisation...");

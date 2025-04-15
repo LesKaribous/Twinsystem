@@ -141,6 +141,16 @@
             stepC = 26;
         }
         
+        namespace PCA9685{
+            const int
+            PUMP_AB = 0,
+            EV_AB = 1,
+            //PUMP_BC = 0,
+            //EV_BC = 1,
+            PUMP_CA = 2,
+            EV_CA = 3;
+        }
+
         // Actuator Pinout
         namespace Servo{
             // Connector Act 1
