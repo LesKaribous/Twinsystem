@@ -76,11 +76,13 @@ void matchB(){
     //motion.enableCruiseMode();
     async motion.go(POI::y2);  // Step 1 - POI y2
     async motion.go(POI::BannerYellow);  // Step 2 - POI BannerYellow
+    async motion.go(POI::BannerYellow + Vec2(0,50));  // Step 2 - POI BannerYellow
+    //probeBorder(TableCompass::SOUTH, RobotCompass::BC, 100);
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     async motion.go(POI::y2);  // Step 1 - POI y2
-    async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::NORTH));
-    async motion.go(1100, 1300);  // Step 3
-    async motion.go(POI::stock_4);  // Step 4 - POI stock_4
+
+    takeStock(POI::stock_4, RobotCompass::AB, TableCompass::NORTH);// Step 4 - POI stock_4
+
     async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
     async motion.go(POI::constAreaYellow_2);  // Step 5 - POI constAreaYellow_2
     async motion.go(1218, 1448);  // Step 6
@@ -101,6 +103,124 @@ void waitMs(unsigned long time){
     //delay(time);
 }
 
+
+
+void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
+    if(rc == RobotCompass::BC){
+        THROW("wrong compass");
+        return;
+    }
+
+    RobotCompass nextCompass = (rc == RobotCompass::AB) ? RobotCompass::CA : RobotCompass::AB;
+
+    float approachOffset = 250;
+    float grabOffset = 175;
+    float canOffset = 100;
+    float canGrab = 100;
+
+    Vec2 approach = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, approachOffset).toVec2();
+    Vec2 grab = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, grabOffset).toVec2();
+
+    // ---- Take first planks ----
+    async motion.go(approach); 
+    async motion.align(rc, getCompassOrientation(tc));
+    
+    actuators.moveElevator(rc, ElevatorPose::UP);
+    actuators.grabPlank(rc);
+    waitMs(800);
+    async motion.go(grab);
+    waitMs(800);
+
+    actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -20);
+    waitMs(800);
+    actuators.storePlank(rc);
+
+
+
+    // ---- Take second planks ----
+    async motion.go(approach); 
+    async motion.align(nextCompass, getCompassOrientation(tc));
+
+    actuators.moveElevator(nextCompass, ElevatorPose::UP);
+    actuators.grabPlank(nextCompass);
+    waitMs(800);
+    async motion.go(grab);
+    waitMs(800);
+
+    actuators.moveElevatorOffset(nextCompass, ElevatorPose::DOWN, -20);
+    waitMs(800);
+    actuators.storePlank(nextCompass);
+
+
+    // ---- Take second can ----
+    async motion.goPolar(getCompassOrientation(tc)+90, canOffset); 
+    actuators.grab(nextCompass);
+    async motion.goPolar(getCompassOrientation(tc), canGrab);
+    async motion.goPolar(getCompassOrientation(tc), -canGrab);
+
+    // ---- take first can ---- 
+    async motion.align(rc, getCompassOrientation(tc));
+    async motion.goPolar(getCompassOrientation(tc)-90, canOffset*2);
+    actuators.grab(rc);
+    async motion.goPolar(getCompassOrientation(tc), canGrab);
+    async motion.goPolar(getCompassOrientation(tc), -canGrab);
+
+    motion.setFeedrate(1.0);
+}
+/*
+void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
+    float startOffset = 260.0;
+    float grabOffset = 80.0;
+    float pushOffset = 70.0;
+    float newTargetY = target.y;
+
+    // Ralentir
+    motion.setFeedrate(0.7);
+
+    // Mettre les bras en position Grab
+    actuators.moveElevator(RobotCompass::AB,ElevatorPose::DOWN);
+    actuators.moveElevator(RobotCompass::BC,ElevatorPose::DOWN);
+    actuators.moveElevator(RobotCompass::CA,ElevatorPose::DOWN);
+
+    // On se positionne en bordure de zone
+    if(tc == TableCompass::EAST) newTargetY = newTargetY - startOffset;
+    else if(tc == TableCompass::WEST) newTargetY = newTargetY + startOffset;
+    async motion.go(target.x, newTargetY);
+
+    for(int i = 0; i < 3; i++){
+        actuators.drop(rc);
+
+        // Avancer vers la plante seulement si pas la premiere fois
+        if(i > 0){
+            if(tc == TableCompass::EAST) newTargetY = newTargetY + grabOffset;
+            else if(tc == TableCompass::WEST) newTargetY = newTargetY - grabOffset;
+            async motion.go(target.x, newTargetY);
+        }
+        // Rapprocher les plantes
+        actuators.grab(rc);
+        waitMs(500);
+
+        // Avancer un peu avant de grab
+        if(tc == TableCompass::EAST) async motion.go(target.x, newTargetY + pushOffset);
+        else if(tc == TableCompass::WEST) async motion.go(target.x, newTargetY - pushOffset);
+
+        // Prendre les plantes
+        actuators.grab(rc);
+        waitMs(500);
+
+        // Reculer
+        if(tc == TableCompass::EAST) async motion.go(target.x, newTargetY);
+        else if(tc == TableCompass::WEST) async motion.go(target.x, newTargetY);
+
+        // Lever les plantes et suivant
+        actuators.moveElevator(rc,ElevatorPose::UP);
+        rc = nextActuator(rc);
+        if(i<2) async motion.align(rc, getCompassOrientation(tc)); // Ne pas effectuer la rotation sur la derniere action
+    }
+
+    motion.setFeedrate(1.0);
+}
+*/
 
 RobotCompass nextActuator(RobotCompass rc){
     int RobotCompassSize = 6;

@@ -44,7 +44,19 @@ void setServoPos(SmartServo& servo, ElevatorPose pose, int position){
     servo.setPose(CAST_POSE(pose), position);
 }
 
-void Actuators::registerPoses(){
+void setServoPos(SmartServo& servo, PlankManipulatorPose pose, int position){
+    servo.setPose(CAST_POSE(pose), position);
+}
+
+void Actuators::moveElevatorOffset(RobotCompass rc, ElevatorPose pose, int offset, int speed){
+    if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR)){
+        SmartServo& elevator = getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR);
+        elevator.moveTo(elevator.getPose(CAST_POSE(pose)) + offset, speed);
+    }
+}
+
+void Actuators::registerPoses()
+{
 
     // --- AB ---
     //Left
@@ -68,8 +80,9 @@ void Actuators::registerPoses(){
 
     //Planks
     if(groupAB.hasServo((int)ServoIDs::PLANKS)){
-        setServoPos(groupAB.getServo((int)ServoIDs::PLANKS), ManipulatorPose::DROP, ActuatorPresets::AB.planksDrop);
-        setServoPos(groupAB.getServo((int)ServoIDs::PLANKS), ManipulatorPose::GRAB, ActuatorPresets::AB.planksGrab);
+        setServoPos(groupAB.getServo((int)ServoIDs::PLANKS), PlankManipulatorPose::DROP, ActuatorPresets::AB.planksDrop);
+        setServoPos(groupAB.getServo((int)ServoIDs::PLANKS), PlankManipulatorPose::GRAB, ActuatorPresets::AB.planksGrab);
+        setServoPos(groupAB.getServo((int)ServoIDs::PLANKS), PlankManipulatorPose::STORE, ActuatorPresets::AB.planksStore);
     }
 
     // --- BC ---
@@ -117,9 +130,9 @@ void Actuators::registerPoses(){
     if(groupCA.hasServo((int)ServoIDs::PLANKS)){
         setServoPos(groupCA.getServo((int)ServoIDs::PLANKS), ManipulatorPose::DROP, ActuatorPresets::CA.planksDrop);
         setServoPos(groupCA.getServo((int)ServoIDs::PLANKS), ManipulatorPose::GRAB, ActuatorPresets::CA.planksGrab);
+        setServoPos(groupCA.getServo((int)ServoIDs::PLANKS), PlankManipulatorPose::STORE, ActuatorPresets::CA.planksStore);
     }
 }
-
 
 void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
 
@@ -293,7 +306,7 @@ void Actuators::dropPlank(RobotCompass rc, int speed){
     switch (rc)
     {
     case RobotCompass::AB :
-            groupAB.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(ManipulatorPose::DROP), speed);
+            groupAB.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::DROP), speed);
         break;
 
     // case RobotCompass::BC :
@@ -302,7 +315,7 @@ void Actuators::dropPlank(RobotCompass rc, int speed){
     //     break;
 
     case RobotCompass::CA :
-            groupCA.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(ManipulatorPose::DROP), speed);
+            groupCA.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::DROP), speed);
         break;
     
     default:
@@ -316,7 +329,7 @@ void Actuators::grabPlank(RobotCompass rc, int speed){
     switch (rc)
     {
     case RobotCompass::AB :
-            groupAB.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(ManipulatorPose::GRAB), speed);
+            groupAB.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::GRAB), speed);
         break;
 
     // case RobotCompass::BC :
@@ -325,7 +338,29 @@ void Actuators::grabPlank(RobotCompass rc, int speed){
     //     break;
 
     case RobotCompass::CA :
-            groupCA.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(ManipulatorPose::GRAB), speed);
+            groupCA.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::GRAB), speed);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void Actuators::storePlank(RobotCompass rc, int speed){
+    if(!ihm.isPrimary()) return;
+    switch (rc)
+    {
+    case RobotCompass::AB :
+            groupAB.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::STORE), speed);
+        break;
+
+    // case RobotCompass::BC :
+    //     //groupBC.moveServoToPose((int)ServoIDs::MAGNET_RIGHT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     //groupBC.moveServoToPose((int)ServoIDs::MAGNET_LEFT, CAST_POSE(ManipulatorPose::DROP), speed);
+    //     break;
+
+    case RobotCompass::CA :
+            groupCA.moveServoToPose((int)ServoIDs::PLANKS, CAST_POSE(PlankManipulatorPose::STORE), speed);
         break;
     
     default:
@@ -334,11 +369,16 @@ void Actuators::grabPlank(RobotCompass rc, int speed){
 }
 
 
-
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose, int speed){
     if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
         getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveToPose(CAST_POSE(pose), speed);
 }
+
+/*
+void Actuators::moveElevator(RobotCompass rc, PlankManipulatorPose pose, int speed){
+    if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
+    getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+}*/
 
 void Actuators::moveElevatorAngle(RobotCompass rc, int angle, int speed){
     if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))

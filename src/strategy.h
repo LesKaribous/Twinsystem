@@ -9,6 +9,7 @@ void matchB();
 
 // Macros
 void waitMs(unsigned long time);
+void takeStock(Vec2 target, RobotCompass rc, TableCompass tc);
 
 RobotCompass nextActuator(RobotCompass rc);         //Recupere l'orientation de l'actionneur suivant
 RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de l'actionneur précedant

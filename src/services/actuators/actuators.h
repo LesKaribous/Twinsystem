@@ -25,6 +25,13 @@ enum class ManipulatorPose{
     GRAB = 1
 };
 
+enum class PlankManipulatorPose{
+    DROP = 0,
+    GRAB = 1,
+    STORE = 2,
+};
+
+
 class Actuators : public Service, public Job{
 //protected:
 public:
@@ -57,9 +64,12 @@ public:
 
     void dropPlank   (RobotCompass rc, int speed = 100);
     void grabPlank   (RobotCompass rc, int speed = 100);
+    void storePlank   (RobotCompass rc, int speed = 100);
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
+    //void moveElevator(RobotCompass rc, PlankManipulatorPose poseIndex, int speed = 100);
+    void moveElevatorOffset(RobotCompass rc, ElevatorPose poseIndex, int offset, int speed = 100);
     void registerPoses(); //Register all servos poses
 
 private : 

@@ -18,6 +18,7 @@ struct ManipulatorProperties{
     right_Drop,
     planksGrab,
     planksDrop,
+    planksStore,
     elevator_Up,
     elevator_Down,
     elevator_Drop;
@@ -47,8 +48,9 @@ namespace ActuatorPresets{
         0,      // left_Drop,
         30,     // right_Grab,
         180,    // right_Drop,
-        130,    // planksUp,
+        90,     // planksUp,
         90,     // planksDrop,
+        130,    // planksStore,
         20,     // elevator_Up,
         120,    // elevator_Down,
         80      // elevator_Drop;
@@ -75,8 +77,9 @@ namespace ActuatorPresets{
         0,
         0, 
         180,
-        130,
         90,
+        90,
+        130,
         20,
         120, 
         70
