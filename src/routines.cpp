@@ -288,8 +288,8 @@ void onMatchNearEnd(){
     //actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     //actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
     waitMs(800);
-    //if(ihm.isColorA()) async motion.go(POI::yellowArrival);
-    //else async motion.go(POI::blueArrival);
+    if(ihm.isColor(Settings::BLUE)) async motion.go(POI::b1);
+    else async motion.go(POI::y1);
     ihm.addScorePoints(10); //zone d'arrivée
     chrono.onMatchFinished();
 }
@@ -298,7 +298,8 @@ void onMatchEnd(){
     safety.disable();
     lidar.disable();
     //motion.pause(); //pause the program if possible
-    //motion.disable();
+    motion.cancel();
+    motion.disable();
     actuators.disable();
     os.stop();
 }
