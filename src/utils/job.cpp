@@ -6,8 +6,34 @@ Job::Job(){
 	pauseTime = 0;
 }
 
-Job::~Job(){
+Job::~Job(){}
 
+void Job::run(){
+	if(isCanceling()){
+		onCanceling();
+		return;
+	}
+
+	if(isPausing()){
+		onPausing();
+		return;
+	}
+}
+
+void Job::onCanceling(){
+	onCanceled();
+}
+
+void Job::onCanceled(){
+	m_state = JobState::CANCELED;
+}
+
+void Job::onPausing(){
+	onPaused();
+}
+
+void Job::onPaused(){
+	m_state = JobState::PAUSED;
 }
 
 String  Job::toString() const {
@@ -21,8 +47,14 @@ String  Job::toString() const {
 		case JobState::PAUSED :
 			return "PAUSED";
 		break;
-		case JobState::CANCELLED :
-			return "CANCELLED";
+		case JobState::CANCELED :
+			return "CANCELED";
+		break;
+		case JobState::CANCELING :
+			return "CANCELING";
+		break;
+		case JobState::PAUSING :
+			return "PAUSING";
 		break;
 		case JobState::COMPLETED :
 			return "COMPLETED";
@@ -38,6 +70,10 @@ bool Job::isPaused() const {
 	return m_state == JobState::PAUSED;
 }
 
+bool Job::isPausing() const {
+	return m_state == JobState::PAUSING;
+}
+
 bool Job::isIdle() const {
 	return m_state == JobState::IDLE;
 }
@@ -47,13 +83,20 @@ bool Job::isRunning() const{
 }
 
 bool Job::isPending() const{
-	return m_state == JobState::RUNNNING || m_state == JobState::PAUSED ;
+	return m_state == JobState::RUNNNING || m_state == JobState::PAUSED || m_state == JobState::PAUSING || m_state == JobState::CANCELING;
 }
 
-bool Job::isCancelled() const{
-	return m_state == JobState::CANCELLED;
+bool Job::isBusy() const{
+	return m_state == JobState::RUNNNING || m_state == JobState::PAUSING || m_state == JobState::CANCELING;
 }
 
+bool Job::isCanceling() const{
+	return m_state == JobState::CANCELING;
+}
+
+bool Job::isCanceled() const {
+	return m_state == JobState::CANCELED;
+}
 
 bool Job::isCompleted() const{
 	return m_state == JobState::COMPLETED;
@@ -86,7 +129,7 @@ void  Job::start(){
 void  Job::pause(){
 	if(m_state == JobState::RUNNNING){
 		pauseTime = millis();
-		m_state = JobState::PAUSED;
+		m_state = JobState::PAUSING;
 	}
 }
 
@@ -97,7 +140,11 @@ void  Job::resume(){
 }
 
 void  Job::cancel(){
-	m_state = JobState::CANCELLED;
+	m_state = JobState::CANCELING;
+}
+
+void  Job::forceCancel(){
+	m_state = JobState::CANCELED;
 }
 
 void  Job::complete(){

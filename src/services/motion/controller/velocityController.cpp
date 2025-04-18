@@ -2,16 +2,22 @@
 #include "settings.h"
 #include "pin.h"
 #include "os/console.h"
-#include "kinematics.h"
+#include "services/motion/kinematics.h"
 
 VelocityController::VelocityController() : 
-    m_sA(Pin::Stepper::stepA, Pin::Stepper::dirA, !Settings::Stepper::DIR_A_POLARITY), 
-    m_sB(Pin::Stepper::stepB, Pin::Stepper::dirB, !Settings::Stepper::DIR_B_POLARITY),  
-    m_sC(Pin::Stepper::stepC, Pin::Stepper::dirC, !Settings::Stepper::DIR_C_POLARITY),
+    m_sA(nullptr), 
+    m_sB(nullptr),  
+    m_sC(nullptr),
 
     m_target_velocity(0, 0, 0), m_current_velocity(0, 0, 0),
     m_pid_integral(0, 0, 0), m_pid_last_error(0, 0, 0),
     m_kp(Settings::Motion::kP), m_ki(Settings::Motion::kI), m_kd(Settings::Motion::kD) { 
+}
+
+void VelocityController::setSteppers(Stepper* a, Stepper* b, Stepper* c){
+    m_sA = a;
+    m_sB = b;
+    m_sC = c;
 }
 
 void VelocityController::setPIDGains(float kp, float ki, float kd) {
@@ -20,17 +26,23 @@ void VelocityController::setPIDGains(float kp, float ki, float kd) {
     m_kd = kd;
 }
 
-void VelocityController::enable(){   
-    m_sA.enable();
-    m_sB.enable();
-    m_sC.enable();
+void VelocityController::reset(){
+    m_sA->reset();
+    m_sB->reset();
+    m_sC->reset();
+}
 
+void VelocityController::enable()
+{
+    m_sA->enable();
+    m_sB->enable();
+    m_sC->enable();
 }
 
 void VelocityController::disable(){
-    m_sA.disable();
-    m_sB.disable();
-    m_sC.disable();
+    m_sA->disable();
+    m_sB->disable();
+    m_sC->disable();
 }
 
 void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
@@ -38,9 +50,9 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
     if(targetVelocity.a == 0 && targetVelocity.b == 0 && targetVelocity.c == 0){
         m_target_velocity = Vec3(0);
 
-        m_sA.setVelocity(0);
-        m_sB.setVelocity(0);
-        m_sC.setVelocity(0);
+        m_sA->setVelocity(0);
+        m_sB->setVelocity(0);
+        m_sC->setVelocity(0);
         return;
     }
 
@@ -57,17 +69,17 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
         m_target_velocity = target;
     }
 
-    m_sA.setVelocity(m_target_velocity.a);
-    m_sB.setVelocity(m_target_velocity.b);
-    m_sC.setVelocity(m_target_velocity.c);
+    m_sA->setVelocity(m_target_velocity.a);
+    m_sB->setVelocity(m_target_velocity.b);
+    m_sC->setVelocity(m_target_velocity.c);
 }
 
 
 void VelocityController::control() {
-    m_sA.step();
-    m_sB.step();
-    m_sC.step();
-    m_current_velocity = (Vec3(m_sA.getVelocity(), m_sB.getVelocity(), m_sC.getVelocity()));
+    m_sA->step();
+    m_sB->step();
+    m_sC->step();
+    m_current_velocity = (Vec3(m_sA->getVelocity(), m_sB->getVelocity(), m_sC->getVelocity()));
 
 }
 

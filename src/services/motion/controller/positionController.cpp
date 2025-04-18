@@ -74,8 +74,8 @@ float command(float dt,
     return std::clamp(acceleration, -maxAccel, maxAccel);
 }
 
-PositionController::PositionController()
-  : position(0.0f, 0.0f),
+PositionController::PositionController() : 
+    position(0.0f, 0.0f),
     velocity(0.0f, 0.0f),
     acceleration(0.0f, 0.0f),
     target(0.0f, 0.0f),
@@ -84,7 +84,7 @@ PositionController::PositionController()
 {
     controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();
-    controller.setTargetVelocity(Vec3(0));
+    
 }
 
 void PositionController::run() {
@@ -92,82 +92,14 @@ void PositionController::run() {
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
         //THROW(position);
 		lastTime = micros();
-    	float dt = Settings::Motion::PID_INTERVAL * 1e-6;
-        
-        Vec2 error = target - position;
-        float angle = target.c - position.c;
-        //error *= Vec2(Settings::Calibration::Primary.Cartesian);
-        //angle *= Settings::Calibration::Primary.Cartesian.c;
-
-        if(isPaused()) {
-            if(velocity.mag() > 0) deccelerate();
-        }
-
-        if(isCancelled()) {
-            if(velocity.mag() > 0) deccelerate();
-            else complete();
-            Job::cancel();
-        }
-
-        if(isPending() && !isPaused()){
-            acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
-            acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
-            acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL, 0.01, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
-        }
-
-        if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
-            target_velocity.x += acceleration.x * dt;
-        }else {
-            target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
-        }
-
-        if(fabs(error.y) > Settings::Motion::MIN_DISTANCE){
-            target_velocity.y += acceleration.y * dt;
-        }else {
-            target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
-        }
-
-        if(fabs(angle) > Settings::Motion::MIN_ANGLE)  
-            target_velocity.c += acceleration.c * dt;
-        else  
-            target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
-        
-
-        velocity = controller.getCurrentVelocity();
-        velocity.rotateZ(-position.c);
-        position = position + ( velocity * dt);
-
-        Vec3 final_target_velocity = target_velocity;
-        if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
-        if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
-        if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
-
-        if(final_target_velocity.magSq() > 0){
-            final_target_velocity.rotateZ(position.c);
-            controller.setTargetVelocity(final_target_velocity);
-        }else{
-            if (fabs(error.x) < Settings::Motion::MIN_DISTANCE && 
-                fabs(error.y) < Settings::Motion::MIN_DISTANCE && 
-                fabs(angle) < Settings::Motion::MIN_ANGLE && isRunning()) 
-                complete();
-            controller.setTargetVelocity(Vec3(0));
-        }
-
-        Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
-        //Console::plotXY("pos", String(position.x), String(position.y));
-        //Console::plotXY("target", String(target.x), String(target.y));
+        if(isPausing()) onPausing();
+        else if(isCanceling()) onCanceling();
+        else onUpdate();
     }
 }
 
-
-
-
-
-
-
 void PositionController::reset() {
     Job::reset();
-    position = Vec3(0.0f);
     position= Vec3(0.0f);
     velocity= Vec3(0.0f);
     acceleration = Vec3(0.0f);
@@ -175,6 +107,7 @@ void PositionController::reset() {
     target_velocity= Vec3(0.0f);
     newTarget= Vec3(0.0f);
     last_otos_time = micros();
+    controller.reset();
 }
 
 void PositionController::start() {
@@ -197,6 +130,70 @@ void PositionController::complete() {
     controller.disable();
 }
 
+void PositionController::onUpdate(){
+    float dt = Settings::Motion::PID_INTERVAL * 1e-6;
+        
+    Vec2 error = target - position;
+    float angle = target.c - position.c;
+
+    if(isPending() && !isPaused()){
+        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL, 0.01, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
+    }
+
+    if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
+        target_velocity.x += acceleration.x * dt;
+    }else {
+        target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
+    }
+
+    if(fabs(error.y) > Settings::Motion::MIN_DISTANCE){
+        target_velocity.y += acceleration.y * dt;
+    }else {
+        target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
+    }
+
+    if(fabs(angle) > Settings::Motion::MIN_ANGLE)  
+        target_velocity.c += acceleration.c * dt;
+    else  
+        target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
+    
+
+    velocity = controller.getCurrentVelocity();
+    velocity.rotateZ(-position.c);
+    position = position + ( velocity * dt);
+
+    Vec3 final_target_velocity = target_velocity;
+    if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
+    if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
+    if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
+
+    if(final_target_velocity.magSq() > 0){
+        final_target_velocity.rotateZ(position.c);
+        controller.setTargetVelocity(final_target_velocity);
+    }else{
+        if (fabs(error.x) < Settings::Motion::MIN_DISTANCE && 
+            fabs(error.y) < Settings::Motion::MIN_DISTANCE && 
+            fabs(angle) < Settings::Motion::MIN_ANGLE && isRunning()) 
+            complete();
+        controller.setTargetVelocity(Vec3(0));
+    }
+
+    //Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
+    //Console::plotXY("pos", String(position.x), String(position.y));
+    //Console::plotXY("target", String(target.x), String(target.y));
+}
+
+void PositionController::onPausing(){
+    if(velocity.mag() > 0) deccelerate();
+    else Job::onPaused();
+}
+
+void PositionController::onCanceling(){
+    if(velocity.mag() > 0) deccelerate();
+    else Job::onCanceled();
+}
 
 void PositionController::control() {
     controller.control();
@@ -222,9 +219,15 @@ void PositionController::deccelerate(){
 
 void PositionController::setPosition(const Vec3 &t){
     position = t;
+    last_otos_position = t;
 }
 
 void PositionController::setTarget(const Vec3 &t)
 {
     newTarget = t;
+}
+
+void PositionController::setSteppers(Stepper* a, Stepper* b, Stepper* c){
+    controller.setSteppers(a,b,c);
+    controller.setTargetVelocity(Vec3(0));
 }

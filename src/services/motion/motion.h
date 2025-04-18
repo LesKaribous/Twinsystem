@@ -3,8 +3,9 @@
 #include "services/service.h"
 #include "utils/job.h"
 #include "utils/geometry.h"
-#include "positionController.h"
-#include "stepperController.h"
+#include "services/motion/controller/positionController.h"
+#include "services/motion/controller/stepperController.h"
+#include "services/motion/stepper.h"
 
 //BNO
 #include <Wire.h>
@@ -31,16 +32,28 @@ public:
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
 
-    void run()override;
-    void pause() override;
-    void resume() override;
-    void cancel() override;
-    void complete() override;
-    void forceCancel();
 
     void control();
+    void forceCancel();
 
-    void estimatePosition();
+    //Job override
+    void run()override;
+    void start()override;
+    void pause()override;
+    void resume()override;
+    void cancel()override;
+    void complete()override;
+    
+    void onRunning();
+    void onPausing()override;  //Called every run if in Pausing state
+    void onCanceling()override; //Called every run if in  exiting Pausing state
+
+    void onPaused()override;   //Called once when exiting Pausing state
+    void onCanceled()override; //Called once when exiting Canceling state
+
+
+
+    Vec3 estimatedPosition(); //The closest value of our physical position
     bool hasFinished();
 
     //Setters
@@ -62,7 +75,6 @@ public:
     float getAbsoluteTargetDirection() const;
     float getTargetDistance() const;
 
-    void resetCompass(); //zero orientation
     float getOrientation();
     void setOrientation(float angle);
     
@@ -79,9 +91,14 @@ public:
     void disableCruiseMode();
 
 private :
+    Stepper m_sA, m_sB, m_sC;
+
+
     bool m_async = true; //non blocking by default
     bool use_cruise_mode = true; //non blocking by default
     bool current_move_cruised = false; //non blocking by default
+
+    ///Vec3 unrecorded_steps; //Steps that need to be incorporated into position estimation.
 
     Vec3 optmizeRelTarget(Vec3 relTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
@@ -95,6 +112,7 @@ private :
 
     PositionController cruise_controller;
     StepperController stepper_controller;
+
     float m_feedrate = 1.0;
 
     bool _engaged, _sleeping;

@@ -19,6 +19,7 @@ class Stepper {
 
     void enable();
     void disable();
+    void reset();
     
     void setVelocity(float vel);
     float getVelocity() const { return m_velocity; }

@@ -25,7 +25,9 @@ void Localisation::onAttach(){
         }
     }
 
-    if(!m_connected) Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use I2C_OTOS" << Console::endl;
+    if(!m_connected){
+        Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use I2C_OTOS" << Console::endl;
+    }
     else{
         otos.setLinearUnit(kSfeOtosLinearUnitMeters);
         otos.setAngularUnit(kSfeOtosAngularUnitRadians);
@@ -47,6 +49,7 @@ void Localisation::onUpdate(){
 
 // Service routines
 void Localisation::enable(){
+    if(!m_connected) return;
     Service::enable();
     //servicethread = new std::thread(&Localisation::runThread, this);
  	//servicethread->detach();
@@ -84,12 +87,6 @@ void Localisation::read()
 
 
     float orientation = myPosition.h;
-    /*
-    while(orientation > PI) orientation-= 2.0f*PI;
-    while(orientation <= -PI) orientation += 2.0f*PI;
-    
-    */
-
     _unsafePosition.z = orientation;
     //Console::info() << _unsafePosition << Console::endl;
 }
