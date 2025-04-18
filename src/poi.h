@@ -28,8 +28,10 @@ namespace POI{
 
     // ------------------------------------------
     //  Waiting points - Wait for SIMA
-    const Vec2 waitPointYellow  = Vec2(375,675);
-    const Vec2 waitPointBlue    = Vec2(2625,675);
+    const Vec2 waitPointYellowTemp  = Vec2(800,900);
+    const Vec2 waitPointYellow      = Vec2(375,675);
+    const Vec2 waitPointBlueTemp    = Vec2(2200,900);
+    const Vec2 waitPointBlue        = Vec2(2625,675);
 
     // ------------------------------------------
     //  Reserved Material stock
@@ -49,8 +51,15 @@ namespace POI{
     const Vec2 stock_8 = Vec2(2925,675);
 
     // ------------------------------------------
-    //  Waiting points - Wait for SIMA
+    //  Banner Points
     const Vec2 BannerYellow = Vec2(1225,1894);
     const Vec2 BannerBlue   = Vec2(1775,1894);
 
+    // ------------------------------------------
+    //  Some Waypoints
+    const Vec2 yellowWaypoint_1 = Vec2(1100, 1400);
+    const Vec2 yellowWaypoint_2 = Vec2(775, 1400);
+
+    const Vec2 blueWaypoint_1   = Vec2(1900, 1400);
+    const Vec2 blueWaypoint_2   = Vec2(2225, 1400);
 }

@@ -153,7 +153,7 @@ void PositionController::run() {
             controller.setTargetVelocity(Vec3(0));
         }
 
-        Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
+        //Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
         //Console::plotXY("pos", String(position.x), String(position.y));
         //Console::plotXY("target", String(target.x), String(target.y));
     }

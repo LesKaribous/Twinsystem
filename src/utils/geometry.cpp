@@ -78,13 +78,13 @@ float getOffsets(RobotCompass rc){
         return 137.00;
         break;
     case RobotCompass::AB:
-        return 107; //With Bearings
+        return 107.00; //With Bearings
         break;
     case RobotCompass::BC:
-        return 107; //With Bearings
+        return 107.00; //With Bearings
         break;
     case RobotCompass::CA:
-        return 107; //With Bearings
+        return 107.00; //With Bearings
         break;
     default:
         return 0;

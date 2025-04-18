@@ -56,9 +56,9 @@ namespace Settings{
         STRAT_SECONDARY_B = !STRAT_SECONDARY_A;
 
         constexpr unsigned long 
-        DURATION = 90*1000,        //90s
-        NEARLY_FINISH = 10 * 1000,       //10s before the end
-        ENDMATCH = 200;             //200ms before the end
+        DURATION = 100*1000,            //100s
+        NEARLY_FINISH = 15 * 1000,      //15s before the end
+        ENDMATCH = 200;                 //200ms before the end
         
         constexpr float 
         FEEDRATE = 100; //%

@@ -41,7 +41,7 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
 
     int ms = map(speed, 0, 100, 50, 0);
     int currrentPos = 0;
-
+    //TODO safety exit based on max iteration.
     do{
         if(!runAsync) delay(ms);
         else if(millis() - m_lastUpdate < ms){

@@ -3,6 +3,7 @@
 #include "robot.h"
 #include "strategy.h"
 #include "poi.h"
+#include "score.h"
 #include "os/os.h"
 #include "utils/timer/timer.h"
 #include "utils/interpreter/interpreter.h"
@@ -251,7 +252,7 @@ void onRobotAuto(){
 }
 
 void onRobotStop(){
-    ihm.onUpdate();
+    ihm.onUpdate(); //TODO : Check why nothing happened when the robot stopped here
 }
 
 
@@ -281,17 +282,7 @@ void onIntercomRequestReply(Request& req){
 }
 
 void onMatchNearEnd(){
-    //if(motion.isPending())motion.forceCancel();
-    //motion.setFeedrate(1.0);
-    //nav.setAbsolute();
-    //actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
-    //actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
-    //actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
-    waitMs(800);
-    if(ihm.isColor(Settings::BLUE)) async motion.go(POI::b1);
-    else async motion.go(POI::y1);
-    ihm.addScorePoints(10); //zone d'arrivée
-    chrono.onMatchFinished();
+    nearEnd();
 }
 
 void onMatchEnd(){
