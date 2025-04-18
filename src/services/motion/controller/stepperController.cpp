@@ -76,6 +76,10 @@ StepperController::StepperController() :
 {// Initialization of steppers acceleration parameters.
 }
     
+void StepperController::setFeedrate(float feed){
+    m_feedrate = feed;
+}
+
 
 void StepperController::setTarget(long posA, long posB, long posC) {
     m_sA->m_target = posA;
@@ -115,10 +119,10 @@ void StepperController::setTarget(long posA, long posB, long posC) {
         return;
     }
 
-    uint32_t targetSpeed = Settings::Stepper::MAX_SPEED;
+    uint32_t targetSpeed = Settings::Stepper::MAX_SPEED* m_feedrate;
     uint32_t vStart = Settings::Stepper::PULL_IN;
     uint32_t vEnd   = Settings::Stepper::PULL_OUT;
-    uint32_t accel  = Settings::Stepper::MAX_ACCEL;
+    uint32_t accel  = Settings::Stepper::MAX_ACCEL * m_feedrate;
 
     long leadTarget =
         (m_leadStepper == m_sA) ? m_sA->m_target :
@@ -277,8 +281,8 @@ void StepperController::cancel() {
     // Estimate current speed to create a short deceleration move
     int32_t vStart = std::max(1, static_cast<int>(fabs(m_leadStepper->getVelocity())));
     uint32_t vEnd = Settings::Stepper::PULL_OUT;
-    uint32_t accel = Settings::Stepper::STOP_DECCEL;
-    uint32_t speed = Settings::Stepper::MAX_SPEED;
+    uint32_t accel = Settings::Stepper::STOP_DECCEL* m_feedrate;
+    uint32_t speed = Settings::Stepper::MAX_SPEED* m_feedrate;
 
     // Estimate how far we need to stop (s = (v² - ve²) / 2a)
     int32_t stopDistance = (vStart * vStart - vEnd * vEnd) / (2 * accel);
@@ -333,11 +337,11 @@ void StepperController::setSteppers(Stepper* a, Stepper* b, Stepper* c){
     m_sB = b;
     m_sC = c;
 
-    m_sA->m_accel = Settings::Stepper::MAX_ACCEL;
-    m_sB->m_accel = Settings::Stepper::MAX_ACCEL;
-    m_sC->m_accel = Settings::Stepper::MAX_ACCEL;
+    m_sA->m_accel = Settings::Stepper::MAX_ACCEL* m_feedrate;
+    m_sB->m_accel = Settings::Stepper::MAX_ACCEL* m_feedrate;
+    m_sC->m_accel = Settings::Stepper::MAX_ACCEL* m_feedrate;
     
-    m_sA->m_deccel = Settings::Stepper::STOP_DECCEL;
-    m_sB->m_deccel = Settings::Stepper::STOP_DECCEL;
-    m_sC->m_deccel = Settings::Stepper::STOP_DECCEL;
+    m_sA->m_deccel = Settings::Stepper::STOP_DECCEL* m_feedrate;
+    m_sB->m_deccel = Settings::Stepper::STOP_DECCEL* m_feedrate;
+    m_sC->m_deccel = Settings::Stepper::STOP_DECCEL* m_feedrate;
 }

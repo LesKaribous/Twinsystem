@@ -87,6 +87,10 @@ PositionController::PositionController() :
     
 }
 
+void PositionController::setFeedrate(float feed){
+    m_feedrate = feed;
+}
+
 void PositionController::run() {
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
@@ -105,8 +109,7 @@ void PositionController::reset() {
     acceleration = Vec3(0.0f);
     target= Vec3(0.0f);
     target_velocity= Vec3(0.0f);
-    newTarget= Vec3(0.0f);
-    last_otos_time = micros();
+    newTarget = Vec3(0.0f);
     controller.reset();
 }
 
@@ -137,9 +140,9 @@ void PositionController::onUpdate(){
     float angle = target.c - position.c;
 
     if(isPending() && !isPaused()){
-        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL, 5.0f, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL, 0.01, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
+        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 5.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 5.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0.01, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
     }
 
     if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
@@ -203,7 +206,7 @@ void PositionController::deccelerate(){
     //Position
     float currentSpeed = velocity.mag();
     if (currentSpeed > 0) {
-        acceleration = Vec2::normalize(velocity) * (-Settings::Motion::MAX_ACCEL);
+        acceleration = Vec2::normalize(velocity) * (-Settings::Motion::MAX_ACCEL * m_feedrate);
         //Serial.println(acceleration);
     } else {
         acceleration = Vec2(0);
@@ -211,7 +214,7 @@ void PositionController::deccelerate(){
 
     //Rotation
     if (velocity.c > 0) {
-        acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL);
+        acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL * m_feedrate);
     } else {
         acceleration.c = 0;
     }
@@ -219,7 +222,6 @@ void PositionController::deccelerate(){
 
 void PositionController::setPosition(const Vec3 &t){
     position = t;
-    last_otos_position = t;
 }
 
 void PositionController::setTarget(const Vec3 &t)

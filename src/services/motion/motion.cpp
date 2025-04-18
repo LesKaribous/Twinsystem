@@ -233,6 +233,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();
+        cruise_controller.setFeedrate(m_feedrate);
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
         current_move_cruised = true;
@@ -241,12 +242,14 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         current_move_cruised = false;
         if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
         Vec3 steps = ik(_relTarget);
-        Console::println(steps);
-        Console::println(_target);
-        Console::println(_relTarget);
+
+        Console::info("Motion") << "New move :" << "steps(" << steps << "), target(" << _target << "), relTarget(" << _relTarget << ")" << Console::endl;
+        
         cruise_controller.reset();
         stepper_controller.reset();
+        stepper_controller.setFeedrate(m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
+        
     }
 
 
@@ -315,7 +318,9 @@ void Motion::resume(){
         cruise_controller.reset();
         stepper_controller.reset();
         cruise_controller.setPosition(pos);
+        cruise_controller.setFeedrate(m_feedrate);
         cruise_controller.setTarget(_target);
+        
 
         if(m_async){
             cruise_controller.start();
@@ -337,7 +342,9 @@ void Motion::resume(){
         Vec3 _relTarget = toRelativeTarget(_target);
         if(_optimizeRotation) _relTarget = optmizeRelTarget(_relTarget);
         Vec3 steps = ik(_relTarget);
+        stepper_controller.setFeedrate(m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
+        
 
         if(m_async){
             stepper_controller.start();
@@ -384,8 +391,6 @@ void Motion::cancel() {
 }
 
 void Motion::complete() {
-    
-
     _isMoving = false;
     _isRotating = false;
 
@@ -548,7 +553,7 @@ void Motion::setSync(){
 }
 
 void Motion::setFeedrate(float feed){
-    m_feedrate = max(min(feed, 1.0), 0.1);
+    m_feedrate = max(min(feed, 1.0), 0.05);
 }
 
 float Motion::getFeedrate() const{

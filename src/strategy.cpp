@@ -26,14 +26,16 @@ void waitMs(unsigned long time){
 void recalage(){
     motion.engage();
     waitMs(800);
-    //THROW(1)
+    motion.setFeedrate(0.3);
+
     motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD *90));
     if(ihm.isColor(Settings::BLUE)){
+        motion.disableCruiseMode();
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::EAST,  RobotCompass::CA,100);
 
         //motion.enableCruiseMode();
-        motion.disableCruiseMode();
+        
         async motion.go(POI::b2);
         //motion.disableCruiseMode();
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
@@ -58,6 +60,7 @@ void recalage(){
         actuators.storePlank(RobotCompass::CA);
     }
     motion.disengage();
+    motion.setFeedrate(1.0);
     initPump(); //TODO : Integrate into Actuators 
 }
 
@@ -317,7 +320,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
 	bool m_probing = true;
-    motion.setFeedrate(0.3);
+    motion.setFeedrate(0.1);
 	async motion.align(rc, getCompassOrientation(tc));
 
     motion.setRelative();

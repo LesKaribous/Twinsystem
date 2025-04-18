@@ -65,11 +65,15 @@ public:
     Vec3 getDisplacement(); //in mm, mm, rad
     void setSteppers(Stepper* a, Stepper* b, Stepper* c);
 
+    void setFeedrate(float feed);
+
 private:
     Stepper* m_sA = nullptr;
     Stepper* m_sB = nullptr;
-    Stepper* m_sC = nullptr;
-    
+    Stepper* m_sC = nullptr;    
+
+    float m_feedrate = 1.0;
+
     double m_totalTime; // The common move time (in seconds) for the longest trajectory.
     double m_startTime; // The time (in seconds) when the move started.
 

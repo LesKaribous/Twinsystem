@@ -94,9 +94,19 @@ void robotProgramManual(){
             toneOn = true;
         }
         if(ihm.resetButton.pressDuration() > 1950 && toneOn){
+            ihm.playTone(783.99, 150);
             noTone(Pin::Outputs::buzzer);
             toneOn = false;
+            toneOK = false;
         }
+    }
+
+    if((!ihm.buttonPressed()) && (ihm.resetButton.pressDuration() > 1500)  && (ihm.resetButton.pressDuration() < 1950) && toneOn){
+        noTone(Pin::Outputs::buzzer);
+        toneOn = false;
+        toneOK = false;
+        ihm.playTone(440, 150);   // C5
+        ihm.playTone(349.2, 150);   // C5
     }
 
     if( (!ihm.buttonPressed()) &&

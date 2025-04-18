@@ -28,6 +28,7 @@ void Safety::enable(){
 void Safety::disable(){
     Service::disable();
     m_obstacleDetected = false;
+    Console::println("obstable forced to false");
 }
 
 
@@ -56,13 +57,15 @@ void Safety::onUpdate(){
 
     if(millis() - m_lastSeen > 2000){
         m_obstacleDetected = false;
+        Console::print("obstable gone (last seen ");
+        Console::print(millis() - m_lastSeen);
+        Console::println("ms ago");
     }
     
     if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
        motion.resume();
+       Console::println("resume");
     }
-
-
 
 }
 
@@ -72,4 +75,6 @@ void Safety::setSafeDistance(int d){
 
 void Safety::setObstacleDetected(bool state){
     m_obstacleDetected = state;
+    if(m_obstacleDetected) Console::println("obstable detected");
+    else Console::println("obstable gone");
 }

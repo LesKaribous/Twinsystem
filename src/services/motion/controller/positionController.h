@@ -30,12 +30,11 @@ public:
     Vec3 getAcceleration() const { return acceleration; }
     Vec3 getTarget() const { return target; }
 
+    void setFeedrate(float feed);
 private:
+    float m_feedrate = 1.0;
 
     void deccelerate();
-
-    Vec3 last_otos_position;      // Current position
-    long last_otos_time;      // Current position
 
     Vec3 position;      // Current position
     Vec3 velocity;      // Current velocity
