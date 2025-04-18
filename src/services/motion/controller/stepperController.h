@@ -1,6 +1,6 @@
 
 #include "os/asyncExecutor.h"
-#include "stepper.h"
+#include "services/motion/stepper.h"
 
 
 #include <iostream>
@@ -53,17 +53,30 @@ public:
     void start() override;   //Set to PENDING
     void cancel() override;  //Set to CANCELLED
     void complete() override;//Set to COMPLETED
+    void pause() override;  //Set to CANCELLED
+    void resume() override;//Set to COMPLETED
     void control();
 
+    void onUpdate();
+    void onCanceling() override;
+    void onCanceled() override;
+
     void setTarget(long a, long b, long c );
+    Vec3 getDisplacement(); //in mm, mm, rad
+    void setSteppers(Stepper* a, Stepper* b, Stepper* c);
 
 private:
-    Stepper m_sA, m_sB, m_sC;
+    Stepper* m_sA = nullptr;
+    Stepper* m_sB = nullptr;
+    Stepper* m_sC = nullptr;
+    
     double m_totalTime; // The common move time (in seconds) for the longest trajectory.
     double m_startTime; // The time (in seconds) when the move started.
 
-    LinStepAccelerator m_planner;
+    unsigned long m_last_compute;
+    unsigned long m_last_control;
 
+    LinStepAccelerator m_planner;
 
     Stepper* m_leadStepper = nullptr;
     long m_leadDelta = 0;

@@ -26,6 +26,20 @@ void Stepper::disable() {
     m_step_delay = 0;
 }
 
+void Stepper::reset() {
+    m_position = 0;
+    m_start = 0;
+    m_target = 0;
+    m_delta = 0;
+    m_delta = 0;
+    m_stepsDone = 0;
+    m_error = 0;
+    m_totalDistance = 0;
+
+    m_accel = Settings::Stepper::MAX_ACCEL;
+    m_deccel  = Settings::Stepper::STOP_DECCEL;
+}
+
 void Stepper::setDirection(bool forward) {
     bool desired = forward;
     if (m_inverted_dir) desired = !desired;

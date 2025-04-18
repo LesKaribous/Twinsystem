@@ -16,9 +16,6 @@ public:
     void read();
     void calibrate();
 
-    bool isRotating() const;
-    bool isMoving() const;
-
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
     Localisation(): Service(ID_LOCALISATION){};

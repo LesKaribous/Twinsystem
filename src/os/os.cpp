@@ -52,7 +52,7 @@ void OS::manual_routine(){
     updateServices();
     executeRoutine(m_manualRoutine);
     if(currentJob() != nullptr){
-        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
+        if(!currentJob()->isPending()) killCurrentJob();
         else currentJob()->run();
     }
 }
@@ -61,7 +61,7 @@ void OS::auto_routine(){
     updateServices();
     executeRoutine(m_autoRoutine);
     if(currentJob() != nullptr){
-        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
+        if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
         else currentJob()->run();
     }
 }
@@ -117,8 +117,9 @@ void OS::attachService(Service* service){
     if(service != nullptr){
         m_services[service->id()] = service;
         Console::trace() << "Attached service: " << service->id() << Console::endl;
-        service->enable();
         service->onAttach();
+        service->enable();
+        
     }
 }
 
@@ -158,12 +159,12 @@ Job& OS::wait(unsigned long time, bool runasync) {
 
 void OS::waitUntil(Job& obj, bool runasync){
     addJob(&obj);
-    if(!runasync) while(obj.isPending() || obj.isPaused()) run();
+    if(!runasync) while(obj.isPending()) run();
 }
 
 void OS::execute(Job& obj, bool runasync){
     addJob(&obj);
-    if(!runasync)while(obj.isPending()|| obj.isPaused()) run();
+    if(!runasync) while(obj.isPending()) run();
 }
 
 void OS::flush(){

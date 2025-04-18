@@ -314,9 +314,9 @@ void onTerminalCommand(){
             Console::println("Starting program");
             motion.engage();
             prgm.start();
-            while(os.isBusy()) os.flush();
+            os.flush();
             while(prgm.step()){
-                while(os.isBusy()) os.flush();
+                os.flush();
             };
             motion.disengage();
         }else {

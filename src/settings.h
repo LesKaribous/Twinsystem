@@ -111,9 +111,10 @@ namespace Settings{
         MAX_ACCEL = 300, // mm/s^2
         MAX_SPEED = 1000, // mm/s
         MIN_DISTANCE = 20, // Target stop thresold //mm
+        
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms
-        PID_INTERVAL = 5000;//microseconds
+        PID_INTERVAL = 5000; //microseconds
     }
 
     namespace Stepper{
@@ -137,6 +138,7 @@ namespace Settings{
         MIN_SPEED = 20,
         STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
         MIN_STEP_DELAY = 20,
+        MIN_STEPS = 5,
         STEPPER_COMPUTE_DELAY = 1000,//µs Steps every 1000 µs seconds
         PULL_IN = 100,//fullsteps/s
         PULL_OUT = 100; //fullsteps/s

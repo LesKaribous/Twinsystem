@@ -3,7 +3,7 @@
 #include "os/asyncExecutor.h"
 #include "velocityController.h"
 
-class PositionController : public Job {
+class PositionController : public Job{
 public:
     PositionController();
 
@@ -15,9 +15,14 @@ public:
     void start() override;   //Set to PENDING
     void complete() override;//Set to COMPLETED
 
+    void onUpdate();
+    void onPausing();
+    void onCanceling();
+
     // Set a new target position (in world coordinates)
     void setPosition(const Vec3 &t);
     void setTarget(const Vec3 &t);
+    void setSteppers(Stepper* a, Stepper* b, Stepper* c);
 
     // Getters for debugging or further processing
     Vec3 getPosition() const { return position/Settings::Calibration::Primary.Cartesian; }
@@ -28,10 +33,6 @@ public:
 private:
 
     void deccelerate();
-
-    void controlPositionX(float dt, float positionErrorX);
-    void controlPositionY(float dt, float positionErrorY);
-    void controlRotation(float dt, float rotationError);
 
     Vec3 last_otos_position;      // Current position
     long last_otos_time;      // Current position
