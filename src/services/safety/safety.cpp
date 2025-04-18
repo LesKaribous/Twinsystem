@@ -47,26 +47,27 @@ void Safety::onUpdate(){
 
             intercom.sendRequest("checkObstacle("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
         }
+
+        if(m_obstacleDetected/*m_currentDistance <= 350*/){
+            if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
+            if(!motion.isRotating()) m_lastSeen = millis();
+         }
+     
+         if(millis() - m_lastSeen > 2000){
+            if(m_obstacleDetected){
+                m_obstacleDetected = false;
+                Console::print("obstable gone (last seen ");
+                Console::print(millis() - m_lastSeen);
+                Console::println("ms ago");
+            }
+
+         }
+         
+         if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
+            motion.resume();
+            Console::println("resume");
+         }
     , 50)
-
-    
-    if(m_obstacleDetected/*m_currentDistance <= 350*/){
-       if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
-       if(!motion.isRotating()) m_lastSeen = millis();
-    }
-
-    if(millis() - m_lastSeen > 2000){
-        m_obstacleDetected = false;
-        Console::print("obstable gone (last seen ");
-        Console::print(millis() - m_lastSeen);
-        Console::println("ms ago");
-    }
-    
-    if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
-       motion.resume();
-       Console::println("resume");
-    }
-
 }
 
 void Safety::setSafeDistance(int d){
@@ -74,7 +75,13 @@ void Safety::setSafeDistance(int d){
 }
 
 void Safety::setObstacleDetected(bool state){
+    
+    if(m_obstacleDetected && state){
+        Console::println("obstable detected");
+        Console::print("obstable detected (seen at");
+        Console::print(millis());
+        Console::println("ms");
+    }
+    else if(m_obstacleDetected && !state) Console::println("obstable gone");
     m_obstacleDetected = state;
-    if(m_obstacleDetected) Console::println("obstable detected");
-    else Console::println("obstable gone");
 }

@@ -114,8 +114,8 @@ void StepperController::setTarget(long posA, long posB, long posC) {
     }
 
     if (m_leadStepper == nullptr || m_leadDelta == 0) {
-        Console::error("start") << "Lead stepper not assigned properly!" << Console::endl;
-        complete();
+        Console::error("StepperController") << "Lead stepper not assigned properly!" << Console::endl;
+        reset();
         return;
     }
 
@@ -142,7 +142,7 @@ void StepperController::setTarget(long posA, long posB, long posC) {
     else if (m_leadStepper == m_sB) m_leadStepsDone = &m_sB->m_stepsDone;
     else if (m_leadStepper == m_sC) m_leadStepsDone = &m_sC->m_stepsDone;
 
-    m_startTime = micros() * 1e-6;
+    
 }
 
 // start() – Enable steppers, then begin the move.
@@ -151,6 +151,13 @@ void StepperController::start() {
     m_sA->enable();
     m_sB->enable();
     m_sC->enable();
+    
+    if (m_leadStepper == nullptr || m_leadDelta == 0) {
+        Console::error("StepperController") << "Lead stepper not assigned properly!" << Console::endl;
+        reset();
+    }
+
+    m_startTime = micros() * 1e-6;
 }
 
 void StepperController::run(){
@@ -180,8 +187,10 @@ void StepperController::onUpdate() {
             }
         }
     } else if(isRunning()){
-        Console::success() << Console::microTimeStamp() << " : Motion complete (speed = 0)" << Console::endl;
+        Console::success("StepperController") << Console::microTimeStamp() << " : Motion complete (speed = 0)" << Console::endl;
         complete();
+    } else if(isCanceling()){
+        onCanceled();
     }
 }
 
@@ -196,10 +205,12 @@ void StepperController::control() {
         m_last_control = now;
     }else return;
 
-    // --- Step pins fast for pulse generation (if needed for waveform stability) ---
+    // more stable like this...
+    
     m_sA->step();
     m_sB->step();
     m_sC->step();
+    
 
     // --- Throttle logic updates ---
     static unsigned long m_last_compute = micros();
@@ -234,21 +245,18 @@ void StepperController::control() {
         m_sB->m_stepsDone >= m_sB->m_delta &&
         m_sC->m_stepsDone >= m_sC->m_delta)
     {
-        Console::success() << Console::microTimeStamp() << " : All axes complete, calling complete()" << Console::endl;
+        Console::success("StepperController") << Console::microTimeStamp() << " : All axes complete, calling complete()" << Console::endl;
         complete();
     }
 }
 
 void StepperController::onCanceling(){
-    if(fabs(m_leadStepper->getVelocity()) > 1.0f) {
-        onUpdate();
-    }else{
-        onCanceled();
-    }
+    onUpdate();
 }
 
 void StepperController::onCanceled(){
     Job::onCanceled();
+    Console::success("StepperController") << Console::microTimeStamp() << " : Motion cancelled succesfully (speed = 0)" << Console::endl;
     complete();
 }
 
@@ -274,7 +282,7 @@ void StepperController::resume(){
 
 // cancel() – Decelerate (using pause) then complete the move.
 void StepperController::cancel() {
-    if (!isPending()) return;
+    if (!isRunning()) return;
 
     Console::info("cancel") << "Cancelling with controlled deceleration..." << Console::endl;
 
@@ -297,7 +305,7 @@ void StepperController::cancel() {
     long stopTarget = m_leadStepper->m_position + dir * stopDistance;
 
     m_planner.prepare(m_leadStepper->m_position, stopTarget, speed, vStart, vEnd, accel);
-
+    Job::cancel();
     
 }
 

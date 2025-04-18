@@ -182,15 +182,15 @@ void PositionController::onUpdate(){
             complete();
         controller.setTargetVelocity(Vec3(0));
     }
-
+    
     //Console::info() << "p:" << position << " | t:" << target << " | v:" << velocity << " | tv:" << target_velocity << " | a:" << acceleration << Console::endl;
     //Console::plotXY("pos", String(position.x), String(position.y));
     //Console::plotXY("target", String(target.x), String(target.y));
 }
 
 void PositionController::onPausing(){
-    if(velocity.mag() > 0) deccelerate();
-    else Job::onPaused();
+    Console::error() << "Not implemented, cancelling instead" << Console::endl;
+    onCanceling(); 
 }
 
 void PositionController::onCanceling(){
@@ -203,6 +203,7 @@ void PositionController::control() {
 }
 
 void PositionController::deccelerate(){
+    float dt = Settings::Motion::PID_INTERVAL * 1e-6;
     //Position
     float currentSpeed = velocity.mag();
     if (currentSpeed > 0) {
@@ -217,6 +218,25 @@ void PositionController::deccelerate(){
         acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL * m_feedrate);
     } else {
         acceleration.c = 0;
+    }    
+
+    target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
+    target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
+    target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
+
+    Vec3 final_target_velocity = target_velocity;
+    if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
+    if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
+    if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
+
+    if(final_target_velocity.magSq() > 100){
+        final_target_velocity.rotateZ(position.c);
+        controller.setTargetVelocity(final_target_velocity);
+    }else{
+        controller.setTargetVelocity(Vec3(0));
+        onCanceled();
+        Console::success("PositionController") << "Successfully canceled move" << Console::endl;
+        complete();
     }
 }
 

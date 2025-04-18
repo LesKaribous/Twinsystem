@@ -103,6 +103,10 @@ void Motion::onPaused(){
     Job::onPaused();
     _isMoving = false;
     _isRotating = false;
+    Console::info("Motion") << "Move paused successfully" << Console::endl;
+
+    cruise_controller.reset();
+    stepper_controller.reset();
 
     _startPosition = _position = estimatedPosition();
 }
@@ -114,11 +118,10 @@ void Motion::onCanceled(){
 
     _startPosition = _position = estimatedPosition();
 
-
     cruise_controller.reset();
     stepper_controller.reset();
     
-    Console::println("canceled");
+    Console::info("Motion") << "Move cancelled successfully" << Console::endl;
 }
 
 void Motion::control(){
@@ -310,8 +313,9 @@ void Motion::pause(){
 }
 
 void Motion::resume(){
+
+    if(!isPaused()) return;
     Job::resume();
-    if(!isPaused() && !isPausing()) return;
 
     if(current_move_cruised){
         Vec3 pos = estimatedPosition();
@@ -380,6 +384,7 @@ bool Motion::hasFinished() {
 }
 
 void Motion::cancel() {
+    if(isCanceling() || isCanceled() || isCompleted()) return;
     Job::cancel();
     if(Job::m_state == JobState::CANCELING){
         if(current_move_cruised){

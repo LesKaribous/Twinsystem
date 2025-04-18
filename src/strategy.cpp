@@ -360,7 +360,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
 	bool m_probing = true;
-    motion.setFeedrate(0.1);
+    motion.setFeedrate(0.2);
 	async motion.align(rc, getCompassOrientation(tc));
 
     motion.setRelative();
