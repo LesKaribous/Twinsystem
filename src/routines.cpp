@@ -170,6 +170,8 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10);
     ihm.onUpdate(); // Read inputs
+    //TODO 
+    Console::println("TODO : Add important modifier to moves to dupplicate move");
 
     ihm.drawBootProgress("Linking actuators...");
     os.attachService(&actuators); ihm.addBootProgress(10);
@@ -291,6 +293,7 @@ void onMatchEnd(){
     //motion.pause(); //pause the program if possible
     motion.cancel();
     motion.disable();
+    motion.disengage();
     actuators.disable();
     os.stop();
 }

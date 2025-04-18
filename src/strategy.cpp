@@ -79,7 +79,7 @@ void matchB(){
     motion.setFeedrate(1.0);
     // Select POI on color Team
     bool isYellow = ihm.isColor(Settings::YELLOW);
-    //motion.enableCruiseMode();
+    motion.enableCruiseMode();
     // -------------------------------------------
 
     // Step 2 - POI BannerYellow
@@ -163,7 +163,7 @@ void nearEnd(){
 
     // Time to wait befor SIMAs leave the Backstage
     unsigned long left = chrono.getTimeLeft();
-    unsigned long waitSima = (left > 4000) ? (left - 4000) : 0; 
+    unsigned long waitSima = (left > 5000) ? (left - 5000) : 0; 
     // Wait for SIMAs
     waitMs(waitSima);
 

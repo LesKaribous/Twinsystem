@@ -108,8 +108,8 @@ namespace Settings{
 
         const int 
         //STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 300, // mm/s^2
-        MAX_SPEED = 1000, // mm/s
+        MAX_ACCEL = 600, // mm/s^2 300
+        MAX_SPEED = 2000, // mm/s 1000
         MIN_DISTANCE = 20, // Target stop thresold //mm
         
         PID_MAX_PERIOD = 10,//ms
@@ -132,9 +132,9 @@ namespace Settings{
         constexpr int
         PULSE_WIDTH = 14, //https://www.analog.com/media/en/technical-documentation/data-sheets/tmc2209_datasheet_rev1.09.pdf   page 63
         STEPS_PER_REVOLUTION = 200,
-        STOP_DECCEL = 2000, // equivalent fullsteps/s^2
-        MAX_ACCEL = 1000, // equivalent fullsteps/s^2
-        MAX_SPEED = 8000, // equivalent fullsteps/s
+        STOP_DECCEL = 3000, // equivalent fullsteps/s^2
+        MAX_ACCEL = 3000, // equivalent fullsteps/s^2
+        MAX_SPEED = 15000, // equivalent fullsteps/s
         MIN_SPEED = 20,
         STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
         MIN_STEP_DELAY = 20,
