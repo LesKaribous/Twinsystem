@@ -85,7 +85,7 @@ namespace Settings{
         USE_GYROSCOPE = true;
 
         constexpr int VELOCITY_SAMPLES = 0,
-        MIN_CRUISE_DISTANCE = 600;
+        MIN_CRUISE_DISTANCE = 600; // TODO : decrease !!!!
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
