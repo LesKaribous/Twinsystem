@@ -3,6 +3,7 @@
 #include "console.h"
 
 #define async (AsyncExecutor)
+#define RUN_TWICE(x) x; x;
 
 class AsyncExecutor {
 Job* job = nullptr;

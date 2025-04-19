@@ -25,20 +25,18 @@ void waitMs(unsigned long time){
 
 void recalage(){
     motion.engage();
-    waitMs(800);
+    motion.disableCruiseMode();
     motion.setFeedrate(0.3);
-
-    motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD *90));
+    waitMs(600);
+    motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD * 90));
+    waitMs(600);
     if(ihm.isColor(Settings::BLUE)){
-        motion.disableCruiseMode();
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::EAST,  RobotCompass::CA,100);
-
-        //motion.enableCruiseMode();
         
         async motion.go(POI::b2);
         async motion.go(POI::b2);
-        //motion.disableCruiseMode();
+        
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
         motion.setAbsPosition(Vec3(POI::b2, motion.getOrientation()));
         actuators.storePlank(RobotCompass::AB);
@@ -46,17 +44,14 @@ void recalage(){
         actuators.storePlank(RobotCompass::CA);
 
     }else{
-        //motion.setAbsPosition({-1,-1,PI});
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::B,100);
 
-        //motion.enableCruiseMode();
-        motion.disableCruiseMode();
         async motion.go(POI::y2);
         async motion.go(POI::y2);
-        //motion.disableCruiseMode();
+
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
-        //motion.setAbsPosition(Vec3(POI::y2, motion.getOrientation()));
+
         actuators.storePlank(RobotCompass::AB);
         actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
         actuators.storePlank(RobotCompass::CA);

@@ -85,7 +85,7 @@ namespace Settings{
         USE_GYROSCOPE = true;
 
         constexpr int VELOCITY_SAMPLES = 0,
-        MIN_CRUISE_DISTANCE = 200; // TODO : decrease !!!!
+        MIN_CRUISE_DISTANCE = 600; // TODO : decrease !!!! or not ?
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
@@ -108,8 +108,8 @@ namespace Settings{
 
         const int 
         //STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 600, // mm/s^2 300
-        MAX_SPEED = 2000, // mm/s 1000
+        MAX_ACCEL = 400, // mm/s^2 300
+        MAX_SPEED = 1600, // mm/s 1000
         MIN_DISTANCE = 20, // Target stop thresold //mm
         
         PID_MAX_PERIOD = 10,//ms
@@ -154,7 +154,7 @@ namespace Settings{
     namespace Calibration{
         const CalibrationProfile Primary = {
             { 1.0f, 1.0f, 1.0f }, //Holonomic : ABC
-            { 1.1f, -1.1f, 0.85f} //Cartesian : XYROT
+            { 1.089f, -1.089f, 0.831f} //Cartesian : XYROT
         };
     }
 }
