@@ -430,7 +430,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     position.c = DEG_TO_RAD * (getCompassOrientation(tc) - getCompassOrientation(rc));
 	Console::println(position);
     motion.setAbsPosition(position);
-    waitMs(1000);
+    delay(1000);
     
     if(clearance != 0){ 
         async motion.goPolar(getCompassOrientation(rc),-clearance);
