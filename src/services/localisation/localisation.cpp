@@ -96,9 +96,9 @@ void Localisation::calibrate() {
     Serial.println("Ensure the OTOS is flat and stationary");
     delay(1000);
     Serial.println("Calibrating IMU...");
-
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    otos.calibrateImu();
+    otos.calibrateImu(400, true);
+    otos.setLinearScalar(1.0);
     Serial.println("Calibrated IMU.");
     m_calibrated = true;
 }

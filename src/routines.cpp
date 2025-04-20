@@ -14,6 +14,7 @@
 
 void robotProgramAuto(){
     Console::println("Started match");
+    ihm.setPage(IHM::Page::MATCH);
     lidar.enable();
     safety.enable();
     chrono.start();
@@ -21,24 +22,28 @@ void robotProgramAuto(){
     //motion.disable();
 }
 
+void robotArmed(){
+    lidar.showRadarLED();
+    ihm.freezeSettings();
+    motion.engage();
+
+    ihm.playTone(329.2, 150);   // C5
+    ihm.playTone(349.2, 150);   // C5
+    ihm.playTone(440, 150);   // C5
+   
+    
+    noTone(Pin::Outputs::buzzer);
+}
+
 void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    ihm.setRobotPosition(motion.getAbsPosition());
+    ihm.setRobotPosition(motion.estimatedPosition());
     //ihm.setRobotPosition(nav.getPosition());
     
     if(ihm.hasStarter() && !hadStarter){
-        lidar.showRadarLED();
-        ihm.freezeSettings();
-        motion.engage();
-
-        ihm.playTone(329.2, 150);   // C5
-        ihm.playTone(349.2, 150);   // C5
-        ihm.playTone(440, 150);   // C5
-       
-        
-        noTone(Pin::Outputs::buzzer);
+        robotArmed();
 
         /*
         ihm.playTone(440.00, 500);   // A4
@@ -233,6 +238,11 @@ void onRobotBoot(){
     Expression::registerVariables("C", "C");
     Expression::registerVariables("CA", "CA");
 
+    Expression::registerVariables("NORTH", "NORTH");
+    Expression::registerVariables("SOUTH", "SOUTH");
+    Expression::registerVariables("WEST", "WEST");
+    Expression::registerVariables("EAST", "EAST");
+
     Expression::registerVariables("MOTION", "MOTION");
     Expression::registerVariables("ACTUATORS", "ACTUATORS");
     Expression::registerVariables("SAFETY", "SAFETY");
@@ -255,12 +265,12 @@ void onRobotBoot(){
 
 void onRobotManual(){
     //ihm.setRobotPosition(nav.getPosition());
-    ihm.setRobotPosition(motion.getAbsPosition());
+    ihm.setRobotPosition(motion.estimatedPosition());
 }
 
 void onRobotAuto(){
-    //ihm.setRobotPosition(motion.getAbsPosition());
-    //lidar.setLidarPosition(nav.getPosition());
+    ihm.setRobotPosition(motion.estimatedPosition());
+    //lidar.setLidarPosition(motion.estimatedPosition());
 }
 
 void onRobotStop(){
@@ -325,13 +335,13 @@ void onTerminalCommand(){
         Program prgm = in.processScript(rawcmd);
         if(prgm.isValid()){ //TODO Integrate that in OS
             Console::println("Starting program");
-            motion.engage();
+            //motion.engage();
             prgm.start();
             os.flush();
             while(prgm.step()){
                 os.flush();
             };
-            motion.disengage();
+            //motion.disengage();
         }else {
             Console::println("Invalid program : Unknown error");
         }

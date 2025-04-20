@@ -21,8 +21,9 @@ void registerCommands() {
     CommandHandler::registerCommand("pause", "Pause motion", command_pause);
     CommandHandler::registerCommand("resume", "Resume motion", command_resume);
     CommandHandler::registerCommand("cancel", "Cancel motion", command_cancel);
-    //CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
-    //CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
+    CommandHandler::registerCommand("probe(tableCompass, side)", "Probe border", command_probe);
+    CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
+    CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
     CommandHandler::registerCommand("align(side,angle)", "Align to a specific side and angle", command_align);
     CommandHandler::registerCommand("setAbsolute", "Set motion to absolute mode", command_setAbsolute);
     CommandHandler::registerCommand("setRelative", "Set motion to relative mode", command_setRelative);
@@ -37,6 +38,11 @@ void registerCommands() {
     CommandHandler::registerCommand("drop(side)", "Drop object using actuator", command_drop);
     CommandHandler::registerCommand("grabPlank(side)", "Grab Plank using actuator", command_grabPlank);
     CommandHandler::registerCommand("dropPlank(side)", "Drop Plank using actuator", command_dropPlank);
+    CommandHandler::registerCommand("pump(side)", "enable pump", command_pump);
+    CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
+    CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
+    CommandHandler::registerCommand("cruise", " Enable cruise mode", command_cruise);
+
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
     CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
@@ -107,6 +113,7 @@ void command_wait(const args_t &args){
 }
 
 void command_start(const args_t &args){
+    robotArmed();
     os.start();
 }
 
@@ -116,6 +123,33 @@ void command_stop(const args_t &args){
 
 void command_reboot(const args_t &args){
     os.reboot();
+}
+
+void command_cruise(const args_t& args){
+    motion.enableCruiseMode();
+}
+
+void command_probe(const args_t &args){
+    if(args.size() != 2)return;
+    String tableCompass = args[0];
+    String side = args[1];
+
+    RobotCompass rc = RobotCompass::A;
+    if(side.equalsIgnoreCase("A"))         rc = RobotCompass::A;
+    else if(side.equalsIgnoreCase("AB"))   rc = RobotCompass::AB;
+    else if(side.equalsIgnoreCase("B"))    rc = RobotCompass::B;
+    else if(side.equalsIgnoreCase("BC"))   rc = RobotCompass::BC;
+    else if(side.equalsIgnoreCase("C"))    rc = RobotCompass::C;
+    else if(side.equalsIgnoreCase("CA"))   rc = RobotCompass::CA;
+
+    TableCompass tc = TableCompass::NORTH;
+    if(tableCompass.equalsIgnoreCase("NORTH"))         tc = TableCompass::NORTH;
+    else if(tableCompass.equalsIgnoreCase("EAST"))   tc = TableCompass::EAST;
+    else if(tableCompass.equalsIgnoreCase("SOUTH"))    tc = TableCompass::SOUTH;
+    else if(tableCompass.equalsIgnoreCase("WEST"))   tc = TableCompass::WEST;
+
+    probeBorder(tc, rc, 100);
+
 }
 
 //Motion
@@ -263,6 +297,26 @@ void command_grabPlank(const args_t& args){
     else if(side.equals("CA")) actuators.grabPlank(RobotCompass::CA);
 }
 
+void command_pump(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) startPump(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) startPump(RobotCompass::CA);
+}
+
+void command_ev(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) stopPump(RobotCompass::AB, 500);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) stopPump(RobotCompass::CA, 500);
+}
+void command_initPump(const args_t& args){
+    initPump();
+}
+
+
 void command_elevator(const args_t& args){
     if(args.size() != 2)return;
     const String& side = args[0];
@@ -329,7 +383,15 @@ void command_print(const args_t& args){
     }
 }
 
+void command_wake(const args_t& args){
+    motion.engage();
+    actuators.enable();
+}
 
+void command_sleep(const args_t& args){
+    motion.disengage();
+    actuators.disable();
+}
 
 //std::vector<String> arguments = extractArguments(args);
 

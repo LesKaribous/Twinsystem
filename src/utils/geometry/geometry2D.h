@@ -16,7 +16,7 @@ struct Vec2 {
         struct { float a, b; };
     };
 
-    //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.GetAbsPosition())).heading())
+    //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.estimatedPosition())).heading())
 
     Vec2();
     Vec2(float);

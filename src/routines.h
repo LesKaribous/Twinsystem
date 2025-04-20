@@ -11,7 +11,7 @@ void onRobotAuto();  //Execute during robotProgram (run loop)
 void onRobotStop(); //Execute while robot stopped (stop loop)
 
 void control(); //fast control loop (Used for PID controller and high speed functionnality)
-
+void robotArmed();
 void onTerminalCommand();
 void onIntercomConnected();
 void onIntercomDisconnected();

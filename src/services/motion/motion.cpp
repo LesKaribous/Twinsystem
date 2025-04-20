@@ -46,6 +46,15 @@ void Motion::onRunning(){
         if(hasFinished()){
             complete();
         }
+        
+        bool canceled = false;
+        if(current_move_cruised) canceled = cruise_controller.isCanceled();
+        if(stepper_controller) canceled = stepper_controller.isCanceled();
+        if(canceled){
+            Console::error("Motion") << "Move command was canceled" << Console::endl; 
+            onCanceled();
+        }
+
 
         Vec3 position = estimatedPosition();
         if(position != _position && current_move_cruised){
@@ -177,6 +186,7 @@ Motion& Motion::turn(float angle){
         _position.c = getOrientation();
     }*/
     //setStepsVelocity(Settings::Motion::TURN_SPEED);
+    //TODO push Motion properties
     _isMoving = true;
     _isRotating = true;
     if (_absolute) move(Vec3(_position.a, _position.b, angle));
@@ -236,7 +246,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();
-        cruise_controller.setFeedrate(m_feedrate);
+        cruise_controller.setFeedrate( isRotating() ? m_feedrate * 0.5 : m_feedrate);
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
         current_move_cruised = true;
@@ -250,7 +260,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         
         cruise_controller.reset();
         stepper_controller.reset();
-        stepper_controller.setFeedrate(m_feedrate);
+        stepper_controller.setFeedrate( isRotating() ? m_feedrate * 0.5 : m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         
     }
@@ -365,15 +375,14 @@ void Motion::resume(){
 }
 
 Vec3 Motion::estimatedPosition(){
-    if(isPending()){
-        if(localisation.enabled()){
-            localisation.onUpdate();
-            return localisation.getPosition();
-        }else{
-            return _position + stepper_controller.getDisplacement();
-        }
+
+    if(localisation.enabled()){
+        localisation.onUpdate();
+        return localisation.getPosition();
+    }else{
+        return _position + stepper_controller.getDisplacement();
     }
-    return _position;
+
 }
 
 bool Motion::hasFinished() {
@@ -523,16 +532,17 @@ bool  Motion::isRelative() const{
 }
 
 bool Motion::isRotating() const{
-    return (Job::isPending() &&  _isRotating);
+    return (_isRotating);
 }
 
 bool Motion::isMoving() const{
-    return (Job::isPending() && _isMoving);
+    return (_isMoving);
 }
 
 void  Motion::setAbsPosition(Vec3 newPos){
     THROW(newPos);
     _position = newPos; 
+    _startPosition = newPos;
     localisation.setPosition(newPos);
     //if(_useBNO) setOrientation(newPos.c);
 }
