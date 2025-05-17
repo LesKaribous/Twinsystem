@@ -150,6 +150,9 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 
 void Program::run(){
     //Do nothing
+    if(isRunning()){
+        step();
+    }
 }
 
 void Program::reset(){

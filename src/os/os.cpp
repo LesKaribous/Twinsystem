@@ -52,7 +52,8 @@ void OS::manual_routine(){
     updateServices();
     executeRoutine(m_manualRoutine);
     if(currentJob() != nullptr){
-        if(!currentJob()->isPending()) killCurrentJob();
+        //if(!currentJob()->isPending()) killCurrentJob();
+        if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
         else currentJob()->run();
     }
 }
@@ -69,6 +70,7 @@ void OS::auto_routine(){
 void OS::auto_program_routine(){
     m_state = AUTO;
     executeRoutine(m_auto_programRoutine);
+    auto_routine();
     m_state = STOPPED;
 }
 
@@ -76,6 +78,7 @@ void OS::manual_program_routine(){
     m_state = MANUAL;
     updateServices();
     executeRoutine(m_manual_programRoutine);
+    manual_routine();
     if(m_state == MANUAL) m_state = MANUAL_PROGRAM;
 }
 
@@ -164,6 +167,7 @@ void OS::waitUntil(Job& obj, bool runasync){
 
 void OS::execute(Job& obj, bool runasync){
     addJob(&obj);
+    obj.start();
     if(!runasync) while(obj.isPending()) run();
 }
 

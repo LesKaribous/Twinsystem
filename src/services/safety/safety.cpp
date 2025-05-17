@@ -45,7 +45,7 @@ void Safety::onUpdate(){
             if(distanceToGo > 500) distanceToGo = 500;
             if(distanceToGo < 350) distanceToGo = 350;
 
-            intercom.sendRequest("checkObstacle("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
+            intercom.sendRequest("ob("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
         }
 
         if(m_obstacleDetected/*m_currentDistance <= 350*/){

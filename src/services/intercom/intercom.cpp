@@ -152,6 +152,7 @@ void Intercom::_processIncomingData() {
                 if (requestIt != _sentRequests.end()) {
                     Request& request = requestIt->second;
                     request.onResponse(responseData);
+                    Console::trace("Intercom") << "<" << incomingMessage << Console::endl;
                 }else{
                     Console::trace("Intercom")<< "not found" << Console::endl;
                 }

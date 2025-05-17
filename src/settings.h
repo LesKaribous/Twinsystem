@@ -20,6 +20,13 @@
 #define TW_STRAT_OPT1 BROWN
 #define TW_STRAT_OPT2 NOBROWN
 
+
+//Occupancy map size	
+#define GRID_WIDTH 20
+#define GRID_HEIGHT 13
+#define GRID_BITS   (GRID_WIDTH * GRID_HEIGHT)
+#define GRID_BYTES  ((GRID_BITS + 7) / 8)
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,

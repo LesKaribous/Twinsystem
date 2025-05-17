@@ -39,7 +39,7 @@ void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    ihm.setRobotPosition(motion.estimatedPosition());
+    //ihm.setRobotPosition(motion.estimatedPosition());
     //ihm.setRobotPosition(nav.getPosition());
     
     if(ihm.hasStarter() && !hadStarter){
@@ -264,13 +264,20 @@ void onRobotBoot(){
 }
 
 void onRobotManual(){
-    //ihm.setRobotPosition(nav.getPosition());
+    RUN_EVERY(
     ihm.setRobotPosition(motion.estimatedPosition());
+    ,100);
+
+    RUN_EVERY(
+    intercom.sendRequest("oM", 100, onIntercomRequestReply);
+    ,500);
 }
 
 void onRobotAuto(){
+    RUN_EVERY(
     ihm.setRobotPosition(motion.estimatedPosition());
-    //lidar.setLidarPosition(motion.estimatedPosition());
+    //intercom.sendRequest("oM", 100, onIntercomRequestReply);
+    ,100);
 }
 
 void onRobotStop(){
@@ -283,8 +290,6 @@ void onRobotStop(){
 // -------------------------------------
 //           MODULES EVENTS
 // -------------------------------------
-
-
 void onIntercomConnected(){
     ihm.setIntercomState(true);
 }
@@ -300,7 +305,19 @@ void onIntercomRequest(Request& req){
 
 
 void onIntercomRequestReply(Request& req){
-
+    //return;
+    if(req.getContent().startsWith("oM")){ //occupancyMap
+        lidar.decompressOccupancyMap(req.getResponse());
+        /*
+        Console::println("Occupancy map received");
+        Console::println("Occupancy map : ");
+        for(int i = 0; i < GRID_WIDTH; i++){
+            for(int j = 0; j < GRID_HEIGHT; j++){
+                Console::print(lidar.isOccupied(i * 3000.0/GRID_WIDTH, j* 2000.0/GRID_HEIGHT) ? "1" : "0");
+            }
+            Console::println("");
+        }*/
+    }
 }
 
 void onMatchNearEnd(){
@@ -333,14 +350,17 @@ void onTerminalCommand(){
         String rawcmd = terminal.dequeCommand();
         Interpreter in;
         Program prgm = in.processScript(rawcmd);
+        
         if(prgm.isValid()){ //TODO Integrate that in OS
             Console::println("Starting program");
             //motion.engage();
-            prgm.start();
-            os.flush();
-            while(prgm.step()){
-                os.flush();
-            };
+            os.execute(prgm);
+
+            //prgm.start();
+            //os.flush();
+            //while(prgm.step()){
+            //    os.flush();
+            //};
             //motion.disengage();
         }else {
             Console::println("Invalid program : Unknown error");

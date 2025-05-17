@@ -214,7 +214,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
 
     const float approachOffset = 250;
     float grabOffset = 150;//175
-    if(ihm.isColor(Settings::BLUE)) grabOffset = 160;
+    if(ihm.isColor(Settings::BLUE)) grabOffset = 140;
 
 
     const float canOffsetA = 125;//100
