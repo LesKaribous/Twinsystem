@@ -267,6 +267,14 @@ void onRobotManual(){
     RUN_EVERY(
     ihm.setRobotPosition(motion.estimatedPosition());
     ,100);
+    
+    RUN_EVERY(
+        if(ihm.teamSwitch.getState() == Settings::YELLOW){
+            intercom.sendRequest("team(Y)");
+        }else{
+            intercom.sendRequest("team(B)");
+        }
+    ,1000);
 
     RUN_EVERY(
     intercom.sendRequest("oM", 100, onIntercomRequestReply);
