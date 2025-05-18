@@ -1,7 +1,7 @@
 #pragma once
 #include "settings.h"
 #include "services/service.h"
-#include "utils/job.h"
+#include "os/jobs/job.h"
 #include "utils/geometry.h"
 #include "services/motion/controller/positionController.h"
 #include "services/motion/controller/stepperController.h"
@@ -122,6 +122,6 @@ private :
     bool _optimizeRotation = true;
     bool _debug = true;
 
-    SERVICE(Motion);
+    SINGLETON(Motion);
 };
-EXTERN_DECLARATION(Motion, motion)
+SINGLETON_EXTERN(Motion, motion)

@@ -1,7 +1,7 @@
 #include "terminal.h"
 #include "os/console.h"
 
-INSTANTIATE_SERVICE(Terminal, terminal)
+SINGLETON_INSTANTIATE(Terminal, terminal)
 
 Terminal::Terminal() : Service(ID_TERMINAL){}
 

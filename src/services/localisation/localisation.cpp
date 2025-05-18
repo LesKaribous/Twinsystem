@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-INSTANTIATE_SERVICE(Localisation, localisation);
+SINGLETON_INSTANTIATE(Localisation, localisation);
 
 #ifdef OLD_BOARD
 #define I2C_OTOS I2C_OTOS

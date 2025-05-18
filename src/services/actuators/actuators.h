@@ -2,7 +2,7 @@
 #include "services/service.h"
 #include "services/actuators/actuatorGroup.h"
 #include "utils/geometry.h"
-#include "utils/job.h"
+#include "os/jobs/manager.h"
 #include "services/actuators/groups.h"
 
 
@@ -79,7 +79,7 @@ private :
     void createManipulator(RobotCompass, ManipulatorProperties);
     void createBannerManipulator(RobotCompass, BannerManipulatorProperties);
 
-    SERVICE(Actuators)
+    SINGLETON(Actuators)
 };
 
-EXTERN_DECLARATION(Actuators, actuators)
+SINGLETON_EXTERN(Actuators, actuators)

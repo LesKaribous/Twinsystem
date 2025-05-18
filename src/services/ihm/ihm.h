@@ -18,7 +18,7 @@ typedef ILI9341_t3 TFTScreen;
 
 class IHM : public Service{
     IHM();
-    SERVICE(IHM)
+    SINGLETON(IHM)
 public:
     enum class Page{
         BOOT,
@@ -114,4 +114,4 @@ public:
     
 };
 
-EXTERN_DECLARATION(IHM, ihm)
+SINGLETON_EXTERN(IHM, ihm)

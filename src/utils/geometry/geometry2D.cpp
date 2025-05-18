@@ -101,8 +101,8 @@ Vec2& Vec2::sub(const Vec2& v){
     return *this;
 }
 
-Vec2& Vec2::dist(const Vec2& v){
-    return this->sub(v);
+float Vec2::dist(const Vec2& v){
+    return sqrt((a-v.a)*(a-v.a) + (b-v.b)*(b-v.b));
 }
 
 float Vec2::mag(){
@@ -211,9 +211,9 @@ float Vec2::det(const Vec2& a, const Vec2& b){
     return a.a * b.a - a.b * b.b;
 }
 
-Vec2 Vec2::dist(const Vec2& a, const Vec2& b){
+float Vec2::dist(const Vec2& a, const Vec2& b){
     Vec2 r = a.copy().sub(b);
-    return r;
+    return r.mag();
 }
 
 float Vec2::angleBetween(const Vec2& a, const Vec2& b){

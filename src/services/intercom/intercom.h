@@ -53,6 +53,6 @@ private:
     void _processIncomingData();
     void _processPendingRequests();
 
-    SERVICE(Intercom)
+    SINGLETON(Intercom)
 };
-EXTERN_DECLARATION(Intercom, intercom)
+SINGLETON_EXTERN(Intercom, intercom)

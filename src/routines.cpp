@@ -44,22 +44,6 @@ void robotProgramManual(){
     
     if(ihm.hasStarter() && !hadStarter){
         robotArmed();
-
-        /*
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(349.23, 350);   // F4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(523.25, 150);   // C5
-        ihm.playTone(440.00, 500);   // A4
-        ihm.playTone(349.23, 350);   // F4
-        ihm.playTone(523.25, 150);   // C5
-        ihm.playTone(440.00, 1000);  // A4
-        */
         hadStarter = true;
         return;
     }
@@ -315,16 +299,7 @@ void onIntercomRequest(Request& req){
 void onIntercomRequestReply(Request& req){
     //return;
     if(req.getContent().startsWith("oM")){ //occupancyMap
-        lidar.decompressOccupancyMap(req.getResponse());
-        /*
-        Console::println("Occupancy map received");
-        Console::println("Occupancy map : ");
-        for(int i = 0; i < GRID_WIDTH; i++){
-            for(int j = 0; j < GRID_HEIGHT; j++){
-                Console::print(lidar.isOccupied(i * 3000.0/GRID_WIDTH, j* 2000.0/GRID_HEIGHT) ? "1" : "0");
-            }
-            Console::println("");
-        }*/
+        occupancy.decompress(req.getResponse());
     }
 }
 

@@ -17,7 +17,7 @@ public:
     void setEndCallback(routine_ptr cb);
 
     Chrono(): Service(ID_CHRONO){};
-    SERVICE(Chrono)
+    SINGLETON(Chrono)
 
 private :
     routine_ptr m_matchNearEnd_callback;
@@ -26,4 +26,4 @@ private :
     bool nearlyFinished = false;
     bool finished = false;
 };
-EXTERN_DECLARATION(Chrono, chrono)
+SINGLETON_EXTERN(Chrono, chrono)

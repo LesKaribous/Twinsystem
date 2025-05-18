@@ -3,7 +3,7 @@
 
 #include "services/ihm/ihm.h"
 
-INSTANTIATE_SERVICE(Chrono, chrono)
+SINGLETON_INSTANTIATE(Chrono, chrono)
 
 void Chrono::onAttach(){
     setDuration(Settings::Match::DURATION);

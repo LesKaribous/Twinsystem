@@ -8,7 +8,7 @@
 #include "services/localisation/localisation.h"
 #include <cmath>
 
-INSTANTIATE_SERVICE(Motion, motion)
+SINGLETON_INSTANTIATE(Motion, motion)
 
 Motion::Motion() : Service(ID_MOTION),
 m_sA(Pin::Stepper::stepA, Pin::Stepper::dirA, !Settings::Stepper::DIR_A_POLARITY), 

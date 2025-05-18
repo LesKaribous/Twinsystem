@@ -3,7 +3,7 @@
 #include "settings.h"
 #include "comUtilities.h"
 
-INSTANTIATE_SERVICE(Intercom, intercom)
+SINGLETON_INSTANTIATE(Intercom, intercom)
 
 Intercom::Intercom() : Service(ID_INTERCOM),  _stream(INTERCOM_SERIAL) {}
 

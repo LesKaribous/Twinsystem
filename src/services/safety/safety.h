@@ -14,11 +14,11 @@ public:
     void setSafeDistance(int safeDistance);
 
     Safety(): Service(ID_SAFETY){};
-    SERVICE(Safety)
+    SINGLETON(Safety)
 
 private:
     int m_currentDistance = infinity();
     bool m_obstacleDetected = false;
     int m_lastSeen = infinity();
 };
-EXTERN_DECLARATION(Safety, safety)
+SINGLETON_EXTERN(Safety, safety)

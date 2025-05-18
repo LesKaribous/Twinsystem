@@ -5,7 +5,7 @@
 
 #define CAST_POSE(x) static_cast<int>(x)
 
-INSTANTIATE_SERVICE(Actuators, actuators)
+SINGLETON_INSTANTIATE(Actuators, actuators)
 
 Actuators::Actuators() : Service(ID_ACTUATORS){}
 

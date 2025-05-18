@@ -19,7 +19,7 @@ public:
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
     Localisation(): Service(ID_LOCALISATION){};
-    SERVICE(Localisation)
+    SINGLETON(Localisation)
 
 private : 
 
@@ -34,4 +34,4 @@ private :
 
     QwiicOTOS otos;
 };
-EXTERN_DECLARATION(Localisation, localisation)
+SINGLETON_EXTERN(Localisation, localisation)

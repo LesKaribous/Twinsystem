@@ -1,5 +1,6 @@
 #pragma once
 #include <Arduino.h>
+#include "os/singleton.h"
 #include "os/tw_threads.h"
 
 using callback_ptr = void (*)();
@@ -31,27 +32,15 @@ public:
     void onAttach()override;
     
     Example(): Service(EXAMPLE_ID){};
-    SERVICE(Screen)
+    SINGLETON(Screen)
 };
-
+SINGLETON_EXTERN(Example, example)
 
 in source file : 
 
-INSTANTIATE_SERVICE(Actuators)
+SINGLETON_INSTANTIATE(example)
 
 */
-
-#define SERVICE(X) public: \
-    static inline X& instance(){return m_instance;} \
-    X(const X&) = delete; \
-    X(X&&) = delete; \
-    X& operator=(const X&) = delete; \
-    X& operator=(X&&) = delete; \
-private: \
-    static X m_instance;
-
-#define INSTANTIATE_SERVICE(className, name) className className::m_instance; className& name = className::instance();
-#define EXTERN_DECLARATION(className, name) extern className& name;
 
 class Service{
 protected:

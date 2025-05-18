@@ -5,7 +5,7 @@
 #include "services/intercom/intercom.h"
 #include "utils/timer/timer.h"
 
-INSTANTIATE_SERVICE(Safety, safety)
+SINGLETON_INSTANTIATE(Safety, safety)
 
 void getDistanceCallback(Request& req){
     int d = req.getResponse().toInt();

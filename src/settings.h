@@ -27,6 +27,10 @@
 #define GRID_BITS   (GRID_WIDTH * GRID_HEIGHT)
 #define GRID_BYTES  ((GRID_BITS + 7) / 8)
 
+#define TABLE_SIZE_X 3000 //mm
+#define TABLE_SIZE_Y 2000 //mm
+
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,

@@ -25,7 +25,7 @@ struct Vec2 {
 
     Vec2& add(const Vec2&);
     Vec2& sub(const Vec2&);
-    Vec2& dist(const Vec2&);
+    float dist(const Vec2&);
     Vec2& mult(float);
     Matrix2x2 toMatrix() const;
 
@@ -46,7 +46,7 @@ struct Vec2 {
 
     static Vec2 add(const Vec2&, const Vec2&);
     static Vec2 sub( const Vec2&, const Vec2&);
-    static Vec2 dist( const Vec2&, const Vec2&);
+    static float dist( const Vec2&, const Vec2&);
     static float angleBetween(const Vec2&, const Vec2&);
     static float dot( const Vec2&, const Vec2&);
     static float det( const Vec2&, const Vec2&);
