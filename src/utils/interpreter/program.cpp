@@ -160,6 +160,7 @@ void Program::start(){
     if(_statements.size() > 0){
         Job::start();
         _currentTask = 0;
+        executeStatement(_statements[_currentTask]);
     }
 }
 

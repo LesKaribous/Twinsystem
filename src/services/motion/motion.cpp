@@ -541,7 +541,6 @@ bool Motion::isMoving() const{
 }
 
 void  Motion::setAbsPosition(Vec3 newPos){
-    THROW(newPos);
     _position = newPos; 
     _startPosition = newPos;
     localisation.setPosition(newPos);

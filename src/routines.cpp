@@ -338,11 +338,8 @@ void onTerminalCommand() {
         if (prgm && prgm->isValid()) {
             Console::println("Starting program");
 
-            Program* jobPtr = prgm.get();          // Non-owning reference
+            //Program* jobPtr = prgm.get();          // Non-owning reference
             os.execute(std::move(prgm));           // Transfer ownership to OS
-
-            // Optionally: monitor state via jobPtr
-            // while (jobPtr->isRunning()) { ... }
         } else {
             Console::println("Invalid program : Unknown error");
         }
