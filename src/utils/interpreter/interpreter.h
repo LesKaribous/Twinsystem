@@ -6,7 +6,7 @@
 class Interpreter {
 public:
     Interpreter();
-    Program processScript(const String& script);
+    ProgramHandle processScript(const String& script);
 
 private:
     // Lexer functions

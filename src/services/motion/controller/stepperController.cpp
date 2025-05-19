@@ -1,4 +1,5 @@
 #include "stepperController.h"
+#include "os/console.h"
 #include "services/motion/kinematics.h"
 
 #include <algorithm>

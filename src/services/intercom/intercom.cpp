@@ -7,11 +7,11 @@ SINGLETON_INSTANTIATE(Intercom, intercom)
 
 Intercom::Intercom() : Service(ID_INTERCOM),  _stream(INTERCOM_SERIAL) {}
 
-void Intercom::onAttach() {
+void Intercom::attach() {
     Console::info() << "Intercom activated" << Console::endl;
 }
 
-void Intercom::onUpdate() {
+void Intercom::run() {
     if(!enabled()) return;
 
     if (_stream.available()) {
@@ -33,6 +33,7 @@ void Intercom::enable(){
     Service::enable();
     INTERCOM_SERIAL.begin(INTERCOM_BAUDRATE);
     sendMessage("ping");
+    while(_stream.available()) _stream.read(); // Clear residual
 }
 
 void Intercom::disable(){
@@ -85,6 +86,10 @@ bool Intercom::closeRequest(int uid) {
     };
 }
 
+bool Intercom::isConnected(){
+    return _connected;
+}
+
 void Intercom::setConnectLostCallback(callback_ptr callback){
     onConnectionLost = callback;
 }
@@ -132,8 +137,10 @@ void Intercom::_processIncomingData() {
         if (incomingMessage.startsWith("ping")) {
             pingReceived();
         } else if (incomingMessage.startsWith("pong")) {
-            if(!isConnected())connectionSuccess();
-
+            if(!_connected){
+                _connected = true;
+                connectionSuccess();
+            }
         }else if (incomingMessage.startsWith("r") && !_sentRequests.empty()){ //reply incomming
             int id_separatorIndex = incomingMessage.indexOf(':');
             int crc_separatorIndex = incomingMessage.indexOf('|');

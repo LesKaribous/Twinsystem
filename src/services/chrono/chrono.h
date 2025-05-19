@@ -7,8 +7,8 @@ using routine_ptr = void (*)();
 class Chrono : public Service, public Timer{
 public:
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach() override;
+    void run() override;
 
     void onMatchNearlyFinished();
     void onMatchFinished();

@@ -1,7 +1,7 @@
 #pragma once
 #include "settings.h"
 #include "services/service.h"
-#include "os/jobs/job.h"
+#include "os/jobs/job_owner.h"
 #include "utils/geometry.h"
 #include "services/motion/controller/positionController.h"
 #include "services/motion/controller/stepperController.h"
@@ -11,13 +11,13 @@
 #include <Wire.h>
 #include <SPI.h>
 
-class Motion : public Service, public Job{
+class Motion : public Service, public JobOwner{
 public:
 
     Motion();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     void enable() override;
     void disable() override;
@@ -25,33 +25,29 @@ public:
     void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
     void disengage();// Disengaging motors turn them off. They cannot move at all.
 
-    Motion& go(Vec2);
-    Motion& go(float x, float y);
-    Motion& goPolar(float angle, float dist);
-    Motion& turn(float w);
-    Motion& align(RobotCompass, float orientation);
-    Motion& move(Vec3 target);
+    JobHandle go(Vec2);
+    JobHandle go(float x, float y);
+    JobHandle goPolar(float angle, float dist);
+    JobHandle turn(float w);
+    JobHandle align(RobotCompass, float orientation);
+    JobHandle move(Vec3 target);
 
 
     void control();
-    void forceCancel();
-
-    //Job override
-    void run()override;
-    void start()override;
-    void pause()override;
-    void resume()override;
-    void cancel()override;
-    void complete()override;
+    
+    void start() override;
+    void pause() override;
+    void resume() override;
+    void cancel() override;
+    void forceCancel() override;
+    void complete() override;
     
     void onRunning();
-    void onPausing()override;  //Called every run if in Pausing state
-    void onCanceling()override; //Called every run if in  exiting Pausing state
+    void onPausing() override;  //Called every run if in Pausing state
+    void onCanceling() override; //Called every run if in  exiting Pausing state
 
-    void onPaused()override;   //Called once when exiting Pausing state
-    void onCanceled()override; //Called once when exiting Canceling state
-
-
+    void onPaused() override;   //Called once when exiting Pausing state
+    void onCanceled() override; //Called once when exiting Canceling state
 
     Vec3 estimatedPosition(); //The closest value of our physical position
     bool hasFinished();

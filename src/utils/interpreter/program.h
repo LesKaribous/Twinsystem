@@ -99,4 +99,8 @@ public:
     bool step();
     void restart();
     void stop();
+
+    static std::unique_ptr<Program> create();
 };
+
+typedef std::unique_ptr<Program> ProgramHandle;

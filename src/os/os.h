@@ -1,8 +1,10 @@
 #pragma once
 #include "services/service.h"
+#include "utils/interpreter/program.h"
 #include "utils/timer/timer.h"
-#include "tw_threads.h"
+#include "threads/tw_threads.h"
 #include <map>
+#include <list>
 #include <queue>
 #include <string>
 
@@ -44,9 +46,8 @@ public:
     bool debug(ServiceID);
     void toggleDebug(ServiceID s);
 
-    Job& wait(unsigned long time, bool runasync = false);
-    void waitUntil(Job& job, bool runasync = false);
-    void execute(Job& job, bool runasync = true);
+    void wait(unsigned long time);
+    void execute(JobHandle job, bool runasync = true);
     bool isBusy();
 
 private:
@@ -59,10 +60,11 @@ private:
     void executeRoutine(routine_ptr routine);
 
     Job* currentJob();
-    void addJob(Job* job);
+    void addJob(JobHandle job);
     void killCurrentJob();
 
     std::map<ServiceID, Service*> m_services;
+
     routine_ptr m_bootRoutine = nullptr; 
     routine_ptr m_manualRoutine = nullptr; 
     routine_ptr m_autoRoutine = nullptr; 
@@ -71,8 +73,10 @@ private:
     routine_ptr m_manual_programRoutine = nullptr; 
     SystemState m_state = BOOT;
 
+    Program script;
+
     Timer m_timer;
-    std::queue<Job*> m_jobs;
+    std::queue<JobHandle, std::list<JobHandle>> m_jobs;
 
 
 //Singleton

@@ -7,17 +7,17 @@ Interpreter::Interpreter() : pos(0) {
 }
 
 // Process a script
-Program Interpreter::processScript(const String& script) {
+ProgramHandle Interpreter::processScript(const String& script) {
     input = script;
     input.trim();
     pos = 0;
     currentToken = nextToken();
 
-    Program prgm;
+    ProgramHandle prgm = Program::create();
 
     // Parse and execute statements until the end of the script
     while (currentToken.type != END_OF_SCRIPT) {
-        prgm.addStatement(parseStatement());
+        prgm->addStatement(parseStatement());
     }
     return prgm;
 }

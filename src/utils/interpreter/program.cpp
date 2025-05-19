@@ -149,10 +149,7 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
 }
 
 void Program::run(){
-    //Do nothing
-    if(isRunning()){
-        step();
-    }
+    step();
 }
 
 void Program::reset(){
@@ -161,12 +158,9 @@ void Program::reset(){
 
 void Program::start(){
     if(_statements.size() > 0){
-        //THROW(1);
         Job::start();
         _currentTask = 0;
-        executeStatement(_statements[_currentTask]);
     }
-
 }
 
 void Program::pause(){
@@ -194,6 +188,10 @@ void Program::restart(){
 void Program::stop(){
     cancel();
     reset();
+}
+
+std::unique_ptr<Program> Program::create(){
+    return std::make_unique<Program>();
 }
 
 bool Program::step(){

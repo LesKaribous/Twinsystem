@@ -1,17 +1,17 @@
 #pragma once
 #include <Arduino.h>
+#include <memory>
 //#include "os/asyncExecutor.h"
 
 enum class JobState{
     IDLE,
     PAUSING,
     PAUSED,
-    RUNNNING,
+    RUNNING,
     CANCELING,
     CANCELED,
     COMPLETED
 };
-
 
 class Job  {
 public:
@@ -20,6 +20,8 @@ public:
 
     String toString() const;
     //operator AsyncExecutor() { OS::instance().waitUntil(*this); };
+
+    inline JobState state(){return m_state;}
 
     bool isIdle()const;
     bool isPausing()const;
@@ -53,10 +55,13 @@ public:
     virtual void onPaused();   //Called once when exiting Pausing state
     virtual void onCanceled(); //Called once when exiting Canceling state
 
-
+    inline static std::unique_ptr<Job> create() {
+        return std::make_unique<Job>();
+    }
 protected:
     JobState m_state = JobState::IDLE;
     long startTime = 0;
     long pauseTime = 0;
 };
     
+typedef std::unique_ptr<Job> JobHandle;

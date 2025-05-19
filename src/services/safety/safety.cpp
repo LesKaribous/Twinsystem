@@ -32,10 +32,10 @@ void Safety::disable(){
 }
 
 
-void Safety::onAttach(){
+void Safety::attach(){
 }
 
-void Safety::onUpdate(){
+void Safety::run(){
     if(!enabled()){return;}
 
     RUN_EVERY(

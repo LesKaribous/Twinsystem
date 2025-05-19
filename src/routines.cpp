@@ -168,7 +168,7 @@ void onRobotBoot(){
     os.attachService(&ihm);
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10);
-    ihm.onUpdate(); // Read inputs
+    ihm.run(); // Read inputs
     //TODO 
     Console::println("TODO : Add important modifier to moves to dupplicate move");
 
@@ -250,7 +250,7 @@ void onRobotBoot(){
 void onRobotManual(){
     RUN_EVERY(
     ihm.setRobotPosition(motion.estimatedPosition());
-    ,100);
+    ,300);
     
     RUN_EVERY(
         if(ihm.teamSwitch.getState() == Settings::YELLOW){
@@ -273,7 +273,7 @@ void onRobotAuto(){
 }
 
 void onRobotStop(){
-    ihm.onUpdate(); //TODO : Check why nothing happened when the robot stopped here
+    ihm.run(); //TODO : Check why nothing happened when the robot stopped here
 }
 
 
@@ -326,26 +326,24 @@ void onOccupancyTimeout(){
     
 }
 
-void onTerminalCommand(){
+void onTerminalCommand() {
     Interpreter interpreter;
-    if( terminal.commandAvailable() > 0){
-        //Console::println("Received command. parsing...");
+
+    if (terminal.commandAvailable() > 0) {
         String rawcmd = terminal.dequeCommand();
         Interpreter in;
-        Program prgm = in.processScript(rawcmd);
-        
-        if(prgm.isValid()){ //TODO Integrate that in OS
-            Console::println("Starting program");
-            //motion.engage();
-            os.execute(prgm);
 
-            //prgm.start();
-            //os.flush();
-            //while(prgm.step()){
-            //    os.flush();
-            //};
-            //motion.disengage();
-        }else {
+        ProgramHandle prgm = in.processScript(rawcmd);
+
+        if (prgm && prgm->isValid()) {
+            Console::println("Starting program");
+
+            Program* jobPtr = prgm.get();          // Non-owning reference
+            os.execute(std::move(prgm));           // Transfer ownership to OS
+
+            // Optionally: monitor state via jobPtr
+            // while (jobPtr->isRunning()) { ... }
+        } else {
             Console::println("Invalid program : Unknown error");
         }
     }

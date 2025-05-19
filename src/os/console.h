@@ -5,6 +5,7 @@
 
 #define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
 #define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+#define BEEP Console::println( "Beep in " + String(__FILE__) + " at line " + String(__LINE__));
 
 class ConsoleStream;
 

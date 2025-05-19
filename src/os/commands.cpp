@@ -109,7 +109,7 @@ void command_lidarMode(const args_t& args){
 void command_wait(const args_t &args){
     if(args.size() != 1) return;
     float duration = args[0].toFloat();
-    async os.wait(duration);
+    os.wait(duration);
 }
 
 void command_start(const args_t &args){
@@ -246,13 +246,11 @@ void command_setRelative(const args_t& args){
 
 
 void command_setAbsPosition(const args_t& args){
-    /**/
     if(args.size() != 3)return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     float angle = args[2].toFloat() * DEG_TO_RAD;
     motion.setAbsPosition({x, y, angle});
-    /**/
 }
 
 

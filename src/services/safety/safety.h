@@ -7,8 +7,8 @@ public:
     void enable() override;
     void disable() override;
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach()override;
+    void run()override;
 
     void setObstacleDetected(bool state);
     void setSafeDistance(int safeDistance);

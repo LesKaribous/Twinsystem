@@ -19,7 +19,7 @@ void match(){
 }
 
 void waitMs(unsigned long time){
-    os.wait(time,false);
+    os.wait(time);
     //delay(time);
 }
 
@@ -401,7 +401,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
-	bool m_probing = true;
+
     motion.setFeedrate(feedrate);
 	async motion.align(rc, getCompassOrientation(tc));
 

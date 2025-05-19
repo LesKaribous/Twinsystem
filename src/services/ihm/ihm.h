@@ -27,8 +27,8 @@ public:
         RESET
     };
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach() override;
+    void run() override;
    
     void setPage(Page p);
     void drawBootProgress(String msg);//%

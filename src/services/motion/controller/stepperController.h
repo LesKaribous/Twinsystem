@@ -1,5 +1,4 @@
-
-#include "os/asyncExecutor.h"
+#include "services/motion/controller/controller.h"
 #include "services/motion/stepper.h"
 
 
@@ -44,7 +43,7 @@ private:
 };
 
 
-class StepperController : public Job{
+class StepperController : public Controller{
 public:
     StepperController();
 
@@ -55,7 +54,7 @@ public:
     void complete() override;//Set to COMPLETED
     void pause() override;  //Set to CANCELLED
     void resume() override;//Set to COMPLETED
-    void control();
+    void control() override;;
 
     void onUpdate();
     void onCanceling() override;

@@ -12,7 +12,7 @@ SINGLETON_INSTANTIATE(Localisation, localisation);
 #define I2C_OTOS Wire
 #endif
 
-void Localisation::onAttach(){
+void Localisation::attach(){
     
     Console::info() << "Localisation activated" << Console::endl;
     I2C_OTOS.begin();
@@ -37,7 +37,7 @@ void Localisation::onAttach(){
 }
 
 // Main loop
-void Localisation::onUpdate(){ 
+void Localisation::run(){ 
     //THROW(1)
 
     static long elapsed = 0;

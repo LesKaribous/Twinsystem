@@ -5,11 +5,11 @@ SINGLETON_INSTANTIATE(Terminal, terminal)
 
 Terminal::Terminal() : Service(ID_TERMINAL){}
 
-void Terminal::onAttach(){
+void Terminal::attach(){
     Console::info() << "Terminal activated" << Console::endl;
 }   
 
-void Terminal::onUpdate(){
+void Terminal::run(){
     if(!enabled()) return;
     
     if (CONSOLE_SERIAL.available() > 0) {

@@ -12,8 +12,8 @@ class Intercom : public Service{
 public:
     Intercom();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     void enable() override;
     void disable() override;
@@ -29,7 +29,7 @@ public:
     void setRequestCallback(requestCallback_ptr callback);
     void setConnectionSuccessCallback(callback_ptr callback);
 
-    inline bool isConnected(){return _connected;}
+    bool isConnected();
 
 private:
 

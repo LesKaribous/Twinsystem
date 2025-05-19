@@ -15,7 +15,7 @@ IHM::IHM() : Service(ServiceID::ID_IHM),
 {};
 
 
-void IHM::onAttach(){
+void IHM::attach(){
     Console::info() << "IHM activated" << Console::endl;
     screen.begin();
     starter.setInverted(true);
@@ -49,7 +49,7 @@ void IHM::onAttach(){
     drawBootProgress("System Booting...");
 }
 
-void IHM::onUpdate(){
+void IHM::run(){
     //update inputs
     starter.read();
     teamSwitch.read();

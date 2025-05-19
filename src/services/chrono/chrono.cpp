@@ -5,11 +5,11 @@
 
 SINGLETON_INSTANTIATE(Chrono, chrono)
 
-void Chrono::onAttach(){
+void Chrono::attach(){
     setDuration(Settings::Match::DURATION);
 }
 
-void Chrono::onUpdate(){
+void Chrono::run(){
     if(!nearlyFinished && getTimeLeft() <= Settings::Match::NEARLY_FINISH && getTimeLeft() >= Settings::Match::ENDMATCH){
         onMatchNearlyFinished();
     }

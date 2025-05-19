@@ -10,8 +10,8 @@ public :
     
     Terminal();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     String dequeCommand();
     int commandAvailable();

@@ -1,6 +1,0 @@
-#pragma once
-
-//extends Job state machine
-enum class MotionState {
-    IDLE, PENDING, RUNNING, PAUSED, CANCELING, COMPLETED, BRAKING, AVOIDING
-};

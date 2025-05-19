@@ -1,14 +1,14 @@
 #pragma once
 #include "utils/geometry.h"
-#include "os/asyncExecutor.h"
+#include "os/jobs/asyncExecutor.h"
 #include "velocityController.h"
 
-class PositionController : public Job{
+class PositionController : public Controller{
 public:
     PositionController();
 
     // Call this method every control cycle
-    void control();
+    void control() override;
 
     void run() override; 
     void reset() override;  //Set to IDLE

@@ -8,8 +8,8 @@ public:
 
     Lidar();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     void enable() override;
     void disable() override;

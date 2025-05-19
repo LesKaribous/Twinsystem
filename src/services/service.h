@@ -1,7 +1,8 @@
 #pragma once
 #include <Arduino.h>
+#include "os/jobs/job.h"
 #include "os/singleton.h"
-#include "os/tw_threads.h"
+#include "os/threads/tw_threads.h"
 
 using callback_ptr = void (*)();
 using wrapper_ptr = void (*)();
@@ -53,8 +54,8 @@ public:
     Service(ServiceID id) : m_ID(id){};
     inline ServiceID id(){return m_ID;}
 
-    virtual void onAttach() = 0;
-    virtual void onUpdate() = 0;
+    virtual void attach() = 0;
+    virtual void run() = 0;
     
     inline bool threaded(){return m_threaded;}
 
@@ -75,7 +76,7 @@ public:
 class ThreadedService : public Service{
 protected:
     std::thread *servicethread;
-	virtual void onUpdateThread(void *arg) = 0;
+	virtual void runThreaded(void *arg) = 0;
 public:    
     ThreadedService(ServiceID id) : Service(id){
         m_threaded = true;
@@ -84,6 +85,6 @@ public:
     static void runThread(void *arg)
 	{
 		ThreadedService *_runnable = static_cast<ThreadedService*> (arg);
-		_runnable->onUpdateThread(arg);
+		_runnable->runThreaded(arg);
 	}
 };

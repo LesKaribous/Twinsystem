@@ -1,8 +1,9 @@
 #pragma once
 #include "services/motion/stepper.h"
+#include "services/motion/controller/controller.h"
 #include "utils/geometry.h"
 
-class VelocityController {
+class VelocityController : public Controller {
 public:
     VelocityController();
     void setSteppers(Stepper* a, Stepper* b, Stepper* c);
@@ -12,7 +13,8 @@ public:
     void reset();
     void enable();
     void disable();
-    void control();
+
+    void control() override;
 
     Vec3 getCurrentVelocity() const;
     Vec3 getTargetVelocity() const;
