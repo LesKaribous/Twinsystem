@@ -1,4 +1,5 @@
 #include "stepperController.h"
+#include "os/console.h"
 #include "services/motion/kinematics.h"
 
 #include <algorithm>
@@ -116,6 +117,7 @@ void StepperController::setTarget(long posA, long posB, long posC) {
     if (m_leadStepper == nullptr || m_leadDelta == 0) {
         Console::error("StepperController") << "Lead stepper not assigned properly!" << Console::endl;
         reset();
+        m_state = JobState::CANCELED;
         return;
     }
 
@@ -337,6 +339,7 @@ void StepperController::reset() {
 }
 
 Vec3 StepperController::getDisplacement(){
+    if(isIdle()) return Vec3(0);
     return fk(Vec3(m_sA->m_position, m_sB->m_position, m_sC->m_position));
 }
 

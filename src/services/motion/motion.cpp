@@ -8,7 +8,7 @@
 #include "services/localisation/localisation.h"
 #include <cmath>
 
-INSTANTIATE_SERVICE(Motion, motion)
+SINGLETON_INSTANTIATE(Motion, motion)
 
 Motion::Motion() : Service(ID_MOTION),
 m_sA(Pin::Stepper::stepA, Pin::Stepper::dirA, !Settings::Stepper::DIR_A_POLARITY), 
@@ -17,15 +17,16 @@ m_sC(Pin::Stepper::stepC, Pin::Stepper::dirC, !Settings::Stepper::DIR_C_POLARITY
     disengage();
 }
 
-void Motion::onAttach(){
+void Motion::attach(){
     Console::info() << "Motion activated" << Console::endl;
-    
+
+    Job::reset();
+
     stepper_controller.setSteppers(&m_sA, &m_sB, &m_sC);
     cruise_controller.setSteppers(&m_sA, &m_sB, &m_sC);
     
     _absolute = Settings::Motion::ABSOLUTE;
 
-    Job::reset();
     _startPosition  = {0,0,0};
     _position       = {-1,-1,0};
     _target 	     = {0,0,0};
@@ -37,15 +38,20 @@ void Motion::onAttach(){
 
 }
 
-void Motion::onUpdate(){       
-    run();
-}
-
 void Motion::onRunning(){
     if(isBusy()){
         if(hasFinished()){
             complete();
         }
+        
+        bool canceled = false;
+        if(current_move_cruised) canceled = cruise_controller.isCanceled();
+        if(stepper_controller) canceled = stepper_controller.isCanceled();
+        if(canceled){
+            Console::error("Motion") << "Move command was canceled" << Console::endl; 
+            onCanceled();
+        }
+
 
         Vec3 position = estimatedPosition();
         if(position != _position && current_move_cruised){
@@ -100,6 +106,7 @@ void Motion::onCanceling(){
 }
 
 void Motion::onPaused(){
+    //if\(!hasJob\(\)\) return;
     Job::onPaused();
     _isMoving = false;
     _isRotating = false;
@@ -112,6 +119,7 @@ void Motion::onPaused(){
 }
 
 void Motion::onCanceled(){
+    //if\(!hasJob\(\)\) return;
     Job::onCanceled();
     _isMoving = false;
     _isRotating = false;
@@ -142,15 +150,18 @@ void Motion::disable(){
 }
 
 void Motion::engage(){
+    if(_engaged) return;
+    _engaged = true;
     digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
 }
 
 void Motion::disengage(){
+    if(!_engaged) return;
+    _engaged = false;
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
 }
 
 Motion& Motion::go(float x, float y){
-    //setStepsVelocity(Settings::Motion::MAX_SPEED);
     _isMoving = true;
     go(Vec2(x, y));
     return *this;
@@ -163,10 +174,12 @@ Motion& Motion::goPolar(float heading, float dist){
     if (_absolute){
         Vec2 target = _position + poltarget.toVec2();
         move(Vec3(target.a, target.b, _position.c*RAD_TO_DEG));
+        
     }
     else{
         Vec2 reltarget = poltarget.toVec2();
         move(Vec3(reltarget.a, reltarget.b, 0));
+        
     }
     return *this;
 }
@@ -177,6 +190,7 @@ Motion& Motion::turn(float angle){
         _position.c = getOrientation();
     }*/
     //setStepsVelocity(Settings::Motion::TURN_SPEED);
+    //TODO push Motion properties
     _isMoving = true;
     _isRotating = true;
     if (_absolute) move(Vec3(_position.a, _position.b, angle));
@@ -197,7 +211,6 @@ Motion&  Motion::align(RobotCompass rc, float orientation){
     return *this;
 }
 
-//Raw relative move request
 Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     if(!enabled()) {
         Console::error("Motion") << "Motion not enabled" << Console::endl;
@@ -205,8 +218,9 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     }
     if(isRunning()) cancel();
     Job::reset();//Start a new job
-    
-    
+
+    engage();
+
     target.c *= DEG_TO_RAD; //Convert to rotation to radian
     if(isRelative()){
         if(target.magSq() == 0){ //Test if move is 0 length
@@ -236,7 +250,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();
-        cruise_controller.setFeedrate(m_feedrate);
+        cruise_controller.setFeedrate( isRotating() ? m_feedrate * 0.5 : m_feedrate);
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
         current_move_cruised = true;
@@ -250,30 +264,29 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         
         cruise_controller.reset();
         stepper_controller.reset();
-        stepper_controller.setFeedrate(m_feedrate);
+        stepper_controller.setFeedrate( isRotating() ? m_feedrate * 0.5 : m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         
     }
 
-
     start();
-    
+
     return *this;
 }
 
-
 void Motion::run(){
     if(!enabled()) return;
-
     if(isPausing()){
         onPausing();
     }else if(isCanceling()){
         onCanceling();
-    }else if(isRunning())
+    }else if(isRunning()){
         onRunning();
+    }
 }
 
 void Motion::start(){
+    //if\(!hasJob\(\)\) return;
     if(isPending()) forceCancel();
 
     Job::start();
@@ -302,8 +315,9 @@ void Motion::start(){
 }
 
 void Motion::pause(){
+    //if\(!hasJob\(\)\) return;
     Job::pause();
-    if(!isPausing()) return;
+    if(!Job::isPausing()) return;
 
     if(current_move_cruised){
         cruise_controller.cancel();
@@ -313,8 +327,8 @@ void Motion::pause(){
 }
 
 void Motion::resume(){
-
-    if(!isPaused()) return;
+    //if\(!hasJob\(\)\) return;
+    if(!Job::isPaused()) return;
     Job::resume();
 
     if(current_move_cruised){
@@ -365,15 +379,14 @@ void Motion::resume(){
 }
 
 Vec3 Motion::estimatedPosition(){
-    if(isPending()){
-        if(localisation.enabled()){
-            localisation.onUpdate();
-            return localisation.getPosition();
-        }else{
-            return _position + stepper_controller.getDisplacement();
-        }
+
+    if(localisation.enabled()){
+        localisation.run();
+        return localisation.getPosition();
+    }else{
+        return _position + stepper_controller.getDisplacement();
     }
-    return _position;
+
 }
 
 bool Motion::hasFinished() {
@@ -384,9 +397,10 @@ bool Motion::hasFinished() {
 }
 
 void Motion::cancel() {
+    //if\(!hasJob\(\)\) return;
     if(isCanceling() || isCanceled() || isCompleted()) return;
     Job::cancel();
-    if(Job::m_state == JobState::CANCELING){
+    if(isCanceling()){
         if(current_move_cruised){
             cruise_controller.cancel();
         }else{
@@ -403,6 +417,8 @@ void Motion::complete() {
 
     cruise_controller.reset();
     stepper_controller.reset();
+    
+    //if\(!hasJob\(\)\) return;
     Job::complete();
     Console::println("complete");
 }
@@ -410,8 +426,6 @@ void Motion::complete() {
 
 
 void Motion::forceCancel() {
-    Job::forceCancel();
-
     _isMoving = false;
     _isRotating = false;
 
@@ -420,6 +434,7 @@ void Motion::forceCancel() {
     cruise_controller.reset();
     stepper_controller.reset();
 
+    //if\(!hasJob\(\)\) return;
     Job::forceCancel();
     Console::println("canceled");
 }
@@ -523,16 +538,16 @@ bool  Motion::isRelative() const{
 }
 
 bool Motion::isRotating() const{
-    return (Job::isPending() &&  _isRotating);
+    return (_isRotating);
 }
 
 bool Motion::isMoving() const{
-    return (Job::isPending() && _isMoving);
+    return (_isMoving);
 }
 
 void  Motion::setAbsPosition(Vec3 newPos){
-    THROW(newPos);
     _position = newPos; 
+    _startPosition = newPos;
     localisation.setPosition(newPos);
     //if(_useBNO) setOrientation(newPos.c);
 }

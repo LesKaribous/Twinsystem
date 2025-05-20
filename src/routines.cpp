@@ -6,7 +6,7 @@
 #include "score.h"
 #include "os/os.h"
 #include "utils/timer/timer.h"
-#include "utils/interpreter/interpreter.h"
+
 
 // -------------------------------------
 //           Main programs
@@ -14,6 +14,7 @@
 
 void robotProgramAuto(){
     Console::println("Started match");
+    ihm.setPage(IHM::Page::MATCH);
     lidar.enable();
     safety.enable();
     chrono.start();
@@ -21,40 +22,28 @@ void robotProgramAuto(){
     //motion.disable();
 }
 
+void robotArmed(){
+    lidar.showRadarLED();
+    ihm.freezeSettings();
+    motion.engage();
+
+    ihm.playTone(329.2, 150);   // C5
+    ihm.playTone(349.2, 150);   // C5
+    ihm.playTone(440, 150);   // C5
+   
+    
+    noTone(Pin::Outputs::buzzer);
+}
+
 void robotProgramManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
-    ihm.setRobotPosition(motion.getAbsPosition());
+    //ihm.setRobotPosition(motion.estimatedPosition());
     //ihm.setRobotPosition(nav.getPosition());
     
     if(ihm.hasStarter() && !hadStarter){
-        lidar.showRadarLED();
-        ihm.freezeSettings();
-        motion.engage();
-
-        ihm.playTone(329.2, 150);   // C5
-        ihm.playTone(349.2, 150);   // C5
-        ihm.playTone(440, 150);   // C5
-       
-        
-        noTone(Pin::Outputs::buzzer);
-
-        /*
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(440.00, 500);   // A4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(349.23, 350);   // F4
-        noTone(Pin::Outputs::buzzer); delay(50);
-        ihm.playTone(523.25, 150);   // C5
-        ihm.playTone(440.00, 500);   // A4
-        ihm.playTone(349.23, 350);   // F4
-        ihm.playTone(523.25, 150);   // C5
-        ihm.playTone(440.00, 1000);  // A4
-        */
+        robotArmed();
         hadStarter = true;
         return;
     }
@@ -179,7 +168,7 @@ void onRobotBoot(){
     os.attachService(&ihm);
     ihm.drawBootProgress("Linking ihm...");
     ihm.addBootProgress(10);
-    ihm.onUpdate(); // Read inputs
+    ihm.run(); // Read inputs
     //TODO 
     Console::println("TODO : Add important modifier to moves to dupplicate move");
 
@@ -233,6 +222,11 @@ void onRobotBoot(){
     Expression::registerVariables("C", "C");
     Expression::registerVariables("CA", "CA");
 
+    Expression::registerVariables("NORTH", "NORTH");
+    Expression::registerVariables("SOUTH", "SOUTH");
+    Expression::registerVariables("WEST", "WEST");
+    Expression::registerVariables("EAST", "EAST");
+
     Expression::registerVariables("MOTION", "MOTION");
     Expression::registerVariables("ACTUATORS", "ACTUATORS");
     Expression::registerVariables("SAFETY", "SAFETY");
@@ -254,17 +248,32 @@ void onRobotBoot(){
 }
 
 void onRobotManual(){
-    //ihm.setRobotPosition(nav.getPosition());
-    ihm.setRobotPosition(motion.getAbsPosition());
+    RUN_EVERY(
+    ihm.setRobotPosition(motion.estimatedPosition());
+    ,300);
+    
+    RUN_EVERY(
+        if(ihm.teamSwitch.getState() == Settings::YELLOW){
+            intercom.sendRequest("team(Y)");
+        }else{
+            intercom.sendRequest("team(B)");
+        }
+    ,1000);
+
+    RUN_EVERY(
+    intercom.sendRequest("oM", 100, onIntercomRequestReply);
+    ,500);
 }
 
 void onRobotAuto(){
-    //ihm.setRobotPosition(motion.getAbsPosition());
-    //lidar.setLidarPosition(nav.getPosition());
+    RUN_EVERY(
+    ihm.setRobotPosition(motion.estimatedPosition());
+    //intercom.sendRequest("oM", 100, onIntercomRequestReply);
+    ,100);
 }
 
 void onRobotStop(){
-    ihm.onUpdate(); //TODO : Check why nothing happened when the robot stopped here
+    ihm.run(); //TODO : Check why nothing happened when the robot stopped here
 }
 
 
@@ -273,8 +282,6 @@ void onRobotStop(){
 // -------------------------------------
 //           MODULES EVENTS
 // -------------------------------------
-
-
 void onIntercomConnected(){
     ihm.setIntercomState(true);
 }
@@ -290,7 +297,9 @@ void onIntercomRequest(Request& req){
 
 
 void onIntercomRequestReply(Request& req){
-
+    if(req.getContent().startsWith("oM")){ //occupancyMap
+        occupancy.decompress(req.getResponse());
+    }
 }
 
 void onMatchNearEnd(){
@@ -316,24 +325,9 @@ void onOccupancyTimeout(){
     
 }
 
-void onTerminalCommand(){
-    Interpreter interpreter;
-    if( terminal.commandAvailable() > 0){
-        //Console::println("Received command. parsing...");
+void onTerminalCommand() {
+    if (terminal.commandAvailable() > 0) {
         String rawcmd = terminal.dequeCommand();
-        Interpreter in;
-        Program prgm = in.processScript(rawcmd);
-        if(prgm.isValid()){ //TODO Integrate that in OS
-            Console::println("Starting program");
-            motion.engage();
-            prgm.start();
-            os.flush();
-            while(prgm.step()){
-                os.flush();
-            };
-            motion.disengage();
-        }else {
-            Console::println("Invalid program : Unknown error");
-        }
+        os.execute(rawcmd);
     }
 }

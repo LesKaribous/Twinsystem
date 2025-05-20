@@ -2,7 +2,7 @@
 #include "services/service.h"
 #include "services/actuators/actuatorGroup.h"
 #include "utils/geometry.h"
-#include "utils/job.h"
+#include "os/jobs/job.h"
 #include "services/actuators/groups.h"
 
 
@@ -32,7 +32,7 @@ enum class PlankManipulatorPose{
 };
 
 
-class Actuators : public Service, public Job{
+class Actuators : public Service{
 //protected:
 public:
     // When BAU is front of robot, 
@@ -44,11 +44,11 @@ public:
 public:
     Actuators();
 
-    void run(){};
     void sleep();
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach() override;
+    void run()override;
+
     void disable()override;
     void enable()override;
 
@@ -79,7 +79,7 @@ private :
     void createManipulator(RobotCompass, ManipulatorProperties);
     void createBannerManipulator(RobotCompass, BannerManipulatorProperties);
 
-    SERVICE(Actuators)
+    SINGLETON(Actuators)
 };
 
-EXTERN_DECLARATION(Actuators, actuators)
+SINGLETON_EXTERN(Actuators, actuators)

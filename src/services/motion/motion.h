@@ -1,7 +1,7 @@
 #pragma once
 #include "settings.h"
 #include "services/service.h"
-#include "utils/job.h"
+#include "os/jobs/job.h"
 #include "utils/geometry.h"
 #include "services/motion/controller/positionController.h"
 #include "services/motion/controller/stepperController.h"
@@ -16,8 +16,8 @@ public:
 
     Motion();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     void enable() override;
     void disable() override;
@@ -32,26 +32,27 @@ public:
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
 
+    // std::unique_ptr<Job> createJob() override {
+    //     std::unique_ptr<Job> job = std::make_unique<Job>(this);
+    //     m_job = job.get();
+    //     return job;
+    // }
 
     void control();
-    void forceCancel();
-
-    //Job override
-    void run()override;
-    void start()override;
-    void pause()override;
-    void resume()override;
-    void cancel()override;
-    void complete()override;
+    
+    void start() override;
+    void pause() override;
+    void resume() override;
+    void cancel() override;
+    void forceCancel() override;
+    void complete() override;
     
     void onRunning();
-    void onPausing()override;  //Called every run if in Pausing state
-    void onCanceling()override; //Called every run if in  exiting Pausing state
+    void onPausing() override;  //Called every run if in Pausing state
+    void onCanceling() override; //Called every run if in  exiting Pausing state
 
-    void onPaused()override;   //Called once when exiting Pausing state
-    void onCanceled()override; //Called once when exiting Canceling state
-
-
+    void onPaused() override;   //Called once when exiting Pausing state
+    void onCanceled() override; //Called once when exiting Canceling state
 
     Vec3 estimatedPosition(); //The closest value of our physical position
     bool hasFinished();
@@ -122,6 +123,6 @@ private :
     bool _optimizeRotation = true;
     bool _debug = true;
 
-    SERVICE(Motion);
+    SINGLETON(Motion);
 };
-EXTERN_DECLARATION(Motion, motion)
+SINGLETON_EXTERN(Motion, motion)

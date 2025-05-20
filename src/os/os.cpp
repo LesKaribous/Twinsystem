@@ -1,5 +1,6 @@
 #include "os.h"
 #include "console.h"
+#include "utils/interpreter/interpreter.h"
 
 OS OS::m_instance;
 
@@ -49,11 +50,14 @@ void OS::boot_routine(){
 }
 
 void OS::manual_routine(){
+    
     updateServices();
     executeRoutine(m_manualRoutine);
+
     if(currentJob() != nullptr){
-        if(!currentJob()->isPending()) killCurrentJob();
+        if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
         else currentJob()->run();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
@@ -63,12 +67,14 @@ void OS::auto_routine(){
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
         else currentJob()->run();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
 void OS::auto_program_routine(){
     m_state = AUTO;
     executeRoutine(m_auto_programRoutine);
+    auto_routine();
     m_state = STOPPED;
 }
 
@@ -76,6 +82,7 @@ void OS::manual_program_routine(){
     m_state = MANUAL;
     updateServices();
     executeRoutine(m_manual_programRoutine);
+    manual_routine();
     if(m_state == MANUAL) m_state = MANUAL_PROGRAM;
 }
 
@@ -116,10 +123,9 @@ void OS::setState(SystemState state){
 void OS::attachService(Service* service){
     if(service != nullptr){
         m_services[service->id()] = service;
+        service->attach();
         Console::trace() << "Attached service: " << service->id() << Console::endl;
-        service->onAttach();
         service->enable();
-        
     }
 }
 
@@ -146,20 +152,11 @@ void OS::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
-Job& OS::wait(unsigned long time, bool runasync) {
+void OS::wait(unsigned long time) {
     m_timer.setDuration(time);
     m_timer.start();
-    //addJob(&m_timer);
-    if(!runasync)while(m_timer.isPending()|| m_timer.isPaused()){
-        m_timer.run();
-        run();
-    }
-    return m_timer;
-}
-
-void OS::waitUntil(Job& obj, bool runasync){
-    addJob(&obj);
-    if(!runasync) while(obj.isPending()) run();
+    // Move the unique_ptr into execute(), which assumes ownership
+    execute(m_timer, false);  // Or `runasync` if applicable
 }
 
 void OS::execute(Job& obj, bool runasync){
@@ -167,12 +164,33 @@ void OS::execute(Job& obj, bool runasync){
     if(!runasync) while(obj.isPending()) run();
 }
 
+void OS::execute(String& rawcmd){
+        Interpreter in;
+        in.processScript(rawcmd, script);
+
+        if (script.isValid()) {
+            Console::println("Starting program");
+            script.start();
+            execute(script, false);
+        } else {
+            Console::println("Invalid program : Unknown error");
+        }
+}
+
 void OS::flush(){
     while(isBusy()) run();
 }
 
 bool OS::isBusy() {
-    return m_jobs.size() != 0;
+    return m_jobs.size() > 0;
+}
+
+void OS::clearProgram(){
+    script.clear();
+}
+
+Program &OS::program(){
+    return script;
 };
 
 Job* OS::currentJob(){
@@ -187,10 +205,11 @@ void OS::killCurrentJob(){
     m_jobs.pop();
 }
 
+
 void OS::updateServices(){
     for(const auto& service : m_services) {
         if(service.second->enabled() && !service.second->threaded()) {
-            service.second->onUpdate();
+            service.second->run();
         }
     }
 }

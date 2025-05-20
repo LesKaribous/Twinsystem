@@ -1,12 +1,16 @@
 #include "job.h"
+#include "os/console.h"
 
-Job::Job(){
+Job::Job() {
 	m_state = JobState::IDLE;
 	startTime = 0;
 	pauseTime = 0;
+	//Console::trace("Job") << "Allocated at " << (uintptr_t)this << Console::endl;
 }
 
-Job::~Job(){}
+Job::~Job(){
+	//Console::trace("Job") << "Destroyed at " << (uintptr_t)this << Console::endl;
+}
 
 void Job::run(){
 	if(isCanceling()){
@@ -41,7 +45,7 @@ String  Job::toString() const {
 		case JobState::IDLE :
 			return "IDLE";
 		break;
-		case JobState::RUNNNING :
+		case JobState::RUNNING :
 			return "RUNNNING";
 		break;
 		case JobState::PAUSED :
@@ -79,15 +83,20 @@ bool Job::isIdle() const {
 }
 
 bool Job::isRunning() const{
-	return m_state == JobState::RUNNNING;
+	return m_state == JobState::RUNNING;
 }
 
 bool Job::isPending() const{
-	return m_state == JobState::RUNNNING || m_state == JobState::PAUSED || m_state == JobState::PAUSING || m_state == JobState::CANCELING;
+	return m_state == JobState::RUNNING || 
+		   m_state == JobState::PAUSED  || 
+		   m_state == JobState::PAUSING || 
+		   m_state == JobState::CANCELING;
 }
 
 bool Job::isBusy() const{
-	return m_state == JobState::RUNNNING || m_state == JobState::PAUSING || m_state == JobState::CANCELING;
+	return m_state == JobState::RUNNING || 
+		   m_state == JobState::PAUSING || 
+		   m_state == JobState::CANCELING;
 }
 
 bool Job::isCanceling() const{
@@ -122,12 +131,12 @@ void Job::reset(){
 void  Job::start(){
 	if(m_state == JobState::IDLE){
 		startTime = millis();
-		m_state = JobState::RUNNNING;
+		m_state = JobState::RUNNING;
 	}
 }
 
 void  Job::pause(){
-	if(m_state == JobState::RUNNNING){
+	if(m_state == JobState::RUNNING){
 		pauseTime = millis();
 		m_state = JobState::PAUSING;
 	}
@@ -135,7 +144,7 @@ void  Job::pause(){
 
 void  Job::resume(){
 	if(m_state == JobState::PAUSED){
-		m_state = JobState::RUNNNING;
+		m_state = JobState::RUNNING;
 	}
 }
 

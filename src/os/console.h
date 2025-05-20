@@ -5,6 +5,7 @@
 
 #define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
 #define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+#define BEEP Console::println( "Beep in " + String(__FILE__) + " at line " + String(__LINE__));
 
 class ConsoleStream;
 
@@ -38,8 +39,8 @@ public:
 	static void plot(const String& name, String s);
 	static void plotXY(const String& n, String x, String y);
 
-	static void print(const String& s);
-	static void println(const String& s);
+	static void print(const String& s = "");
+	static void println(const String& s = "");
 	static void prettyPrint(const String& s);
 	static void line();
 

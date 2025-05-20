@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-INSTANTIATE_SERVICE(Localisation, localisation);
+SINGLETON_INSTANTIATE(Localisation, localisation);
 
 #ifdef OLD_BOARD
 #define I2C_OTOS I2C_OTOS
@@ -12,7 +12,7 @@ INSTANTIATE_SERVICE(Localisation, localisation);
 #define I2C_OTOS Wire
 #endif
 
-void Localisation::onAttach(){
+void Localisation::attach(){
     
     Console::info() << "Localisation activated" << Console::endl;
     I2C_OTOS.begin();
@@ -37,7 +37,7 @@ void Localisation::onAttach(){
 }
 
 // Main loop
-void Localisation::onUpdate(){ 
+void Localisation::run(){ 
     //THROW(1)
 
     static long elapsed = 0;
@@ -96,9 +96,9 @@ void Localisation::calibrate() {
     Serial.println("Ensure the OTOS is flat and stationary");
     delay(1000);
     Serial.println("Calibrating IMU...");
-
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    otos.calibrateImu();
+    otos.calibrateImu(400, true);
+    otos.setLinearScalar(1.0);
     Serial.println("Calibrated IMU.");
     m_calibrated = true;
 }

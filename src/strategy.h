@@ -18,6 +18,7 @@ void matchB();
 void waitMs(unsigned long time);
 void takeStock(Vec2 target, RobotCompass rc, TableCompass tc);
 void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc);
+void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc);
 void nearEnd();
 //------------------------------------------------------
 // TODO : Integrate Pump and EV into Actuators <3
@@ -29,4 +30,4 @@ extern Adafruit_PWMServoDriver pwm;
 
 RobotCompass nextActuator(RobotCompass rc);         //Recupere l'orientation de l'actionneur suivant
 RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de l'actionneur précedant
-void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist = 200.0, float probeDist = 80.0 );
+void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist = 200.0, float probeDist = 80.0, float feedrate = 0.2 );

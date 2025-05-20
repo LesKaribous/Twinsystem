@@ -1,3 +1,4 @@
+#pragma once
 #include "smartServo.h"
 #include "sensor.h"
 #include <vector>

@@ -5,10 +5,12 @@
 
 class Localisation : public Service{
 public:
-    void onAttach() override;
+   
+    void attach() override;
+    void run() override;
+    
     void enable()override;
     void disable() override;
-    void onUpdate() override;
     //void onUpdateThread(void* arg) override;
     
     void setPosition(Vec3);
@@ -19,7 +21,7 @@ public:
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
     Localisation(): Service(ID_LOCALISATION){};
-    SERVICE(Localisation)
+    SINGLETON(Localisation)
 
 private : 
 
@@ -34,4 +36,4 @@ private :
 
     QwiicOTOS otos;
 };
-EXTERN_DECLARATION(Localisation, localisation)
+SINGLETON_EXTERN(Localisation, localisation)

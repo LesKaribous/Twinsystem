@@ -1,7 +1,7 @@
 #pragma once
 #include "settings.h"
 #include "services/service.h"
-#include "utils/job.h"
+#include "os/jobs/job.h"
 
 #include <deque>
 
@@ -10,8 +10,8 @@ public :
     
     Terminal();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     String dequeCommand();
     int commandAvailable();
@@ -19,7 +19,7 @@ public :
 private:
     std::deque<String> _pendingCommands;
 
-    SERVICE(Terminal)
+    SINGLETON(Terminal)
 };
 
-EXTERN_DECLARATION(Terminal, terminal)
+SINGLETON_EXTERN(Terminal, terminal)

@@ -5,11 +5,11 @@
 
 #define CAST_POSE(x) static_cast<int>(x)
 
-INSTANTIATE_SERVICE(Actuators, actuators)
+SINGLETON_INSTANTIATE(Actuators, actuators)
 
 Actuators::Actuators() : Service(ID_ACTUATORS){}
 
-void Actuators::onAttach(){
+void Actuators::attach(){
     Console::info() << "Actuators activated" << Console::endl;
     pinMode(Pin::Outputs::enTraco, OUTPUT); // Enable Traco to enable Servos
    
@@ -32,7 +32,7 @@ void Actuators::onAttach(){
     //sleep();
 }
 
-void Actuators::onUpdate(){
+void Actuators::run(){
 }
 
 

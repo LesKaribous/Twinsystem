@@ -3,7 +3,7 @@
 #include "notes.h"
 #include "os/console.h"
 
-INSTANTIATE_SERVICE(IHM, ihm)
+SINGLETON_INSTANTIATE(IHM, ihm)
 
 IHM::IHM() : Service(ServiceID::ID_IHM), 
     starter(Pin::Inputs::starter),
@@ -15,7 +15,7 @@ IHM::IHM() : Service(ServiceID::ID_IHM),
 {};
 
 
-void IHM::onAttach(){
+void IHM::attach(){
     Console::info() << "IHM activated" << Console::endl;
     screen.begin();
     starter.setInverted(true);
@@ -49,7 +49,7 @@ void IHM::onAttach(){
     drawBootProgress("System Booting...");
 }
 
-void IHM::onUpdate(){
+void IHM::run(){
     //update inputs
     starter.read();
     teamSwitch.read();

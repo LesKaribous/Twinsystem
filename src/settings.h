@@ -20,6 +20,17 @@
 #define TW_STRAT_OPT1 BROWN
 #define TW_STRAT_OPT2 NOBROWN
 
+
+//Occupancy map size	
+#define GRID_WIDTH 20
+#define GRID_HEIGHT 13
+#define GRID_BITS   (GRID_WIDTH * GRID_HEIGHT)
+#define GRID_BYTES  ((GRID_BITS + 7) / 8)
+
+#define TABLE_SIZE_X 3000 //mm
+#define TABLE_SIZE_Y 2000 //mm
+
+
 // Struct definition
 struct  CalibrationProfile{
     Vec3 Holonomic,
@@ -60,8 +71,8 @@ namespace Settings{
         NEARLY_FINISH = 15 * 1000,      //15s before the end
         ENDMATCH = 200;                 //200ms before the end
         
-        constexpr float 
-        FEEDRATE = 100; //%
+        //constexpr float 
+        //FEEDRATE = 100; //%
     }
 
     namespace Inputs{
@@ -85,7 +96,7 @@ namespace Settings{
         USE_GYROSCOPE = true;
 
         constexpr int VELOCITY_SAMPLES = 0,
-        MIN_CRUISE_DISTANCE = 600; // TODO : decrease !!!! or not ?
+        MIN_CRUISE_DISTANCE = 600; // 600
 
         // Kp is used to improve the transient response rise time and settling time of course.
         // Ki works to improve steady-state response. Kd is used to improve the transient response by way of predicting error
@@ -109,7 +120,7 @@ namespace Settings{
         const int 
         //STOP_DECCEL = 10000, // mm/s^2
         MAX_ACCEL = 400, // mm/s^2 300
-        MAX_SPEED = 1600, // mm/s 1000
+        MAX_SPEED = 1600, // mm/s 1000      otos max Tracking speed: 2.5m/s
         MIN_DISTANCE = 20, // Target stop thresold //mm
         
         PID_MAX_PERIOD = 10,//ms

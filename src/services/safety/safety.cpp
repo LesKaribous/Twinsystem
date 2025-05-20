@@ -5,7 +5,7 @@
 #include "services/intercom/intercom.h"
 #include "utils/timer/timer.h"
 
-INSTANTIATE_SERVICE(Safety, safety)
+SINGLETON_INSTANTIATE(Safety, safety)
 
 void getDistanceCallback(Request& req){
     int d = req.getResponse().toInt();
@@ -32,10 +32,10 @@ void Safety::disable(){
 }
 
 
-void Safety::onAttach(){
+void Safety::attach(){
 }
 
-void Safety::onUpdate(){
+void Safety::run(){
     if(!enabled()){return;}
 
     RUN_EVERY(
@@ -45,7 +45,7 @@ void Safety::onUpdate(){
             if(distanceToGo > 500) distanceToGo = 500;
             if(distanceToGo < 350) distanceToGo = 350;
 
-            intercom.sendRequest("checkObstacle("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
+            intercom.sendRequest("ob("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
         }
 
         if(m_obstacleDetected/*m_currentDistance <= 350*/){
