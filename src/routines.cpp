@@ -297,7 +297,6 @@ void onIntercomRequest(Request& req){
 
 
 void onIntercomRequestReply(Request& req){
-    //return;
     if(req.getContent().startsWith("oM")){ //occupancyMap
         occupancy.decompress(req.getResponse());
     }
