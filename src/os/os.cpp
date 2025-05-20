@@ -1,5 +1,6 @@
 #include "os.h"
 #include "console.h"
+#include "utils/interpreter/interpreter.h"
 
 OS OS::m_instance;
 
@@ -49,14 +50,14 @@ void OS::boot_routine(){
 }
 
 void OS::manual_routine(){
+    
     updateServices();
     executeRoutine(m_manualRoutine);
+
     if(currentJob() != nullptr){
-        BEEP
         if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
-        else if(currentJob()->isRunning()) currentJob()->run();
-        else if(currentJob()->isIdle()) currentJob()->start();
-        BEEP
+        else currentJob()->run();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
@@ -65,8 +66,8 @@ void OS::auto_routine(){
     executeRoutine(m_autoRoutine);
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
-        else if(currentJob()->isRunning()) currentJob()->run();
-        else if(currentJob()->isIdle()) currentJob()->start();
+        else currentJob()->run();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
@@ -123,9 +124,7 @@ void OS::attachService(Service* service){
     if(service != nullptr){
         m_services[service->id()] = service;
         service->attach();
-
         Console::trace() << "Attached service: " << service->id() << Console::endl;
-
         service->enable();
     }
 }
@@ -154,33 +153,28 @@ void OS::toggleDebug(ServiceID s){
 }
 
 void OS::wait(unsigned long time) {
-    auto timer = std::make_unique<Timer>();
-    timer->setDuration(time);
-
-    Timer* timerPtr = timer.get();
-
+    m_timer.setDuration(time);
+    m_timer.start();
     // Move the unique_ptr into execute(), which assumes ownership
-    execute(std::move(timer), false);  // Or `runasync` if applicable
-    m_timer.start(); // What is m_timer? Another Timer?
-
-    // Synchronous wait loop (blocking)
-    while (timerPtr->isPending() || timerPtr->isPaused()) {
-        timerPtr->run();
-        run();
-    }
-    
+    execute(m_timer, false);  // Or `runasync` if applicable
 }
 
-void OS::execute(std::unique_ptr<Job> obj, bool runasync){
-    Job* job = obj.get();  // Keep raw pointer for state checking
-    addJob(std::move(obj));  // Transfer ownership
+void OS::execute(Job& obj, bool runasync){
+    addJob(&obj);
+    if(!runasync) while(obj.isPending()) run();
+}
 
-    if (job->isIdle()) job->start();
+void OS::execute(String& rawcmd){
+        Interpreter in;
+        in.processScript(rawcmd, script);
 
-    if (!runasync) {
-        while (job->isPending())
-            run();
-    }
+        if (script.isValid()) {
+            Console::println("Starting program");
+            script.start();
+            execute(script, false);
+        } else {
+            Console::println("Invalid program : Unknown error");
+        }
 }
 
 void OS::flush(){
@@ -189,19 +183,28 @@ void OS::flush(){
 
 bool OS::isBusy() {
     return m_jobs.size() > 0;
+}
+
+void OS::clearProgram(){
+    script.clear();
+}
+
+Program &OS::program(){
+    return script;
 };
 
 Job* OS::currentJob(){
     if(m_jobs.size() == 0) return nullptr;
-    else return m_jobs.front().get();
+    else return m_jobs.front();
 }
-void OS::addJob(JobHandle job){
-    m_jobs.push(std::move(job));
+void OS::addJob(Job* job){
+    m_jobs.push(job);
 }
 void OS::killCurrentJob(){
     if(m_jobs.size() == 0) return;
     m_jobs.pop();
 }
+
 
 void OS::updateServices(){
     for(const auto& service : m_services) {

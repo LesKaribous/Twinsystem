@@ -1,6 +1,6 @@
 #pragma once
 #include <Arduino.h>
-#include <memory>
+//#include <memory>
 //#include "os/asyncExecutor.h"
 
 enum class JobState{
@@ -12,9 +12,13 @@ enum class JobState{
     CANCELED,
     COMPLETED
 };
+//class JobOwner;
 
 class Job  {
+    //JobOwner* m_owner = nullptr;
+    //bool m_blocking = false;
 public:
+    //Job(JobOwner* = nullptr);
     Job();
     ~Job();// make the class polymorphic by providing a virtual destructor
 
@@ -55,13 +59,19 @@ public:
     virtual void onPaused();   //Called once when exiting Pausing state
     virtual void onCanceled(); //Called once when exiting Canceling state
 
-    inline static std::unique_ptr<Job> create() {
-        return std::make_unique<Job>();
-    }
+    //bool hasOwner() const { return m_owner != nullptr; }
+    //bool isBlocking() const { return m_blocking; }
+    //void setBlocking(bool blocking) { m_blocking = blocking; }
+
+    //inline static std::unique_ptr<Job> create() {
+    //    return std::make_unique<Job>();
+    //}
+    //void track(Job* job); //to update the job pointer for the owner
+
 protected:
     JobState m_state = JobState::IDLE;
     long startTime = 0;
     long pauseTime = 0;
 };
     
-typedef std::unique_ptr<Job> JobHandle;
+//typedef std::unique_ptr<Job> JobHandle;

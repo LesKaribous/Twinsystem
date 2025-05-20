@@ -33,7 +33,7 @@ void recalage(){
 
     if(ihm.isColor(Settings::BLUE)){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
-        probeBorder(TableCompass::EAST,  RobotCompass::CA,100);
+        probeBorder(TableCompass::EAST,  RobotCompass::CA,100);//when starting this line
         
         async motion.go(POI::b2);
         async motion.go(POI::b2);
@@ -401,14 +401,14 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
-
+    
     motion.setFeedrate(feedrate);
-	async motion.align(rc, getCompassOrientation(tc));
-
+	async motion.align(rc, getCompassOrientation(tc));//here crash
+    
     motion.setRelative();
 	async motion.goPolar(getCompassOrientation(rc),approachDist);
 	async motion.goPolar(getCompassOrientation(rc),probeDist);
-
+    
 	float _offset = getOffsets(rc);
     Console::println(_offset);
 	Vec3 position = motion.estimatedPosition();
@@ -428,14 +428,14 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 		//_probedY = true;
 	}
     position.c = DEG_TO_RAD * (getCompassOrientation(tc) - getCompassOrientation(rc));
-	Console::println(position);
+	
     motion.setAbsPosition(position);
     delay(1000);
     
     if(clearance != 0){ 
         async motion.goPolar(getCompassOrientation(rc),-clearance);
     }
-
+    
 	if(wasAbsolute) motion.setAbsolute();
     motion.setFeedrate(currentFeedrate);
 }

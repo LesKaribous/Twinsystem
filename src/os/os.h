@@ -47,8 +47,14 @@ public:
     void toggleDebug(ServiceID s);
 
     void wait(unsigned long time);
-    void execute(JobHandle job, bool runasync = true);
+    
+    void execute(Job& job, bool runasync = true);
+    void execute(String& rawcmd);
+
     bool isBusy();
+
+    void clearProgram();
+    Program& program();
 
 private:
     void boot_routine();
@@ -60,7 +66,7 @@ private:
     void executeRoutine(routine_ptr routine);
 
     Job* currentJob();
-    void addJob(JobHandle job);
+    void addJob(Job* job);
     void killCurrentJob();
 
     std::map<ServiceID, Service*> m_services;
@@ -76,7 +82,7 @@ private:
     Program script;
 
     Timer m_timer;
-    std::queue<JobHandle, std::list<JobHandle>> m_jobs;
+    std::queue<Job*> m_jobs;
 
 
 //Singleton

@@ -1,12 +1,16 @@
 #include "job.h"
+#include "os/console.h"
 
-Job::Job(){
+Job::Job() {
 	m_state = JobState::IDLE;
 	startTime = 0;
 	pauseTime = 0;
+	//Console::trace("Job") << "Allocated at " << (uintptr_t)this << Console::endl;
 }
 
-Job::~Job(){}
+Job::~Job(){
+	//Console::trace("Job") << "Destroyed at " << (uintptr_t)this << Console::endl;
+}
 
 void Job::run(){
 	if(isCanceling()){

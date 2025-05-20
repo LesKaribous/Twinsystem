@@ -50,7 +50,7 @@ void Intercom::sendMessage(const char* message) {
     }
     _stream.print(message);
     _stream.write('\n');
-    Console::trace("Intercom") << ">" << message << Console::endl;
+    if(debug) Console::trace("Intercom") << ">" << message << Console::endl;
 }
 
 void Intercom::sendMessage(const String& message) {
@@ -62,7 +62,7 @@ void Intercom::sendMessage(const String& message) {
     }
     _stream.print(message);
     _stream.write('\n');
-    Console::trace("Intercom") << ">" << message.c_str() << Console::endl;
+    if(debug) Console::trace("Intercom") << ">" << message.c_str() << Console::endl;
 }
 
 int Intercom::sendRequest(const String& payload, long timeout,  requestCallback_ptr cbfunc,  callback_ptr func){
@@ -151,7 +151,7 @@ void Intercom::_processIncomingData() {
                 int crc = incomingMessage.substring(crc_separatorIndex + 1).toInt(); //without crc
                 
                 if(!checkCRC(incomingMessage.substring(0, crc_separatorIndex), crc)){
-                    Console::trace("Intercom") << "Bad crc for message " << incomingMessage << Console::endl;
+                    if(debug) Console::trace("Intercom") << "Bad crc for message " << incomingMessage << Console::endl;
                     continue;
                 }
 
@@ -159,9 +159,9 @@ void Intercom::_processIncomingData() {
                 if (requestIt != _sentRequests.end()) {
                     Request& request = requestIt->second;
                     request.onResponse(responseData);
-                    Console::trace("Intercom") << "<" << incomingMessage << Console::endl;
+                    if(debug) Console::trace("Intercom") << "<" << incomingMessage << Console::endl;
                 }else{
-                    Console::trace("Intercom")<< "not found" << Console::endl;
+                    if(debug) Console::trace("Intercom")<< "not found" << Console::endl;
                 }
             }
 
@@ -194,7 +194,7 @@ void Intercom::_processPendingRequests() {
         Request::Status status = request.getStatus();
     
         if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 300){
-            Console::trace("Intercom") << ": request " << request.getContent() << "too old, cleared." << Console::endl;
+            if(debug) Console::trace("Intercom") << ": request " << request.getContent() << "too old, cleared." << Console::endl;
             request.close();
             ++it;
             continue;
@@ -214,13 +214,13 @@ void Intercom::_processPendingRequests() {
             ++it;
             request.close();
         } else if (status == Request::Status::CLOSED) {
-            Console::trace("Intercom") << int(_sentRequests.size()) << "currently in the buffer" << Console::endl;
+            if(debug) Console::trace("Intercom") << int(_sentRequests.size()) << "currently in the buffer" << Console::endl;
             it = _sentRequests.erase(it); // Remove the request from the map
 
         }  else if (status == Request::Status::TIMEOUT) {
             request.close();
             //CONSOLE_SERIAL.print(request.getPayload());
-            Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
+            if(debug) Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
         } else if (status == Request::Status::ERROR) {
             request.close();
             Console::error("Intercom") << "request " << request.getContent() << " unknown error." << Console::endl;

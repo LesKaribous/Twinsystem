@@ -6,15 +6,17 @@
 #define RUN_TWICE(x) x; x;
 
 class AsyncExecutor {
-    Job* job = nullptr;
-
+Job* job = nullptr;
 public:
-    explicit AsyncExecutor(JobHandle&& x) {
-        job = x.get();                    // Save non-owning pointer
-        os.execute(std::move(x), false);  // Transfer ownership
+    explicit AsyncExecutor(Job& x) : job(&x){
+        //Console::info("AsyncExecutor") << "Starting task" << Console::endl;
+        os.execute(x, false);
+        //Console::info("AsyncExecutor") << "ending task" << Console::endl;
     }
 
+    // Cast operator to bool, for use in logical expressions
     explicit operator bool() const {
-        return job && job->isCompleted();
+        if(job) return job->isCompleted();  // Return true if the job succeeded, false otherwise
+        return false;  // Return true if the job succeeded, false otherwise
     }
 };

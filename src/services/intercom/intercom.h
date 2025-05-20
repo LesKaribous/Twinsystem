@@ -37,6 +37,8 @@ private:
     void connectionLost(); 
     void connectionSuccess(); 
 
+    bool debug = false;
+
     Stream& _stream;
     std::map<int,Request> _sentRequests;
     //std::map<uint32_t,Request> _receivedRequests;

@@ -1,7 +1,7 @@
 #pragma once
 #include "settings.h"
 #include "services/service.h"
-#include "os/jobs/job_owner.h"
+#include "os/jobs/job.h"
 #include "utils/geometry.h"
 #include "services/motion/controller/positionController.h"
 #include "services/motion/controller/stepperController.h"
@@ -11,7 +11,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-class Motion : public Service, public JobOwner{
+class Motion : public Service, public Job{
 public:
 
     Motion();
@@ -25,13 +25,18 @@ public:
     void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
     void disengage();// Disengaging motors turn them off. They cannot move at all.
 
-    JobHandle go(Vec2);
-    JobHandle go(float x, float y);
-    JobHandle goPolar(float angle, float dist);
-    JobHandle turn(float w);
-    JobHandle align(RobotCompass, float orientation);
-    JobHandle move(Vec3 target);
+    Motion& go(Vec2);
+    Motion& go(float x, float y);
+    Motion& goPolar(float angle, float dist);
+    Motion& turn(float w);
+    Motion& align(RobotCompass, float orientation);
+    Motion& move(Vec3 target);
 
+    // std::unique_ptr<Job> createJob() override {
+    //     std::unique_ptr<Job> job = std::make_unique<Job>(this);
+    //     m_job = job.get();
+    //     return job;
+    // }
 
     void control();
     

@@ -87,7 +87,8 @@ public:
     inline int size() const { return _statements.size(); }
     inline void addStatement(std::shared_ptr<Statement> statement){_statements.push_back(statement);}
     inline bool isValid(){return _statements.size() > 0;};
-
+    inline void clear(){_statements.clear(); _currentTask = 0; reset();}
+    
     void run()      override; 
     void reset()    override;  
     void start()    override; 
@@ -100,7 +101,4 @@ public:
     void restart();
     void stop();
 
-    static std::unique_ptr<Program> create();
 };
-
-typedef std::unique_ptr<Program> ProgramHandle;

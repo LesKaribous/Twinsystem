@@ -6,7 +6,7 @@
 #include "score.h"
 #include "os/os.h"
 #include "utils/timer/timer.h"
-#include "utils/interpreter/interpreter.h"
+
 
 // -------------------------------------
 //           Main programs
@@ -327,21 +327,8 @@ void onOccupancyTimeout(){
 }
 
 void onTerminalCommand() {
-    Interpreter interpreter;
-
     if (terminal.commandAvailable() > 0) {
         String rawcmd = terminal.dequeCommand();
-        Interpreter in;
-
-        ProgramHandle prgm = in.processScript(rawcmd);
-
-        if (prgm && prgm->isValid()) {
-            Console::println("Starting program");
-
-            //Program* jobPtr = prgm.get();          // Non-owning reference
-            os.execute(std::move(prgm));           // Transfer ownership to OS
-        } else {
-            Console::println("Invalid program : Unknown error");
-        }
+        os.execute(rawcmd);
     }
 }

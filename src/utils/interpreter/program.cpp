@@ -191,10 +191,6 @@ void Program::stop(){
     reset();
 }
 
-std::unique_ptr<Program> Program::create(){
-    return std::make_unique<Program>();
-}
-
 bool Program::step(){
     //THROW(_currentTask)
     _currentTask++;
