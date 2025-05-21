@@ -32,8 +32,9 @@ float command(float dt,
     float targetSpeed = maxSpeed;
     if (fabs(error) < proportionalThreshold)
     {
-        targetSpeed = std::max(minSpeed, maxSpeed * (fabs(error) / proportionalThreshold));
+        targetSpeed = std::min(minSpeed, maxSpeed * (fabs(error) / proportionalThreshold));
     }
+    //targetSpeed = std::min(minSpeed, maxSpeed/10.0f * (fabs(error)));
 
     float targetVel = direction * targetSpeed;
 
@@ -46,9 +47,9 @@ float command(float dt,
     
     if (fabs(velError) < proportionalVelocityThreshold)
     {
-        accel = std::max(0.0f, maxAccel * (fabs(velError) / proportionalVelocityThreshold));
+        accel = std::min(maxAccel, maxAccel * (fabs(velError) / proportionalVelocityThreshold));
     }
-    
+    //accel = std::min(maxAccel, maxAccel/10.0f * (fabs(velError)));
 
     // Compute the required stopping distance from current velocity.
     float stoppingDistance = (velocity * velocity) / (2.0f * (accel + EPSILON));
@@ -56,7 +57,7 @@ float command(float dt,
     float acceleration = 0.0f;
 
     // Determine motion phase clearly.
-    if (stoppingDistance*3.0 >= fabs(error))
+    if (stoppingDistance*1.0 >= fabs(error))
     {
         // Deceleration phase.
         acceleration = -NORMALIZE(velocity) * accel;
@@ -75,44 +76,7 @@ float command(float dt,
     // Clamp the final acceleration.
     return std::clamp(acceleration, -maxAccel, maxAccel);
 }
-/**/
-/*
-float pidCommand(
-    float dt,
-    float error,           // Position error
-    float velocity,        // Current velocity
-    float kp,              // Position gain -> target velocity
-    float kv,              // Velocity gain -> acceleration
-    float ka,              // Max acceleration output
-    float minSpeed,
-    float maxSpeed,
-    float minDistance)
-{
-    constexpr float EPSILON = 1e-5f;
 
-    if (fabs(error) < minDistance)
-        return 0.0f;
-
-    // 1. Position control -> target velocity
-    float targetVelocity = kp * error;
-
-    // Clamp target velocity
-    float speed = fabs(targetVelocity);
-    if (speed > maxSpeed)
-        targetVelocity = NORMALIZE(targetVelocity) * maxSpeed;
-    else if (speed < minSpeed)
-        targetVelocity = 0;
-
-    // 2. Velocity control -> acceleration
-    float velocityError = targetVelocity - velocity;
-    float acceleration = kv * velocityError;
-
-    // Clamp acceleration
-    acceleration = std::clamp(acceleration, -ka, ka);
-
-    return acceleration;
-}
-*/
 
 PositionController::PositionController() : 
     position(0.0f, 0.0f),
@@ -172,13 +136,21 @@ void PositionController::complete() {
 
 void PositionController::onUpdate(){
     float dt = Settings::Motion::PID_INTERVAL * 1e-6;
-        
+    
+
+    float heading = localisation.getPosition().c;
+    velocity = localisation.getVelocity();
+    position = localisation.getPosition();
+    //velocity = controller.getCurrentVelocity();
+    velocity.rotateZ(-heading);
+    //position = position + ( velocity * dt);
+
     Vec2 error = target - position;
     float angle = target.c - position.c;
 
     if(isPending() && !isPaused()){
-        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 5.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 5.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 20.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 20.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
         acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0.01, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
     }
     /*
@@ -204,20 +176,17 @@ void PositionController::onUpdate(){
         target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
     }
 
-    if(fabs(angle) > Settings::Motion::MIN_ANGLE)  
+    if(fabs(angle) > Settings::Motion::MIN_ANGLE){
         target_velocity.c += acceleration.c * dt;
-    else  
+    }else{
         target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
-    
+    }
 
-    velocity = localisation.getVelocity();
-    //velocity = controller.getCurrentVelocity();
-    velocity.rotateZ(-position.c);
-    position = position + ( velocity * dt);
+
 
     Vec3 final_target_velocity = target_velocity;
-    if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
-    if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
+    if(fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
+    if(fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
     if(fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
 
     if(final_target_velocity.magSq() > 0){
@@ -386,8 +355,8 @@ void PositionController::setPosition(const Vec3 &t){
     position = t;
 }
 
-void PositionController::setTarget(const Vec3 &t)
-{
+void PositionController::setTarget(const Vec3 &t){
+    Console::info() << "Setting target to " << t << Console::endl;
     newTarget = t;
 }
 
