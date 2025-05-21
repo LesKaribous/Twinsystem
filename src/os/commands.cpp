@@ -42,6 +42,7 @@ void registerCommands() {
     CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
     CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
     CommandHandler::registerCommand("cruise", " Enable cruise mode", command_cruise);
+    CommandHandler::registerCommand("music", " Play a sound", command_music);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -127,6 +128,27 @@ void command_reboot(const args_t &args){
 
 void command_cruise(const args_t& args){
     motion.enableCruiseMode();
+}
+
+void command_music(const args_t &args){
+    ihm.playTone(659, 167); // E5, 8th note
+    ihm.playTone(587, 167); // D5
+    ihm.playTone(370, 333); // F#4, quarter note
+    ihm.playTone(415, 333); // G#4
+
+    ihm.playTone(554, 167); // C#5
+    ihm.playTone(494, 167); // B4
+    ihm.playTone(294, 333); // D4
+    ihm.playTone(330, 333); // E4
+
+    ihm.playTone(494, 167); // B4
+    ihm.playTone(440, 167); // A4
+    ihm.playTone(280, 333); // C4
+    //ihm.playTone(262, 333); // C4
+    ihm.playTone(330, 333); // E4
+
+    ihm.playTone(440, 667); // A4, half note
+
 }
 
 void command_probe(const args_t &args){

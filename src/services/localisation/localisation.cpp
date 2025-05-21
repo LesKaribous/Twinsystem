@@ -76,16 +76,26 @@ Vec3 Localisation::getPosition(){
     return _unsafePosition;
 }
 
+Vec3 Localisation::getVelocity(){
+    return _unsafeVelocity;
+}
+
 void Localisation::read()
 {
     sfe_otos_pose2d_t myPosition;
+    sfe_otos_pose2d_t myVelocity;
+
+    otos.getVelocity(myVelocity);
     otos.getPosition(myPosition);
 
     //Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
 
     _unsafePosition.x = -myPosition.y * 1000.0; //to millimeters
     _unsafePosition.y = -myPosition.x * 1000.0; //to millimeters
-
+    
+    _unsafeVelocity.x = -myVelocity.y * 1000.0; //to millimeters /s
+    _unsafeVelocity.y = -myVelocity.x * 1000.0; //to millimeters /s
+    _unsafeVelocity.z =  myVelocity.h; //to radians /s
 
     float orientation = myPosition.h;
     _unsafePosition.z = orientation;

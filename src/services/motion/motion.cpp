@@ -52,13 +52,6 @@ void Motion::onRunning(){
             onCanceled();
         }
 
-
-        Vec3 position = estimatedPosition();
-        if(position != _position && current_move_cruised){
-            _position = position;
-            cruise_controller.setPosition(position);
-        }
-
         if(current_move_cruised)
             cruise_controller.run();
         else 
@@ -134,6 +127,17 @@ void Motion::onCanceled(){
 
 void Motion::control(){
     if(enabled()){
+
+        
+        RUN_EVERY(
+            Vec3 position = estimatedPosition();
+            if(position != _position && current_move_cruised){
+                _position = position;
+                cruise_controller.setPosition(position);
+            }
+        , Settings::Motion::PID_INTERVAL);
+            
+
         if(current_move_cruised)
             cruise_controller.control();
         else
@@ -246,7 +250,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     Vec3 _relTarget = toRelativeTarget(_target);
 
     //resetSteps();
-    if(use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE && localisation.enabled()){
+    if(true || use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE && localisation.enabled()){
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();

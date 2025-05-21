@@ -10,9 +10,11 @@ public:
     
     bool isInBounds(int x, int y) const; //return true if the cell coordinates are valid (inbounds)
 
-    bool isOccupied(int x, int y);
+    bool isOccupied(int x, int y) const;
+    bool isCellOccupied(int x, int y) const;
+    
     float distanceToNearestObstacle(const Vec2& pos) const;
-    //Vec2 repulsiveGradient(const Vec2& pos) const;
+    Vec2 repulsiveGradient(const Vec2& pos) const;
     void decompress(const String& encoded);
 private:
     uint8_t m_map[GRID_WIDTH][GRID_HEIGHT];

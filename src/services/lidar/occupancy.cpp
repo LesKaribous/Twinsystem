@@ -38,6 +38,35 @@ float OccupancyMap::distanceToNearestObstacle(const Vec2& pos) const {
     return minDistance;
 }
 
+Vec2 OccupancyMap::repulsiveGradient(const Vec2 &pos) const{
+    const int RANGE = 5; // Neighborhood size (5x5)
+    Vec2 force(0.0f, 0.0f);
+
+    int cx = static_cast<int>((pos.x + TABLE_SIZE_X) * GRID_WIDTH / (2 * TABLE_SIZE_X));
+    int cy = static_cast<int>((pos.y + TABLE_SIZE_Y) * GRID_HEIGHT / (2 * TABLE_SIZE_Y));
+
+    for (int dx = -RANGE; dx <= RANGE; ++dx) {
+        for (int dy = -RANGE; dy <= RANGE; ++dy) {
+            int nx = cx + dx;
+            int ny = cy + dy;
+
+            if (!isInBounds(nx, ny))
+                continue;
+
+            if (isCellOccupied(nx, ny)) {
+                Vec2 obs(static_cast<float>(nx), static_cast<float>(ny));
+                Vec2 diff = pos - obs;
+                float distSq = diff.x * diff.x + diff.y * diff.y + 1e-5f;
+
+                // Inverse square law for repulsion
+                force = force + (diff / distSq);
+            }
+        }
+    }
+
+    return force;
+}
+
 void OccupancyMap::decompress(const String& encoded) {
     if (encoded.length() < (GRID_BYTES * 2 + 3)) // hex chars + dash + CRC
         return;
@@ -82,11 +111,15 @@ void OccupancyMap::decompress(const String& encoded) {
             m_map[x][y] = map[x][y];
 }
 
-bool OccupancyMap::isOccupied(int x, int y) {
+bool OccupancyMap::isOccupied(int x, int y) const {
     // Convert world coordinates to grid coordinates
     int gx = static_cast<int>((x + TABLE_SIZE_X) * GRID_WIDTH / (2 * TABLE_SIZE_X));
     int gy = static_cast<int>((y + TABLE_SIZE_Y) * GRID_HEIGHT / (2 * TABLE_SIZE_Y));
 
+    return isCellOccupied(gx, gy);
+}
+
+bool OccupancyMap::isCellOccupied(int gx, int gy) const {
     if (gx < 0 || gx >= GRID_WIDTH || gy < 0 || gy >= GRID_HEIGHT) {
         return false;
     }
