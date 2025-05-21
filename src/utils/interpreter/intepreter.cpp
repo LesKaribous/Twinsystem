@@ -71,10 +71,8 @@ Token Interpreter::nextToken() {
                 }
                 return nextToken(); // Recursively call to get the next token
             case '\n' : 
-                pos++; // Skip the unexpected character
             case 13 : 
                 pos++; // Skip the unexpected character
-
                 return nextToken(); // Recursively call to get the next token
             default:
                 // Handle error: unexpected character

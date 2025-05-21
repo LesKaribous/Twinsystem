@@ -16,6 +16,10 @@ public:
     float distanceToNearestObstacle(const Vec2& pos) const;
     Vec2 repulsiveGradient(const Vec2& pos) const;
     void decompress(const String& encoded);
+
+    Vec2 gridToWorld(int x, int y) const;
+    Vec2 worldToGrid(int x, int y) const;
+
 private:
     uint8_t m_map[GRID_WIDTH][GRID_HEIGHT];
 

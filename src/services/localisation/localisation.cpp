@@ -103,12 +103,12 @@ void Localisation::read()
 }
 
 void Localisation::calibrate() {
-    Serial.println("Ensure the OTOS is flat and stationary");
-    delay(1000);
-    Serial.println("Calibrating IMU...");
+    Console::println("Ensure the OTOS is flat and stationary");
+    delay(2000);
+    Console::info("Localisation") << "Calibrating IMU...";
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
     otos.calibrateImu(400, true);
     otos.setLinearScalar(1.0);
-    Serial.println("Calibrated IMU.");
+    Console::println("done.");
     m_calibrated = true;
 }

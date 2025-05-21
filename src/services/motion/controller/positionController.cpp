@@ -5,6 +5,7 @@
 #include "services/lidar/occupancy.h"
 #include "services/localisation/localisation.h"
 
+
 #define NORMALIZE(x) (x > 0 ? 1.0 : (x < 0 ? -1.0 : 0.0))
 
 /**/
@@ -86,9 +87,13 @@ PositionController::PositionController() :
     target(0.0f, 0.0f),
     last_velocity(0.0f, 0.0f, 0.0f),
     target_velocity(0.0f, 0.0f, 0.0f),
-    newTarget(0.0f, 0.0f)
+    newTarget(0.0f, 0.0f),
+
+    x_controller  (20.0, 0.01, 15.0),
+    y_controller  (20.0, 0.01, 15.0),
+    rot_controller(20.0, 0.01, 15.0)
 {
-    controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
+    //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();
     
 }
@@ -112,6 +117,9 @@ void PositionController::reset() {
     target_velocity= Vec3(0.0f);
     newTarget = Vec3(0.0f);
     controller.reset();
+    x_controller.reset();
+    y_controller.reset();
+    rot_controller.reset();
 }
 
 void PositionController::start() {
@@ -134,6 +142,14 @@ void PositionController::complete() {
     controller.disable();
 }
 
+
+float shortestAngleDiff(float target, float current) {
+    float diff = fmodf(target - current + M_PI, 2.0f * M_PI);
+    if (diff < 0)
+        diff += 2.0f * M_PI;
+    return diff - M_PI;
+}
+
 void PositionController::onUpdate(){
     float dt = Settings::Motion::PID_INTERVAL * 1e-6;
     
@@ -146,23 +162,39 @@ void PositionController::onUpdate(){
     //position = position + ( velocity * dt);
 
     Vec2 error = target - position;
-    float angle = target.c - position.c;
+    float angle = shortestAngleDiff(target.c, position.c);
+
+
+    //while(angle > PI) angle -= 2.0f*PI;
+    //while(angle <= -PI) angle += 2.0f*PI;
 
     if(isPending() && !isPaused()){
-        acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 20.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 20.0f, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0.01, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 0.5, 0.1 );
+        //acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 0, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        //acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 0, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
+        //acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 1.0, 0.6 );
+    
+        acceleration.x = x_controller.compute(error.x, dt);
+        acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+        acceleration.y = y_controller.compute(error.y, dt);
+        acceleration.y =std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+        acceleration.c = rot_controller.compute(angle, dt);
+        acceleration.c =std::clamp(acceleration.c, -Settings::Motion::MAX_ROT_ACCEL * m_feedrate, Settings::Motion::MAX_ROT_ACCEL * m_feedrate);
     }
-    /*
-    if(isPending() && !isPaused()){
-        acceleration.x = pidCommand(dt, error.x, velocity.x, 0.8, 0.4, Settings::Motion::MAX_ACCEL, 5, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE);
-        acceleration.y = pidCommand(dt, error.y, velocity.y, 0.8, 0.4, Settings::Motion::MAX_ACCEL, 5, Settings::Motion::MAX_SPEED, Settings::Motion::MIN_DISTANCE);
-        acceleration.c = pidCommand(dt, angle, velocity.c, 0.7, 0.1, Settings::Motion::MAX_ROT_ACCEL, 5, Settings::Motion::MAX_ROT_SPEED, Settings::Motion::MIN_ANGLE);
-    }*/
 
-    Vec2 lidar_repulsion = occupancy.repulsiveGradient(position) * 0.1;
-    acceleration.x -= lidar_repulsion.x;
-    acceleration.y -= lidar_repulsion.y;
+    
+    // lidar repulsion
+
+    //Vec2 lidar_repulsion = occupancy.repulsiveGradient(position) * 200.0;
+    //acceleration.x -= lidar_repulsion.x;
+    //acceleration.y -= lidar_repulsion.y;
+
+    //Console::plotXY("attractor", position.x - lidar_repulsion.x, position.y - lidar_repulsion.y);
+    //Console::plotXY("robot", position.x, position.y);
+
+    //acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+    //acceleration.y = std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+
+
 
     if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
         target_velocity.x += acceleration.x * dt;
@@ -189,6 +221,10 @@ void PositionController::onUpdate(){
     if(fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
     if(fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
 
+    std::clamp(final_target_velocity.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
+    std::clamp(final_target_velocity.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
+    std::clamp(final_target_velocity.z, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
+
     if(final_target_velocity.magSq() > 0){
         final_target_velocity.rotateZ(position.c);
         controller.setTargetVelocity(final_target_velocity);
@@ -199,7 +235,7 @@ void PositionController::onUpdate(){
             complete();
         controller.setTargetVelocity(Vec3(0));
     }
-    
+    //target_velocity = final_target_velocity;
 
     //Console::plot("pos", String(position.x));
     //Console::plot("vel", String(Vec2(velocity).mag()));
@@ -273,9 +309,9 @@ void PositionController::onCanceling(){
     position = position + ( velocity * dt);
 
     Vec3 final_target_velocity = target_velocity;
-    if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
-    if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
-    if(fabs(target_velocity.c) < 0.2) final_target_velocity.c = 0;
+    if(fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
+    if(fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
+    if(fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
 
     if(final_target_velocity.magSq() > 0){
         final_target_velocity.rotateZ(position.c);
@@ -289,14 +325,21 @@ void PositionController::onCanceling(){
 
 void PositionController::control() {
 
-
+    /*
     RUN_EVERY(
         Console::plot("posx", String(position.x));
         Console::plot("posy", String(position.y));
-        Console::plot("vel", String(Vec2(velocity).mag()));
-        Console::plot("tvel", String(Vec2(target_velocity).mag()));
-    ,50)
+        Console::plot("posz", String(position.z));
 
+        Console::plot("velx", String(velocity.x));
+        Console::plot("vely", String(velocity.y));
+        Console::plot("velz", String(velocity.z));
+
+        Console::plot("tvelx", String(target_velocity.x));
+        Console::plot("tvely", String(target_velocity.y));
+        Console::plot("tvelz", String(target_velocity.z));
+    ,100)
+    */
 
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {

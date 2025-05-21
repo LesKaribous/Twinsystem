@@ -3,6 +3,8 @@
 #include "os/jobs/asyncExecutor.h"
 #include "velocityController.h"
 
+#include "pid.h"
+
 class PositionController : public Controller{
 public:
     PositionController();
@@ -48,6 +50,11 @@ private:
     Vec3 acceleration;  // Current acceleration
 
     VelocityController controller;
+
+    PIDController x_controller;
+    PIDController y_controller;
+    PIDController rot_controller;
+    
 
     Vec3 target;        // Active target position
     Vec3 newTarget;     // New target to be applied

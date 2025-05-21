@@ -5,7 +5,7 @@
 #include "threads/tw_threads.h"
 #include <map>
 #include <list>
-#include <queue>
+#include <stack>
 #include <string>
 
 class Service;
@@ -82,7 +82,7 @@ private:
     Program script;
 
     Timer m_timer;
-    std::queue<Job*> m_jobs;
+    std::stack<Job*> m_jobs;
 
 
 //Singleton

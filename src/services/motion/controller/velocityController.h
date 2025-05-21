@@ -26,8 +26,4 @@ private:
 
     Vec3 m_target_velocity;
     Vec3 m_current_velocity;
-    Vec3 m_pid_integral;
-    Vec3 m_pid_last_error;
-    
-    float m_kp, m_ki, m_kd;
 };

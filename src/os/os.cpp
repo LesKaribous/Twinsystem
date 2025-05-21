@@ -195,7 +195,7 @@ Program &OS::program(){
 
 Job* OS::currentJob(){
     if(m_jobs.size() == 0) return nullptr;
-    else return m_jobs.front();
+    else return m_jobs.top();
 }
 void OS::addJob(Job* job){
     m_jobs.push(job);

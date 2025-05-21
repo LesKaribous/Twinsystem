@@ -1,4 +1,6 @@
 #include "occupancy.h"
+#include "os/console.h"
+#include "utils/timer/timer.h"
 
 SINGLETON_INSTANTIATE(OccupancyMap, occupancy);
 
@@ -38,8 +40,25 @@ float OccupancyMap::distanceToNearestObstacle(const Vec2& pos) const {
     return minDistance;
 }
 
-Vec2 OccupancyMap::repulsiveGradient(const Vec2 &pos) const{
-    const int RANGE = 5; // Neighborhood size (5x5)
+Vec2 OccupancyMap::gridToWorld(int x, int y) const {
+    float wx = (2.0f * TABLE_SIZE_X * x / GRID_WIDTH) - TABLE_SIZE_X;
+    float wy = (2.0f * TABLE_SIZE_Y * y / GRID_HEIGHT) - TABLE_SIZE_Y;
+    return Vec2(wx, wy);
+}
+
+Vec2 OccupancyMap::worldToGrid(int x, int y) const {
+    int cx = static_cast<int>((x + TABLE_SIZE_X) * GRID_WIDTH / (2 * TABLE_SIZE_X));
+    int cy = static_cast<int>((y + TABLE_SIZE_Y) * GRID_HEIGHT / (2 * TABLE_SIZE_Y));
+    return Vec2(cx, cy);
+}
+
+Vec2 OccupancyMap::repulsiveGradient(const Vec2 &pos) const {
+    const int RANGE = 5;                // Neighborhood size in grid cells
+    const float REPULSION_GAIN = 10.0f;  // Overall strength multiplier
+    const float CUTOFF_RADIUS = 300.0f;   // Meters or normalized units
+    const float CUTOFF_RADIUS_SQ = CUTOFF_RADIUS * CUTOFF_RADIUS;
+    const float FALL_OFF_POWER = 2.5f;  // 2.0 = inverse square, >2 = faster dropoff
+
     Vec2 force(0.0f, 0.0f);
 
     int cx = static_cast<int>((pos.x + TABLE_SIZE_X) * GRID_WIDTH / (2 * TABLE_SIZE_X));
@@ -50,22 +69,28 @@ Vec2 OccupancyMap::repulsiveGradient(const Vec2 &pos) const{
             int nx = cx + dx;
             int ny = cy + dy;
 
-            if (!isInBounds(nx, ny))
+            if (!isInBounds(nx, ny) || !isCellOccupied(nx, ny))
                 continue;
 
-            if (isCellOccupied(nx, ny)) {
-                Vec2 obs(static_cast<float>(nx), static_cast<float>(ny));
-                Vec2 diff = pos - obs;
-                float distSq = diff.x * diff.x + diff.y * diff.y + 1e-5f;
+            Vec2 obs = gridToWorld(nx, ny); // Convert back to real-world pos
+            Vec2 diff = pos - obs;
+            float distSq = diff.x * diff.x + diff.y * diff.y;
 
-                // Inverse square law for repulsion
-                force = force + (diff / distSq);
-            }
+            if (distSq < 1e-6f) distSq = 1e-6f; // avoid divide-by-zero
+
+            // Apply cutoff
+            if (distSq > CUTOFF_RADIUS_SQ)
+                continue;
+
+            // Generalized inverse falloff
+            float scale = REPULSION_GAIN / std::pow(distSq, FALL_OFF_POWER / 2.0f);
+            force = force + diff * scale;
         }
     }
 
     return force;
 }
+
 
 void OccupancyMap::decompress(const String& encoded) {
     if (encoded.length() < (GRID_BYTES * 2 + 3)) // hex chars + dash + CRC

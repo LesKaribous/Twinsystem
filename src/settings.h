@@ -104,18 +104,18 @@ namespace Settings{
 
         //https://en.wikipedia.org/wiki/PID_controller
         //const Vec3 kP = Vec3(3.0, 3.0, 3.5);
-        const float kP = 0.8f;
-        const float kI = 0.0;
-        const float kD = 0.0;
+        //const float kP = 0.8f;
+        //const float kI = 0.0;
+        //const float kD = 0.0;
 
-        const float OTOS_UNCERTAINTY = 0.04;
+        //const float OTOS_UNCERTAINTY = 0.04;
 
         const float MAX_PID_DELAY = 10;
 
         const float 
-        MAX_ROT_ACCEL = 2.4, // rad/s^2
-        MAX_ROT_SPEED = 9.0, // rad/s
-        MIN_ANGLE = 3.0*DEG_TO_RAD; // Target stop thresold //mm
+        MAX_ROT_ACCEL = 5.6, // rad/s^2
+        MAX_ROT_SPEED = 2.4, // rad/s
+        MIN_ANGLE = 2.0*DEG_TO_RAD; // Target stop thresold //mm
 
         const int 
         //STOP_DECCEL = 10000, // mm/s^2
