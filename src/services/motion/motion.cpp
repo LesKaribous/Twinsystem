@@ -35,7 +35,6 @@ void Motion::attach(){
 	_absolute = true;
 
     pinMode(Pin::Stepper::enable, OUTPUT);
-
 }
 
 void Motion::onRunning(){
@@ -367,7 +366,6 @@ void Motion::resume(){
         stepper_controller.setFeedrate(m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         
-
         if(m_async){
             stepper_controller.start();
             Console::println("resume");

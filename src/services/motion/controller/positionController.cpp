@@ -142,7 +142,6 @@ void PositionController::complete() {
     controller.disable();
 }
 
-
 float shortestAngleDiff(float target, float current) {
     float diff = fmodf(target - current + M_PI, 2.0f * M_PI);
     if (diff < 0)
@@ -152,7 +151,6 @@ float shortestAngleDiff(float target, float current) {
 
 void PositionController::onUpdate(){
     float dt = Settings::Motion::PID_INTERVAL * 1e-6;
-    
 
     float heading = localisation.getPosition().c;
     velocity = localisation.getVelocity();
@@ -174,11 +172,11 @@ void PositionController::onUpdate(){
         //acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 1.0, 0.6 );
     
         acceleration.x = x_controller.compute(error.x, dt);
-        acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+        acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL, Settings::Motion::MAX_ACCEL);
         acceleration.y = y_controller.compute(error.y, dt);
-        acceleration.y =std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
+        acceleration.y =std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL, Settings::Motion::MAX_ACCEL);
         acceleration.c = rot_controller.compute(angle, dt);
-        acceleration.c =std::clamp(acceleration.c, -Settings::Motion::MAX_ROT_ACCEL * m_feedrate, Settings::Motion::MAX_ROT_ACCEL * m_feedrate);
+        acceleration.c =std::clamp(acceleration.c, -Settings::Motion::MAX_ROT_ACCEL, Settings::Motion::MAX_ROT_ACCEL );
     }
 
     
