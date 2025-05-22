@@ -15,6 +15,7 @@ public:
     
     void setPosition(Vec3);
     Vec3 getPosition();
+    Vec3 getVelocity();
     void read();
     void calibrate();
 
@@ -33,6 +34,7 @@ private :
     long m_refresh = 10; //ms  previous 300
 
     Vec3 _unsafePosition = {0,0,0};
+    Vec3 _unsafeVelocity = {0,0,0};
 
     QwiicOTOS otos;
 };

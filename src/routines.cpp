@@ -42,6 +42,21 @@ void robotProgramManual(){
     //ihm.setRobotPosition(motion.estimatedPosition());
     //ihm.setRobotPosition(nav.getPosition());
     
+
+    /*
+    RUN_EVERY(
+        Vec2 position = motion.estimatedPosition();
+        Vec2 lidar_repulsion = occupancy.repulsiveGradient(position) * 1000.0;
+        Console::plotXY("attractor", position.x - lidar_repulsion.x, position.y - lidar_repulsion.y);
+        Console::plotXY("robot", position.x, position.y);
+
+        Console::plotXY("table", 0, 0);
+        Console::plotXY("table", 3000, 0);
+        Console::plotXY("table", 3000, 2000);
+        Console::plotXY("table", 0, 2000);
+
+    ,100)*/
+
     if(ihm.hasStarter() && !hadStarter){
         robotArmed();
         hadStarter = true;

@@ -3,6 +3,8 @@
 #include "os/jobs/asyncExecutor.h"
 #include "velocityController.h"
 
+#include "pid.h"
+
 class PositionController : public Controller{
 public:
     PositionController();
@@ -34,14 +36,25 @@ public:
 private:
     float m_feedrate = 1.0;
 
+    int collisionCounter = 0; // Reset on movement or normal progress
+    constexpr static int COLLISION_THRESHOLD = 10; // Number of cycles to confirm collision
+    constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
+
     void deccelerate();
 
     Vec3 position;      // Current position
+    Vec3 last_position;      // Current position
     Vec3 velocity;      // Current velocity
+    Vec3 last_velocity;      // Current velocity
     Vec3 target_velocity;      // Current velocity
     Vec3 acceleration;  // Current acceleration
 
     VelocityController controller;
+
+    PIDController x_controller;
+    PIDController y_controller;
+    PIDController rot_controller;
+    
 
     Vec3 target;        // Active target position
     Vec3 newTarget;     // New target to be applied

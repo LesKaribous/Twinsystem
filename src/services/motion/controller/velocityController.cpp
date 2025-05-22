@@ -8,22 +8,15 @@ VelocityController::VelocityController() :
     m_sA(nullptr), 
     m_sB(nullptr),  
     m_sC(nullptr),
+    m_target_velocity(0, 0, 0), m_current_velocity(0, 0, 0)
+{
 
-    m_target_velocity(0, 0, 0), m_current_velocity(0, 0, 0),
-    m_pid_integral(0, 0, 0), m_pid_last_error(0, 0, 0),
-    m_kp(Settings::Motion::kP), m_ki(Settings::Motion::kI), m_kd(Settings::Motion::kD) { 
 }
 
 void VelocityController::setSteppers(Stepper* a, Stepper* b, Stepper* c){
     m_sA = a;
     m_sB = b;
     m_sC = c;
-}
-
-void VelocityController::setPIDGains(float kp, float ki, float kd) {
-    m_kp = kp;
-    m_ki = ki;
-    m_kd = kd;
 }
 
 void VelocityController::reset(){

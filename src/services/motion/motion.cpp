@@ -35,7 +35,6 @@ void Motion::attach(){
 	_absolute = true;
 
     pinMode(Pin::Stepper::enable, OUTPUT);
-
 }
 
 void Motion::onRunning(){
@@ -50,13 +49,6 @@ void Motion::onRunning(){
         if(canceled){
             Console::error("Motion") << "Move command was canceled" << Console::endl; 
             onCanceled();
-        }
-
-
-        Vec3 position = estimatedPosition();
-        if(position != _position && current_move_cruised){
-            _position = position;
-            cruise_controller.setPosition(position);
         }
 
         if(current_move_cruised)
@@ -134,6 +126,17 @@ void Motion::onCanceled(){
 
 void Motion::control(){
     if(enabled()){
+
+        
+        RUN_EVERY(
+            Vec3 position = estimatedPosition();
+            if(position != _position && current_move_cruised){
+                _position = position;
+                cruise_controller.setPosition(position);
+            }
+        , Settings::Motion::PID_INTERVAL);
+            
+
         if(current_move_cruised)
             cruise_controller.control();
         else
@@ -246,7 +249,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     Vec3 _relTarget = toRelativeTarget(_target);
 
     //resetSteps();
-    if(use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE && localisation.enabled()){
+    if(true || use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE && localisation.enabled()){
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();
@@ -363,7 +366,6 @@ void Motion::resume(){
         stepper_controller.setFeedrate(m_feedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         
-
         if(m_async){
             stepper_controller.start();
             Console::println("resume");
