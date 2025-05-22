@@ -48,8 +48,8 @@ void recalage(){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::AB,100);
 
-        async motion.go(POI::y2);
-        async motion.go(POI::y2);
+        //async motion.go(POI::y2);
+        //async motion.go(POI::y2);
 
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
         //motion.setAbsPosition(Vec3(POI::y2, motion.getOrientation()));
