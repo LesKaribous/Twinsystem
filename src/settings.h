@@ -120,6 +120,7 @@ namespace Settings{
         const float 
         //STOP_DECCEL = 10000, // mm/s^2
         MAX_ACCEL = 400, // mm/s^2 300
+       // MAX_SPEED = 300, // mm/s 1600      otos max Tracking speed: 2.5m/s
         MAX_SPEED = 300, // mm/s 1600      otos max Tracking speed: 2.5m/s
         MIN_DISTANCE = 20; // Target stop thresold //mm
         

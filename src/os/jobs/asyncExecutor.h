@@ -11,6 +11,7 @@ public:
     explicit AsyncExecutor(Job& x) : job(&x){
         //Console::info("AsyncExecutor") << "Starting task" << Console::endl;
         os.execute(x, false);
+        //os.wait(1000);
         //Console::info("AsyncExecutor") << "ending task" << Console::endl;
     }
 

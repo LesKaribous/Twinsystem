@@ -89,9 +89,9 @@ PositionController::PositionController() :
     target_velocity(0.0f, 0.0f, 0.0f),
     newTarget(0.0f, 0.0f),
 
-    x_controller  (20.0, 0.01, 15.0),
-    y_controller  (20.0, 0.01, 15.0),
-    rot_controller(20.0, 0.01, 15.0)
+    x_controller  (20.0, 0.01, 20.0),
+    y_controller  (20.0, 0.01, 20.0),
+    rot_controller(20.0, 0.01, 20.0)
 {
     //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();
@@ -111,6 +111,7 @@ void PositionController::reset() {
     position= Vec3(0.0f);
     last_position= Vec3(0.0f);
     velocity= Vec3(0.0f);
+    last_velocity= Vec3(0.0f);
     acceleration = Vec3(0.0f);
     target= Vec3(0.0f);
     last_velocity= Vec3(0.0f);
@@ -122,6 +123,21 @@ void PositionController::reset() {
     rot_controller.reset();
 }
 
+/*
+void PositionController::start() {
+    reset();
+    m_state = JobState::IDLE;
+    Job::start();
+
+    controller.enable();
+    // Update target if a new one has been set. 
+    if (!(newTarget == target)) {
+        target = newTarget;
+    }
+}
+/**/
+
+/**/
 void PositionController::start() {
     Job::start();
     controller.enable();
@@ -130,16 +146,12 @@ void PositionController::start() {
         target = newTarget;
     }
 }
+/**/
 
 void PositionController::complete() {
-    Job::complete();
-    //Serial.println("Stopping");
-    acceleration = Vec3(0);
-    velocity = Vec3(0);
-    target_velocity= Vec3(0.0f);
+    reset();
+    m_state = JobState::COMPLETED;
     newTarget = target = position;  // Reset target to current position.
-    controller.setTargetVelocity(Vec3(0));
-    controller.disable();
 }
 
 float shortestAngleDiff(float target, float current) {
@@ -163,6 +175,7 @@ void PositionController::onUpdate(){
     float angle = shortestAngleDiff(target.c, position.c);
 
 
+    
     //while(angle > PI) angle -= 2.0f*PI;
     //while(angle <= -PI) angle += 2.0f*PI;
 
@@ -318,7 +331,6 @@ void PositionController::onCanceling(){
         controller.setTargetVelocity(Vec3(0));
         onCanceled();
     }
-
 }
 
 void PositionController::control() {
@@ -338,6 +350,8 @@ void PositionController::control() {
         Console::plot("tvelz", String(target_velocity.z));
     ,100)
     */
+
+    if(!isBusy()) return;
 
     static long lastTime = 0;
     if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
@@ -387,8 +401,11 @@ void PositionController::deccelerate(){
     }else{
         controller.setTargetVelocity(Vec3(0));
         onCanceled();
+        reset();
+        m_state = JobState::CANCELED;
         Console::success("PositionController") << "Successfully canceled move" << Console::endl;
-        complete();
+        //complete();
+        newTarget = target = position;  // Reset target to current position.
     }
 }
 

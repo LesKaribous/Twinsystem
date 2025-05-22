@@ -108,7 +108,7 @@ void Localisation::calibrate() {
     Console::info("Localisation") << "Calibrating IMU...";
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
     otos.calibrateImu(400, true);
-    otos.setLinearScalar(1.0);
+    otos.setLinearScalar(1.05f);
     Console::println("done.");
     m_calibrated = true;
 }

@@ -7,6 +7,7 @@ OS OS::m_instance;
 OS& os = OS::instance();
 
 void OS::run(){
+    
     switch(m_state){
         case BOOT:
             boot_routine();

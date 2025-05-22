@@ -42,6 +42,7 @@ void registerCommands() {
     CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
     CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
     CommandHandler::registerCommand("cruise", " Enable cruise mode", command_cruise);
+    CommandHandler::registerCommand("feed(feedrate)", " Set Move feedrate", command_feed);
     CommandHandler::registerCommand("music", " Play a sound", command_music);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
@@ -128,6 +129,14 @@ void command_reboot(const args_t &args){
 
 void command_cruise(const args_t& args){
     motion.enableCruiseMode();
+}
+
+void command_feed(const args_t &args){
+    if(args.size() != 1) return;
+    float feedrate = args[0].toFloat();
+    std::clamp(feedrate, 0.05f, 1.0f);
+    motion.setFeedrate(feedrate);
+    //motion.feed(1000);
 }
 
 void command_music(const args_t &args){

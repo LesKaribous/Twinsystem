@@ -16,6 +16,7 @@ void command_stop(const args_t& args); //Start match
 void command_reboot(const args_t& args); //Start match
 void command_probe(const args_t& args); //Start match
 void command_cruise(const args_t& args); //Start match
+void command_feed(const args_t& args); //Start match
 void command_music(const args_t& args); //Start match
 
 //Motion
