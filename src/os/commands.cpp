@@ -38,6 +38,7 @@ void registerCommands() {
     CommandHandler::registerCommand("drop(side)", "Drop object using actuator", command_drop);
     CommandHandler::registerCommand("grabPlank(side)", "Grab Plank using actuator", command_grabPlank);
     CommandHandler::registerCommand("dropPlank(side)", "Drop Plank using actuator", command_dropPlank);
+    CommandHandler::registerCommand("storePlank(side)", "Store Plank using actuator", command_storePlank);
     CommandHandler::registerCommand("pump(side)", "enable pump", command_pump);
     CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
     CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
@@ -309,6 +310,15 @@ void command_grab(const args_t& args){
     //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
     else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
 }
+
+void command_storePlank(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.storePlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.storePlank(RobotCompass::CA);
+}
+
 
 void command_dropPlank(const args_t& args){
     if(args.size() != 1)return;

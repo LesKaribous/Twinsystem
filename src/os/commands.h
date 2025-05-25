@@ -43,6 +43,7 @@ void command_grab(const args_t& args);
 void command_drop(const args_t& args);
 void command_grabPlank(const args_t& args);
 void command_dropPlank(const args_t& args);
+void command_storePlank(const args_t& args);
 void command_pump(const args_t& args);
 void command_ev(const args_t& args);
 void command_initPump(const args_t& args);

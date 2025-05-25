@@ -189,6 +189,25 @@ Motion& Motion::goPolar(float heading, float dist){
     return *this;
 }
 
+Motion &Motion::goPolarAlign(float heading, float dist, RobotCompass rc, float orientation){
+    //setStepsVelocity(Settings::Motion::MAX_SPEED);
+    _isMoving = true;
+    PolarVec poltarget = PolarVec(heading*DEG_TO_RAD, dist);
+    float angle = (orientation - getCompassOrientation(rc));
+
+    if (_absolute){
+        Vec2 target = _position + poltarget.toVec2();
+        move(Vec3(target.a, target.b, angle));
+        
+    }
+    else{
+        Vec2 reltarget = poltarget.toVec2();
+        move(Vec3(reltarget.a, reltarget.b, angle));
+        
+    }
+    return *this;
+}
+
 Motion& Motion::turn(float angle){
     /*
     if(_useBNO){
@@ -213,6 +232,18 @@ Motion& Motion::go(Vec2 target){
 
 Motion&  Motion::align(RobotCompass rc, float orientation){
     turn((orientation - getCompassOrientation(rc)));
+    return *this;
+}
+
+Motion&  Motion::goAlign(Vec2 target, RobotCompass rc, float orientation){
+    _isMoving = true;
+    _isRotating = true;
+
+    float angle = (orientation - getCompassOrientation(rc));
+
+    if (_absolute) move(Vec3(target.a, target.b, angle));
+    else move(Vec3(target.a, target.b, angle));
+
     return *this;
 }
 

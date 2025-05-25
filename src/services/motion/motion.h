@@ -28,7 +28,9 @@ public:
 
     Motion& go(Vec2);
     Motion& go(float x, float y);
+    Motion& goAlign(Vec2 target, RobotCompass rc, float orientation);
     Motion& goPolar(float angle, float dist);
+    Motion& goPolarAlign(float angle, float dist, RobotCompass rc, float orientation);
     Motion& turn(float w);
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
@@ -109,6 +111,9 @@ private :
     Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _position       = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
+
+    bool use_move_retry = false;
+    Vec3 lastSafePos     = { 0, 0, 0}; //Absolute mm, mm, rad
 
     Vec2 _controlPoint   = { 0, 0};
 

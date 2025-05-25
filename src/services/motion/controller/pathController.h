@@ -5,9 +5,9 @@
 
 #include "pid.h"
 
-class PositionController : public Controller{
+class PathController : public Controller{
 public:
-    PositionController();
+    PathController();
 
     // Call this method every control cycle
     void control() override;
@@ -33,14 +33,13 @@ public:
     Vec3 getTarget() const { return target; }
 
     void setFeedrate(float feed);
-
     static float shortestAngleDiff(float target, float current);
 private:
     float m_feedrate = 1.0;
 
     int collisionCounter = 0; // Reset on movement or normal progress
-    constexpr static int COLLISION_THRESHOLD = 30; // Number of cycles to confirm collision
-    constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
+    constexpr static int COLLISION_THRESHOLD = 60; // Number of cycles to confirm collision
+    constexpr static float COLLISION_VELOCITY_DIFF = 0.5f; // %
 
     void deccelerate();
 
@@ -57,7 +56,6 @@ private:
     PIDController vy_controller;
     PIDController vrot_controller;
     
-
     Vec3 target;        // Active target position
     Vec3 newTarget;     // New target to be applied
 };

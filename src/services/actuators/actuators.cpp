@@ -29,6 +29,22 @@ void Actuators::attach(){
 
     enable();//sinon il fait pas la pose par defaut. Who knowns ?
     enable();
+
+    /*
+    drop(RobotCompass::AB);
+    drop(RobotCompass::CA);
+    grab(RobotCompass::AB);
+    grab(RobotCompass::CA);
+    moveElevator(RobotCompass::AB, ElevatorPose::UP,80);
+    moveElevator(RobotCompass::CA, ElevatorPose::UP,80);
+    moveElevator(RobotCompass::AB, ElevatorPose::DOWN,80);
+    moveElevator(RobotCompass::CA, ElevatorPose::DOWN,80);
+    grabPlank(RobotCompass::AB);
+    grabPlank(RobotCompass::CA);
+    storePlank(RobotCompass::AB);
+    storePlank(RobotCompass::CA);
+    /**/
+
     //sleep();
 }
 

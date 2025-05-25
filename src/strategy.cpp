@@ -26,7 +26,7 @@ void waitMs(unsigned long time){
 void recalage(){
     motion.engage();
     motion.disableCruiseMode();
-    motion.setFeedrate(0.3);
+    motion.setFeedrate(0.5);
     waitMs(600);
     motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD * 90));
     waitMs(600);
@@ -143,26 +143,30 @@ void matchB(){
                POI::yellowWaypoint_1,
                POI::blueWaypoint_1)
     );
-
+    /*
     async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
 
     async motion.go(
         choose(isYellow,
             POI::yellowWaypoint_2,
             POI::blueWaypoint_2)
-    );
+    );*/
+    async motion.goAlign(choose(isYellow,
+            POI::yellowWaypoint_2,
+            POI::blueWaypoint_2), RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
+    
     async motion.go(
         choose(isYellow,
             POI::yellowWaypoint_2,
             POI::blueWaypoint_2)
     );
   
-        async motion.go(
-            choose(isYellow,
-                POI::stock_3,
-                POI::stock_6)
-        );
-        ihm.addScorePoints(Score::TribuneLevel1Points);
+    async motion.go(
+        choose(isYellow,
+            POI::stock_3,
+            POI::stock_6)
+    );
+    ihm.addScorePoints(Score::TribuneLevel1Points);
 
     //Wait for the end to arrive (left space for PAMI)
     chrono.onMatchNearlyFinished(); 
@@ -212,13 +216,13 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
 
     RobotCompass nextCompass = (rc == RobotCompass::AB) ? RobotCompass::CA : RobotCompass::AB;
 
-    const float approachOffset = 250;
-    float grabOffset = 150;//175
+    const float approachOffset = 300; //250 
+    float grabOffset = 160;//175 //150
     if(ihm.isColor(Settings::BLUE)) grabOffset = 140;
 
 
     const float canOffsetA = 125;//100
-    const float canOffsetB = 200;//100 * 2
+    const float canOffsetB = 225;//100 * 2
     const float canGrab = 125;//120
     const unsigned long delayTime = 400;
 
@@ -226,8 +230,9 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     Vec2 grab = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, grabOffset).toVec2();
 
     // ---- Take first planks ----
-    async motion.go(approach); 
-    async motion.align(rc, getCompassOrientation(tc));
+    //async motion.go(approach); 
+    //async motion.align(rc, getCompassOrientation(tc));
+    async motion.goAlign(approach, rc, getCompassOrientation(tc)); //opti
     
     // !!!! Disable safety !!!!
     safety.disable();
@@ -236,7 +241,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -40,50);
     waitMs(delayTime);
     async motion.go(grab);
-    async motion.go(grab); // double to be sure
+    //async motion.go(grab); // double to be sure
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -30,50);
     actuators.grabPlank(rc);
     waitMs(1000);
@@ -244,14 +249,15 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
 
     // ---- Take second planks ----
-    async motion.go(approach); 
-    async motion.align(nextCompass, getCompassOrientation(tc));
+    //async motion.go(approach); 
+    //async motion.align(nextCompass, getCompassOrientation(tc));
+    async motion.goAlign(approach, nextCompass, getCompassOrientation(tc)); //opti
 
     startPump(nextCompass);
     actuators.moveElevatorOffset(nextCompass, ElevatorPose::DOWN, -25,50);
     waitMs(delayTime);
     async motion.go(grab);
-    async motion.go(grab); // double to be sure
+    //async motion.go(grab); // double to be sure
     actuators.moveElevatorOffset(nextCompass, ElevatorPose::DOWN, -10,50);
     actuators.grabPlank(nextCompass);
     waitMs(1000);
@@ -262,17 +268,19 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.goPolar(getCompassOrientation(tc)+90, canOffsetA); 
     actuators.grab(nextCompass);
     async motion.goPolar(getCompassOrientation(tc), canGrab);
-    async motion.goPolar(getCompassOrientation(tc), -canGrab);
+    async motion.goPolar(getCompassOrientation(tc), -canGrab*2);
 
     // ---- take first can ---- 
-    async motion.align(rc, getCompassOrientation(tc));
-    async motion.goPolar(getCompassOrientation(tc)-90, canOffsetB);
+    //async motion.align(rc, getCompassOrientation(tc));
+    //async motion.goPolar(getCompassOrientation(tc)-90, canOffsetB);
+    async motion.goPolarAlign(getCompassOrientation(tc)-90, canOffsetB, rc, getCompassOrientation(tc));
+
     actuators.grab(rc);
-    async motion.goPolar(getCompassOrientation(tc), canGrab);
-    async motion.goPolar(getCompassOrientation(tc), -canGrab);
+    async motion.goPolar(getCompassOrientation(tc), canGrab*2);
+    //async motion.goPolar(getCompassOrientation(tc), -canGrab*2);
 
     // !!!! Engage safety !!!!
-    //safety.enable();
+    safety.enable();
     //-------------------------
 
     motion.setFeedrate(1.0);
@@ -295,9 +303,10 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     Vec2 build = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, buildOffset).toVec2();
 
     // ---- Approach construction area ----
-    async motion.align(rc, getCompassOrientation(tc));
-    async motion.go(approach);
-    async motion.go(approach);
+    //async motion.align(rc, getCompassOrientation(tc));
+    //async motion.go(approach);
+    async motion.goAlign(approach, rc, getCompassOrientation(tc));
+    //async motion.go(approach);
 
     //motion.setFeedrate(1.0);
 
@@ -315,20 +324,21 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     stopPump(rc,500);
     //waitMs(delayTime);
     actuators.storePlank(rc);
-    waitMs(delayTime);
+    //waitMs(delayTime);
     async motion.go(approach);
     ihm.addScorePoints(Score::TribuneLevel1Points);
 
     // ---- Build level 2 ----
-    actuators.dropPlank(nextCompass,50);
+    //actuators.dropPlank(nextCompass,50);
     actuators.moveElevatorOffset(nextCompass, ElevatorPose::UP, -20,50);
-    waitMs(delayTime);
+    //waitMs(delayTime);
     async motion.align(nextCompass, getCompassOrientation(tc));
-    waitMs(delayTime);
+    //waitMs(delayTime);
     async motion.go(build);
     actuators.drop(nextCompass);
-    waitMs(delayTime);
+    //waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
+    actuators.dropPlank(nextCompass,50);
     waitMs(delayTime);
     stopPump(nextCompass,500);
     //waitMs(delayTime);
@@ -358,9 +368,10 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
     Vec2 build = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, buildOffset).toVec2();
 
     // ---- Approach construction area ----
-    async motion.go(approach);
-    async motion.go(approach);
-    async motion.align(rc, getCompassOrientation(tc));
+    //async motion.go(approach);
+    //async motion.go(approach);
+    //async motion.align(rc, getCompassOrientation(tc));
+    async motion.goAlign(approach, rc, getCompassOrientation(tc)); //optimization
 
     //motion.setFeedrate(1.0);
 
@@ -372,9 +383,9 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
     actuators.drop(rc);
     waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
-    waitMs(delayTime);
+    //waitMs(delayTime);
     actuators.dropPlank(rc,50);
-    waitMs(1000);
+    waitMs(800);
     stopPump(rc,500);
     //waitMs(delayTime);
     actuators.storePlank(rc);
@@ -384,7 +395,7 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
 
     motion.setFeedrate(1.0);
     // !!!! Engage safety !!!!
-    //safety.enable();
+    safety.enable();
 }
 
 RobotCompass nextActuator(RobotCompass rc){

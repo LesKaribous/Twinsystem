@@ -114,7 +114,7 @@ namespace Settings{
 
         const float 
         MAX_ROT_ACCEL = 8.0, // rad/s^2 5.6
-        MAX_ROT_SPEED = 2.4, // rad/s
+        MAX_ROT_SPEED = 4.4, // rad/s
         MIN_ANGLE = 2.0*DEG_TO_RAD; // Target stop thresold //mm
 
         const float 
