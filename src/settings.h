@@ -68,7 +68,7 @@ namespace Settings{
 
         constexpr unsigned long 
         DURATION = 100*1000,            //100s
-        NEARLY_FINISH = 15 * 1000,      //15s before the end
+        NEARLY_FINISH = 10 * 1000,      //15s before the end
         ENDMATCH = 200;                 //200ms before the end
         
         //constexpr float 
@@ -113,15 +113,15 @@ namespace Settings{
         const float MAX_PID_DELAY = 10;
 
         const float 
-        MAX_ROT_ACCEL = 8.0, // rad/s^2 5.6
-        MAX_ROT_SPEED = 4.4, // rad/s
+        MAX_ROT_ACCEL = 20.0, // rad/s^2 5.6
+        MAX_ROT_SPEED = 10, // rad/s
         MIN_ANGLE = 2.0*DEG_TO_RAD; // Target stop thresold //mm
 
         const float 
         //STOP_DECCEL = 10000, // mm/s^2
         MAX_ACCEL = 1000, // mm/s^2 300
        // MAX_SPEED = 300, // mm/s 1600      otos max Tracking speed: 2.5m/s
-        MAX_SPEED = 1600, // mm/s 1600      otos max Tracking speed: 2.5m/s
+        MAX_SPEED = 1800, // mm/s 1600      otos max Tracking speed: 2.5m/s
         MIN_DISTANCE = 20; // Target stop thresold //mm
         
         const int

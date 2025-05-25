@@ -7,7 +7,7 @@ namespace POI{
     // ------------------------------------------
     // Departure Areas - Center
     const Vec2 y1 = Vec2(375,225);
-    const Vec2 y2 = Vec2(1225,1775);
+    const Vec2 y2 = Vec2(1225,1825);//1775
     const Vec2 y3 = Vec2(2775,1125);
 
     const Vec2 b1 = Vec2(2625,225);
@@ -16,7 +16,7 @@ namespace POI{
 
     // ------------------------------------------
     // Construction Areas
-    const Vec2 constAreaYellow_1 = Vec2(775,1940);//1800
+    const Vec2 constAreaYellow_1 = Vec2(775,2000);//1940
     const Vec2 constAreaYellow_2 = Vec2(1300,1850);
     const Vec2 constAreaYellowBelow_2 = Vec2(1300,1650);
     const Vec2 constAreaYellow_3 = Vec2(2800,1125);
@@ -44,7 +44,7 @@ namespace POI{
     //  Raw Material stock
     const Vec2 stock_1 = Vec2(75,675);
     const Vec2 stock_2 = Vec2(75,1600);
-    const Vec2 stock_3 = Vec2(775,1750);
+    const Vec2 stock_3 = Vec2(765,1710); //775 1750
     const Vec2 stock_4 = Vec2(1100,1050);// + Vec2(50,0);
 
     const Vec2 stock_5 = Vec2(1900,1050);

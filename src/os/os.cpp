@@ -29,7 +29,7 @@ void OS::run(){
             break;
         default: 
         break;
-    },10)
+    },2)
 }
 
 void OS::start(){
@@ -160,6 +160,11 @@ void OS::wait(unsigned long time) {
     // Move the unique_ptr into execute(), which assumes ownership
     execute(m_timer, false);  // Or `runasync` if applicable
 }
+
+void OS::wait(Job& obj, bool isasync) {
+    execute(obj, isasync);  // Or `runasync` if applicable
+}
+
 
 void OS::execute(Job& obj, bool runasync){
     addJob(&obj);

@@ -31,7 +31,7 @@ private :
     bool m_calibrated = false;
     bool m_isMoving = false;
     bool m_isRotating = false;
-    long m_refresh = 30; //ms  previous 300
+    long m_refresh = 10; //ms  previous 300
 
     Vec3 _unsafePosition = {0,0,0};
     Vec3 _unsafeVelocity = {0,0,0};

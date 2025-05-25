@@ -42,7 +42,7 @@ private:
     int collisionCounter = 0; // Reset on movement or normal progress
     constexpr static int COLLISION_THRESHOLD = 10; // Number of cycles to confirm collision
     constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
-    static constexpr int     COLLISION_COUNT_LIMIT= 100;      // need 3 successive fails
+    static constexpr int     COLLISION_COUNT_LIMIT= 60;      // need 3 successive fails
 
     void deccelerate();
 

@@ -1,3 +1,4 @@
+
 #include "os/console.h"
 
 #include "routines.h"
@@ -23,3 +24,21 @@ void setup(){
 void loop(){
 	os.run();	//update the services and run the current routine
 }
+
+
+/*
+#include <Arduino.h>
+#include <Servo.h>
+Servo myservo;
+
+void setup(){
+	myservo.attach(16);
+}
+
+void loop(){
+	delay(1000);
+	myservo.write(32);
+	delay(1000);
+	myservo.write(180);
+}
+*/

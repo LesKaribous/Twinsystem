@@ -19,9 +19,9 @@ PositionController::PositionController() :
     target_velocity(0.0f, 0.0f, 0.0f),
     newTarget(0.0f, 0.0f),
     collisionCounter(0),
-    vx_controller  (2.0, 0.0, 40.0),
-    vy_controller  (2.0, 0.0, 40.0),
-    vrot_controller(5.0, 0.0, 2.0)
+    vx_controller  (4.0, 0.0, 100.0),
+    vy_controller  (4.0, 0.0, 100.0),
+    vrot_controller(13.5, 0.0, 25.0)
 {
     //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();

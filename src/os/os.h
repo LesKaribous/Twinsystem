@@ -47,6 +47,7 @@ public:
     void toggleDebug(ServiceID s);
 
     void wait(unsigned long time);
+    void wait(Job& job, bool runasync = true);
     
     void execute(Job& job, bool runasync = true);
     void execute(String& rawcmd);
