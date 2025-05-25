@@ -272,7 +272,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.goPolar(getCompassOrientation(tc), -canGrab);
 
     // !!!! Engage safety !!!!
-    safety.enable();
+    //safety.enable();
     //-------------------------
 
     motion.setFeedrate(1.0);
@@ -340,7 +340,7 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
 
     motion.setFeedrate(1.0);
     // !!!! Engage safety !!!!
-    safety.enable();
+    //safety.enable();
 }
 
 void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
@@ -384,7 +384,7 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
 
     motion.setFeedrate(1.0);
     // !!!! Engage safety !!!!
-    safety.enable();
+    //safety.enable();
 }
 
 RobotCompass nextActuator(RobotCompass rc){

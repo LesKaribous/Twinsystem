@@ -12,7 +12,7 @@ public:
     // Call this method every control cycle
     void control() override;
 
-    void run() override; 
+    void exec() override; 
     void reset() override;  //Set to IDLE
     void start() override;   //Set to PENDING
     void complete() override;//Set to COMPLETED
@@ -37,8 +37,8 @@ private:
     float m_feedrate = 1.0;
 
     int collisionCounter = 0; // Reset on movement or normal progress
-    constexpr static int COLLISION_THRESHOLD = 10; // Number of cycles to confirm collision
-    constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
+    constexpr static int COLLISION_THRESHOLD = 60; // Number of cycles to confirm collision
+    constexpr static float COLLISION_VELOCITY_DIFF = 0.5f; // %
 
     void deccelerate();
 
@@ -54,6 +54,10 @@ private:
     PIDController x_controller;
     PIDController y_controller;
     PIDController rot_controller;
+
+    PIDController vx_controller;
+    PIDController vy_controller;
+    PIDController vrot_controller;
     
 
     Vec3 target;        // Active target position

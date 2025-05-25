@@ -51,10 +51,12 @@ void Motion::onRunning(){
             onCanceled();
         }
 
+        /*
         if(current_move_cruised)
             cruise_controller.run();
         else 
             stepper_controller.run();
+        */
     }
 }
 
@@ -68,11 +70,11 @@ void Motion::onPausing()
             _position = position;
             cruise_controller.setPosition(position);
         }
-        cruise_controller.run();
-        finished = cruise_controller.isCompleted();
+        cruise_controller.exec();
+        finished = cruise_controller.isCanceled();
     }else{
-        stepper_controller.run();
-        finished = stepper_controller.isCompleted();
+        stepper_controller.exec();
+        finished = stepper_controller.isCanceled();
     }
 
     if(finished) onPaused();
@@ -87,10 +89,10 @@ void Motion::onCanceling(){
             _position = position;
             cruise_controller.setPosition(position);
         }
-        cruise_controller.run();
+        cruise_controller.exec();
         finished = cruise_controller.isCompleted();
     }else{
-        stepper_controller.run();
+        stepper_controller.exec();
         finished = stepper_controller.isCompleted();
     }
 
@@ -288,9 +290,21 @@ void Motion::run(){
     }
 }
 
+void Motion::exec(){
+    if(!enabled()) return;
+    if(isPausing()){
+        onPausing();
+    }else if(isCanceling()){
+        onCanceling();
+    }else if(isRunning()){
+        onRunning();
+    }
+}
+
 void Motion::start(){
     //if\(!hasJob\(\)\) return;
-    if(isPending()) forceCancel();
+    //if(isPending()) forceCancel();
+    if(isPending()) return;
 
     Job::start();
     if(m_async){
@@ -303,13 +317,13 @@ void Motion::start(){
             cruise_controller.start();
             Console::println(String("start motion ") + String(current_move_cruised ? "(cruised)" : ""));
             while (cruise_controller.isBusy()){
-                cruise_controller.run();
+                cruise_controller.exec();
             }
         }else{ 
             stepper_controller.start();
             Console::println(String("start motion ") + String(current_move_cruised ? "(cruised)" : ""));
             while (stepper_controller.isBusy()){
-                stepper_controller.run();
+                stepper_controller.exec();
             }
         }
 
@@ -351,7 +365,7 @@ void Motion::resume(){
             cruise_controller.start();
             Console::println("start");
             while (cruise_controller.isPending()){
-                cruise_controller.run();
+                cruise_controller.exec();
             }
             complete();
         }
@@ -373,7 +387,7 @@ void Motion::resume(){
             stepper_controller.start();
             Console::println("resume");
             while (stepper_controller.isPending()){
-                stepper_controller.run();
+                stepper_controller.exec();
             }
             complete();
         }

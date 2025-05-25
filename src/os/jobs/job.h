@@ -44,7 +44,7 @@ public:
     long elaspedTime() const;
     long pauseDuration() const;
 
-    virtual void run(); 
+    virtual void exec(); 
     virtual void reset();   //Set to IDLE
     virtual void start();   //Set to PENDING
     virtual void pause();   //Set to PAUSING

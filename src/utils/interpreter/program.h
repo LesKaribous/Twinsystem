@@ -89,7 +89,7 @@ public:
     inline bool isValid(){return _statements.size() > 0;};
     inline void clear(){_statements.clear(); _currentTask = 0; reset();}
     
-    void run()      override; 
+    void exec()      override; 
     void reset()    override;  
     void start()    override; 
     void pause()    override;

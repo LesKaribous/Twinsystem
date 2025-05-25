@@ -17,6 +17,7 @@ void setup(){
 	threads.setSliceMicros(10);
 	int id = threads.addThread(control, 0, 8192);
 	threads.setTimeSlice(id, 100);
+	
 }
 
 void loop(){

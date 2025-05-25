@@ -8,7 +8,7 @@ public:
 
     Timer();
     
-    void run()override;
+    void exec()override;
     void reset()override;   
     void start()override;   
 

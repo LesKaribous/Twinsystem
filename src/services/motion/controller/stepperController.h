@@ -47,7 +47,7 @@ class StepperController : public Controller{
 public:
     StepperController();
 
-    void run() override; 
+    void exec() override; 
     void reset() override;  //Set to IDLE
     void start() override;   //Set to PENDING
     void cancel() override;  //Set to CANCELLED

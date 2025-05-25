@@ -18,6 +18,7 @@ public:
 
     void attach() override;
     void run() override;
+    void exec() override;
 
     void enable() override;
     void disable() override;

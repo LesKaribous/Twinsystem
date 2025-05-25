@@ -12,7 +12,7 @@ Job::~Job(){
 	//Console::trace("Job") << "Destroyed at " << (uintptr_t)this << Console::endl;
 }
 
-void Job::run(){
+void Job::exec(){
 	if(isCanceling()){
 		onCanceling();
 		return;

@@ -7,7 +7,7 @@ OS OS::m_instance;
 OS& os = OS::instance();
 
 void OS::run(){
-    
+    RUN_EVERY(
     switch(m_state){
         case BOOT:
             boot_routine();
@@ -29,7 +29,7 @@ void OS::run(){
             break;
         default: 
         break;
-    }
+    },100)
 }
 
 void OS::start(){
@@ -57,7 +57,7 @@ void OS::manual_routine(){
 
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
-        else currentJob()->run();
+        else currentJob()->exec();
         //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
@@ -65,9 +65,10 @@ void OS::manual_routine(){
 void OS::auto_routine(){
     updateServices();
     executeRoutine(m_autoRoutine);
+
     if(currentJob() != nullptr){
         if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
-        else currentJob()->run();
+        else currentJob()->exec();
         //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }

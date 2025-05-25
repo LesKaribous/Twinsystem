@@ -23,7 +23,7 @@ void Timer::reset(){
     Job::reset();
 }
 
-void Timer::run(){
+void Timer::exec(){
     updateTime();
 }
 

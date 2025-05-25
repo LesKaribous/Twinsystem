@@ -7,7 +7,6 @@
 #include "os/os.h"
 #include "utils/timer/timer.h"
 
-
 // -------------------------------------
 //           Main programs
 // -------------------------------------
@@ -16,7 +15,9 @@ void robotProgramAuto(){
     Console::println("Started match");
     ihm.setPage(IHM::Page::MATCH);
     lidar.enable();
+    //lidar.disable();
     safety.enable();
+    //safety.disable();
     chrono.start();
     match();
     //motion.disable();
@@ -155,19 +156,16 @@ void robotProgramManual(){
 // -------------------------------------
 
 void control() {
-    static const unsigned long CONTROL_PERIOD_MS = Settings::Stepper::STEPPER_DELAY;
+    static const unsigned long CONTROL_PERIOD_US = Settings::Stepper::STEPPER_DELAY;
     unsigned long lastCall = micros();  
     while (true) {
-        unsigned long now = micros();
-        unsigned long elapsed = now - lastCall;
-
-        if (elapsed < CONTROL_PERIOD_MS) {
-            threads.delay_us(CONTROL_PERIOD_MS - elapsed);
-        }
-
         motion.control();
-        lastCall = micros();
-    
+        lastCall += CONTROL_PERIOD_US;
+
+        long waitTime = lastCall - micros();
+        if (waitTime > 0)
+            threads.delay_us(waitTime);
+
         threads.yield();
     }
 }

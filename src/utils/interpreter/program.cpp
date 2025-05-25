@@ -148,7 +148,7 @@ void Program::executeStatement(const std::shared_ptr<Statement>& statement) {
     }
 }
 
-void Program::run(){
+void Program::exec(){
     step();
 }
 

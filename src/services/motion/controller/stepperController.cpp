@@ -162,7 +162,7 @@ void StepperController::start() {
     m_startTime = micros() * 1e-6;
 }
 
-void StepperController::run(){
+void StepperController::exec(){
     long now = micros();
     if (now - m_last_compute >= Settings::Stepper::STEPPER_COMPUTE_DELAY) {
         m_last_compute = now;
