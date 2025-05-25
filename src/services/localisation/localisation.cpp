@@ -73,10 +73,12 @@ void Localisation::setPosition(Vec3 newPos){
 }
 
 Vec3 Localisation::getPosition(){
+    run();
     return _unsafePosition;
 }
 
 Vec3 Localisation::getVelocity(){
+    run();
     return _unsafeVelocity;
 }
 

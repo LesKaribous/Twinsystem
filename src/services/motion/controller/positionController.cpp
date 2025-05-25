@@ -18,7 +18,7 @@ PositionController::PositionController() :
     last_velocity(0.0f, 0.0f, 0.0f),
     target_velocity(0.0f, 0.0f, 0.0f),
     newTarget(0.0f, 0.0f),
-
+    collisionCounter(0),
     vx_controller  (2.0, 0.0, 40.0),
     vy_controller  (2.0, 0.0, 40.0),
     vrot_controller(5.0, 0.0, 2.0)
@@ -50,7 +50,7 @@ void PositionController::reset() {
     vx_controller.reset();
     vy_controller.reset();
     vrot_controller.reset();
-
+    collisionCounter = 0;
     controller.disable();
     //Console::info("PositionController") << "reset" << Console::endl;
 }
@@ -90,7 +90,12 @@ void PositionController::complete() {
     //Console::info("PositionController") << "complete" << Console::endl;
 }
 
-float PositionController::shortestAngleDiff(float target, float current) {
+bool PositionController::collision() const {
+    return (collisionCounter >= COLLISION_COUNT_LIMIT && !isCanceling());
+}
+
+float PositionController::shortestAngleDiff(float target, float current)
+{
     float diff = fmodf(target - current + M_PI, 2.0f * M_PI);
     if (diff < 0)
         diff += 2.0f * M_PI;
@@ -227,7 +232,7 @@ void PositionController::onUpdate(){
     }
 
     //Velocity based collisions
-    /*
+    /**/
     float velocityError = Vec2(final_target_velocity).mag() - Vec2(velocity).mag();
 
     bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(final_target_velocity).mag();
@@ -237,18 +242,17 @@ void PositionController::onUpdate(){
     } else {
         collisionCounter = 0;
     }
-    if (collisionCounter > COLLISION_THRESHOLD && !isCanceling()) {
-        Console::error("PositionController") << "Collision detected, canceling move" << Console::endl;
-        cancel();
-        last_position = position;
-        last_velocity = velocity;
-        return;
-    }*/
+    
+    /*
+    RUN_EVERY(
+        Console::info("velocityError") << velocityError << Console::endl;
+        Console::info("collision") << possibleCollision << Console::endl;
+        Console::info("collision") << final_target_velocity.mag() << ">" << COLLISION_THRESHOLD << Console::endl;
+        Console::info("collisionCounter") << collisionCounter << ">" << COLLISION_COUNT_LIMIT << Console::endl;
+    ,100)
+    /**/
 
-    static constexpr float   MIN_EXPECTED_DISP    = 0.05f;  // mm, ignore tiny steps
-    static constexpr float   DISP_RATIO_THRESH    = 0.5f;   // if we move <50% of expected
-    static constexpr int     COLLISION_COUNT_LIMIT= 3;      // need 3 successive fails
-
+    /*
     static int  collisionCounter = 0;
 
     Vec2 vel2d = Vec2(final_target_velocity);
@@ -270,14 +274,7 @@ void PositionController::onUpdate(){
         // tiny commanded move → ignore
         collisionCounter = 0;
     }
-
-    if (collisionCounter >= COLLISION_COUNT_LIMIT && !isCanceling()) {
-        cancel();
-        // you might also want to reset the counter here:
-        collisionCounter = 0;
-        return;
-    }
-
+    /**/
     last_position = position;
     last_velocity = velocity;
 }
@@ -336,7 +333,7 @@ void PositionController::control() {
     if(!isBusy()) return;
 
     static long lastTime = 0;
-    if(micros() - lastTime > Settings::Motion::PID_INTERVAL) {
+    if(micros() - lastTime > Settings::Motion::PID_MIN_INTERVAL) {
         //THROW(position);
 		lastTime = micros();
         if(isPausing()) onCanceling();
@@ -345,7 +342,6 @@ void PositionController::control() {
         else if(isCompleted()) return;
         else onUpdate();
     }
-
 
     controller.control();
 }

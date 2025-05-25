@@ -129,7 +129,8 @@ namespace Settings{
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms
         */
-        PID_INTERVAL = 8000; //microseconds
+        PID_INTERVAL = 5000, //microseconds
+        PID_MIN_INTERVAL = PID_INTERVAL/2; //microseconds
     }
 
     namespace Stepper{

@@ -52,6 +52,15 @@ void Motion::onRunning(){
         }
 
         /*
+        RUN_EVERY(
+        Console::info("cruise_controller.collision()") << cruise_controller.collision() << Console::endl;
+        Console::info("use_cancel_on_collide") << use_cancel_on_collide << Console::endl;
+        ,100)
+        /**/
+
+        if( use_cancel_on_collide && cruise_controller.collision()) cruise_controller.cancel();
+
+        /*
         if(current_move_cruised)
             cruise_controller.run();
         else 
@@ -128,16 +137,15 @@ void Motion::onCanceled(){
 
 void Motion::control(){
     if(enabled()){
-
-        
+        /*
         RUN_EVERY(
             Vec3 position = estimatedPosition();
             if(position != _position && current_move_cruised){
                 _position = position;
                 cruise_controller.setPosition(position);
             }
-        , Settings::Motion::PID_INTERVAL);
-            
+        , Settings::Motion::PID_MIN_INTERVAL);
+        */
 
         if(current_move_cruised)
             cruise_controller.control();
@@ -323,6 +331,7 @@ void Motion::run(){
 
 void Motion::exec(){
     if(!enabled()) return;
+
     if(isPausing()){
         onPausing();
     }else if(isCanceling()){
@@ -520,6 +529,10 @@ void Motion::disableCruiseMode(){
     if(isMoving())
         Console::error("Motion") << "Cruise mode cannot be toggled while moving" << Console::endl;
     use_cruise_mode = false;
+}
+
+void Motion::cancelOnCollide(bool state){
+    use_cancel_on_collide = state;
 }
 
 Vec3 Motion::optmizeRelTarget(Vec3 relTarget){

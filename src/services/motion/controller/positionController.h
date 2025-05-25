@@ -34,13 +34,15 @@ public:
 
     void setFeedrate(float feed);
 
+    bool collision() const;
     static float shortestAngleDiff(float target, float current);
 private:
     float m_feedrate = 1.0;
 
     int collisionCounter = 0; // Reset on movement or normal progress
-    constexpr static int COLLISION_THRESHOLD = 30; // Number of cycles to confirm collision
+    constexpr static int COLLISION_THRESHOLD = 10; // Number of cycles to confirm collision
     constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
+    static constexpr int     COLLISION_COUNT_LIMIT= 100;      // need 3 successive fails
 
     void deccelerate();
 
@@ -57,7 +59,6 @@ private:
     PIDController vy_controller;
     PIDController vrot_controller;
     
-
     Vec3 target;        // Active target position
     Vec3 newTarget;     // New target to be applied
 };

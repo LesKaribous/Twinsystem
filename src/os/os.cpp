@@ -29,7 +29,7 @@ void OS::run(){
             break;
         default: 
         break;
-    },100)
+    },10)
 }
 
 void OS::start(){

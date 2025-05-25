@@ -25,7 +25,8 @@ void waitMs(unsigned long time){
 
 void recalage(){
     motion.engage();
-    motion.disableCruiseMode();
+    //motion.disableCruiseMode();
+    
     motion.setFeedrate(0.5);
     waitMs(600);
     motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD * 90));
@@ -82,7 +83,7 @@ void matchB(){
     bool isYellow = ihm.isColor(Settings::YELLOW);
     motion.enableCruiseMode();
     // -------------------------------------------
-
+    motion.cancelOnCollide(true);
     // Step 2 - POI BannerYellow
     async motion.go(
         choose(isYellow,
@@ -91,7 +92,7 @@ void matchB(){
     );
 
     probeBorder(TableCompass::SOUTH, RobotCompass::BC, 0);
-
+    motion.cancelOnCollide(false);
     //---- Drop Banner ----
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     ihm.addScorePoints(Score::BannerPoints);
@@ -217,7 +218,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     RobotCompass nextCompass = (rc == RobotCompass::AB) ? RobotCompass::CA : RobotCompass::AB;
 
     const float approachOffset = 300; //250 
-    float grabOffset = 160;//175 //150
+    float grabOffset = 150;//175 //150
     if(ihm.isColor(Settings::BLUE)) grabOffset = 140;
 
 
@@ -294,9 +295,9 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
 
     RobotCompass nextCompass = (rc == RobotCompass::AB) ? RobotCompass::CA : RobotCompass::AB;
 
-    float approachOffset = 250;
-    float buildOffset = 165;
-    float dropPlankOffset = 40;
+    float approachOffset = 400;//250
+    float buildOffset = 180;//165
+    float dropPlankOffset = 60;//40
     unsigned long delayTime = 400;
 
     Vec2 approach = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, approachOffset).toVec2();
@@ -317,7 +318,7 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.go(build);
     actuators.drop(rc);
     waitMs(delayTime);
-    async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
+    async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset); //
     waitMs(delayTime);
     actuators.dropPlank(rc,50);
     waitMs(1000);
@@ -325,7 +326,7 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     //waitMs(delayTime);
     actuators.storePlank(rc);
     //waitMs(delayTime);
-    async motion.go(approach);
+    async motion.go(approach);//
     ihm.addScorePoints(Score::TribuneLevel1Points);
 
     // ---- Build level 2 ----
@@ -336,7 +337,7 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     //waitMs(delayTime);
     async motion.go(build);
     actuators.drop(nextCompass);
-    //waitMs(delayTime);
+    waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
     actuators.dropPlank(nextCompass,50);
     waitMs(delayTime);
@@ -409,6 +410,7 @@ RobotCompass previousActuator(RobotCompass rc){
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist, float feedrate){
+    motion.cancelOnCollide(true);
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
@@ -419,6 +421,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     motion.setRelative();
 	async motion.goPolar(getCompassOrientation(rc),approachDist);
 	async motion.goPolar(getCompassOrientation(rc),probeDist);
+    motion.cancelOnCollide(false);
     
 	float _offset = getOffsets(rc);
     Console::println(_offset);
@@ -449,6 +452,7 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     
 	if(wasAbsolute) motion.setAbsolute();
     motion.setFeedrate(currentFeedrate);
+    
 }
 
 void initPump(){

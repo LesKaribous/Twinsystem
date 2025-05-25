@@ -35,12 +35,6 @@ public:
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
 
-    // std::unique_ptr<Job> createJob() override {
-    //     std::unique_ptr<Job> job = std::make_unique<Job>(this);
-    //     m_job = job.get();
-    //     return job;
-    // }
-
     void control();
     
     void start() override;
@@ -94,6 +88,8 @@ public:
     void enableCruiseMode();
     void disableCruiseMode();
 
+    void cancelOnCollide(bool state);
+
 private :
     Stepper m_sA, m_sB, m_sC;
 
@@ -112,8 +108,7 @@ private :
     Vec3 _position       = { 0, 0, 0}; //Absolute mm, mm, rad
     Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
 
-    bool use_move_retry = false;
-    Vec3 lastSafePos     = { 0, 0, 0}; //Absolute mm, mm, rad
+    bool use_cancel_on_collide = false;
 
     Vec2 _controlPoint   = { 0, 0};
 
