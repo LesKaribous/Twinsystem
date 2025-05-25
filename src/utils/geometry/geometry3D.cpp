@@ -87,6 +87,16 @@ float Vec3::dot(const Vec3& a) const{
     return Vec3::dot(*this, a);
 }
 
+Vec3& Vec3::normalize(){
+    if(mag() != 0){
+        float cMag = mag();
+        a /= cMag;
+        b /= cMag;
+        c /= cMag;
+    }
+    return *this;
+}
+
 float Vec3::mag() const{
     return sqrt(magSq());
 }
@@ -163,8 +173,7 @@ float Vec3::angleBetween(const Vec3& a, const Vec3& b){
 
 
 Vec3::operator Vec2() const{
-    Vec2 v = Vec2(a, b);
-    return v;
+    return Vec2(a, b);
 }
 
 Vec3::operator String() const{

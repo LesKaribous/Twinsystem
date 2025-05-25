@@ -1,11 +1,14 @@
 
 Table table = new Table();
 Robot robot = new Robot();
+ArrayList<Obstacle> obstacles;
 
 void setup(){
   size(100 + 3000/3, 100 + 2000/3);
   tablePNG = loadImage("./data/vinyle.png");
   robotSVG = loadShape("./data/robot.svg");
+  obstacles = new ArrayList<Obstacle>();
+  
   
   frameRate(30);
 }
@@ -23,11 +26,15 @@ void draw(){
   translate(50,50);
   
   
-  robot.control();
+  robot.control(1.0/30.0);
   robot.integrate(1.0/30.0);
   
   table.draw();
   robot.draw();
+  
+  for(Obstacle ob : obstacles){
+    ob.draw(); 
+  }
   
   strokeWeight(10);
   point(mx- 50, my- 50);
@@ -41,7 +48,13 @@ void draw(){
 
 
 void mousePressed(){
-  mx = mouseX;
-  my = mouseY;
-  robot.setTarget(table.getCursorPos());
+  if(mouseButton == LEFT){
+    mx = mouseX;
+    my = mouseY;
+    robot.setTarget(table.getCursorPos());
+  }else if(mouseButton == RIGHT){
+    PVector pos = table.getCursorPos();
+    obstacles.add(new Obstacle(pos.x, pos.y));
+    
+  }
 }

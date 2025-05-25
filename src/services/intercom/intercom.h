@@ -12,8 +12,8 @@ class Intercom : public Service{
 public:
     Intercom();
 
-    void onAttach() override;
-    void onUpdate() override;
+    void attach() override;
+    void run() override;
 
     void enable() override;
     void disable() override;
@@ -29,13 +29,15 @@ public:
     void setRequestCallback(requestCallback_ptr callback);
     void setConnectionSuccessCallback(callback_ptr callback);
 
-    inline bool isConnected(){return _connected;}
+    bool isConnected();
 
 private:
 
     void pingReceived(); 
     void connectionLost(); 
     void connectionSuccess(); 
+
+    bool debug = false;
 
     Stream& _stream;
     std::map<int,Request> _sentRequests;
@@ -53,6 +55,6 @@ private:
     void _processIncomingData();
     void _processPendingRequests();
 
-    SERVICE(Intercom)
+    SINGLETON(Intercom)
 };
-EXTERN_DECLARATION(Intercom, intercom)
+SINGLETON_EXTERN(Intercom, intercom)

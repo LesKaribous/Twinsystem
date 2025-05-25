@@ -2,45 +2,53 @@
 #include "services/service.h"
 #include "services/actuators/actuatorGroup.h"
 #include "utils/geometry.h"
-#include "utils/job.h"
-#include "groups.h"
+#include "os/jobs/job.h"
+#include "services/actuators/groups.h"
 
-#define FORK_SERVO       0
-#define GRIPPER_RIGHT    0
-#define ELEVATOR         1
-#define GRIPPER_LEFT     2
 
+enum class ServoIDs : int{
+    MAGNET_RIGHT = 0,
+    ELEVATOR = 1,
+    MAGNET_LEFT = 2,
+    PLANKS = 3
+};
 
 enum class ElevatorPose{
-    UP = 0,
-    DOWN = 1, 
-    GRAB = 2,
-    BORDER = 3,
-    PLANTER = 4
+    DROP = 0,
+    UP = 1,
+    DOWN = 2
+    //BORDER = 3,
 };
 
-enum class GripperPose{
-    OPEN = 0,
+enum class ManipulatorPose{
+    DROP = 0,
+    GRAB = 1
+};
+
+enum class PlankManipulatorPose{
+    DROP = 0,
     GRAB = 1,
-    CLOSE = 2,
+    STORE = 2,
 };
 
-class Actuators : public Service, public Job{
+
+class Actuators : public Service{
 //protected:
 public:
-    ActuatorGroup groupAB; // Facing BAU
-    ActuatorGroup groupBC; // Facing Init button
-    ActuatorGroup groupCA; // Facing Tirette
+    // When BAU is front of robot, 
+    ActuatorGroup groupAB; // Left Manipulator
+    ActuatorGroup groupBC; // Banner elevator
+    ActuatorGroup groupCA; // Right Manipulator
 
 //common methods  
 public:
     Actuators();
 
-    void run(){};
     void sleep();
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach() override;
+    void run()override;
+
     void disable()override;
     void enable()override;
 
@@ -49,56 +57,29 @@ public:
 private:
     ActuatorGroup& getActuatorGroup(RobotCompass rc);
     
-
-
-
 //primary methods
 public:
-    void close  (RobotCompass rc, int speed = 100);
-    void open   (RobotCompass rc, int speed = 100);
+    void drop   (RobotCompass rc, int speed = 100);
     void grab   (RobotCompass rc, int speed = 100);
-    //void applause(RobotCompass rc, int speed = 100);
+
+    void dropPlank   (RobotCompass rc, int speed = 100);
+    void grabPlank   (RobotCompass rc, int speed = 100);
+    void storePlank   (RobotCompass rc, int speed = 100);
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
-    //bool readSensor(RobotCompass rc, Side gs);
-    //void testSensors();
-    //int howManyPlant(RobotCompass rc);
+    //void moveElevator(RobotCompass rc, PlankManipulatorPose poseIndex, int speed = 100);
+    void moveElevatorOffset(RobotCompass rc, ElevatorPose poseIndex, int offset, int speed = 100);
+    void registerPoses(); //Register all servos poses
 
-    void registerPrimaryPoses(); //Register all servos poses
-
-    /*
-    bool runGrabbing(RobotCompass rc, Side gs = Side::BOTH);
-    bool runOpening(RobotCompass rc, Side gs = Side::BOTH);
-    bool runClosing(RobotCompass rc, Side gs = Side::BOTH);
-    bool runElevatorUp(RobotCompass rc);
-    bool runElevatorDown(RobotCompass rc);
-    bool runElevatorGrab(RobotCompass rc);
-    bool runElevatorBorder(RobotCompass rc);
-    bool runElevatorPlanter(RobotCompass rc);
-    /**/
 private : 
-    bool moveGripperDual(SmartServo& a,SmartServo& b, GripperPose pose, int speed = 100);
-    bool moveGripper(SmartServo& servo, GripperPose pose, int speed = 100);
+    bool moveMagnetDual(SmartServo& a,SmartServo& b, ManipulatorPose pose, int speed = 100);
+    bool moveMagnet(SmartServo& servo, ManipulatorPose pose, int speed = 100);
     bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
-    void createFingerGroup(RobotCompass, FingerGroupProperty);
+    void createManipulator(RobotCompass, ManipulatorProperties);
+    void createBannerManipulator(RobotCompass, BannerManipulatorProperties);
 
-
-//secondary methods   
-public :
-    //void forkUp   (RobotCompass rc, int speed = 100);
-    //void forkDown (RobotCompass rc, int speed = 100);
-    //void forkGrab (RobotCompass rc, int speed = 100);
-    //void moveForkElevator(RobotCompass rc, ElevatorPose pose, int speed = 100);
-
-    //void registerSecondaryPoses(); //Register all servos poses
-
-private :
-    //void createForkGroup(RobotCompass, ForkGroupProperty);
-
-    
-
-    SERVICE(Actuators)
+    SINGLETON(Actuators)
 };
 
-EXTERN_DECLARATION(Actuators, actuators)
+SINGLETON_EXTERN(Actuators, actuators)

@@ -37,6 +37,7 @@ struct Vec3 {
     float magSq() const;
     float heading() const;
     float dot(const Vec3&) const;
+    Vec3& normalize();
 
     Vec3 copy() const;
 

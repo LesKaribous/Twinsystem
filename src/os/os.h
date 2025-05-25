@@ -1,15 +1,21 @@
 #pragma once
 #include "services/service.h"
+#include "utils/interpreter/program.h"
 #include "utils/timer/timer.h"
-#include "tw_threads.h"
+#include "threads/tw_threads.h"
 #include <map>
-#include <queue>
+#include <list>
+#include <stack>
 #include <string>
 
 class Service;
 class ThreadedService;
 using routine_ptr = void (*)();
 using routine_arg = void*;
+
+#define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
+#define CPU_RESTART_VAL 0x5FA0004
+#define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL);
 
 class OS{
 public:
@@ -23,6 +29,7 @@ public:
     };
 
     void start();
+    void reboot();
     void stop();
     void run();
     void flush(); //Run the current task until it's done. (Blocking)
@@ -39,10 +46,16 @@ public:
     bool debug(ServiceID);
     void toggleDebug(ServiceID s);
 
-    Job& wait(unsigned long time, bool runasync = false);
-    void waitUntil(Job& job, bool runasync = false);
+    void wait(unsigned long time);
+    void wait(Job& job, bool runasync = true);
+    
     void execute(Job& job, bool runasync = true);
+    void execute(String& rawcmd);
+
     bool isBusy();
+
+    void clearProgram();
+    Program& program();
 
 private:
     void boot_routine();
@@ -58,6 +71,7 @@ private:
     void killCurrentJob();
 
     std::map<ServiceID, Service*> m_services;
+
     routine_ptr m_bootRoutine = nullptr; 
     routine_ptr m_manualRoutine = nullptr; 
     routine_ptr m_autoRoutine = nullptr; 
@@ -66,8 +80,10 @@ private:
     routine_ptr m_manual_programRoutine = nullptr; 
     SystemState m_state = BOOT;
 
+    Program script;
+
     Timer m_timer;
-    std::queue<Job*> m_jobs;
+    std::stack<Job*> m_jobs;
 
 
 //Singleton

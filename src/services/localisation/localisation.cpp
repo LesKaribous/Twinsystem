@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <SPI.h>
 
-INSTANTIATE_SERVICE(Localisation, localisation);
+SINGLETON_INSTANTIATE(Localisation, localisation);
 
 #ifdef OLD_BOARD
 #define I2C_OTOS I2C_OTOS
@@ -12,7 +12,7 @@ INSTANTIATE_SERVICE(Localisation, localisation);
 #define I2C_OTOS Wire
 #endif
 
-void Localisation::onAttach(){
+void Localisation::attach(){
     
     Console::info() << "Localisation activated" << Console::endl;
     I2C_OTOS.begin();
@@ -25,7 +25,9 @@ void Localisation::onAttach(){
         }
     }
 
-    if(!m_connected) Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use I2C_OTOS" << Console::endl;
+    if(!m_connected){
+        Console::error("Localisation") << "Ooops, no OTOS detected ... It may be unplugged. Make sure you use I2C_OTOS" << Console::endl;
+    }
     else{
         otos.setLinearUnit(kSfeOtosLinearUnitMeters);
         otos.setAngularUnit(kSfeOtosAngularUnitRadians);
@@ -35,28 +37,28 @@ void Localisation::onAttach(){
 }
 
 // Main loop
-void Localisation::onUpdateThread(void* arg){
-    while(true){
-        static long elapsed = 0;
-        if(millis() - elapsed < m_refresh){
-            threads.delay(m_refresh/10);
-            continue;
-        }
+void Localisation::run(){ 
+    //THROW(1)
+
+    static long elapsed = 0;
+    if(millis() - elapsed > m_refresh){
         elapsed = millis();
-        Localisation* this_obj = static_cast<Localisation*>(arg);
-        this_obj->read();
+        read();
     }
 }
 
 // Service routines
 void Localisation::enable(){
-    servicethread = new std::thread(&Localisation::runThread, this);
- 	servicethread->detach();
+    if(!m_connected) return;
+    Service::enable();
+    //servicethread = new std::thread(&Localisation::runThread, this);
+ 	//servicethread->detach();
     m_use_IMU = true;
 }
 
 void Localisation::disable(){
-    delete servicethread;
+    Service::disable();
+    //delete servicethread;
     m_use_IMU = false;
 }
 
@@ -65,43 +67,50 @@ void Localisation::setPosition(Vec3 newPos){
     pos.x = -newPos.y/1000.0;
     pos.y = -newPos.x/1000.0;
     pos.h = newPos.z;
+    otos.resetTracking(); // WIP
     otos.setPosition(pos);
+    _unsafePosition = newPos;
 }
 
 Vec3 Localisation::getPosition(){
+    run();
     return _unsafePosition;
+}
+
+Vec3 Localisation::getVelocity(){
+    run();
+    return _unsafeVelocity;
 }
 
 void Localisation::read()
 {
-    static long lastRead = 0;
-
-    if(millis() - lastRead < 300) return;
-    lastRead = millis();
-
     sfe_otos_pose2d_t myPosition;
+    sfe_otos_pose2d_t myVelocity;
+
+    otos.getVelocity(myVelocity);
     otos.getPosition(myPosition);
 
     //Console::info() << "x:" << myPosition.x << "y:" << myPosition.y << "h:" << myPosition.h << Console::endl;
 
     _unsafePosition.x = -myPosition.y * 1000.0; //to millimeters
     _unsafePosition.y = -myPosition.x * 1000.0; //to millimeters
+    
+    _unsafeVelocity.x = -myVelocity.y * 1000.0; //to millimeters /s
+    _unsafeVelocity.y = -myVelocity.x * 1000.0; //to millimeters /s
+    _unsafeVelocity.z =  myVelocity.h; //to radians /s
 
     float orientation = myPosition.h;
-    while(orientation > PI) orientation-= 2.0f*PI;
-    while(orientation <= -PI) orientation += 2.0f*PI;
     _unsafePosition.z = orientation;
-
     //Console::info() << _unsafePosition << Console::endl;
 }
 
 void Localisation::calibrate() {
-    Serial.println("Ensure the OTOS is flat and stationary");
-    delay(1000);
-    Serial.println("Calibrating IMU...");
-
+    Console::println("Ensure the OTOS is flat and stationary");
+    delay(2000);
+    Console::info("Localisation") << "Calibrating IMU...";
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
-    otos.calibrateImu();
-    Serial.println("Calibrated IMU.");
+    otos.calibrateImu(400, true);
+    otos.setLinearScalar(1.05f);
+    Console::println("done.");
     m_calibrated = true;
 }

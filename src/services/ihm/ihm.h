@@ -2,6 +2,7 @@
 #include "services/service.h"
 #include "services/ihm/fields.h"
 #include "services/ihm/button.h"
+#include "settings.h"
 #include "utils/geometry.h"
 #include "pin.h"
 
@@ -17,7 +18,7 @@ typedef ILI9341_t3 TFTScreen;
 
 class IHM : public Service{
     IHM();
-    SERVICE(IHM)
+    SINGLETON(IHM)
 public:
     enum class Page{
         BOOT,
@@ -26,8 +27,8 @@ public:
         RESET
     };
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach() override;
+    void run() override;
    
     void setPage(Page p);
     void drawBootProgress(String msg);//%
@@ -38,8 +39,8 @@ public:
     void unfreezeSettings();
 
     #ifndef OLD_BOARD
-    void playTone(int freq, int duration);
-    void playMelody(int* notes, int* durations, int len, int tempo);
+    void playTone(const int freq, const int duration);
+    void playMelody(const int* notes, const int* durations, const int len, const int tempo);
     void playStartupMelody();
     #endif
 
@@ -49,8 +50,9 @@ public:
     bool starterPlaced() const;
     bool buttonReleased() const;
     bool starterCancelled() const;
-    bool isColorA() const;
-    bool isColorB() const;
+
+    bool isColor(Color) const;
+
     bool isPrimary() const;
     bool isSecondary() const;
     bool getRobotType() const;
@@ -94,12 +96,6 @@ private:
     BooleanField armed;
     BooleanField started;
 
-    Switch starter;
-    Switch teamSwitch;
-    Switch twinSwitch;
-    Switch strategySwitch;
-    Button resetButton;
-    
     TFTScreen screen;
     Page currentPage = Page::BOOT;
 
@@ -108,6 +104,14 @@ private:
     bool needDraw = true;
 
     int bootProgress = 0;
+
+public:
+    Switch starter;
+    Switch teamSwitch;
+    Switch twinSwitch;
+    Switch strategySwitch;
+    Button resetButton;
+    
 };
 
-EXTERN_DECLARATION(IHM, ihm)
+SINGLETON_EXTERN(IHM, ihm)

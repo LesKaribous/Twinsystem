@@ -24,9 +24,20 @@ ConsoleStream Console::success(const ServiceID& origin) {
 	return ConsoleStream( ConsoleLevel::SUCCESS, origin);
 }
 
+String Console::timeStamp(){
+	String time = String(millis());
+	return String("[t=" + time + "ms]");
+}
 
-ConsoleStream Console::info(const String& origin) {
-	return ConsoleStream(ConsoleLevel::INFO, origin);
+String Console::microTimeStamp(){
+	String time = String(micros());
+	return String("[t=" + time + "us]");
+}
+
+
+ConsoleStream Console::info(const String &origin)
+{
+    return ConsoleStream(ConsoleLevel::INFO, origin);
 }
 
 ConsoleStream Console::warn(const String& origin) {
@@ -77,6 +88,10 @@ void Console::write(const char* str) {
 
 void Console::plot(const String& n, String s){
 	print(">" + n + ":"); println(s);
+}
+
+void Console::plotXY(const String& n, String x, String y){
+	println(">" + n + ":" + x + ":" + y + "|xy"); 
 }
 
 void Console::print(const String& s){

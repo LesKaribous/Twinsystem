@@ -3,28 +3,26 @@
 #include "utils/geometry.h"
 #include <SparkFun_Qwiic_OTOS_Arduino_Library.h>
 
-class Localisation : public ThreadedService{
+class Localisation : public Service{
 public:
-    void onAttach() override;
+   
+    void attach() override;
+    void run() override;
+    
     void enable()override;
-    void disable()override;
-    void onUpdate()override{}
-    void onUpdateThread(void* arg) override;
+    void disable() override;
+    //void onUpdateThread(void* arg) override;
     
     void setPosition(Vec3);
     Vec3 getPosition();
+    Vec3 getVelocity();
     void read();
     void calibrate();
 
-    bool isRotating() const;
-    bool isMoving() const;
-
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
-    Localisation(): ThreadedService(ID_LOCALISATION){};
-    SERVICE(Localisation)
-
-
+    Localisation(): Service(ID_LOCALISATION){};
+    SINGLETON(Localisation)
 
 private : 
 
@@ -33,10 +31,11 @@ private :
     bool m_calibrated = false;
     bool m_isMoving = false;
     bool m_isRotating = false;
-    long m_refresh = 300;
+    long m_refresh = 10; //ms  previous 300
 
     Vec3 _unsafePosition = {0,0,0};
+    Vec3 _unsafeVelocity = {0,0,0};
 
     QwiicOTOS otos;
 };
-EXTERN_DECLARATION(Localisation, localisation)
+SINGLETON_EXTERN(Localisation, localisation)

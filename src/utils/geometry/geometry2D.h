@@ -16,7 +16,7 @@ struct Vec2 {
         struct { float a, b; };
     };
 
-    //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.GetAbsPosition())).heading())
+    //TODO : Vec2::sub(cakeBrownSW.copy(), Vec2(motion.estimatedPosition())).heading())
 
     Vec2();
     Vec2(float);
@@ -25,13 +25,14 @@ struct Vec2 {
 
     Vec2& add(const Vec2&);
     Vec2& sub(const Vec2&);
-    Vec2& dist(const Vec2&);
+    float dist(const Vec2&);
     Vec2& mult(float);
     Matrix2x2 toMatrix() const;
 
     Vec2& setMagnitude(float);
     Vec2& setHeading(float);
     Vec2& normalize();
+    static Vec2 normalize(Vec2);
 
     Vec2& div(float);
     Vec2& mult(Matrix2x2);
@@ -45,7 +46,7 @@ struct Vec2 {
 
     static Vec2 add(const Vec2&, const Vec2&);
     static Vec2 sub( const Vec2&, const Vec2&);
-    static Vec2 dist( const Vec2&, const Vec2&);
+    static float dist( const Vec2&, const Vec2&);
     static float angleBetween(const Vec2&, const Vec2&);
     static float dot( const Vec2&, const Vec2&);
     static float det( const Vec2&, const Vec2&);
@@ -58,7 +59,9 @@ struct Vec2 {
     Vec2& operator+=(float u);
     Vec2& operator-=(float u);
     Vec2& operator*=(float u);
+    Vec2& operator*=(const Vec2& u);
     Vec2& operator/=(float u);
+    Vec2& operator/=(const Vec2& u);
     //conversion operator
     operator String() const;
 };

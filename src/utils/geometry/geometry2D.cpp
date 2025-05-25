@@ -101,8 +101,8 @@ Vec2& Vec2::sub(const Vec2& v){
     return *this;
 }
 
-Vec2& Vec2::dist(const Vec2& v){
-    return this->sub(v);
+float Vec2::dist(const Vec2& v){
+    return sqrt((a-v.a)*(a-v.a) + (b-v.b)*(b-v.b));
 }
 
 float Vec2::mag(){
@@ -138,15 +138,29 @@ Vec2& Vec2::setHeading(float head){
     return *this;
 }
 
-Vec2& Vec2::normalize(){
-    if(mag() != 0){
-        float cMag = mag();
-        a /= cMag * a > 0 ? 1 : -1;
-        b /= cMag * b > 0 ? 1 : -1;
+Vec2& Vec2::normalize() {
+    float length = std::sqrt(x * x + y * y);
+    if (length > 1e-6) { // Avoid division by zero
+        x /= length;
+        y /= length;
+    } else {
+        x = y = 0; // Handle zero-length case
     }
     return *this;
 }
 
+Vec2 Vec2::normalize(Vec2 a) {
+    float x = a.x, y = a.y;
+
+    float length = std::sqrt(x * x + y * y);
+    if (length > 1e-6) { // Avoid division by zero
+        x /= length;
+        y /= length;
+    } else {
+        x = y = 0; // Handle zero-length case
+    }
+    return Vec2(x, y);
+}
 
 Vec2& Vec2::mult(float v){
     a*=v; 
@@ -197,9 +211,9 @@ float Vec2::det(const Vec2& a, const Vec2& b){
     return a.a * b.a - a.b * b.b;
 }
 
-Vec2 Vec2::dist(const Vec2& a, const Vec2& b){
+float Vec2::dist(const Vec2& a, const Vec2& b){
     Vec2 r = a.copy().sub(b);
-    return r;
+    return r.mag();
 }
 
 float Vec2::angleBetween(const Vec2& a, const Vec2& b){
@@ -356,7 +370,23 @@ Vec2& Vec2::operator*=(float u){
     b *= u;
     return *this;
 }
-Vec2& Vec2::operator/=(float u ){
+
+Vec2 &Vec2::operator*=(const Vec2 &u)
+{
+    a *= u.a;
+    b *= u.b;
+    return *this;
+}
+
+Vec2 &Vec2::operator/=(const Vec2 &u)
+{
+    a /= u.a;
+    b /= u.b;
+    return *this;
+}
+
+Vec2 &Vec2::operator/=(float u)
+{
     a /= u;
     b /= u;
     return *this;

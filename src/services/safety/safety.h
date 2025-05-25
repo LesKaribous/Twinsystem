@@ -7,18 +7,18 @@ public:
     void enable() override;
     void disable() override;
 
-    void onAttach()override;
-    void onUpdate()override;
+    void attach()override;
+    void run()override;
 
     void setObstacleDetected(bool state);
     void setSafeDistance(int safeDistance);
 
     Safety(): Service(ID_SAFETY){};
-    SERVICE(Safety)
+    SINGLETON(Safety)
 
 private:
     int m_currentDistance = infinity();
     bool m_obstacleDetected = false;
     int m_lastSeen = infinity();
 };
-EXTERN_DECLARATION(Safety, safety)
+SINGLETON_EXTERN(Safety, safety)

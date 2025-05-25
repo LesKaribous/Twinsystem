@@ -7,19 +7,17 @@ Interpreter::Interpreter() : pos(0) {
 }
 
 // Process a script
-Program Interpreter::processScript(const String& script) {
+void Interpreter::processScript(const String& script, Program& prgm) {
+    prgm.clear();
     input = script;
     input.trim();
     pos = 0;
     currentToken = nextToken();
 
-    Program prgm;
-
     // Parse and execute statements until the end of the script
     while (currentToken.type != END_OF_SCRIPT) {
         prgm.addStatement(parseStatement());
     }
-    return prgm;
 }
 
 
@@ -73,10 +71,8 @@ Token Interpreter::nextToken() {
                 }
                 return nextToken(); // Recursively call to get the next token
             case '\n' : 
-                pos++; // Skip the unexpected character
             case 13 : 
                 pos++; // Skip the unexpected character
-
                 return nextToken(); // Recursively call to get the next token
             default:
                 // Handle error: unexpected character

@@ -5,7 +5,7 @@
 #include "services/intercom/intercom.h"
 #include "utils/timer/timer.h"
 
-INSTANTIATE_SERVICE(Safety, safety)
+SINGLETON_INSTANTIATE(Safety, safety)
 
 void getDistanceCallback(Request& req){
     int d = req.getResponse().toInt();
@@ -28,50 +28,46 @@ void Safety::enable(){
 void Safety::disable(){
     Service::disable();
     m_obstacleDetected = false;
+    Console::println("obstable forced to false");
 }
 
 
-void Safety::onAttach(){
+void Safety::attach(){
 }
 
-void Safety::onUpdate(){
+void Safety::run(){
     if(!enabled()){return;}
-/*
+
     RUN_EVERY(
         if(!motion.hasFinished()){
             int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
             int distanceToGo = motion.getTargetDistance() + 350;
             if(distanceToGo > 500) distanceToGo = 500;
             if(distanceToGo < 350) distanceToGo = 350;
-            //intercom.sendRequest("getDistance("+ String(streer) +")", 100, getDistanceCallback);
-            //Console::println( String("streer:") + String(streer));
-            intercom.sendRequest("checkObstacle("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
-            //CONSOLE_SERIAL.println(m_obstacleDetected);
+
+            intercom.sendRequest("ob("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
         }
+
+        if(m_obstacleDetected/*m_currentDistance <= 350*/){
+            if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
+            if(!motion.isRotating()) m_lastSeen = millis();
+         }
+     
+         if(millis() - m_lastSeen > 2000){
+            if(m_obstacleDetected){
+                m_obstacleDetected = false;
+                Console::print("obstable gone (last seen ");
+                Console::print(millis() - m_lastSeen);
+                Console::println("ms ago");
+            }
+
+         }
+         
+         if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
+            motion.resume();
+            Console::println("resume");
+         }
     , 50)
-*/
-    
-    //if(m_obstacleDetected/*m_currentDistance <= 350*/){
-    //    if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
-    //    if(!motion.isRotating()) m_lastSeen = millis();
-    //}
-/*
-    if(m_obstacleDetected && !motion.hasFinished() && motion.isPaused() && motion.pauseDuration() > 1000){
-        motion.cancel();
-        m_obstacleDetected = false;
-        Console::println("cancelled");
-    }
-*/
-    if(millis() - m_lastSeen > 2000){
-        m_obstacleDetected = false;
-    }
-    
-    //if(motion.isPaused() && !m_obstacleDetected/*m_currentDistance > 350 */&& millis() - m_lastSeen > 1000){
-    //    motion.resume();
-    //}
-
-
-
 }
 
 void Safety::setSafeDistance(int d){
@@ -79,5 +75,13 @@ void Safety::setSafeDistance(int d){
 }
 
 void Safety::setObstacleDetected(bool state){
+    
+    if(m_obstacleDetected && state){
+        Console::println("obstable detected");
+        Console::print("obstable detected (seen at");
+        Console::print(millis());
+        Console::println("ms");
+    }
+    else if(m_obstacleDetected && !state) Console::println("obstable gone");
     m_obstacleDetected = state;
 }

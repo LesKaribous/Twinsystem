@@ -6,47 +6,62 @@ namespace POI{
 
     // ------------------------------------------
     // Departure Areas - Center
-    const Vec2 b1 = Vec2(225,225);  //BLUE
-    const Vec2 b2 = Vec2(225,1775); //BLUE
-    const Vec2 b3 = Vec2(2775,1000); //BLUE
+    const Vec2 y1 = Vec2(375,225);
+    const Vec2 y2 = Vec2(1225,1825);//1775
+    const Vec2 y3 = Vec2(2775,1125);
 
-    const Vec2 y1 = Vec2(2775,225); //YELLOW
-    const Vec2 y2 = Vec2(2775,1775);  //YELLOW
-    const Vec2 y3 = Vec2(225,1000);  //YELLOW
+    const Vec2 b1 = Vec2(2625,225);
+    const Vec2 b2 = Vec2(1775,1775);
+    const Vec2 b3 = Vec2(225,1125);
 
-    // End Of Match
-    const Vec2 blueArrival = Vec2(450,1550);  //BLUE
-    const Vec2 yellowArrival = Vec2(2550,1550); //Yellow
-	// ------------------------------------------
-    // Plant Supply - Center
-    const Vec2 plantSupplySE = Vec2(1015,1300);     //Plant supply SOUTH EAST
-    const Vec2 plantSupplySW = Vec2(1015,700);      //Plant supply SOUTH WEST
-
-    const Vec2 plantSupplyNE = Vec2(1985,1300);     //Plant supply NORTH EAST
-    const Vec2 plantSupplyNW = Vec2(1985,700);      //Plant supply NORTH WEST
-
-    const Vec2 plantSupplyW  = Vec2(1500,500);      //Plant supply WEST
-    const Vec2 plantSupplyE  = Vec2(1500,1500);     //Plant supply EAST
     // ------------------------------------------
-    // Solar Panels
-    const Vec2 solarPanelBlue_1 = Vec2(275,1800);      //Solar panel Blue 1
-    const Vec2 solarPanelBlue_2 = Vec2(500,1800);      //Solar panel Blue 2
-    const Vec2 solarPanelBlue_3 = Vec2(725,1800);      //Solar panel Blue 3
+    // Construction Areas
+    const Vec2 constAreaYellow_1 = Vec2(775,2000);//1940
+    const Vec2 constAreaYellow_2 = Vec2(1300,1850);
+    const Vec2 constAreaYellowBelow_2 = Vec2(1300,1650);
+    const Vec2 constAreaYellow_3 = Vec2(2800,1125);
+    const Vec2 constAreaYellow_4 = Vec2(2775,1800);
 
-    const Vec2 solarPanelOther_1 = Vec2(1275,1800);   //Solar panel No Team 1
-    const Vec2 solarPanelOther_2 = Vec2(1500,1800);   //Solar panel No Team 2
-    const Vec2 solarPanelOther_3 = Vec2(1725,1800);   //Solar panel No Team 3
+    const Vec2 constAreaBlue_1 = Vec2(2225,1940);
+    const Vec2 constAreaBlue_2 = Vec2(1700,1850);
+    const Vec2 constAreaBlueBelow_2 = Vec2(1700,1650);
+    const Vec2 constAreaBlue_3 = Vec2(200,1125);
+    const Vec2 constAreaBlue_4 = Vec2(225,1800);
 
-    const Vec2 solarPanelYellow_1 = Vec2(2725,1800);    //Solar panel Yellow 1
-    const Vec2 solarPanelYellow_2 = Vec2(2500,1800);    //Solar panel Yellow 2
-    const Vec2 solarPanelYellow_3 = Vec2(2275,1800);    //Solar panel Yellow 3
     // ------------------------------------------
-    // Planters
-    const Vec2 planterBlueSouth = Vec2(0,612);          //Planter Blue South
-    const Vec2 planterBlueNorth = Vec2(3000,1388);      //Planter Blue North
-    const Vec2 planterBlueWest  = Vec2(762,0);          //Planter Blue West
+    //  Waiting points - Wait for SIMA
+    const Vec2 waitPointYellowTemp  = Vec2(800,900);
+    const Vec2 waitPointYellow      = Vec2(375,675);
+    const Vec2 waitPointBlueTemp    = Vec2(2200,900);
+    const Vec2 waitPointBlue        = Vec2(2625,675);
 
-    const Vec2 planterYellowSouth = Vec2(0,1388);       //Planter Yellow South
-    const Vec2 planterYellowNorth = Vec2(3000,612);     //Planter Yellow North
-    const Vec2 planterYellowWest  = Vec2(2238,0);    //Planter Yellow West
+    // ------------------------------------------
+    //  Reserved Material stock
+    const Vec2 stockReservedYellow  = Vec2(825,275);
+    const Vec2 stockReservedBlue    = Vec2(2175,275);
+
+    // ------------------------------------------
+    //  Raw Material stock
+    const Vec2 stock_1 = Vec2(75,675);
+    const Vec2 stock_2 = Vec2(75,1600);
+    const Vec2 stock_3 = Vec2(765,1710); //775 1750
+    const Vec2 stock_4 = Vec2(1100,1050);// + Vec2(50,0);
+
+    const Vec2 stock_5 = Vec2(1900,1050);
+    const Vec2 stock_6 = Vec2(2225,1750);
+    const Vec2 stock_7 = Vec2(2925,1600);
+    const Vec2 stock_8 = Vec2(2925,675);
+
+    // ------------------------------------------
+    //  Banner Points
+    const Vec2 BannerYellow = Vec2(1225,1894);
+    const Vec2 BannerBlue   = Vec2(1775,1894);
+
+    // ------------------------------------------
+    //  Some Waypoints
+    const Vec2 yellowWaypoint_1 = Vec2(1100, 1300);
+    const Vec2 yellowWaypoint_2 = Vec2(775, 1300);
+
+    const Vec2 blueWaypoint_1   = Vec2(1900, 1300);
+    const Vec2 blueWaypoint_2   = Vec2(2225, 1300);
 }

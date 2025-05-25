@@ -28,7 +28,7 @@ SmartServo::SmartServo(const SmartServo& cpy) : m_pin(cpy.m_pin),
 bool SmartServo::moveToDefault(int speed, bool runAsync){
     return moveTo(m_defaultPos, speed, runAsync);
 }
-
+/**/
 bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non blocking mode
     if(!m_enabled) return;
     if(m_sleeping) wakeUp(); //Wake
@@ -41,7 +41,8 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
 
     int ms = map(speed, 0, 100, 50, 0);
     int currrentPos = 0;
-
+    long start = millis();
+    //TODO safety exit based on max iteration.
     do{
         if(!runAsync) delay(ms);
         else if(millis() - m_lastUpdate < ms){
@@ -58,7 +59,7 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
         }
 
         if (currrentPos < target){
-            m_servo.write(currrentPos + 2);
+            m_servo.write(currrentPos + 2); //use multiple of two to avoid infinite loop an bricked
             if(runAsync) return false;
         }else if (currrentPos > target){
             m_servo.write(currrentPos - 2);
@@ -66,9 +67,81 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
         }else{
             if(runAsync) return true;
         }
-    }while(!runAsync && currrentPos != m_target);
+    }while(!runAsync && currrentPos != m_target && millis() - start < 2000);
+    
+    m_servo.write(m_target);
     return true;
 }
+/**/
+
+/*
+bool SmartServo::moveTo(int target, int speedPct, bool runAsync) {
+    // 0) early exit if not enabled
+    if (!m_enabled) return false;
+    if (m_sleeping) wakeUp();
+
+    // 1) clamp inputs
+    target   = constrain(target,   m_minPos,     m_maxPos);
+    speedPct = constrain(speedPct, 0,            100);
+    m_target = target;
+    m_speed  = speedPct;
+
+    // 2) map speed→delay, but never go to 0ms
+    static constexpr int   MIN_DELAY_MS   = 1;    // ms
+    int intervalMs = map(speedPct, 0, 100, 50, MIN_DELAY_MS);
+    intervalMs = max(intervalMs, MIN_DELAY_MS);
+
+    // 3) constants
+    static constexpr int   STEP_SIZE      = 2;    // degrees per micro‐step
+    static constexpr unsigned long MAX_SYNC_TIME = 2000; // ms timeout
+
+    unsigned long now = millis();
+
+    if (runAsync) {
+        // ---- ASYNC mode: one micro‐step per invocation ----
+        if (now - m_lastUpdate < (unsigned)intervalMs) {
+            // not yet time for next tiny step
+            return false;
+        }
+        m_lastUpdate = now;
+
+        int cur = getPosition();
+        int diff = m_target - cur;
+
+        if (abs(diff) <= STEP_SIZE) {
+            // final snap
+            m_servo.write(m_target);
+            return true;
+        }
+
+        // step toward the target
+        int next = cur + (diff > 0 ? STEP_SIZE : -STEP_SIZE);
+        m_servo.write(next);
+        return false;
+    }
+    else {
+        // ---- SYNC mode: blocking until done or timeout ----
+        unsigned long start = now;
+        while (millis() - start < MAX_SYNC_TIME) {
+            int cur = getPosition();
+            int diff = m_target - cur;
+
+            if (abs(diff) <= STEP_SIZE) {
+                m_servo.write(m_target);
+                return true;
+            }
+
+            int next = cur + (diff > 0 ? STEP_SIZE : -STEP_SIZE);
+            m_servo.write(next);
+            delay(intervalMs);
+        }
+        // timeout!
+        return false;
+    }
+}
+
+/**/
+
 
 bool SmartServo::moveToPose(int index,  int speed, bool runAsync){
     return moveTo(getPose(index), speed, runAsync);
@@ -114,6 +187,7 @@ void SmartServo::wakeUp(){
 void SmartServo::enable(){
     if(m_pin == -1) return;
     m_servo.attach(m_pin);
+    moveToDefault();
     m_enabled = true;
     m_sleeping = false;
 }

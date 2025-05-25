@@ -5,6 +5,7 @@
 
 #define HERE " [" + String(__FILE__) + " at line " + String(__LINE__) + "]"
 #define THROW(x) Console::println( "Throw in " + String(__FILE__) + " at line " + String(__LINE__) + " : " + x);
+#define BEEP Console::println( "Beep in " + String(__FILE__) + " at line " + String(__LINE__));
 
 class ConsoleStream;
 
@@ -18,6 +19,9 @@ public:
 
 	//Use the current log level
 	static void init();
+	
+	static String timeStamp();
+	static String microTimeStamp();
 	
 	static ConsoleStream info(const String& origin);
 	static ConsoleStream warn(const String& origin);
@@ -33,9 +37,10 @@ public:
 	static ConsoleStream success(const ServiceID& origin = ID_NOT_A_SERVICE);
 
 	static void plot(const String& name, String s);
+	static void plotXY(const String& n, String x, String y);
 
-	static void print(const String& s);
-	static void println(const String& s);
+	static void print(const String& s = "");
+	static void println(const String& s = "");
 	static void prettyPrint(const String& s);
 	static void line();
 

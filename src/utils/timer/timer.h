@@ -1,5 +1,5 @@
 #pragma once
-#include "utils/job.h"
+#include "os/jobs/job.h"
 
 #define RUN_EVERY(X, D){static long lastRun = 0;if(millis()-lastRun > D){lastRun = millis();X;}}
 
@@ -8,7 +8,7 @@ public:
 
     Timer();
     
-    void run()override;
+    void exec()override;
     void reset()override;   
     void start()override;   
 

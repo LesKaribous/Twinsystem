@@ -4,9 +4,14 @@
 #include "strategy.h"
 
 void registerCommands() {
+    CommandHandler::registerCommand("start", "Start Match", command_start);
+    CommandHandler::registerCommand("stop", "Stop Robot", command_stop);
+    CommandHandler::registerCommand("reboot", "Reboot Robot", command_reboot);
+
     CommandHandler::registerCommand("enable(service)", "Enable a specific service", command_enable);
     CommandHandler::registerCommand("disable(service)", "Disable a specific service", command_disable);
     CommandHandler::registerCommand("status(service)", "Display single status", command_status);
+    CommandHandler::registerCommand("wait(duration)", "Wait a bit for duration", command_wait);
     CommandHandler::registerCommand("lidarMode(mode)", "Change neopixel display mode on lidar", command_lidarMode);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
@@ -16,6 +21,7 @@ void registerCommands() {
     CommandHandler::registerCommand("pause", "Pause motion", command_pause);
     CommandHandler::registerCommand("resume", "Resume motion", command_resume);
     CommandHandler::registerCommand("cancel", "Cancel motion", command_cancel);
+    CommandHandler::registerCommand("probe(tableCompass, side)", "Probe border", command_probe);
     CommandHandler::registerCommand("sleep", "Put motion to sleep", command_sleep);
     CommandHandler::registerCommand("wake", "Wake up motion", command_wake);
     CommandHandler::registerCommand("align(side,angle)", "Align to a specific side and angle", command_align);
@@ -29,8 +35,19 @@ void registerCommands() {
     CommandHandler::registerCommand("raise(side)", "Raise elevator", command_raise);
     CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
-    CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
-    CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
+    CommandHandler::registerCommand("drop(side)", "Drop object using actuator", command_drop);
+    CommandHandler::registerCommand("grabPlank(side)", "Grab Plank using actuator", command_grabPlank);
+    CommandHandler::registerCommand("dropPlank(side)", "Drop Plank using actuator", command_dropPlank);
+    CommandHandler::registerCommand("storePlank(side)", "Store Plank using actuator", command_storePlank);
+    CommandHandler::registerCommand("pump(side)", "enable pump", command_pump);
+    CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
+    CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
+    CommandHandler::registerCommand("cruise", " Enable cruise mode", command_cruise);
+    CommandHandler::registerCommand("feed(feedrate)", " Set Move feedrate", command_feed);
+    CommandHandler::registerCommand("music", " Play a sound", command_music);
+
+    //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
+    //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
     CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal", command_print);
     CommandHandler::registerCommand("help", "Display help", command_help);
@@ -92,7 +109,80 @@ void command_lidarMode(const args_t& args){
     else if(args[0].equalsIgnoreCase("intercom"))lidar.showStatusLED();
 }
 
+void command_wait(const args_t &args){
+    if(args.size() != 1) return;
+    float duration = args[0].toFloat();
+    os.wait(duration);
+}
 
+void command_start(const args_t &args){
+    robotArmed();
+    os.start();
+}
+
+void command_stop(const args_t &args){
+    os.stop();
+}
+
+void command_reboot(const args_t &args){
+    os.reboot();
+}
+
+void command_cruise(const args_t& args){
+    motion.enableCruiseMode();
+}
+
+void command_feed(const args_t &args){
+    if(args.size() != 1) return;
+    float feedrate = args[0].toFloat();
+    std::clamp(feedrate, 0.05f, 1.0f);
+    motion.setFeedrate(feedrate);
+    //motion.feed(1000);
+}
+
+void command_music(const args_t &args){
+    ihm.playTone(659, 167); // E5, 8th note
+    ihm.playTone(587, 167); // D5
+    ihm.playTone(370, 333); // F#4, quarter note
+    ihm.playTone(415, 333); // G#4
+
+    ihm.playTone(554, 167); // C#5
+    ihm.playTone(494, 167); // B4
+    ihm.playTone(294, 333); // D4
+    ihm.playTone(330, 333); // E4
+
+    ihm.playTone(494, 167); // B4
+    ihm.playTone(440, 167); // A4
+    ihm.playTone(280, 333); // C4
+    //ihm.playTone(262, 333); // C4
+    ihm.playTone(330, 333); // E4
+
+    ihm.playTone(440, 667); // A4, half note
+
+}
+
+void command_probe(const args_t &args){
+    if(args.size() != 2)return;
+    String tableCompass = args[0];
+    String side = args[1];
+
+    RobotCompass rc = RobotCompass::A;
+    if(side.equalsIgnoreCase("A"))         rc = RobotCompass::A;
+    else if(side.equalsIgnoreCase("AB"))   rc = RobotCompass::AB;
+    else if(side.equalsIgnoreCase("B"))    rc = RobotCompass::B;
+    else if(side.equalsIgnoreCase("BC"))   rc = RobotCompass::BC;
+    else if(side.equalsIgnoreCase("C"))    rc = RobotCompass::C;
+    else if(side.equalsIgnoreCase("CA"))   rc = RobotCompass::CA;
+
+    TableCompass tc = TableCompass::NORTH;
+    if(tableCompass.equalsIgnoreCase("NORTH"))         tc = TableCompass::NORTH;
+    else if(tableCompass.equalsIgnoreCase("EAST"))   tc = TableCompass::EAST;
+    else if(tableCompass.equalsIgnoreCase("SOUTH"))    tc = TableCompass::SOUTH;
+    else if(tableCompass.equalsIgnoreCase("WEST"))   tc = TableCompass::WEST;
+
+    probeBorder(tc, rc, 100);
+
+}
 
 //Motion
 void command_go(const args_t& args){
@@ -119,7 +209,8 @@ void command_move(const args_t& args){
     if(args.size() != 3) return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
-    float z = args[3].toFloat();
+    float z = args[2].toFloat();
+    Console::info("Interpreter") << "Move to (" << x << ", " << y << ", " << z << ")" << Console::endl;
     async motion.move({x, y, z});
     /**/
 }
@@ -155,13 +246,6 @@ void command_cancel(const args_t& args){
     motion.cancel();
 }
 
-void command_sleep(const args_t& args){
-    motion.sleep();
-}
-
-void command_wake(const args_t& args){
-    motion.wakeUp();
-}
 
 void command_align(const args_t& args){
     /**/
@@ -194,13 +278,11 @@ void command_setRelative(const args_t& args){
 
 
 void command_setAbsPosition(const args_t& args){
-    /**/
     if(args.size() != 3)return;
     float x = args[0].toFloat();
     float y = args[1].toFloat();
     float angle = args[2].toFloat() * DEG_TO_RAD;
     motion.setAbsPosition({x, y, angle});
-    /**/
 }
 
 
@@ -211,34 +293,70 @@ void command_resetCompass(const args_t& args){
 
 
 //Actuators
+
+void command_drop(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.drop(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.drop(RobotCompass::CA);
+}
+
+
 void command_grab(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
     if(side.equals("AB")) actuators.grab(RobotCompass::AB);
-    else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
     else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
 }
 
-
-void command_open(const args_t& args){
+void command_storePlank(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) actuators.open(RobotCompass::AB);
-    else if(side.equals("BC")) actuators.open(RobotCompass::BC);
-    else if(side.equals("CA")) actuators.open(RobotCompass::CA);
+    if(side.equals("AB")) actuators.storePlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.storePlank(RobotCompass::CA);
 }
 
 
-void command_close(const args_t& args){
+void command_dropPlank(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) actuators.close(RobotCompass::AB);
-    else if(side.equals("BC")) actuators.close(RobotCompass::BC);
-    else if(side.equals("CA")) actuators.close(RobotCompass::CA);
+    if(side.equals("AB")) actuators.dropPlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.dropPlank(RobotCompass::CA);
 }
+
+void command_grabPlank(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) actuators.grabPlank(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) actuators.grabPlank(RobotCompass::CA);
+}
+
+void command_pump(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) startPump(RobotCompass::AB);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) startPump(RobotCompass::CA);
+}
+
+void command_ev(const args_t& args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(side.equals("AB")) stopPump(RobotCompass::AB, 500);
+    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
+    else if(side.equals("CA")) stopPump(RobotCompass::CA, 500);
+}
+void command_initPump(const args_t& args){
+    initPump();
+}
+
 
 void command_elevator(const args_t& args){
-
     if(args.size() != 2)return;
     const String& side = args[0];
     const String& poseStr = args[1];
@@ -262,9 +380,9 @@ void command_move_elevator(const args_t& args){
 }
 
 void command_raise(const args_t& args){
-
     if(args.size() != 1)return;
     const String& side = args[0];
+
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::UP);
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::UP);
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::UP);
@@ -273,11 +391,11 @@ void command_raise(const args_t& args){
 void command_lower(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
+
     if(side.equals("AB")) actuators.moveElevator(RobotCompass::AB, ElevatorPose::DOWN);
     else if(side.equals("BC")) actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     else if(side.equals("CA")) actuators.moveElevator(RobotCompass::CA, ElevatorPose::DOWN);
 }
-
 
 //Routines 
 
@@ -304,7 +422,15 @@ void command_print(const args_t& args){
     }
 }
 
+void command_wake(const args_t& args){
+    motion.engage();
+    actuators.enable();
+}
 
+void command_sleep(const args_t& args){
+    motion.disengage();
+    actuators.disable();
+}
 
 //std::vector<String> arguments = extractArguments(args);
 

@@ -1,11 +1,13 @@
 #include "os.h"
 #include "console.h"
+#include "utils/interpreter/interpreter.h"
 
 OS OS::m_instance;
 
 OS& os = OS::instance();
 
 void OS::run(){
+    RUN_EVERY(
     switch(m_state){
         case BOOT:
             boot_routine();
@@ -27,11 +29,15 @@ void OS::run(){
             break;
         default: 
         break;
-    }
+    },2)
 }
 
 void OS::start(){
     m_state = AUTO_PROGRAM;
+}
+
+void OS::reboot(){
+    CPU_RESTART
 }
 
 void OS::stop(){
@@ -45,26 +51,32 @@ void OS::boot_routine(){
 }
 
 void OS::manual_routine(){
+    
     updateServices();
     executeRoutine(m_manualRoutine);
+
     if(currentJob() != nullptr){
-        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
-        else currentJob()->run();
+        if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
+        else currentJob()->exec();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
 void OS::auto_routine(){
     updateServices();
     executeRoutine(m_autoRoutine);
+
     if(currentJob() != nullptr){
-        if(currentJob()->isCompleted() || currentJob()->isCancelled()) killCurrentJob();
-        else currentJob()->run();
+        if(currentJob()->isCompleted() || currentJob()->isCanceled()) killCurrentJob();
+        else currentJob()->exec();
+        //else if(currentJob()->isIdle()) currentJob()->start();
     }
 }
 
 void OS::auto_program_routine(){
     m_state = AUTO;
     executeRoutine(m_auto_programRoutine);
+    auto_routine();
     m_state = STOPPED;
 }
 
@@ -72,6 +84,7 @@ void OS::manual_program_routine(){
     m_state = MANUAL;
     updateServices();
     executeRoutine(m_manual_programRoutine);
+    manual_routine();
     if(m_state == MANUAL) m_state = MANUAL_PROGRAM;
 }
 
@@ -112,9 +125,9 @@ void OS::setState(SystemState state){
 void OS::attachService(Service* service){
     if(service != nullptr){
         m_services[service->id()] = service;
+        service->attach();
         Console::trace() << "Attached service: " << service->id() << Console::endl;
         service->enable();
-        service->onAttach();
     }
 }
 
@@ -141,25 +154,34 @@ void OS::toggleDebug(ServiceID s){
         m_services[s]->toggleDebug();
 }
 
-Job& OS::wait(unsigned long time, bool runasync) {
+void OS::wait(unsigned long time) {
     m_timer.setDuration(time);
     m_timer.start();
-    //addJob(&m_timer);
-    if(!runasync)while(m_timer.isPending()|| m_timer.isPaused()){
-        m_timer.run();
-        run();
-    }
-    return m_timer;
+    // Move the unique_ptr into execute(), which assumes ownership
+    execute(m_timer, false);  // Or `runasync` if applicable
 }
 
-void OS::waitUntil(Job& obj, bool runasync){
-    addJob(&obj);
-    if(!runasync) while(obj.isPending() || obj.isPaused()) run();
+void OS::wait(Job& obj, bool isasync) {
+    execute(obj, isasync);  // Or `runasync` if applicable
 }
+
 
 void OS::execute(Job& obj, bool runasync){
     addJob(&obj);
-    if(!runasync)while(obj.isPending()|| obj.isPaused()) run();
+    if(!runasync) while(obj.isPending()) run();
+}
+
+void OS::execute(String& rawcmd){
+        Interpreter in;
+        in.processScript(rawcmd, script);
+
+        if (script.isValid()) {
+            Console::println("Starting program");
+            script.start();
+            execute(script, false);
+        } else {
+            Console::println("Invalid program : Unknown error");
+        }
 }
 
 void OS::flush(){
@@ -167,12 +189,20 @@ void OS::flush(){
 }
 
 bool OS::isBusy() {
-    return m_jobs.size() != 0;
+    return m_jobs.size() > 0;
+}
+
+void OS::clearProgram(){
+    script.clear();
+}
+
+Program &OS::program(){
+    return script;
 };
 
 Job* OS::currentJob(){
     if(m_jobs.size() == 0) return nullptr;
-    else return m_jobs.front();
+    else return m_jobs.top();
 }
 void OS::addJob(Job* job){
     m_jobs.push(job);
@@ -182,10 +212,11 @@ void OS::killCurrentJob(){
     m_jobs.pop();
 }
 
+
 void OS::updateServices(){
     for(const auto& service : m_services) {
         if(service.second->enabled() && !service.second->threaded()) {
-            service.second->onUpdate();
+            service.second->run();
         }
     }
 }
