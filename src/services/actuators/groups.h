@@ -46,7 +46,7 @@ namespace ActuatorPresets{
         //position servo
         170,    // left_Grab,
         0,      // left_Drop,
-        30,     // right_Grab,
+        32,     // right_Grab,
         180,    // right_Drop,
         90,     // planksUp,
         90,     // planksDrop,

@@ -144,29 +144,41 @@ void matchB(){
                POI::yellowWaypoint_1,
                POI::blueWaypoint_1)
     );
-    /*
-    async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
+    
+    //async motion.align(RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
 
-    async motion.go(
-        choose(isYellow,
-            POI::yellowWaypoint_2,
-            POI::blueWaypoint_2)
-    );*/
     async motion.goAlign(choose(isYellow,
             POI::yellowWaypoint_2,
             POI::blueWaypoint_2), RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
     
-    async motion.go(
-        choose(isYellow,
-            POI::yellowWaypoint_2,
-            POI::blueWaypoint_2)
-    );
-  
-    async motion.go(
-        choose(isYellow,
-            POI::stock_3,
-            POI::stock_6)
-    );
+
+
+    if(ihm.getStrategyState()==Settings::Match::STRAT_PRIMARY_A){
+        takeStock(
+            choose(isYellow,
+                POI::stock_3,
+                POI::stock_6),
+            RobotCompass::AB, 
+            TableCompass::SOUTH
+        );
+
+        buildTribune(
+            choose(isYellow,
+                POI::constAreaYellow_1,
+                POI::constAreaBlue_1),
+            RobotCompass::AB,
+            TableCompass::SOUTH
+        );
+    }
+    else {
+        async motion.go(
+            choose(isYellow,
+                POI::stock_3,
+                POI::stock_6)
+        );
+    }
+
+
     ihm.addScorePoints(Score::TribuneLevel1Points);
 
     //Wait for the end to arrive (left space for PAMI)
@@ -268,6 +280,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     // ---- Take second can ----
     async motion.goPolar(getCompassOrientation(tc)+90, canOffsetA); 
     actuators.grab(nextCompass);
+    waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), canGrab);
     async motion.goPolar(getCompassOrientation(tc), -canGrab*2);
 
@@ -275,8 +288,8 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     //async motion.align(rc, getCompassOrientation(tc));
     //async motion.goPolar(getCompassOrientation(tc)-90, canOffsetB);
     async motion.goPolarAlign(getCompassOrientation(tc)-90, canOffsetB, rc, getCompassOrientation(tc));
-
     actuators.grab(rc);
+    waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), canGrab*2);
     //async motion.goPolar(getCompassOrientation(tc), -canGrab*2);
 

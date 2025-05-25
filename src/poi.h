@@ -16,13 +16,13 @@ namespace POI{
 
     // ------------------------------------------
     // Construction Areas
-    const Vec2 constAreaYellow_1 = Vec2(775,1800);
+    const Vec2 constAreaYellow_1 = Vec2(775,1940);//1800
     const Vec2 constAreaYellow_2 = Vec2(1300,1850);
     const Vec2 constAreaYellowBelow_2 = Vec2(1300,1650);
     const Vec2 constAreaYellow_3 = Vec2(2800,1125);
     const Vec2 constAreaYellow_4 = Vec2(2775,1800);
 
-    const Vec2 constAreaBlue_1 = Vec2(2225,1800);
+    const Vec2 constAreaBlue_1 = Vec2(2225,1940);
     const Vec2 constAreaBlue_2 = Vec2(1700,1850);
     const Vec2 constAreaBlueBelow_2 = Vec2(1700,1650);
     const Vec2 constAreaBlue_3 = Vec2(200,1125);

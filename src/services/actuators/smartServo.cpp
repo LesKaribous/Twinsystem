@@ -28,7 +28,7 @@ SmartServo::SmartServo(const SmartServo& cpy) : m_pin(cpy.m_pin),
 bool SmartServo::moveToDefault(int speed, bool runAsync){
     return moveTo(m_defaultPos, speed, runAsync);
 }
-/*
+/**/
 bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non blocking mode
     if(!m_enabled) return;
     if(m_sleeping) wakeUp(); //Wake
@@ -41,6 +41,7 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
 
     int ms = map(speed, 0, 100, 50, 0);
     int currrentPos = 0;
+    long start = millis();
     //TODO safety exit based on max iteration.
     do{
         if(!runAsync) delay(ms);
@@ -66,12 +67,14 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
         }else{
             if(runAsync) return true;
         }
-    }while(!runAsync && currrentPos != m_target);
+    }while(!runAsync && currrentPos != m_target && millis() - start < 2000);
+    
+    m_servo.write(m_target);
     return true;
 }
 /**/
 
-/**/
+/*
 bool SmartServo::moveTo(int target, int speedPct, bool runAsync) {
     // 0) early exit if not enabled
     if (!m_enabled) return false;
