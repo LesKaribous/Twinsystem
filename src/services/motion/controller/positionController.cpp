@@ -21,7 +21,7 @@ PositionController::PositionController() :
     collisionCounter(0),
     vx_controller  (4.0, 0.0, 100.0),
     vy_controller  (4.0, 0.0, 100.0),
-    vrot_controller(13.5, 0.0, 25.0)
+    vrot_controller(10, 0.0, 70.0)
 {
     //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();
@@ -207,9 +207,9 @@ void PositionController::onUpdate(){
 
 
     Vec3 final_target_velocity = target_velocity;
-    if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(velocity.x) < 20) final_target_velocity.x = 0;
-    if(fabs(error.y) < Settings::Motion::MIN_DISTANCE && fabs(velocity.y) < 20) final_target_velocity.y = 0;
-    if(fabs(angle) < Settings::Motion::MIN_ANGLE && fabs(velocity.c) < 0.1) final_target_velocity.c = 0;
+    if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
+    if(fabs(error.y) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
+    if(fabs(angle) < Settings::Motion::MIN_ANGLE && fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
 
     std::clamp(final_target_velocity.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
     std::clamp(final_target_velocity.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
