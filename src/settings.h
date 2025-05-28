@@ -6,7 +6,7 @@
 #define INTERCOM_SERIAL Serial1
 #define INTERCOM_BAUDRATE 31250
 
-
+//#define XBEE
 #ifdef XBEE
 #define CONSOLE_SERIAL Serial3
 #define CONSOLE_BAUDRATE 9600
@@ -24,6 +24,7 @@
 //Occupancy map size	
 #define GRID_WIDTH 20
 #define GRID_HEIGHT 13
+#define GRID_CELLSIZE 150
 #define GRID_BITS   (GRID_WIDTH * GRID_HEIGHT)
 #define GRID_BYTES  ((GRID_BITS + 7) / 8)
 
@@ -115,7 +116,7 @@ namespace Settings{
         const float 
         MAX_ROT_ACCEL = 30.0, // rad/s^2 5.6
         MAX_ROT_SPEED = 10, // rad/s
-        MIN_ANGLE = 2.0*DEG_TO_RAD; // Target stop thresold //mm
+        MIN_ANGLE = 2.0 * DEG_TO_RAD; // Target stop thresold //mm
 
         const float 
         //STOP_DECCEL = 10000, // mm/s^2

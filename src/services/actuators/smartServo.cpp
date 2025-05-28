@@ -36,8 +36,15 @@ bool SmartServo::moveTo(int target, int speed, bool runAsync){ //true for non bl
     constrain(target, m_minPos, m_maxPos);
     constrain(speed, 0, 100);
 
+    
+
     m_target = target;
     m_speed = speed;
+
+    //if(speed == 100){
+         m_servo.write(m_target);
+         return true;
+    //}
 
     int ms = map(speed, 0, 100, 50, 0);
     int currrentPos = 0;

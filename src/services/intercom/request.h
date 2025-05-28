@@ -54,6 +54,7 @@ private:
     String _crc;
     String _content;
     String _response;
+    unsigned long _firstSent = 0;
     unsigned long _lastSent;
     unsigned long _responseTime;
     unsigned long _timeout;

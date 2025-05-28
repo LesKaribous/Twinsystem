@@ -52,6 +52,8 @@ void Request::setCallback(requestCallback_ptr func){
 void Request::send(){
     _status = Status::SENT;
     _lastSent = millis();
+    if(_firstSent == 0)
+        _firstSent = millis();
     Intercom::instance().sendMessage(getPayload());
 }
 
@@ -108,7 +110,7 @@ String Request::getPayload() const{
 }
 
 bool Request::isTimedOut() const{
-    return millis() - _lastSent >= _timeout;
+    return millis() - _firstSent >= _timeout;
 }
 
 unsigned long Request::getTimeout() const{

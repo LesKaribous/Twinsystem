@@ -18,11 +18,11 @@ void Lidar::run(){
     static Vec3 pos;
     if(enabled()){
         //if((millis() - m_lastPosUpdate > 100 && Vec3::distanceBetween(pos, nav.getPosition()) > 10) || millis() - m_lastPosUpdate > 1000){
-        if(/*(*/millis() - m_lastPosUpdate > 100 /*&& Vec3::distanceBetween(pos, motion.estimatedPosition()) > 10)*/ || millis() - m_lastPosUpdate > 1000){
+        if(/*(*/millis() - m_lastPosUpdate > 50 /*&& Vec3::distanceBetween(pos, motion.estimatedPosition()) > 10)*/ || millis() - m_lastPosUpdate > 1000){
             m_lastPosUpdate = millis();
             //pos = nav.getPosition();
             pos = motion.estimatedPosition();
-            intercom.sendRequest("pos(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z*RAD_TO_DEG) + ")", 100);
+            intercom.sendRequest("pos(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z*RAD_TO_DEG) + ")");
         }
         /*
         if(millis() - m_lastOccupancyRequest > 150){
@@ -41,12 +41,12 @@ void Lidar::disable(){
 }
 
 void Lidar::showRadarLED(){
-    intercom.sendRequest("on",100);
+    intercom.sendMessage("on");
     Console::println("displayLidar");
 }
 
 void Lidar::showStatusLED(){
-    intercom.sendRequest("off",100);
+    intercom.sendMessage("off");
     //Console::println("displayIntercom");
 }
 

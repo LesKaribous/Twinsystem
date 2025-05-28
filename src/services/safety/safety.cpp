@@ -42,18 +42,19 @@ void Safety::run(){
         if(!motion.hasFinished()){
             int streer = RAD_TO_DEG * motion.getAbsoluteTargetDirection(); //We are moving in this direction
             int distanceToGo = motion.getTargetDistance() + 350;
-            if(distanceToGo > 500) distanceToGo = 500;
-            if(distanceToGo < 350) distanceToGo = 350;
+            if(distanceToGo > 600) distanceToGo = 600;
+            if(distanceToGo < 300) distanceToGo = 300;
 
-            intercom.sendRequest("ob("+ String(streer) + "," + String(distanceToGo) + ")", 100, getDistanceCallback);
+            intercom.sendRequest("ob("+ String(streer) + "," + String(distanceToGo) + ")", 300, getDistanceCallback);
+            //intercom.sendRequest("pos(" + String(pos.x)  + "," + String(pos.y) + "," + String(pos.z*RAD_TO_DEG) + ")");
         }
 
         if(m_obstacleDetected/*m_currentDistance <= 350*/){
-            if(!motion.hasFinished() && !motion.isRotating()) motion.pause();
+            if(!motion.hasFinished() /*&& !motion.isRotating()*/) motion.pause();
             if(!motion.isRotating()) m_lastSeen = millis();
          }
      
-         if(millis() - m_lastSeen > 2000){
+         if(millis() - m_lastSeen > 1500){
             if(m_obstacleDetected){
                 m_obstacleDetected = false;
                 Console::print("obstable gone (last seen ");
@@ -67,7 +68,7 @@ void Safety::run(){
             motion.resume();
             Console::println("resume");
          }
-    , 50)
+    , 100)
 }
 
 void Safety::setSafeDistance(int d){

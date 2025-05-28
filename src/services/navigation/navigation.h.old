@@ -1,0 +1,51 @@
+#pragma once
+/*
+#include "services/service.h"
+#include "os/jobs/job.h"
+
+#include "utils/geometry.h"
+#include "utils/planner/pathfinder.h"
+#include <vector>
+
+
+
+class Navigation : public Service, Job{
+private:
+    std::vector<Vec2> _path;
+    float final_orientation;
+    size_t _currentStep = 0;
+    bool _inProgress = false;
+
+
+public:
+    Navigation();
+
+    void attach() override;
+    void run() override;
+    void exec() override;
+
+
+    Navigation& go(float x, float y);
+    Navigation& go(float x, float y, float theta);
+
+
+    void start() override;
+    void pause() override;
+    void resume() override;
+    void cancel() override;
+    void forceCancel() override;
+    void complete() override;
+    
+    void onRunning();
+    void onPausing() override;  //Called every run if in Pausing state
+    void onCanceling() override; //Called every run if in  exiting Pausing state
+
+    void onPaused() override;   //Called once when exiting Pausing state
+    void onCanceled() override; //Called once when exiting Canceling state
+
+
+    
+    SINGLETON(Navigation);
+};
+SINGLETON_EXTERN(Navigation, navigation)
+*/

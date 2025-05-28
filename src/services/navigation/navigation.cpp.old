@@ -1,0 +1,126 @@
+#include "navigation.h"
+#include "os/console.h"
+#include "services/motion/motion.h"
+#include "services/localisation/localisation.h"
+
+SINGLETON_INSTANTIATE(Navigation, navigation)
+
+Navigation::Navigation() : Service(ID_NAVIGATION){
+
+}
+
+void Navigation::attach() {
+    Console::info("Navigation") << "Navigation service attached." << Console::endl;
+}
+
+Navigation& Navigation::go(float x, float y) {
+    Console::info("Navigation") << "Planning path to (" << x << ", " << y << ")" << Console::endl;
+    Vec2 current = localisation.getPosition();  // assumes localisation returns Vec3
+    Vec2 target(x, y);
+
+    _path = simplifyPath(computePath(current, target));
+    _currentStep = 0;
+
+    Console::info("Navigation") << "Path steps: " << _path.size() << Console::endl;
+
+    return *this;
+}
+
+Navigation& Navigation::go(float x, float y, float theta) {
+    final_orientation = theta;
+    go(x, y);
+    return *this;
+}
+
+void Navigation::start() {
+    if (_path.empty()) {
+        Console::error("Navigation") << "No path to follow!" << Console::endl;
+        return;
+    }
+
+    Job::start();
+    _inProgress = true;
+    Console::info("Navigation") << "Starting navigation" << Console::endl;
+
+    motion.go(_path[_currentStep]); //non blocking
+}
+
+
+void Navigation::run() {
+    if (!enabled()) return;
+
+    if (isRunning()) {
+        onRunning();
+    } else if (isPausing()) {
+        onPausing();
+    } else if (isCanceling()) {
+        onCanceling();
+    }
+}
+
+void Navigation::exec() {
+    run(); // delegation
+}
+
+void Navigation::onRunning() {
+    if (!motion.isBusy()) {
+        _currentStep++;
+        if (_currentStep < _path.size()) {
+            Console::info("Navigation") << "Next waypoint " << _currentStep << Console::endl;
+            motion.go(_path[_currentStep]);
+            motion.start();
+        } else {
+            complete();
+        }
+    }
+}
+
+
+void Navigation::pause() {
+    Job::pause();
+    motion.pause();
+}
+
+void Navigation::resume() {
+    Job::resume();
+    motion.resume();
+}
+
+void Navigation::cancel() {
+    if (!isCanceling() && !isCanceled()) {
+        Job::cancel();
+        motion.cancel();
+    }
+}
+
+void Navigation::forceCancel() {
+    Job::forceCancel();
+    motion.forceCancel();
+}
+
+void Navigation::complete() {
+    Job::complete();
+    _inProgress = false;
+    Console::info("Navigation") << "Navigation complete." << Console::endl;
+}
+
+void Navigation::onPausing() {
+    motion.exec();
+}
+
+void Navigation::onCanceling() {
+    motion.exec();
+}
+
+void Navigation::onPaused() {
+    Job::onPaused();
+    Console::info("Navigation") << "Paused" << Console::endl;
+}
+
+void Navigation::onCanceled() {
+    Job::onCanceled();
+    _path.clear();
+    _currentStep = 0;
+    _inProgress = false;
+    Console::info("Navigation") << "Canceled" << Console::endl;
+}

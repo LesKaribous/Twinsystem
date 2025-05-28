@@ -21,7 +21,7 @@ public:
     void sendMessage(const char* message);
     void sendMessage(const String& message);
 
-    int sendRequest(const String& payload, long timeout = 0, requestCallback_ptr cbfunc = nullptr, callback_ptr func = nullptr);
+    int sendRequest(const String& payload, long timeout = 300, requestCallback_ptr cbfunc = nullptr, callback_ptr func = nullptr);
     bool closeRequest(int);
     String getRequestResponse(int);
 

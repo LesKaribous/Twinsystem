@@ -45,6 +45,7 @@ void registerCommands() {
     CommandHandler::registerCommand("cruise", " Enable cruise mode", command_cruise);
     CommandHandler::registerCommand("feed(feedrate)", " Set Move feedrate", command_feed);
     CommandHandler::registerCommand("music", " Play a sound", command_music);
+    CommandHandler::registerCommand("radar", " Toogle radar view on neopixel", command_radar);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -159,6 +160,13 @@ void command_music(const args_t &args){
 
     ihm.playTone(440, 667); // A4, half note
 
+}
+
+void command_radar(const args_t &args){
+    static bool on = false;
+    on = !on;
+    Console::println( on ? "on" : "off");
+    intercom.sendRequest(on ? "on" : "off",100);
 }
 
 void command_probe(const args_t &args){

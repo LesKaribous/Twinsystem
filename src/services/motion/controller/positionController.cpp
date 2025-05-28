@@ -78,6 +78,9 @@ void PositionController::start() {
         target = newTarget;
     }
 
+    startPos = localisation.getPosition();
+    moveStart = millis();
+
     //Console::info("PositionController") << "start" << Console::endl;
 }
 /**/
@@ -234,7 +237,6 @@ void PositionController::onUpdate(){
     //Velocity based collisions
     /**/
     float velocityError = Vec2(final_target_velocity).mag() - Vec2(velocity).mag();
-
     bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(final_target_velocity).mag();
 
     if (possibleCollision && final_target_velocity.mag() > COLLISION_THRESHOLD) {
@@ -243,6 +245,14 @@ void PositionController::onUpdate(){
         collisionCounter = 0;
     }
     
+
+    if(millis() - moveStart > 4000 && 
+        (fabs(startPos.x - position.x) < 80 && fabs(startPos.y - position.y) < 80 ) && fabs(startPos.z - position.z) < 5.0 * DEG_TO_RAD){
+        collisionCounter++;
+    }
+
+
+
     /*
     RUN_EVERY(
         Console::info("velocityError") << velocityError << Console::endl;

@@ -40,9 +40,9 @@ private:
     float m_feedrate = 1.0;
 
     int collisionCounter = 0; // Reset on movement or normal progress
-    constexpr static int COLLISION_THRESHOLD = 10; // Number of cycles to confirm collision
-    constexpr static float COLLISION_VELOCITY_DIFF = 0.4f; // %
-    static constexpr int     COLLISION_COUNT_LIMIT= 60;      // need 3 successive fails
+    constexpr static int COLLISION_THRESHOLD = 30; // avoid move initial drift
+    constexpr static float COLLISION_VELOCITY_DIFF = 0.6f; // %
+    static constexpr int     COLLISION_COUNT_LIMIT= 80;      // need 3 successive fails
 
     void deccelerate();
 
@@ -58,6 +58,10 @@ private:
     PIDController vx_controller;
     PIDController vy_controller;
     PIDController vrot_controller;
+
+    long moveStart = 0;
+    Vec3 startPos = Vec3(0);
+
     
     Vec3 target;        // Active target position
     Vec3 newTarget;     // New target to be applied

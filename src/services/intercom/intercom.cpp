@@ -194,12 +194,14 @@ void Intercom::_processPendingRequests() {
         Request::Status status = request.getStatus();
     
         if(status != Request::Status::CLOSED && status != Request::Status::IDLE && millis() - request.getLastSent() > 300){
-            if(debug) Console::trace("Intercom") << ": request " << request.getContent() << "too old, cleared." << Console::endl;
+            //if(debug) Console::trace("Intercom") << ": request " << request.getContent() << "too old, cleared." << Console::endl;
             request.close();
             ++it;
             continue;
         }
 
+        const size_t MAX_REQUESTS = 200;  // Or any reasonable number
+        
         if (status == Request::Status::IDLE) {
             request.send();
             ++it;
@@ -207,20 +209,23 @@ void Intercom::_processPendingRequests() {
             if (request.isTimedOut()) {
                 request.onTimeout();
             } else {
-                if(millis() - request.getLastSent() > 10)  request.send();
+                if(millis() - request.getLastSent() > 100)  request.send();
                 ++it;
             }
         } else if (status == Request::Status::OK) {
             ++it;
             request.close();
         } else if (status == Request::Status::CLOSED) {
-            if(debug) Console::trace("Intercom") << int(_sentRequests.size()) << "currently in the buffer" << Console::endl;
+            //if(debug) Console::trace("Intercom") << int(_sentRequests.size()) << "currently in the buffer" << Console::endl;
             it = _sentRequests.erase(it); // Remove the request from the map
 
-        }  else if (status == Request::Status::TIMEOUT) {
+        } else if (_sentRequests.size() > MAX_REQUESTS) {
+            //if (debug) Console::warn("Intercom") << "Request buffer exceeded max size. Dropping oldest." << Console::endl;
+            _sentRequests.erase(_sentRequests.begin()); // Assumes it's ordered by insertion
+        }else if (status == Request::Status::TIMEOUT) {
             request.close();
             //CONSOLE_SERIAL.print(request.getPayload());
-            if(debug) Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
+            //if(debug) Console::trace("Intercom") << "request " << request.getPayload() << " timedout." << Console::endl;
         } else if (status == Request::Status::ERROR) {
             request.close();
             Console::error("Intercom") << "request " << request.getContent() << " unknown error." << Console::endl;

@@ -250,7 +250,7 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.goAlign(approach, rc, getCompassOrientation(tc)); //opti
     
     // !!!! Disable safety !!!!
-    safety.disable();
+    //safety.disable();
     //-------------------------
     startPump(rc);
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -40,50);
@@ -322,7 +322,7 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.goAlign(approach, rc, getCompassOrientation(tc));
 
     // !!!! Disable safety !!!!
-    safety.disable();
+    //safety.disable();
 
     // ---- Build level 1 ----
     async motion.go(build);
@@ -389,7 +389,7 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
     //motion.setFeedrate(1.0);
 
     // !!!! Disable safety !!!!
-    safety.disable();
+    //safety.disable();
 
     // ---- Build level 1 ----
     async motion.go(build);
@@ -422,7 +422,7 @@ RobotCompass previousActuator(RobotCompass rc){
 }
 
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist, float feedrate){
-    motion.cancelOnCollide(true);
+    
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
     motion.disableCruiseMode();
@@ -431,6 +431,8 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
 	async motion.align(rc, getCompassOrientation(tc));//here crash
     
     motion.setRelative();
+
+    motion.cancelOnCollide(true);
 	async motion.goPolar(getCompassOrientation(rc),approachDist);
 	async motion.goPolar(getCompassOrientation(rc),probeDist);
     motion.cancelOnCollide(false);

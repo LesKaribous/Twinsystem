@@ -261,10 +261,13 @@ void onRobotBoot(){
 }
 
 void onRobotManual(){
+    {
     RUN_EVERY(
     ihm.setRobotPosition(motion.estimatedPosition());
     ,300);
+    }
     
+    {
     RUN_EVERY(
         if(ihm.teamSwitch.getState() == Settings::YELLOW){
             intercom.sendRequest("team(Y)");
@@ -272,10 +275,13 @@ void onRobotManual(){
             intercom.sendRequest("team(B)");
         }
     ,1000);
+    }
 
+    {
     RUN_EVERY(
     intercom.sendRequest("oM", 100, onIntercomRequestReply);
-    ,500);
+    ,1000);
+    }
 }
 
 void onRobotAuto(){

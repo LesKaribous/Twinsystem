@@ -52,7 +52,7 @@ namespace ActuatorPresets{
         90,     // planksDrop,
         120,    // planksStore,
         0,     // elevator_Up,
-        120,    // elevator_Down,
+        100,    // elevator_Down,
         80      // elevator_Drop;
     };
         
@@ -78,10 +78,10 @@ namespace ActuatorPresets{
         0, 
         180,
         90,
-        88,
+        80,
         120,
         0,
-        130, 
+        115, 
         70
     };
 }

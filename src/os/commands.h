@@ -18,6 +18,7 @@ void command_probe(const args_t& args); //Start match
 void command_cruise(const args_t& args); //Start match
 void command_feed(const args_t& args); //Start match
 void command_music(const args_t& args); //Start match
+void command_radar(const args_t& args); //Start match
 
 //Motion
 void command_go(const args_t& args);
