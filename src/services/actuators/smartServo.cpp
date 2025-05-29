@@ -185,9 +185,9 @@ void SmartServo::sleep(){
 
 void SmartServo::wakeUp(){
     
-    if(m_enabled){
+    //if(m_enabled){
         m_servo.attach(m_pin);
-    }
+    //}
     m_sleeping = false;
 }
 

@@ -181,7 +181,7 @@ void matchB(){
     }
 
 
-    ihm.addScorePoints(Score::TribuneLevel1Points);
+    //ihm.addScorePoints(Score::TribuneLevel1Points);
 
     //Wait for the end to arrive (left space for PAMI)
     chrono.onMatchNearlyFinished(); 
@@ -357,9 +357,9 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
     motion.go(approach); //finish later
     waitMs(1000);
+    ihm.addScorePoints(Score::TribuneLevel2Points);
     actuators.moveElevator(nextCompass, ElevatorPose::DOWN,100);
     os.wait(motion);
-    ihm.addScorePoints(Score::TribuneLevel2Points);
 
     motion.setFeedrate(1.0);
     // !!!! Engage safety !!!!
