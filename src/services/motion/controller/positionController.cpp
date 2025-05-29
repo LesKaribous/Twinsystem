@@ -208,6 +208,8 @@ void PositionController::onUpdate(){
     if(desired.z > target_velocity.z) target_velocity.c += Settings::Motion::MAX_ROT_ACCEL * dt;
     if(desired.z < target_velocity.z) target_velocity.c -= Settings::Motion::MAX_ROT_ACCEL * dt;
 
+    target_velocity += (velocity - target_velocity)*0.01;
+
 
     Vec3 final_target_velocity = target_velocity;
     if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.x) < 20) final_target_velocity.x = 0;

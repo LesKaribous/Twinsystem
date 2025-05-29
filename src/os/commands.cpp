@@ -2,6 +2,7 @@
 #include "robot.h"
 #include "routines.h"
 #include "strategy.h"
+#include "poi.h"
 
 void registerCommands() {
     CommandHandler::registerCommand("start", "Start Match", command_start);
@@ -46,6 +47,7 @@ void registerCommands() {
     CommandHandler::registerCommand("feed(feedrate)", " Set Move feedrate", command_feed);
     CommandHandler::registerCommand("music", " Play a sound", command_music);
     CommandHandler::registerCommand("radar", " Toogle radar view on neopixel", command_radar);
+    CommandHandler::registerCommand("test", " Dummy Test function ", command_test);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -167,6 +169,23 @@ void command_radar(const args_t &args){
     on = !on;
     Console::println( on ? "on" : "off");
     intercom.sendRequest(on ? "on" : "off",100);
+}
+
+void command_test(const args_t &args){
+    motion.setAbsPosition({913, 1440, 90 * DEG_TO_RAD});
+    bool isYellow = ihm.isColor(Settings::YELLOW);
+    initPump();
+    actuators.storePlank(RobotCompass::CA);
+    actuators.storePlank(RobotCompass::AB);
+
+    takeStock(
+    choose(isYellow,
+        POI::stock_4,
+        POI::stock_5),
+    RobotCompass::AB, 
+    TableCompass::NORTH
+    );
+
 }
 
 void command_probe(const args_t &args){

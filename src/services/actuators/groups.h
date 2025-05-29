@@ -77,7 +77,7 @@ namespace ActuatorPresets{
         0,
         0, 
         180,
-        90,
+        80,
         80,
         120,
         0,
