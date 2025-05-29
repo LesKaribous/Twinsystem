@@ -156,14 +156,14 @@ void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
         groupAB.createServo(CAST_POSE(ServoIDs::MAGNET_RIGHT), props.magnetRightPin, props.right_Drop);
         groupAB.createServo(CAST_POSE(ServoIDs::ELEVATOR) ,props.elevatorPin, props.elevator_Down);
         groupAB.createServo(CAST_POSE(ServoIDs::MAGNET_LEFT) ,props.magnetLeftPin, props.left_Drop);
-        groupAB.createServo(CAST_POSE(ServoIDs::PLANKS) ,props.planckPin, props.planksGrab);
+        groupAB.createServo(CAST_POSE(ServoIDs::PLANKS) ,props.planckPin, props.planksStore);
     }else if(rc == RobotCompass::BC){
         Console::error("Actuators") << "No manipulator mounted on BC" << Console::endl;
     }else if(rc == RobotCompass::CA){
         groupCA.createServo(CAST_POSE(ServoIDs::MAGNET_RIGHT) ,props.magnetRightPin, props.right_Drop);
         groupCA.createServo(CAST_POSE(ServoIDs::ELEVATOR) ,props.elevatorPin, props.elevator_Down);
         groupCA.createServo(CAST_POSE(ServoIDs::MAGNET_LEFT) ,props.magnetLeftPin, props.left_Drop);
-        groupCA.createServo(CAST_POSE(ServoIDs::PLANKS) ,props.planckPin, props.planksGrab);
+        groupCA.createServo(CAST_POSE(ServoIDs::PLANKS) ,props.planckPin, props.planksStore);
     }
 }
 
