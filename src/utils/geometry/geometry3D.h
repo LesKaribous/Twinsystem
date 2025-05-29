@@ -35,6 +35,10 @@ struct Vec3 {
     //Properties
     float mag() const;
     float magSq() const;
+    
+    float mag2D() const;
+    float magSq2D() const;
+
     float heading() const;
     float dot(const Vec3&) const;
     Vec3& normalize();

@@ -178,10 +178,35 @@ void matchB(){
                 POI::stock_3,
                 POI::stock_6)
         );
+        ihm.addScorePoints(Score::TribuneLevel1Points);
     }
 
 
-    ihm.addScorePoints(Score::TribuneLevel1Points);
+
+    
+    if(ihm.getStrategyState()==Settings::Match::STRAT_PRIMARY_A){
+
+
+        takeStockFast(
+            choose(isYellow,
+                POI::stock_2,
+                POI::stock_7),
+            RobotCompass::AB,
+            choose(isYellow,
+            TableCompass::WEST, TableCompass::EAST)
+        );
+
+        dropOneLevel(
+            choose(isYellow,
+                POI::constAreaYellowBelow_2,
+                POI::constAreaBlueBelow_2),
+            RobotCompass::AB,
+            TableCompass::SOUTH
+        );
+    }
+
+
+    
 
     //Wait for the end to arrive (left space for PAMI)
     chrono.onMatchNearlyFinished(); 
@@ -221,6 +246,58 @@ void nearEnd(){
     waitMs(200);
     //ihm.onUpdate();
     chrono.onMatchFinished();
+}
+
+
+
+void takeStockFast(Vec2 target, RobotCompass rc, TableCompass tc){
+    if(rc == RobotCompass::BC){
+        THROW("wrong compass");
+        return;
+    }
+
+    RobotCompass nextCompass = (rc == RobotCompass::AB) ? RobotCompass::CA : RobotCompass::AB;
+
+    const float approachOffset = 300; //250 
+    float grabOffset = 155;//175 //150
+    if(ihm.isColor(Settings::BLUE)) grabOffset = 155;
+
+
+    const float canOffsetA = 125;//100
+    const float canOffsetB = 225;//100 * 2
+    const float canGrab = 125;//120
+    const unsigned long delayTime = 400;
+
+    Vec2 approach = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, approachOffset).toVec2();
+    Vec2 grab = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, grabOffset).toVec2();
+
+    // ---- Take first planks ----
+    //async motion.go(approach); 
+    //async motion.align(rc, getCompassOrientation(tc));
+    async motion.goAlign(approach, rc, getCompassOrientation(tc)); //opti
+    
+    // !!!! Disable safety !!!!
+    //safety.disable();
+    //-------------------------
+    //startPump(rc);
+    actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -40,50);
+    waitMs(delayTime);
+    motion.cancelOnCollide(true);
+    async motion.go(grab);
+    motion.cancelOnCollide(false);
+    //async motion.go(grab); // double to be sure
+    actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -30,50);
+    actuators.grabPlank(rc);
+    waitMs(1000);
+    actuators.storePlank(rc,50);
+    actuators.grab(rc);
+    waitMs(delayTime);
+
+    // !!!! Engage safety !!!!
+    safety.enable();
+    //-------------------------
+
+    motion.setFeedrate(1.0);
 }
 
 void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){

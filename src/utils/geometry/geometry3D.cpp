@@ -105,6 +105,14 @@ float Vec3::magSq() const{
     return a*a + b*b + c*c;
 }
 
+float Vec3::mag2D() const{
+    return sqrt(magSq2D());
+}
+
+float Vec3::magSq2D() const{
+    return a*a + b*b;
+}
+
 Vec3& Vec3::mult(float v){
     a *= v; 
     b *= v;

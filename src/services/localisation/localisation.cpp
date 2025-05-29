@@ -67,7 +67,7 @@ void Localisation::setPosition(Vec3 newPos){
     pos.x = -newPos.y/1000.0;
     pos.y = -newPos.x/1000.0;
     pos.h = newPos.z;
-    otos.resetTracking(); // WIP
+    //otos.resetTracking(); // WIP
     otos.setPosition(pos);
     _unsafePosition = newPos;
 }
@@ -111,7 +111,7 @@ void Localisation::calibrate() {
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
     otos.calibrateImu(400, true);
     //otos.setLinearScalar(1.05f);//maison
-    otos.setLinearScalar(0.991f);//coupe
+    otos.setLinearScalar(0.955f);//coupe
     Console::println("done.");
     m_calibrated = true;
 }

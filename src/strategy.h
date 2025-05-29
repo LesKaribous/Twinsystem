@@ -17,6 +17,7 @@ void matchB();
 // Macros
 void waitMs(unsigned long time);
 void takeStock(Vec2 target, RobotCompass rc, TableCompass tc);
+void takeStockFast(Vec2 target, RobotCompass rc, TableCompass tc);
 void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc);
 void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc);
 void nearEnd();

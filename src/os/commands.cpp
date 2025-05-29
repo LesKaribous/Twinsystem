@@ -16,6 +16,8 @@ void registerCommands() {
     CommandHandler::registerCommand("lidarMode(mode)", "Change neopixel display mode on lidar", command_lidarMode);
     CommandHandler::registerCommand("go(x,y)", "Move to a specific position", command_go);
     CommandHandler::registerCommand("goPolar(angle,dist)", "Move to a relative polar position", command_goPolar);
+    CommandHandler::registerCommand("goAlign(x,y, rc, tc)", "Move to a x y position with orientation", command_goAlign);
+    CommandHandler::registerCommand("gPolarAlign(angle,dist, rc, tc)", "Move to relative polar position with orientation", command_goAlign);
     CommandHandler::registerCommand("move(x,y,angle)", "Move to a specific position", command_move);
     CommandHandler::registerCommand("turn(angle)", "Turn to a specific angle", command_turn);
     CommandHandler::registerCommand("rawTurn(angle)", "Turn to a specific angle without optimization", command_rawTurn);
@@ -172,19 +174,37 @@ void command_radar(const args_t &args){
 }
 
 void command_test(const args_t &args){
-    motion.setAbsPosition({913, 1440, 90 * DEG_TO_RAD});
-    bool isYellow = ihm.isColor(Settings::YELLOW);
+    motion.setAbsPosition({700, 1460, 90 * DEG_TO_RAD});
+    //bool isYellow = ihm.isColor(Settings::YELLOW);
     initPump();
     actuators.storePlank(RobotCompass::CA);
     actuators.storePlank(RobotCompass::AB);
 
+
+
     takeStock(
-    choose(isYellow,
+    choose(true,
         POI::stock_4,
         POI::stock_5),
     RobotCompass::AB, 
     TableCompass::NORTH
     );
+
+    waitMs(2000);
+    motion.goPolar(getCompassOrientation(TableCompass::NORTH), -200);
+
+    buildTribune(
+        Vec2(1100-400, 1050+100),
+        RobotCompass::AB,
+        TableCompass::WEST
+    );
+
+
+    actuators.drop(RobotCompass::AB);
+    actuators.drop(RobotCompass::CA);
+
+    actuators.dropPlank(RobotCompass::AB);
+    actuators.dropPlank(RobotCompass::CA);
 
 }
 
@@ -222,14 +242,70 @@ void command_go(const args_t& args){
 }
 
 //Motion
+void command_goAlign(const args_t& args){
+    /**/
+    if(args.size() != 4) return;
+    float x = args[0].toFloat();
+    float y = args[1].toFloat();
+    String rc = args[2];
+    TableCompass tc;
+
+    if(args[3] == "NORTH")      tc = TableCompass::NORTH;
+    else if(args[3] == "SOUTH") tc = TableCompass::SOUTH;
+    else if(args[3] == "EAST")  tc = TableCompass::EAST;
+    else if(args[3] == "WEST")  tc = TableCompass::WEST;
+
+    async motion.goAlign({x, y}, rc == "AB" ? RobotCompass::AB : RobotCompass::CA, getCompassOrientation(tc));
+    /**/
+}
+
+//Motion
 void command_goPolar(const args_t& args){
     /**/
     if(args.size() != 2) return;
-    float angle = args[0].toFloat();
+    float angle = 361; 
+    if(args[0] == "NORTH")      angle = getCompassOrientation(TableCompass::NORTH);
+    else if(args[0] == "SOUTH") angle = getCompassOrientation(TableCompass::SOUTH);
+    else if(args[0] == "EAST")  angle = getCompassOrientation(TableCompass::EAST);
+    else if(args[0] == "WEST")  angle = getCompassOrientation(TableCompass::WEST);
+    if(angle == 361) angle = args[0].toFloat();
+
     float dist = args[1].toFloat();
     async motion.goPolar(angle, dist);
-    /**/
 }
+
+void command_goPolarAlign(const args_t& args){
+    /**/
+    if(args.size() != 2) return;
+    float angle = 361; 
+    if(args[0] == "NORTH")      angle = getCompassOrientation(TableCompass::NORTH);
+    else if(args[0] == "SOUTH") angle = getCompassOrientation(TableCompass::SOUTH);
+    else if(args[0] == "EAST")  angle = getCompassOrientation(TableCompass::EAST);
+    else if(args[0] == "WEST")  angle = getCompassOrientation(TableCompass::WEST);
+    if(angle == 361) angle = args[0].toFloat();
+
+
+    String side = args[2];
+    RobotCompass rc;
+    if(side.equalsIgnoreCase("A"))         rc = RobotCompass::A;
+    else if(side.equalsIgnoreCase("AB"))   rc = RobotCompass::AB;
+    else if(side.equalsIgnoreCase("B"))    rc = RobotCompass::B;
+    else if(side.equalsIgnoreCase("BC"))   rc = RobotCompass::BC;
+    else if(side.equalsIgnoreCase("C"))    rc = RobotCompass::C;
+    else if(side.equalsIgnoreCase("CA"))   rc = RobotCompass::CA;
+    
+
+    float orientation = 361; 
+    if(args[3] == "NORTH")      orientation = getCompassOrientation(TableCompass::NORTH);
+    else if(args[3] == "SOUTH") orientation = getCompassOrientation(TableCompass::SOUTH);
+    else if(args[3] == "EAST")  orientation = getCompassOrientation(TableCompass::EAST);
+    else if(args[3] == "WEST")  orientation = getCompassOrientation(TableCompass::WEST);
+    if(orientation == 361) orientation = args[3].toFloat();
+
+    float dist = args[1].toFloat();
+    async motion.goPolarAlign(angle, dist, rc, orientation);
+}
+
 
 void command_move(const args_t& args){
     /**/

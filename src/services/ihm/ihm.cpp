@@ -91,9 +91,9 @@ void IHM::addBootProgress(int v){
 }
 
 void IHM::setRobotPosition(Vec3 pos){
-    x.setValue(pos.x);
-    y.setValue(pos.y);
-    z.setValue(pos.z);
+    x.setValue(round(pos.x));
+    y.setValue(round(pos.y));
+    z.setValue(round(pos.z*RAD_TO_DEG));
 }
 
 
@@ -223,7 +223,7 @@ void IHM::updateAllStartVar() {
     if(drawProbing) updateInitState();
     if(drawPosition){
         if( millis() - lastPosDraw >= 50){
-            updatePosition(x.getValue(), y.getValue(), z.getValue()*RAD_TO_DEG);
+            updatePosition(x.getValue(), y.getValue(), z.getValue());
             lastPosDraw = millis();
         }
     }    

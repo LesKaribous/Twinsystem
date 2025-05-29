@@ -23,7 +23,9 @@ void command_test(const args_t& args); //Start match
 
 //Motion
 void command_go(const args_t& args);
+void command_goAlign(const args_t& args);
 void command_goPolar(const args_t& args);
+void command_goPolarAlign(const args_t& args);
 void command_move(const args_t& args);
 void command_turn(const args_t& args);
 void command_rawTurn(const args_t& args); //turn without optimization (without modulo)
