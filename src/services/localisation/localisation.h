@@ -18,6 +18,7 @@ public:
     Vec3 getVelocity();
     void read();
     void calibrate();
+    void setLinearScale(float value);
 
     inline bool useIMU() const {return m_use_IMU && m_connected & m_calibrated;}
     
@@ -25,7 +26,7 @@ public:
     SINGLETON(Localisation)
 
 private : 
-
+    float m_scale = 0.955f;
     bool m_use_IMU = false;
     bool m_connected = false;
     bool m_calibrated = false;

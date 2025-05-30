@@ -35,6 +35,8 @@ void recalage(){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::EAST,  RobotCompass::CA,100);//when starting this line
         
+        //calibrate();
+
         async motion.go(POI::b2);
         //async motion.go(POI::b2);
         
@@ -48,6 +50,8 @@ void recalage(){
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::AB,100);
 
+        //calibrate();
+
         async motion.go(POI::y2);
         //async motion.go(POI::y2);
 
@@ -59,6 +63,12 @@ void recalage(){
     }
     //motion.disengage();
     motion.setFeedrate(1.0);
+
+
+
+    
+
+
     initPump(); //TODO : Integrate into Actuators 
 }
 
@@ -421,21 +431,60 @@ RobotCompass previousActuator(RobotCompass rc){
     return static_cast<RobotCompass>((static_cast<int>(rc) + RobotCompassSize - 2) % RobotCompassSize);
 }
 
+
+void calibrate(){
+    motion.disableCruiseMode();
+    //motion.cancelOnCollide(false);
+
+    bool isYellow = ihm.isColor(Settings::YELLOW);
+
+    float start = localisation.getPosition().x;
+    float distance = 0;
+    float distanceGoal = 400;
+    float scale = 0;
+    float current = 0;
+
+    for(int i = 0; i < 3; i++){
+        start = localisation.getPosition().x;
+	    async motion.goPolar(0,distanceGoal);
+        current = localisation.getPosition().x;
+        distance = fabs(current - start);
+        Console::info() << "distance : " << current - start << "|" << 400 << Console::endl;
+        scale = distanceGoal/distance;
+        localisation.setLinearScale(scale);
+
+        start = localisation.getPosition().x;
+	    async motion.goPolar(0,-distanceGoal);
+        current = localisation.getPosition().x;
+        distance = fabs(current - start);
+        Console::info() << "distance : " << current - start << "|" << 400 << Console::endl;
+        scale = distanceGoal/distance;
+        localisation.setLinearScale(scale);
+
+        
+    }
+
+    //motion.cancelOnCollide(false);
+    motion.enableCruiseMode();
+}
+
+
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist, float probeDist, float feedrate){
     
 	boolean wasAbsolute = motion.isAbsolute();
     float currentFeedrate = motion.getFeedrate();
-    motion.disableCruiseMode();
+    
     
     motion.setFeedrate(feedrate);
-	async motion.align(rc, getCompassOrientation(tc));//here crash
-    
+	async motion.align(rc, getCompassOrientation(tc));
     motion.setRelative();
 
+    motion.disableCruiseMode();
     motion.cancelOnCollide(true);
 	async motion.goPolar(getCompassOrientation(rc),approachDist);
 	async motion.goPolar(getCompassOrientation(rc),probeDist);
     motion.cancelOnCollide(false);
+    motion.enableCruiseMode();
     
 	float _offset = getOffsets(rc);
     Console::println(_offset);

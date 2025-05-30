@@ -111,7 +111,15 @@ void Localisation::calibrate() {
     // Calibrate the IMU, which removes the accelerometer and gyroscope offsets
     otos.calibrateImu(400, true);
     //otos.setLinearScalar(1.05f);//maison
-    otos.setLinearScalar(0.955f);//coupe
+    otos.setLinearScalar(m_scale);//coupe
     Console::println("done.");
     m_calibrated = true;
+}
+
+void Localisation::setLinearScale(float value){
+    //Console::info() << "new value : " << value << Console::endl;
+    m_scale = value;
+    Console::info() << "new scale : " ;
+    Serial.println(m_scale, 5);
+    otos.setLinearScalar(m_scale);//coupe
 }

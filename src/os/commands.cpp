@@ -48,6 +48,8 @@ void registerCommands() {
     CommandHandler::registerCommand("music", " Play a sound", command_music);
     CommandHandler::registerCommand("radar", " Toogle radar view on neopixel", command_radar);
     CommandHandler::registerCommand("test", " Dummy Test function ", command_test);
+    CommandHandler::registerCommand("scale(value)", " Set otos linear scale", command_otos_scale);
+    CommandHandler::registerCommand("calibrate", " calibrate otos linear scale", command_otos_calibration);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -273,6 +275,17 @@ void command_cancel(const args_t& args){
     motion.cancel();
 }
 
+
+void command_otos_calibration(const args_t& args){
+    calibrate();
+}
+
+
+void command_otos_scale(const args_t& args){
+    if(args.size() != 1)return;
+    float x = args[0].toFloat();
+    localisation.setLinearScale(x);
+}
 
 void command_align(const args_t& args){
     /**/

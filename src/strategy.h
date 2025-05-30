@@ -30,4 +30,5 @@ extern Adafruit_PWMServoDriver pwm;
 
 RobotCompass nextActuator(RobotCompass rc);         //Recupere l'orientation de l'actionneur suivant
 RobotCompass previousActuator(RobotCompass rc);     //Recupere l'orientation de l'actionneur précedant
+void calibrate();
 void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approachDist = 200.0, float probeDist = 80.0, float feedrate = 0.2 );

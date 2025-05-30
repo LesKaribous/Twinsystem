@@ -58,14 +58,15 @@ void Motion::onRunning(){
         ,100)
         /**/
 
-        if( use_cancel_on_collide && cruise_controller.collision()) cruise_controller.cancel();
+        if( current_move_cruised && use_cancel_on_collide && cruise_controller.collision()) cruise_controller.cancel();
 
-        /*
-        if(current_move_cruised)
-            cruise_controller.run();
-        else 
-            stepper_controller.run();
-        */
+
+        
+        if(!current_move_cruised) stepper_controller.exec();
+            //cruise_controller.exec();
+        //else 
+            
+        
     }
 }
 
@@ -290,7 +291,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
     Vec3 _relTarget = toRelativeTarget(_target);
 
     //resetSteps();
-    if(true || use_cruise_mode && _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE && localisation.enabled()){
+    if(use_cruise_mode /*&& _relTarget.mag() > Settings::Motion::MIN_CRUISE_DISTANCE*/ && localisation.enabled()){
         //Cuise mode
         cruise_controller.reset();
         stepper_controller.reset();
@@ -298,6 +299,7 @@ Motion&  Motion::move(Vec3 target){ //target is in world frame of reference
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
         current_move_cruised = true;
+
     }else{
         //Stepper Controller
         current_move_cruised = false;
