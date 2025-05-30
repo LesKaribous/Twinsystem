@@ -27,14 +27,17 @@ void recalage(){
     motion.engage();
     //motion.disableCruiseMode();
     
-    motion.setFeedrate(0.1);
-    motion.setAbsPosition(Vec3(0,0,DEG_TO_RAD * 90));
     waitMs(600);
 
     if(ihm.isColor(Settings::BLUE)){
+        motion.setAbsPosition(Vec3(1550 + 138.5 ,2000 - getOffsets(RobotCompass::BC),DEG_TO_RAD * 90));
+
+        /*
+        motion.setFeedrate(0.2);
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::EAST,  RobotCompass::CA,100);//when starting this line
-        
+        motion.setFeedrate(1.0);
+        */
         //calibrate();
 
         async motion.go(POI::b2);
@@ -47,9 +50,13 @@ void recalage(){
         actuators.storePlank(RobotCompass::CA);
 
     }else{
+        motion.setAbsPosition(Vec3(1450 - 138.5 ,2000 - getOffsets(RobotCompass::BC),DEG_TO_RAD * 90));
+        /*
+        motion.setFeedrate(0.2);
         probeBorder(TableCompass::SOUTH, RobotCompass::BC,100);
         probeBorder(TableCompass::WEST,  RobotCompass::AB,100);
-
+        motion.setFeedrate(1.0);
+        */
         //calibrate();
 
         async motion.go(POI::y2);
@@ -63,7 +70,7 @@ void recalage(){
     }
     //motion.disengage();
     motion.setFeedrate(1.0);
-
+    
 
 
     
@@ -436,8 +443,6 @@ void calibrate(){
     motion.disableCruiseMode();
     //motion.cancelOnCollide(false);
 
-    bool isYellow = ihm.isColor(Settings::YELLOW);
-
     float start = localisation.getPosition().x;
     float distance = 0;
     float distanceGoal = 400;
@@ -447,7 +452,7 @@ void calibrate(){
     for(int i = 0; i < 3; i++){
         start = localisation.getPosition().x;
 	    async motion.goPolar(0,distanceGoal);
-        current = localisation.getPosition().x;
+        current = Vec2(localisation.getPosition()).mag();
         distance = fabs(current - start);
         Console::info() << "distance : " << current - start << "|" << 400 << Console::endl;
         scale = distanceGoal/distance;
@@ -455,7 +460,7 @@ void calibrate(){
 
         start = localisation.getPosition().x;
 	    async motion.goPolar(0,-distanceGoal);
-        current = localisation.getPosition().x;
+        current = Vec2(localisation.getPosition()).mag();
         distance = fabs(current - start);
         Console::info() << "distance : " << current - start << "|" << 400 << Console::endl;
         scale = distanceGoal/distance;

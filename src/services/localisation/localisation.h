@@ -26,7 +26,7 @@ public:
     SINGLETON(Localisation)
 
 private : 
-    float m_scale = 0.955f;
+    float m_scale = 0.9714f;
     bool m_use_IMU = false;
     bool m_connected = false;
     bool m_calibrated = false;
