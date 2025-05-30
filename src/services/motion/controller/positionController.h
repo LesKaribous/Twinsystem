@@ -40,9 +40,9 @@ private:
     float m_feedrate = 1.0;
 
     int collisionCounter = 0; // Reset on movement or normal progress
-    constexpr static int COLLISION_THRESHOLD = 40; // avoid move initial drift
-    constexpr static float COLLISION_VELOCITY_DIFF = 0.2f; // %
-    static constexpr int     COLLISION_COUNT_LIMIT= 50;      // need 3 successive fails
+    constexpr static int COLLISION_THRESHOLD = 30; // avoid move initial drift
+    constexpr static float COLLISION_VELOCITY_DIFF = 0.1f; // %
+    static constexpr int     COLLISION_COUNT_LIMIT= 300;      // need 3 successive fails
 
     void deccelerate();
 

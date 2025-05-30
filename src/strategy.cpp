@@ -28,7 +28,7 @@ void recalage(){
     //motion.disableCruiseMode();
     
     waitMs(600);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     if(ihm.isColor(Settings::BLUE)){
         motion.setAbsPosition(Vec3(1550 + 138.5 ,2000 - getOffsets(RobotCompass::BC),DEG_TO_RAD * 90));
 
@@ -94,7 +94,7 @@ void matchB(){
     bool isYellow = ihm.isColor(Settings::YELLOW);
     motion.enableCruiseMode();
     // -------------------------------------------
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     // Step 2 - POI BannerYellow
     /*
     async motion.go(
@@ -104,7 +104,7 @@ void matchB(){
     );*/
 
     probeBorder(TableCompass::SOUTH, RobotCompass::BC, 0);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     //---- Drop Banner ----
     actuators.moveElevator(RobotCompass::BC, ElevatorPose::DOWN);
     ihm.addScorePoints(Score::BannerPoints);
@@ -311,9 +311,9 @@ void takeStockFast(Vec2 target, RobotCompass rc, TableCompass tc){
     actuators.grab(rc);
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -30,50);
     waitMs(delayTime);
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     async motion.go(grab);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     //async motion.go(grab); // double to be sure
     //actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -30,50);
     actuators.grabPlank(rc);
@@ -369,9 +369,9 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
 
     motion.setFeedrate(0.2);
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     async motion.go(grab);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     motion.setFeedrate(0.6);
 
     //async motion.go(grab); // double to be sure
@@ -392,9 +392,9 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
 
     motion.setFeedrate(0.2);
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     async motion.go(grab);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     motion.setFeedrate(0.8);
 
     //async motion.go(grab); // double to be sure
@@ -410,10 +410,10 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     actuators.grab(nextCompass);
     waitMs(delayTime);
 
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     motion.setFeedrate(0.4);
     async motion.go(canA_take);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     motion.setFeedrate(0.8);
     async motion.go(canA_safe); 
     
@@ -425,10 +425,10 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     async motion.go(canB); 
     waitMs(delayTime);
 
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
     motion.setFeedrate(0.4);
     async motion.go(canB_take);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     motion.setFeedrate(0.8);
     async motion.go(canB_safe); 
 
@@ -569,10 +569,10 @@ void probeBorder(TableCompass tc, RobotCompass rc, float clearance, float approa
     
     motion.setRelative();
 
-    motion.cancelOnCollide(true);
+    //motion.cancelOnCollide(true);
 	async motion.goPolar(getCompassOrientation(rc),approachDist);
 	async motion.goPolar(getCompassOrientation(rc),probeDist);
-    motion.cancelOnCollide(false);
+    //motion.cancelOnCollide(false);
     
 	float _offset = getOffsets(rc);
     Console::println(_offset);

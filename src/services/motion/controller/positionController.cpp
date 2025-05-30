@@ -229,7 +229,7 @@ void PositionController::onUpdate(){
     */
 
 
-
+    /*
     float velocityError = Vec2(target_velocity).mag() - Vec2(velocity).mag();
     bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(target_velocity).mag();
 
@@ -244,6 +244,30 @@ void PositionController::onUpdate(){
         (fabs(startPos.x - position.x) < 80 && fabs(startPos.y - position.y) < 80 ) && fabs(startPos.z - position.z) < 5.0 * DEG_TO_RAD){
         collisionCounter++;
     }
+    */
+
+    /*
+    float velocityError = Vec2(target_velocity).mag() - Vec2(velocity).mag();
+    bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(target_velocity).mag();
+
+    if (possibleCollision && target_velocity.mag() > COLLISION_THRESHOLD) {
+        collisionCounter+=2;
+    } else {
+        collisionCounter -= 1;
+        if(collisionCounter < 0) collisionCounter = 0;
+    }*/
+
+    Vec3 wheelVelocity = controller.getCurrentVelocity();
+    if (fabs(wheelVelocity.mag()) > COLLISION_THRESHOLD && fabs(velocity.x) < COLLISION_THRESHOLD * 3.0) {
+        collisionCounter+=2;
+    } else {
+        collisionCounter-=1;
+        if(collisionCounter < 0) collisionCounter = 0;
+    }
+
+    RUN_EVERY(
+        Console::info() << controller.getCurrentVelocity() << "|" << velocity << Console::endl;
+    ,100)
 
 
 

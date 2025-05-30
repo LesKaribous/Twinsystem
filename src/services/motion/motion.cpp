@@ -33,7 +33,7 @@ void Motion::attach(){
 
     _controlPoint   = {0,0};
 	_absolute = true;
-
+    cancelOnCollide(true);
     pinMode(Pin::Stepper::enable, OUTPUT);
 }
 
