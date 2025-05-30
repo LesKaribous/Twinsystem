@@ -114,15 +114,15 @@ namespace Settings{
         const float MAX_PID_DELAY = 10;
 
         const float 
-        MAX_ROT_ACCEL = 30.0, // rad/s^2 5.6
-        MAX_ROT_SPEED = 10, // rad/s
+        MAX_ROT_ACCEL = 50.0f * 3.14f, // rad/s^2 5.6
+        MAX_ROT_SPEED = 4.0f * 3.14f ,//3.14, // rad/s
         MIN_ANGLE = 2.0 * DEG_TO_RAD; // Target stop thresold //mm
 
         const float 
         //STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 2000, // mm/s^2 300
+        MAX_ACCEL = 30000, // mm/s^2 300
        // MAX_SPEED = 300, // mm/s 1600      otos max Tracking speed: 2.5m/s
-        MAX_SPEED = 1800, // mm/s 1600      otos max Tracking speed: 2.5m/s
+        MAX_SPEED = 6000,//3800 // mm/s 1600      otos max Tracking speed: 2.5m/s
         MIN_DISTANCE = 20; // Target stop thresold //mm
         
         const int
@@ -130,7 +130,7 @@ namespace Settings{
         PID_MAX_PERIOD = 10,//ms
         PID_MIN_PERIOD = 5,//ms
         */
-        PID_INTERVAL = 5000, //microseconds
+        PID_INTERVAL = 16000, //microseconds
         PID_MIN_INTERVAL = PID_INTERVAL/2; //microseconds
     }
 
@@ -153,7 +153,7 @@ namespace Settings{
         MAX_ACCEL = 3000, // equivalent fullsteps/s^2
         MAX_SPEED = 15000, // equivalent fullsteps/s
         MIN_SPEED = 20,
-        STEPPER_DELAY = 100,//µs Steps every 1000 µs seconds
+        STEPPER_DELAY = 50,//µs Steps every 1000 µs seconds
         MIN_STEP_DELAY = 20,
         MIN_STEPS = 5,
         STEPPER_COMPUTE_DELAY = 1000,//µs Steps every 1000 µs seconds

@@ -174,11 +174,13 @@ void command_radar(const args_t &args){
 }
 
 void command_test(const args_t &args){
-    motion.setAbsPosition({913, 1440, 90 * DEG_TO_RAD});
+    motion.setAbsPosition({700, 1460, 90 * DEG_TO_RAD});
     //bool isYellow = ihm.isColor(Settings::YELLOW);
     initPump();
     actuators.storePlank(RobotCompass::CA);
     actuators.storePlank(RobotCompass::AB);
+
+
 
     takeStock(
     choose(true,
@@ -190,8 +192,19 @@ void command_test(const args_t &args){
 
     waitMs(2000);
     motion.goPolar(getCompassOrientation(TableCompass::NORTH), -200);
+
+    buildTribune(
+        Vec2(1100-400, 1050+100),
+        RobotCompass::AB,
+        TableCompass::WEST
+    );
+
+
     actuators.drop(RobotCompass::AB);
     actuators.drop(RobotCompass::CA);
+
+    actuators.dropPlank(RobotCompass::AB);
+    actuators.dropPlank(RobotCompass::CA);
 
 }
 

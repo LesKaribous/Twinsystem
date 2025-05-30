@@ -67,7 +67,7 @@ void Localisation::setPosition(Vec3 newPos){
     pos.x = -newPos.y/1000.0;
     pos.y = -newPos.x/1000.0;
     pos.h = newPos.z;
-    otos.resetTracking(); // WIP
+    //otos.resetTracking(); // WIP
     otos.setPosition(pos);
     _unsafePosition = newPos;
 }

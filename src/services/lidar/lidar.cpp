@@ -41,12 +41,12 @@ void Lidar::disable(){
 }
 
 void Lidar::showRadarLED(){
-    intercom.sendMessage("on");
+    intercom.sendRequest("on");
     Console::println("displayLidar");
 }
 
 void Lidar::showStatusLED(){
-    intercom.sendMessage("off");
+    intercom.sendRequest("off");
     //Console::println("displayIntercom");
 }
 

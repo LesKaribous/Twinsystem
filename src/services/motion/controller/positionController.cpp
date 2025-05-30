@@ -19,9 +19,12 @@ PositionController::PositionController() :
     target_velocity(0.0f, 0.0f, 0.0f),
     newTarget(0.0f, 0.0f),
     collisionCounter(0),
-    vx_controller  (4.0, 0.0, 100.0),
-    vy_controller  (4.0, 0.0, 100.0),
-    vrot_controller(10, 0.0, 70.0)
+    // vx_controller  (4.0, 0.0,100.0),
+    // vy_controller  (4.0, 0.0, 100.0),
+    // vrot_controller(10, 0.0,70.0)
+    vx_controller  (3.2, 0, 0.0),
+    vy_controller  (3.2, 0, 0.0),
+    vrot_controller(30.0, 0, 0.6)
 {
     //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
     //controller.enable();
@@ -196,29 +199,74 @@ void PositionController::onUpdate(){
         saturatedY = desired.y == -Settings::Motion::MAX_SPEED || desired.x == Settings::Motion::MAX_SPEED;
 
         static bool saturatedZ = false;
-        float vz_target = vrot_controller.compute(angle, dt, saturatedZ);
-        desired.c = std::clamp(vz_target, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
+        desired.z = vrot_controller.compute(angle, dt, saturatedZ);
+        desired.c = std::clamp(desired.c, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
         saturatedZ = desired.c == -Settings::Motion::MAX_ROT_SPEED * m_feedrate || desired.c == Settings::Motion::MAX_ROT_SPEED * m_feedrate;
     }
 
+    /*
+    Vec2 velocityDiff = Vec2(target_velocity - desired);
+    if(velocityDiff.mag() > Settings::Motion::MAX_ACCEL * 3.0){ //Stalled{
+        target_velocity.x = 0.1 * velocity.x + 0.9 * target_velocity.x;
+        target_velocity.y = 0.1 * velocity.y + 0.9 * target_velocity.y;
+    }
+    
+    float rotVelDiff = fabs(target_velocity.c - desired.c);
+    if(rotVelDiff > Settings::Motion::MAX_ROT_ACCEL * 2.0){ //Stalled{
+        target_velocity.z = 0.1 * velocity.z + 0.9 * target_velocity.z;
+    }*/
+    //target_velocity = desired;
+    //target_velocity = velocity;
+    
+
+    /*
     if(desired.x > target_velocity.x) target_velocity.x += Settings::Motion::MAX_ACCEL * dt;
     if(desired.x < target_velocity.x) target_velocity.x -= Settings::Motion::MAX_ACCEL * dt;
     if(desired.y > target_velocity.y) target_velocity.y += Settings::Motion::MAX_ACCEL * dt;
     if(desired.y < target_velocity.y) target_velocity.y -= Settings::Motion::MAX_ACCEL * dt;
     if(desired.z > target_velocity.z) target_velocity.c += Settings::Motion::MAX_ROT_ACCEL * dt;
     if(desired.z < target_velocity.z) target_velocity.c -= Settings::Motion::MAX_ROT_ACCEL * dt;
+    */
 
-    target_velocity += (velocity - target_velocity)*0.01;
+
+
+    float velocityError = Vec2(target_velocity).mag() - Vec2(velocity).mag();
+    bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(target_velocity).mag();
+
+    if (possibleCollision && target_velocity.mag() > COLLISION_THRESHOLD) {
+        collisionCounter++;
+    } else {
+        collisionCounter = 0;
+    }
+    
+
+    if(millis() - moveStart > 4000 && 
+        (fabs(startPos.x - position.x) < 80 && fabs(startPos.y - position.y) < 80 ) && fabs(startPos.z - position.z) < 5.0 * DEG_TO_RAD){
+        collisionCounter++;
+    }
+
+
+
+
+    Vec3 velocityDiff = desired - velocity;
+    velocityDiff.x = std::clamp(velocityDiff.x, -Settings::Motion::MAX_ACCEL*dt, Settings::Motion::MAX_ACCEL * dt);
+    velocityDiff.y = std::clamp(velocityDiff.y, -Settings::Motion::MAX_ACCEL*dt, Settings::Motion::MAX_ACCEL * dt);
+    velocityDiff.z = std::clamp(velocityDiff.z, -Settings::Motion::MAX_ROT_ACCEL*dt, Settings::Motion::MAX_ROT_ACCEL*dt);
+
+    target_velocity = velocity + velocityDiff;
+
+
+    //target_velocity += (velocity - target_velocity)*0.01;
 
 
     Vec3 final_target_velocity = target_velocity;
-    if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
-    if(fabs(error.y) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
-    if(fabs(angle) < Settings::Motion::MIN_ANGLE && fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
+    if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.x) < 90) final_target_velocity.x = 0;
+    if(fabs(error.y) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.y) < 90) final_target_velocity.y = 0;
+    if(fabs(angle) < Settings::Motion::MIN_ANGLE && fabs(target_velocity.c) < 0.08) final_target_velocity.c = 0;
 
-    std::clamp(final_target_velocity.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-    std::clamp(final_target_velocity.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-    std::clamp(final_target_velocity.z, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
+    final_target_velocity.x = std::clamp(final_target_velocity.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
+    final_target_velocity.y = std::clamp(final_target_velocity.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
+    final_target_velocity.z = std::clamp(final_target_velocity.z, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
 
     if(final_target_velocity.magSq() > 0){
         final_target_velocity.rotateZ(position.c);
@@ -233,25 +281,11 @@ void PositionController::onUpdate(){
             //     onCanceled();
             // }
         controller.setTargetVelocity(Vec3(0));
-
     }
 
     //Velocity based collisions
     /**/
-    float velocityError = Vec2(final_target_velocity).mag() - Vec2(velocity).mag();
-    bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(final_target_velocity).mag();
 
-    if (possibleCollision && final_target_velocity.mag() > COLLISION_THRESHOLD) {
-        collisionCounter++;
-    } else {
-        collisionCounter = 0;
-    }
-    
-
-    if(millis() - moveStart > 4000 && 
-        (fabs(startPos.x - position.x) < 80 && fabs(startPos.y - position.y) < 80 ) && fabs(startPos.z - position.z) < 5.0 * DEG_TO_RAD){
-        collisionCounter++;
-    }
 
 
 
