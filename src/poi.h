@@ -16,14 +16,14 @@ namespace POI{
 
     // ------------------------------------------
     // Construction Areas
-    const Vec2 constAreaYellow_1 = Vec2(775,2000);//1940
-    const Vec2 constAreaYellow_2 = Vec2(1300,1850);
+    const Vec2 constAreaYellow_1 = Vec2(775,1800) + Vec2(0,200);//1940
+    const Vec2 constAreaYellow_2 = Vec2(1300,1800) + Vec2(0,50);
     const Vec2 constAreaYellowBelow_2 = Vec2(1300,1650);
     const Vec2 constAreaYellow_3 = Vec2(2800,1125);
     const Vec2 constAreaYellow_4 = Vec2(2775,1800);
 
-    const Vec2 constAreaBlue_1 = Vec2(2225,2000);
-    const Vec2 constAreaBlue_2 = Vec2(1700,1850);
+    const Vec2 constAreaBlue_1 = Vec2(2225,1800) + Vec2(0,200);
+    const Vec2 constAreaBlue_2 = Vec2(1700,1850) + Vec2(0,50);
     const Vec2 constAreaBlueBelow_2 = Vec2(1700,1650);
     const Vec2 constAreaBlue_3 = Vec2(200,1125);
     const Vec2 constAreaBlue_4 = Vec2(225,1800);
@@ -43,13 +43,13 @@ namespace POI{
     // ------------------------------------------
     //  Raw Material stock
     const Vec2 stock_1 = Vec2(75,675);
-    const Vec2 stock_2 = Vec2(75,1600);
-    const Vec2 stock_3 = Vec2(765,1710); //775 1750
-    const Vec2 stock_4 = Vec2(1100,1050);// + Vec2(50,0);
+    const Vec2 stock_2 = Vec2(75,1600) + Vec2(80,0);
+    const Vec2 stock_3 = Vec2(775,1750) + Vec2(-10,0);
+    const Vec2 stock_4 = Vec2(1100,1050);
 
     const Vec2 stock_5 = Vec2(1900,1050);
-    const Vec2 stock_6 = Vec2(2225,1750);
-    const Vec2 stock_7 = Vec2(2925,1600);
+    const Vec2 stock_6 = Vec2(2225,1750) + Vec2(0,0);
+    const Vec2 stock_7 = Vec2(2925,1600) + Vec2(0,0);
     const Vec2 stock_8 = Vec2(2925,675);
 
     // ------------------------------------------

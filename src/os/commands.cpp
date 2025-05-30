@@ -174,7 +174,8 @@ void command_radar(const args_t &args){
 }
 
 void command_test(const args_t &args){
-    motion.setAbsPosition({700, 1460, 90 * DEG_TO_RAD});
+    motion.setAbsPosition({720, 1440, 90 * DEG_TO_RAD});
+    delay(1000);
     //bool isYellow = ihm.isColor(Settings::YELLOW);
     initPump();
     actuators.storePlank(RobotCompass::CA);

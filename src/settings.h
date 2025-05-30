@@ -115,12 +115,12 @@ namespace Settings{
 
         const float 
         MAX_ROT_ACCEL = 50.0f * 3.14f, // rad/s^2 5.6
-        MAX_ROT_SPEED = 4.0f * 3.14f ,//3.14, // rad/s
+        MAX_ROT_SPEED = 3.0f * 3.14f ,//3.14, // rad/s
         MIN_ANGLE = 2.0 * DEG_TO_RAD; // Target stop thresold //mm
 
         const float 
         //STOP_DECCEL = 10000, // mm/s^2
-        MAX_ACCEL = 30000, // mm/s^2 300
+        MAX_ACCEL = 38000, // mm/s^2 300
        // MAX_SPEED = 300, // mm/s 1600      otos max Tracking speed: 2.5m/s
         MAX_SPEED = 6000,//3800 // mm/s 1600      otos max Tracking speed: 2.5m/s
         MIN_DISTANCE = 20; // Target stop thresold //mm
