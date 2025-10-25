@@ -1,7 +1,7 @@
 #pragma once
 
 #include "kinematics.h"
-#include "settings.h"
+#include "config/settings.h"
 
 //Kinematics
 //Kinematics

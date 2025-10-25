@@ -1,7 +1,7 @@
 #include "services/motion/motion.h"
 #include "utils/geometry.h"
 #include "kinematics.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "os/console.h"
 #include "motion.h"
 #include "utils/timer/timer.h"

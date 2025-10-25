@@ -1,5 +1,5 @@
 #pragma once
-#include "settings.h"
+#include "config/settings.h"
 #include "services/service.h"
 #include "os/jobs/job.h"
 

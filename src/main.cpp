@@ -1,8 +1,7 @@
 
 #include "os/console.h"
-
-#include "routines.h"
-#include "robot.h"
+#include "program/routines.h"
+#include "config/env.h"
 
 void setup(){
 	Console::init();
@@ -24,21 +23,3 @@ void setup(){
 void loop(){
 	os.run();	//update the services and run the current routine
 }
-
-
-/*
-#include <Arduino.h>
-#include <Servo.h>
-Servo myservo;
-
-void setup(){
-	myservo.attach(16);
-}
-
-void loop(){
-	delay(1000);
-	myservo.write(32);
-	delay(1000);
-	myservo.write(180);
-}
-*/

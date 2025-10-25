@@ -1,5 +1,5 @@
 #include "ihm.h"
-#include "text.h"
+#include "config/text.h"
 #include "notes.h"
 #include "os/console.h"
 

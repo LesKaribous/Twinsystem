@@ -1,7 +1,7 @@
 #include "strategy.h"
-#include "poi.h"
-#include "score.h"
-#include "robot.h"
+#include "config/poi.h"
+#include "config/score.h"
+#include "config/env.h"
 #include "routines.h"
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();

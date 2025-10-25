@@ -2,9 +2,9 @@
 #include "services/service.h"
 #include "services/ihm/fields.h"
 #include "services/ihm/button.h"
-#include "settings.h"
+#include "config/settings.h"
+#include "config/pin.h"
 #include "utils/geometry.h"
-#include "pin.h"
 
 #ifdef TEENSY35
 #include <ILI9341_t3n.h>

@@ -1,8 +1,8 @@
 #include "commands.h"
-#include "robot.h"
-#include "routines.h"
-#include "strategy.h"
-#include "poi.h"
+#include "config/env.h"
+#include "program/routines.h"
+#include "program/strategy.h"
+#include "config/poi.h"
 
 void registerCommands() {
     CommandHandler::registerCommand("start", "Start Match", command_start);

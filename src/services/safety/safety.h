@@ -1,5 +1,5 @@
 #include "services/service.h"
-#include "settings.h"
+#include "config/settings.h"
 
 class Safety : public Service{
 public:

@@ -1,5 +1,5 @@
 #pragma once
-#include "pin.h"
+#include "config/pin.h"
 
 struct ManipulatorProperties{
     //Pins and IDs

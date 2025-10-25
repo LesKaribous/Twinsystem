@@ -1,5 +1,5 @@
 #include "actuators.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "os/console.h"
 #include "services/ihm/ihm.h"
 

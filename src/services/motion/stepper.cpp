@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 #include "stepper.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "os/console.h"
 
 Stepper::Stepper(int step, int dir, bool inverted)

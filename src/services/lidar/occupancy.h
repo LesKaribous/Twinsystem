@@ -1,7 +1,7 @@
 #pragma once
 #include "utils/geometry.h"
 #include "os/singleton.h"
-#include "settings.h"
+#include "config/settings.h"
 
 class OccupancyMap{
 public:

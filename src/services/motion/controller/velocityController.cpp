@@ -1,6 +1,6 @@
 #include "velocityController.h"
-#include "settings.h"
-#include "pin.h"
+#include "config/settings.h"
+#include "config/pin.h"
 #include "os/console.h"
 #include "services/motion/kinematics.h"
 

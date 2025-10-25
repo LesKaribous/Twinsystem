@@ -1,9 +1,9 @@
 #include "routines.h"
 #include "os/commands.h"
-#include "robot.h"
+#include "config/env.h"
 #include "strategy.h"
-#include "poi.h"
-#include "score.h"
+#include "config/poi.h"
+#include "config/score.h"
 #include "os/os.h"
 #include "utils/timer/timer.h"
 

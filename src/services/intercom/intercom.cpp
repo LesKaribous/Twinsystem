@@ -1,6 +1,6 @@
 #include "intercom.h"
 #include "os/console.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "comUtilities.h"
 
 SINGLETON_INSTANTIATE(Intercom, intercom)

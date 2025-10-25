@@ -1,6 +1,6 @@
 #pragma once
 #include "services/service.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "occupancy.h"
 
 class Lidar : public Service{

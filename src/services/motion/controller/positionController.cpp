@@ -1,6 +1,6 @@
 
 #include "positionController.h"
-#include "settings.h"
+#include "config/settings.h"
 #include "os/console.h"
 #include "services/lidar/occupancy.h"
 #include "services/localisation/localisation.h"

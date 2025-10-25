@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "utils/geometry.h"
-#include "settings.h"
+#include "config/settings.h"
 
 // Represents an individual stepper motor.
 class Stepper {
