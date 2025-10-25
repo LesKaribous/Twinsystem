@@ -2,16 +2,13 @@
 #include "services/service.h"
 #include "utils/interpreter/program.h"
 #include "utils/timer/timer.h"
-#include "threads/tw_threads.h"
+#include "cycles.h"
 #include <map>
 #include <list>
 #include <stack>
 #include <string>
 
 class Service;
-class ThreadedService;
-using routine_ptr = void (*)();
-using routine_arg = void*;
 
 #define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
 #define CPU_RESTART_VAL 0x5FA0004
@@ -28,6 +25,7 @@ public:
         MANUAL_PROGRAM, // idle program (not really a state since IDLE will be executed during program)
     };
 
+    void init();
     void start();
     void reboot();
     void stop();

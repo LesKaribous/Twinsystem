@@ -70,21 +70,3 @@ public:
     static String toString(ServiceID);
     String toString() const;
 };
-
-
-
-class ThreadedService : public Service{
-protected:
-    std::thread *servicethread;
-	virtual void runThreaded(void *arg) = 0;
-public:    
-    ThreadedService(ServiceID id) : Service(id){
-        m_threaded = true;
-    };
-
-    static void runThread(void *arg)
-	{
-		ThreadedService *_runnable = static_cast<ThreadedService*> (arg);
-		_runnable->runThreaded(arg);
-	}
-};

@@ -6,6 +6,10 @@ OS OS::m_instance;
 
 OS& os = OS::instance();
 
+void OS::init(){
+    cycle_manager.instance().start();
+}
+
 void OS::run(){
     RUN_EVERY(
     switch(m_state){
