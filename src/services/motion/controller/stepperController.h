@@ -54,7 +54,9 @@ public:
     void complete() override;//Set to COMPLETED
     void pause() override;  //Set to CANCELLED
     void resume() override;//Set to COMPLETED
-    void control() override;;
+    
+    void step() override;
+    void control() override;
 
     void onUpdate();
     void onCanceling() override;

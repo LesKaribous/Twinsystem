@@ -55,9 +55,16 @@ void registerCommands() {
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
     CommandHandler::registerCommand("recalage()", "Execute recalage routine", command_recalage);
     CommandHandler::registerCommand("print(value)", "Print the result of an expression in the terminal", command_print);
+    CommandHandler::registerCommand("stats", "Print cyclic stats", command_stats);
     CommandHandler::registerCommand("help", "Display help", command_help);
 
     
+}
+
+void command_stats(const args_t& args){
+    Console::info("Interpreter") << "Stats: " << Console::endl;
+    Console::info() << "10us cycle footprint: " << cycle_manager.getCycleFootprint_ms(CycleFrequency::T_10US) << "ms" << Console::endl;
+    Console::info() << "1ms cycle footprint: " << cycle_manager.getCycleFootprint_ms(CycleFrequency::T_1MS) << "ms" << Console::endl;
 }
 
 void command_enable(const args_t& args){

@@ -11,7 +11,7 @@
 //           Main programs
 // -------------------------------------
 
-void robotProgramAuto(){
+void programAuto(){
     Console::println("Started match");
     ihm.setPage(IHM::Page::MATCH);
     lidar.enable();
@@ -23,20 +23,7 @@ void robotProgramAuto(){
     //motion.disable();
 }
 
-void robotArmed(){
-    lidar.showRadarLED();
-    ihm.freezeSettings();
-    motion.engage();
-
-    ihm.playTone(329.2, 150);   // C5
-    ihm.playTone(349.2, 150);   // C5
-    ihm.playTone(440, 150);   // C5
-   
-    
-    noTone(Pin::Outputs::buzzer);
-}
-
-void robotProgramManual(){
+void programManual(){
     static bool hadStarter = false;
     static bool buttonWasPressed = false;
 
@@ -124,7 +111,6 @@ void robotProgramManual(){
         noTone(Pin::Outputs::buzzer);
         ihm.resetButton.resetDuration();
 
-
         ihm.playTone(523.25, 150);
         ihm.playTone(659.25, 150);
         ihm.playTone(783.99, 150);
@@ -151,23 +137,32 @@ void robotProgramManual(){
 }
 
 
+
+
+void robotArmed(){
+    lidar.showRadarLED();
+    ihm.freezeSettings();
+    motion.engage();
+
+    ihm.playTone(329.2, 150);   // C5
+    ihm.playTone(349.2, 150);   // C5
+    ihm.playTone(440, 150);   // C5
+   
+    
+    noTone(Pin::Outputs::buzzer);
+}
+
+
 // -------------------------------------
 //           CONTROL LOOP
 // -------------------------------------
 
+void step() {
+    motion.step();
+}
+
 void control() {
-    static const unsigned long CONTROL_PERIOD_US = Settings::Stepper::STEPPER_DELAY;
-    unsigned long lastCall = micros();  
-    while (true) {
-        motion.control();
-        lastCall += CONTROL_PERIOD_US;
-
-        long waitTime = lastCall - micros();
-        if (waitTime > 0)
-            threads.delay_us(waitTime);
-
-        threads.yield();
-    }
+    motion.control();
 }
 
 
@@ -185,8 +180,8 @@ void onRobotBoot(){
     //TODO 
     Console::println("TODO : Add important modifier to moves to dupplicate move");
 
-    ihm.drawBootProgress("Linking actuators...");
-    os.attachService(&actuators); ihm.addBootProgress(10);
+    //ihm.drawBootProgress("Linking actuators...");
+    //os.attachService(&actuators); ihm.addBootProgress(10);
     
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
@@ -257,6 +252,11 @@ void onRobotBoot(){
 
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);
+
+    ihm.playTone(880.00, 120);  // A5
+    ihm.playTone(1174.66, 120); // D6
+    ihm.playTone(1318.51, 200); // E6
+    ihm.playTone(1760.00, 250); // A6
     
 }
 

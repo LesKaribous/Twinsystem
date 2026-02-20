@@ -137,22 +137,23 @@ void Motion::onCanceled(){
 }
 
 void Motion::control(){
-    if(enabled()){
-        /*
-        RUN_EVERY(
-            Vec3 position = estimatedPosition();
-            if(position != _position && current_move_cruised){
-                _position = position;
-                cruise_controller.setPosition(position);
-            }
-        , Settings::Motion::PID_MIN_INTERVAL);
-        */
+    SERVICE_METHOD_HEADER
+    
+    if(current_move_cruised)
+        cruise_controller.control();
+    else
+        stepper_controller.control();
 
-        if(current_move_cruised)
-            cruise_controller.control();
-        else
-            stepper_controller.control();
-    }
+}
+
+void Motion::step(){
+    SERVICE_METHOD_HEADER
+
+    if(current_move_cruised)
+        cruise_controller.step();
+    else
+        stepper_controller.step();
+    
 }
 
 void Motion::enable(){
@@ -164,13 +165,13 @@ void Motion::disable(){
 }
 
 void Motion::engage(){
-    if(_engaged) return;
+    SERVICE_METHOD_HEADER
     _engaged = true;
     digitalWrite(Pin::Stepper::enable, Settings::Stepper::ENABLE_POLARITY);
 }
 
 void Motion::disengage(){
-    if(!_engaged) return;
+    SERVICE_METHOD_HEADER
     _engaged = false;
     digitalWrite(Pin::Stepper::enable, !Settings::Stepper::ENABLE_POLARITY);
 }

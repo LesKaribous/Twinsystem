@@ -10,9 +10,9 @@ SINGLETON_INSTANTIATE(Actuators, actuators)
 Actuators::Actuators() : Service(ID_ACTUATORS){}
 
 void Actuators::attach(){
+    SERVICE_METHOD_HEADER
     Console::info() << "Actuators activated" << Console::endl;
     pinMode(Pin::Outputs::enTraco, OUTPUT); // Enable Traco to enable Servos
-   
     
     if(ihm.isPrimary()){
         Console::info() << "Building fingers actuators groups" << Console::endl;
@@ -65,6 +65,7 @@ void setServoPos(SmartServo& servo, PlankManipulatorPose pose, int position){
 }
 
 void Actuators::moveElevatorOffset(RobotCompass rc, ElevatorPose pose, int offset, int speed){
+    SERVICE_METHOD_HEADER
     if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR)){
         SmartServo& elevator = getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR);
         elevator.moveTo(elevator.getPose(CAST_POSE(pose)) + offset, speed);
@@ -73,7 +74,7 @@ void Actuators::moveElevatorOffset(RobotCompass rc, ElevatorPose pose, int offse
 
 void Actuators::registerPoses()
 {
-
+    SERVICE_METHOD_HEADER
     // --- AB ---
     //Left
     if(groupAB.hasServo((int)ServoIDs::MAGNET_LEFT)){
@@ -151,7 +152,7 @@ void Actuators::registerPoses()
 }
 
 void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
-
+    SERVICE_METHOD_HEADER
     if(rc == RobotCompass::AB){
         groupAB.createServo(CAST_POSE(ServoIDs::MAGNET_RIGHT), props.magnetRightPin, props.right_Drop);
         groupAB.createServo(CAST_POSE(ServoIDs::ELEVATOR) ,props.elevatorPin, props.elevator_Down);
@@ -168,7 +169,7 @@ void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
 }
 
 void Actuators::createBannerManipulator(RobotCompass rc, BannerManipulatorProperties props){
-    
+    SERVICE_METHOD_HEADER
     //WARNING : Order do matter !
     //See defines in the header
 
@@ -205,6 +206,8 @@ void Actuators::disable(){
 }
 
 void Actuators::drop(RobotCompass rc, int speed){
+    SERVICE_METHOD_HEADER
+
     if(!ihm.isPrimary()) return;
     switch (rc)
     {
@@ -259,6 +262,8 @@ void Actuators::drop(RobotCompass rc, int speed){
 }
 
 void Actuators::grab(RobotCompass rc, int speed){
+    SERVICE_METHOD_HEADER
+    
     if(!ihm.isPrimary()) return;
     switch (rc)
     {
@@ -318,6 +323,8 @@ void Actuators::grab(RobotCompass rc, int speed){
 
 
 void Actuators::dropPlank(RobotCompass rc, int speed){
+    SERVICE_METHOD_HEADER
+
     if(!ihm.isPrimary()) return;
     switch (rc)
     {
@@ -341,6 +348,8 @@ void Actuators::dropPlank(RobotCompass rc, int speed){
 
 
 void Actuators::grabPlank(RobotCompass rc, int speed){
+    SERVICE_METHOD_HEADER
+
     if(!ihm.isPrimary()) return;
     switch (rc)
     {
@@ -363,6 +372,8 @@ void Actuators::grabPlank(RobotCompass rc, int speed){
 }
 
 void Actuators::storePlank(RobotCompass rc, int speed){
+    SERVICE_METHOD_HEADER
+
     if(!ihm.isPrimary()) return;
     switch (rc)
     {

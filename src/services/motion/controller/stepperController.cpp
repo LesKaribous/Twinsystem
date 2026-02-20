@@ -204,17 +204,6 @@ void StepperController::control() {
 
     unsigned long now = micros();
 
-    if (now - m_last_control >= Settings::Stepper::STEPPER_DELAY) {
-        m_last_control = now;
-    }else return;
-
-    // more stable like this...
-    
-    m_sA->step();
-    m_sB->step();
-    m_sC->step();
-    
-
     // --- Throttle logic updates ---
     static unsigned long m_last_compute = micros();
     if (micros() - m_last_compute < Settings::Stepper::STEPPER_COMPUTE_DELAY) return;
@@ -251,6 +240,20 @@ void StepperController::control() {
         Console::success("StepperController") << Console::microTimeStamp() << " : All axes complete, calling complete()" << Console::endl;
         complete();
     }
+}
+
+void StepperController::step() {
+    if (!isBusy()) return;
+
+    unsigned long now = micros();
+
+    if (now - m_last_control >= Settings::Stepper::STEPPER_DELAY) {
+        m_last_control = now;
+    }else return;
+    
+    m_sA->step();
+    m_sB->step();
+    m_sC->step();
 }
 
 void StepperController::onCanceling(){

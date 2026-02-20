@@ -68,13 +68,14 @@ void VelocityController::setTargetVelocity(const Vec3& targetVelocity) {
 }
 
 
-void VelocityController::control() {
+void VelocityController::step() {
     m_sA->step();
     m_sB->step();
     m_sC->step();
     m_current_velocity = (Vec3(m_sA->getVelocity(), m_sB->getVelocity(), m_sC->getVelocity()));
-
 }
+
+void VelocityController::control() {}
 
 Vec3 VelocityController::getCurrentVelocity() const {
     return fk(m_current_velocity);

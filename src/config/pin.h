@@ -107,7 +107,7 @@
                 strategySwitch = 36,
                 twinSwitch = 2;
         }
-
+        
         namespace Outputs{
             const int 
                 enTraco = 28, // Enable Traco regulator - Enable on true
@@ -143,29 +143,29 @@
         
         namespace PCA9685{
             const int
-            PUMP_AB = 0,
-            EV_AB = 1,
+            PUMP_CA_RIGHT = 0,
+            EV_CA_RIGHT = 1,
             //PUMP_BC = 0,
             //EV_BC = 1,
-            PUMP_CA = 2,
-            EV_CA = 3;
+            PUMP_CA_LEFT = 2,
+            EV_CA_LEFT = 3;
         }
 
         // Actuator Pinout
         namespace Servo{
             // Connector Act 1
             // Bloç Servo 1 - BC
-            const int Servo_BC_4 = 17; //Elevator
+            //const int Servo_BC_4 = 20; //Elevator
             // Bloç Servo 2 - AB
-            const int Servo_AB_1 = 23; //Left Magnet
-            const int Servo_AB_2 = 16; //Right Magnet
-            const int Servo_AB_3 = 39; //Plank Gripper
-            const int Servo_AB_4 = 14; //Elevator
+            const int Servo_AB_1 = 14; //gripper base
+            const int Servo_AB_2 = 15; //Right Magnet
+            //const int Servo_AB_3 = 39; //Plank Gripper
+            //const int Servo_AB_4 = 23; //Elevator
             // Bloç Servo 3 - CA
-            const int Servo_CA_1 = 21; //Left Magnet
-            const int Servo_CA_2 = 22; //Right Magnet
-            const int Servo_CA_3 = 20; //Plank Gripper
-            const int Servo_CA_4 = 15; //Elevator
+            const int Servo_CA_1 = 17; //Elevator
+            const int Servo_CA_2 = 22; //Right Ventouse
+            const int Servo_CA_3 = 21; //Left Ventouse
+            //const int Servo_CA_4 = 16; //
         }
     }
 #endif

@@ -89,7 +89,6 @@ void CycleManager::updateStats(CycleFrequency freq, long time){
     cycle_footprint[freq] = time;
 }
 
-
 void CycleManager::registerCycle(CycleFrequency freq, routine_ptr func){
     if(cycleFunctions.find(freq) == cycleFunctions.end()){
         cycleFunctions[freq] = std::list<routine_ptr>();

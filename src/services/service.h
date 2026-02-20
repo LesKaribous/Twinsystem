@@ -43,6 +43,8 @@ SINGLETON_INSTANTIATE(example)
 
 */
 
+#define SERVICE_METHOD_HEADER if(!m_enabled) return;
+
 class Service{
 protected:
     bool m_enabled = false;

@@ -5,6 +5,7 @@
 
 void registerCommands();
 
+void command_stats(const args_t& args);
 void command_enable(const args_t& args);
 void command_disable(const args_t& args);
 void command_status(const args_t& args); //Display all status

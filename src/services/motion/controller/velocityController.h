@@ -14,6 +14,7 @@ public:
     void enable();
     void disable();
 
+    void step() override;
     void control() override;
 
     Vec3 getCurrentVelocity() const;

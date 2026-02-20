@@ -35,6 +35,7 @@ public:
     Motion& align(RobotCompass, float orientation);
     Motion& move(Vec3 target);
 
+    void step();
     void control();
     
     void start() override;

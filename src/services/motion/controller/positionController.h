@@ -10,6 +10,7 @@ public:
     PositionController();
 
     // Call this method every control cycle
+    void step() override;
     void control() override;
 
     void exec() override; 

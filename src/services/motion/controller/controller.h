@@ -5,6 +5,7 @@ class Controller : public Job{
 
 public:
     Controller(){};
+    virtual void step() = 0; //call with an interupt
     virtual void control() = 0; //call with an interupt
 
     void setControlPeriod(long period) { control_period = period; }

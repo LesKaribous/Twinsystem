@@ -324,24 +324,12 @@ void PositionController::onCanceling(){
     }
 }
 
+void PositionController::step() {
+    if(!isBusy()) return;
+    controller.step();
+}
+
 void PositionController::control() {
-
-    /*
-    RUN_EVERY(
-        Console::plot("posx", String(position.x));
-        Console::plot("posy", String(position.y));
-        Console::plot("posz", String(position.z));
-
-        Console::plot("velx", String(velocity.x));
-        Console::plot("vely", String(velocity.y));
-        Console::plot("velz", String(velocity.z));
-
-        Console::plot("tvelx", String(target_velocity.x));
-        Console::plot("tvely", String(target_velocity.y));
-        Console::plot("tvelz", String(target_velocity.z));
-    ,100)
-    */
-
     if(!isBusy()) return;
 
     static long lastTime = 0;
@@ -354,8 +342,6 @@ void PositionController::control() {
         else if(isCompleted()) return;
         else onUpdate();
     }
-
-    controller.control();
 }
 
 void PositionController::deccelerate(){
