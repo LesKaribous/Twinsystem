@@ -5,27 +5,22 @@
 #include "os/jobs/job.h"
 #include "services/actuators/groups.h"
 
-
 enum class ServoIDs : int{
-    MAGNET_RIGHT = 0,
+    GRABBER_RIGHT = 0,
     ELEVATOR = 1,
-    MAGNET_LEFT = 2,
-    PLANKS = 3
+    GRABBER_LEFT = 2,
+    HUGGER_LIFT = 0,
+    HUGGER_GRAB = 1,
 };
 
 enum class ElevatorPose{
     DROP = 0,
     UP = 1,
-    DOWN = 2
+    DOWN = 2,
     //BORDER = 3,
 };
 
 enum class ManipulatorPose{
-    DROP = 0,
-    GRAB = 1
-};
-
-enum class PlankManipulatorPose{
     DROP = 0,
     GRAB = 1,
     STORE = 2,
@@ -61,10 +56,6 @@ private:
 public:
     void drop   (RobotCompass rc, int speed = 100);
     void grab   (RobotCompass rc, int speed = 100);
-
-    void dropPlank   (RobotCompass rc, int speed = 100);
-    void grabPlank   (RobotCompass rc, int speed = 100);
-    void storePlank   (RobotCompass rc, int speed = 100);
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
@@ -73,11 +64,12 @@ public:
     void registerPoses(); //Register all servos poses
 
 private : 
-    bool moveMagnetDual(SmartServo& a,SmartServo& b, ManipulatorPose pose, int speed = 100);
-    bool moveMagnet(SmartServo& servo, ManipulatorPose pose, int speed = 100);
+    bool moveManipulatorDual(SmartServo& a,SmartServo& b, ManipulatorPose pose, int speed = 100);
+    bool moveManipulator(SmartServo& servo, ManipulatorPose pose, int speed = 100);
     bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
+
+    void createHugger(RobotCompass, HuggerProperties);
     void createManipulator(RobotCompass, ManipulatorProperties);
-    void createBannerManipulator(RobotCompass, BannerManipulatorProperties);
 
     SINGLETON(Actuators)
 };

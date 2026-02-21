@@ -155,10 +155,10 @@
         namespace Servo{
             // Connector Act 1
             // Bloç Servo 1 - BC
-            //const int Servo_BC_4 = 20; //Elevator
+            const int Servo_BC_4 = 20; //thermometre
             // Bloç Servo 2 - AB
-            const int Servo_AB_1 = 14; //gripper base
-            const int Servo_AB_2 = 15; //Right Magnet
+            const int Servo_AB_1 = 14; //hugger lift
+            const int Servo_AB_2 = 15; //gripper servo
             //const int Servo_AB_3 = 39; //Plank Gripper
             //const int Servo_AB_4 = 23; //Elevator
             // Bloç Servo 3 - CA

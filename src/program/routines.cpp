@@ -180,9 +180,9 @@ void onRobotBoot(){
     //TODO 
     Console::println("TODO : Add important modifier to moves to dupplicate move");
 
-    //ihm.drawBootProgress("Linking actuators...");
-    //os.attachService(&actuators); ihm.addBootProgress(10);
-    
+    ihm.drawBootProgress("Linking actuators...");
+    os.attachService(&actuators); ihm.addBootProgress(10);
+
     ihm.drawBootProgress("Linking motion...");
     os.attachService(&motion); ihm.addBootProgress(10);
 

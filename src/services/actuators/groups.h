@@ -1,87 +1,84 @@
 #pragma once
 #include "config/pin.h"
 
+struct HuggerProperties{
+    //Pins and IDs
+    const int 
+    liftPin,    //up down servo
+    gripperPin, //gripper servo
+
+    //positions
+    gripper_grab,
+    gripper_drop,
+    lift_up,
+    lift_down,
+    lift_store;
+};
+
 struct ManipulatorProperties{
     //Pins and IDs
     const int 
-    magnetLeftPin, //hall magnet Left 
-    magnetRightPin, //hall magnet Right
-    planckPin, //plank manipulator
-    elevatorPin, //elevator
-    pump_ID,   //vacuum pump
-    EV_ID,     //electrovanne
+    grabberElevatorPin, //graber suction manipulator
+    grabberRightPin, //graber suction manipulator
+    grabberLeftPin, //graber suction manipulator
+
+    pump_right_ID,   //vacuum pump
+    EV__right_ID,    //electrovanne
+
+    pump_left_ID,   //vacuum pump
+    EV__left_ID,    //electrovanne
 
     //positions
     left_Grab,
     left_Drop,
     right_Grab,
     right_Drop,
-    planksGrab,
-    planksDrop,
-    planksStore,
+
     elevator_Up,
     elevator_Down,
     elevator_Drop;
 };
-
-struct BannerManipulatorProperties{
-    const int 
-    servoPin, //elevator
-    elevator_Up,
-    elevator_Down,
-    elevator_Drop;
-};
-
 
 
 namespace ActuatorPresets{
-    const ManipulatorProperties AB = {
-        //pins
-        Pin::Servo::Servo_AB_1,    //hall magnet Left
-        Pin::Servo::Servo_AB_2,    //hall magnet Right
-        Pin::Servo::Servo_AB_3,    //plank manipulator
-        Pin::Servo::Servo_AB_4,    //elevator
-        Pin::PCA9685::PUMP_AB,
-        Pin::PCA9685::EV_AB,
-        //position servo
-        170,    // left_Grab,
-        0,      // left_Drop,
-        32,     // right_Grab,
-        180,    // right_Drop,
-        90,     // planksUp,
-        90,     // planksDrop,
-        120,    // planksStore,
-        0,     // elevator_Up,
-        100,    // elevator_Down,
-        80      // elevator_Drop;
-    };
-        
-    const BannerManipulatorProperties BC = {
-        //pins
-        Pin::Servo::Servo_BC_4,
-        36,//elevator_Up,
-        17,//elevator_Down,
-        26 //elevator_Drop;
+    const HuggerProperties AB = {
+        //servo pins
+        Pin::Servo::Servo_AB_1,    //lift servo
+        Pin::Servo::Servo_AB_2,    //gripper servo
+
+        //positions
+        90, //gripper_grab,
+        70, //gripper_drop,
+        90, //lift_up,
+        70, //lift_down,
+        60  //lift_store;
     };
 
     const ManipulatorProperties CA = {
         //pins
-        Pin::Servo::Servo_CA_1, //rightServoPin
-        Pin::Servo::Servo_CA_2, //leftServoPin
-        Pin::Servo::Servo_CA_3, //elevatorServoPin
-        Pin::Servo::Servo_CA_4, //elevatorServoPin
-        Pin::PCA9685::PUMP_CA,
-        Pin::PCA9685::EV_CA,
+        Pin::Servo::Servo_CA_1,
+        Pin::Servo::Servo_CA_2,
+        Pin::Servo::Servo_CA_3,
+        Pin::PCA9685::PUMP_CA_RIGHT,
+        Pin::PCA9685::EV_CA_RIGHT,
+        Pin::PCA9685::PUMP_CA_LEFT,
+        Pin::PCA9685::EV_CA_LEFT,
+
         //position servo
-        180,
-        0,
-        0, 
-        180,
-        80,
-        80,
-        120,
-        0,
-        115, 
-        70
+        90, // left_Grab,
+        70,   // left_Drop,
+        90,   // right_Grab,
+        70, // right_Drop,
+        90,  // elevator_Up,
+        70,  // elevator_Down,
+        60  //  elevator_Drop;
     };
 }
+
+
+
+
+
+
+
+

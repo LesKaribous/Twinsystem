@@ -8,6 +8,10 @@ inline const T& choose(bool cond, const T& a, const T& b) {
     return cond ? a : b;
 }
 
+#define RIGHT true
+#define LEFT false
+
+
 void recalage();
 void match();
 
@@ -23,8 +27,8 @@ void nearEnd();
 //------------------------------------------------------
 // TODO : Integrate Pump and EV into Actuators <3
 void initPump();
-void startPump(RobotCompass rc);
-void stopPump(RobotCompass rc, uint16_t evPulseDuration);
+void startPump(RobotCompass rc, bool side);
+void stopPump(RobotCompass rc, uint16_t evPulseDuration, bool side);
 extern Adafruit_PWMServoDriver pwm;
 //------------------------------------------------------
 

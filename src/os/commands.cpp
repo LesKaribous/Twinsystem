@@ -37,9 +37,6 @@ void registerCommands() {
     CommandHandler::registerCommand("lower(side)", "Lower elevator", command_lower);
     CommandHandler::registerCommand("grab(side)", "Grab object using actuator", command_grab);
     CommandHandler::registerCommand("drop(side)", "Drop object using actuator", command_drop);
-    CommandHandler::registerCommand("grabPlank(side)", "Grab Plank using actuator", command_grabPlank);
-    CommandHandler::registerCommand("dropPlank(side)", "Drop Plank using actuator", command_dropPlank);
-    CommandHandler::registerCommand("storePlank(side)", "Store Plank using actuator", command_storePlank);
     CommandHandler::registerCommand("pump(side)", "enable pump", command_pump);
     CommandHandler::registerCommand("ev(side)", " disable pump", command_ev);
     CommandHandler::registerCommand("initPump", " Init Pump", command_initPump);
@@ -184,17 +181,6 @@ void command_test(const args_t &args){
     motion.setAbsPosition({913, 1440, 90 * DEG_TO_RAD});
     bool isYellow = ihm.isColor(Settings::YELLOW);
     initPump();
-    actuators.storePlank(RobotCompass::CA);
-    actuators.storePlank(RobotCompass::AB);
-
-    takeStock(
-    choose(isYellow,
-        POI::stock_4,
-        POI::stock_5),
-    RobotCompass::AB, 
-    TableCompass::NORTH
-    );
-
 }
 
 void command_probe(const args_t &args){
@@ -358,45 +344,21 @@ void command_grab(const args_t& args){
     else if(side.equals("CA")) actuators.grab(RobotCompass::CA);
 }
 
-void command_storePlank(const args_t& args){
-    if(args.size() != 1)return;
-    const String& side = args[0];
-    if(side.equals("AB")) actuators.storePlank(RobotCompass::AB);
-    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
-    else if(side.equals("CA")) actuators.storePlank(RobotCompass::CA);
-}
-
-
-void command_dropPlank(const args_t& args){
-    if(args.size() != 1)return;
-    const String& side = args[0];
-    if(side.equals("AB")) actuators.dropPlank(RobotCompass::AB);
-    //else if(side.equals("BC")) actuators.drop(RobotCompass::BC);
-    else if(side.equals("CA")) actuators.dropPlank(RobotCompass::CA);
-}
-
-void command_grabPlank(const args_t& args){
-    if(args.size() != 1)return;
-    const String& side = args[0];
-    if(side.equals("AB")) actuators.grabPlank(RobotCompass::AB);
-    //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
-    else if(side.equals("CA")) actuators.grabPlank(RobotCompass::CA);
-}
 
 void command_pump(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) startPump(RobotCompass::AB);
+    if(side.equals("AB")) startPump(RobotCompass::AB, RIGHT);
     //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
-    else if(side.equals("CA")) startPump(RobotCompass::CA);
+    else if(side.equals("CA")) startPump(RobotCompass::CA, LEFT);
 }
 
 void command_ev(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) stopPump(RobotCompass::AB, 500);
+    if(side.equals("AB")) stopPump(RobotCompass::AB, 500, RIGHT);
     //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
-    else if(side.equals("CA")) stopPump(RobotCompass::CA, 500);
+    else if(side.equals("CA")) stopPump(RobotCompass::CA, 500, LEFT);
 }
 void command_initPump(const args_t& args){
     initPump();

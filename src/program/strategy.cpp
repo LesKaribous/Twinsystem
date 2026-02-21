@@ -45,9 +45,6 @@ void recalage(){
         
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
         //motion.setAbsPosition(Vec3(POI::b2, motion.getOrientation()));
-        actuators.storePlank(RobotCompass::AB);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
-        actuators.storePlank(RobotCompass::CA);
 
     }else{
         motion.setAbsPosition(Vec3(1450 - 138.5 ,2000 - getOffsets(RobotCompass::BC),DEG_TO_RAD * 90));
@@ -64,9 +61,6 @@ void recalage(){
 
         async motion.align(RobotCompass::BC, getCompassOrientation(TableCompass::SOUTH));
         //motion.setAbsPosition(Vec3(POI::y2, motion.getOrientation()));
-        actuators.storePlank(RobotCompass::AB);
-        actuators.moveElevator(RobotCompass::BC,ElevatorPose::UP);
-        actuators.storePlank(RobotCompass::CA);
     }
     //motion.disengage();
     motion.setFeedrate(1.0);
@@ -269,31 +263,25 @@ void takeStock(Vec2 target, RobotCompass rc, TableCompass tc){
     // !!!! Disable safety !!!!
     //safety.disable();
     //-------------------------
-    startPump(rc);
+    startPump(rc, RIGHT);
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -40,50);
     waitMs(delayTime);
     async motion.go(grab);
     //async motion.go(grab); // double to be sure
     actuators.moveElevatorOffset(rc, ElevatorPose::DOWN, -30,50);
-    actuators.grabPlank(rc);
-    waitMs(1000);
-    actuators.storePlank(rc,50);
-    waitMs(delayTime);
 
     // ---- Take second planks ----
     //async motion.go(approach); 
     //async motion.align(nextCompass, getCompassOrientation(tc));
     async motion.goAlign(approach, nextCompass, getCompassOrientation(tc)); //opti
 
-    startPump(nextCompass);
+    startPump(nextCompass, LEFT);
     actuators.moveElevatorOffset(nextCompass, ElevatorPose::DOWN, -25,50);
     waitMs(delayTime);
     async motion.go(grab);
     //async motion.go(grab); // double to be sure
     actuators.moveElevatorOffset(nextCompass, ElevatorPose::DOWN, -10,50);
-    actuators.grabPlank(nextCompass);
-    waitMs(1000);
-    actuators.storePlank(nextCompass,50);
+
     waitMs(delayTime);
 
     // ---- Take second can ----
@@ -347,11 +335,8 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset); //
     waitMs(delayTime);
-    actuators.dropPlank(rc,50);
-    waitMs(1000);
-    stopPump(rc,500);
+    stopPump(rc,500 , RIGHT);
     waitMs(delayTime);
-    actuators.storePlank(rc);
     //waitMs(delayTime);
     async motion.go(approach);//
     ihm.addScorePoints(Score::TribuneLevel1Points);
@@ -366,11 +351,9 @@ void buildTribune(Vec2 target, RobotCompass rc, TableCompass tc){
     actuators.drop(nextCompass);
     waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
-    actuators.dropPlank(nextCompass,50);
     waitMs(delayTime);
-    stopPump(nextCompass,500);
+    stopPump(nextCompass,500, LEFT);
     waitMs(delayTime);
-    actuators.storePlank(nextCompass);
     waitMs(delayTime);
     motion.go(approach); //finish later
     waitMs(1000);
@@ -414,11 +397,9 @@ void dropOneLevel(Vec2 target, RobotCompass rc, TableCompass tc){
     waitMs(delayTime);
     async motion.goPolar(getCompassOrientation(tc), -dropPlankOffset);
     //waitMs(delayTime);
-    actuators.dropPlank(rc,50);
     waitMs(800);
-    stopPump(rc,500);
+    stopPump(rc,500, RIGHT);
     //waitMs(delayTime);
-    actuators.storePlank(rc);
     waitMs(delayTime);
     async motion.go(approach);
     ihm.addScorePoints(Score::TribuneLevel1Points);
@@ -558,24 +539,24 @@ void setOutput(uint8_t pin, bool state) {
     }
 }
 
-void startPump(RobotCompass rc){
+void startPump(RobotCompass rc, bool side){
     uint8_t evPin ;
     uint8_t pumpPin ;
-    if(rc == RobotCompass::AB) evPin = Pin::PCA9685::EV_AB ;
-    else evPin = Pin::PCA9685::EV_CA;
-    if(rc == RobotCompass::AB) pumpPin = Pin::PCA9685::PUMP_AB;
-    else pumpPin = Pin::PCA9685::PUMP_CA;
+    if(side) evPin = Pin::PCA9685::EV_CA_RIGHT ;
+    else evPin = Pin::PCA9685::EV_CA_LEFT;
+    if(side) pumpPin = Pin::PCA9685::PUMP_CA_RIGHT;
+    else pumpPin = Pin::PCA9685::PUMP_CA_LEFT;
     setOutput(evPin, false);  // Fermer l'électrovanne
     setOutput(pumpPin, true); // Démarrer la pompe
 }
 
-void stopPump(RobotCompass rc, uint16_t evPulseDuration){
+void stopPump(RobotCompass rc, uint16_t evPulseDuration, bool side){
     uint8_t evPin ;
     uint8_t pumpPin ;
-    if(rc == RobotCompass::AB) evPin = Pin::PCA9685::EV_AB ;
-    else evPin = Pin::PCA9685::EV_CA;
-    if(rc == RobotCompass::AB) pumpPin = Pin::PCA9685::PUMP_AB;
-    else pumpPin = Pin::PCA9685::PUMP_CA;
+    if(side) evPin = Pin::PCA9685::EV_CA_RIGHT ;
+    else evPin = Pin::PCA9685::EV_CA_LEFT;
+    if(side) pumpPin = Pin::PCA9685::PUMP_CA_RIGHT;
+    else pumpPin = Pin::PCA9685::PUMP_CA_LEFT;
     setOutput(pumpPin, false); // Stopper la pompe
     setOutput(evPin, true);    // Ouvrir l’EV
     waitMs(evPulseDuration);    // Maintenir l’EV ouverte
