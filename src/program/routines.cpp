@@ -249,6 +249,8 @@ void onRobotBoot(){
     Expression::registerVariables("DOWN", "2");
     Expression::registerVariables("GRAB", "1");
     Expression::registerVariables("DROP", "0");
+    Expression::registerVariables("RIGHT", "1");
+    Expression::registerVariables("LEFT", "0");
 
     ihm.drawBootProgress("Boot done."); 
     ihm.setPage(IHM::Page::INIT);

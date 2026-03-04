@@ -25,7 +25,6 @@ public:
     void sleep();
     void wakeUp();
     
-
     inline bool isSleeping() const {return m_sleeping;}
     inline bool isEnable() const {return m_enabled;}
 //private:

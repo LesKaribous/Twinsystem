@@ -15,7 +15,7 @@ public:
     void enable();
     void disable();
     void sleep();
-
+    void listServo();
     void createServo(int id, int pin, int defaultPos, int minPos = 0, int maxPos = 180);
     SmartServo& getServo(int id);
     bool hasServo(int id);

@@ -23,9 +23,16 @@ void ActuatorGroup::sleep(){
     }
 }
 
+void ActuatorGroup::listServo(){
+    for(auto i = m_servos.begin(); i != m_servos.end(); i++){
+        Console::info() << "    Servo ID : " << i->first << " Pose count : " << i->second.m_poses.size() << Console::endl;
+    }
+}
+
 void ActuatorGroup::createServo(int id, int pin, int defaultPos, int minPos, int maxPos){
     if(m_servos.size() < MAX_SERVOS) m_servos.emplace(id, SmartServo(pin, defaultPos, minPos, maxPos));
     else Console::error("ActuatorGroup") << "Max servo limit reached, ActuatorGroup can handle up to " << MAX_POSES << " poses" << Console::endl;
+    Console::info() << "ActuatorGroup : Servo " << id << " created on pin " << pin << Console::endl;
 }
 
 bool ActuatorGroup::hasServo(int id){
@@ -39,7 +46,7 @@ void ActuatorGroup:: moveServoToPose(int servo, int pose, int speed){
 }
 
 SmartServo& ActuatorGroup::getServo(int id){
-    if(id < 0 || size_t(id) >= m_servos.size()) Console::error("ActuatorGroup") << "servo " << id << " does not exist " << Console::endl; 
+    if(!hasServo(id)) Console::error("ActuatorGroup") << "servo " << id << " does not exist " << Console::endl; 
     return m_servos[id];
 }
 

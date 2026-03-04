@@ -47,6 +47,10 @@ void registerCommands() {
     CommandHandler::registerCommand("test", " Dummy Test function ", command_test);
     CommandHandler::registerCommand("scale(value)", " Set otos linear scale", command_otos_scale);
     CommandHandler::registerCommand("calibrate", " calibrate otos linear scale", command_otos_calibration);
+    
+    CommandHandler::registerCommand("servo(side, servoID, pose)", "move servo to position", command_servo);
+    //CommandHandler::registerCommand("servo_pos(side, servoID, pose)", "move servo to pose", command_servo_pos);
+    CommandHandler::registerCommand("printServo(side)", "print servo mapping", command_printServo);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -348,17 +352,17 @@ void command_grab(const args_t& args){
 void command_pump(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) startPump(RobotCompass::AB, RIGHT);
+    if(side.equals("1")) startPump(RobotCompass::CA, RIGHT);
     //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
-    else if(side.equals("CA")) startPump(RobotCompass::CA, LEFT);
+    else if(side.equals("0")) startPump(RobotCompass::CA, LEFT);
 }
 
 void command_ev(const args_t& args){
     if(args.size() != 1)return;
     const String& side = args[0];
-    if(side.equals("AB")) stopPump(RobotCompass::AB, 500, RIGHT);
+    if(side.equals("1")) stopPump(RobotCompass::CA, 500, RIGHT);
     //else if(side.equals("BC")) actuators.grab(RobotCompass::BC);
-    else if(side.equals("CA")) stopPump(RobotCompass::CA, 500, LEFT);
+    else if(side.equals("0")) stopPump(RobotCompass::CA, 500, LEFT);
 }
 void command_initPump(const args_t& args){
     initPump();
@@ -377,7 +381,6 @@ void command_elevator(const args_t& args){
 }
 
 void command_move_elevator(const args_t& args){
-
     if(args.size() != 2)return;
     const String& side = args[0];
     const String& poseStr = args[1];
@@ -387,6 +390,37 @@ void command_move_elevator(const args_t& args){
     else if(side.equals("BC")) actuators.moveElevatorAngle(RobotCompass::BC, pose);
     else if(side.equals("CA")) actuators.moveElevatorAngle(RobotCompass::CA, pose);
 }
+
+void command_servo(const args_t &args){
+    if(args.size() != 3)return;
+    const String& side = args[0];
+    const String& servoStr = args[1];
+    const String& poseStr = args[2];
+    int servo = servoStr.toInt();
+    int pose = poseStr.toInt();
+    
+
+    if(!validCompassString(side)) return;
+    RobotCompass rc = compassFromString(side);
+    ActuatorGroup& group = actuators.getActuatorGroup(rc);
+
+    if(group.hasServo(servo)){
+        group.getServo(servo).moveTo(pose, 100);
+    } else Console::error("Interpreter") << "Servo " << servo << " not found in group " << side << Console::endl;
+}
+
+void command_printServo(const args_t &args){
+    if(args.size() != 1)return;
+    const String& side = args[0];
+    if(!validCompassString(side)) return;
+    RobotCompass rc = compassFromString(side);
+    ActuatorGroup& group = actuators.getActuatorGroup(rc);
+
+    Console::info("Interpreter") << "Servos in group " << side << " :" << Console::endl;
+    group.listServo();
+
+}
+
 
 void command_raise(const args_t& args){
     if(args.size() != 1)return;

@@ -65,6 +65,45 @@ float getBorderDistance(Vec2 pos, float angle){
 
 }
 
+bool validCompassString(const String& str){
+    return str.equalsIgnoreCase("A") || str.equalsIgnoreCase("AB") || str.equalsIgnoreCase("B") || str.equalsIgnoreCase("BC") || str.equalsIgnoreCase("C") || str.equalsIgnoreCase("CA");
+}
+
+RobotCompass compassFromString(const String& str){
+    if(str.equalsIgnoreCase("A"))         return RobotCompass::A;
+    else if(str.equalsIgnoreCase("AB"))   return RobotCompass::AB;
+    else if(str.equalsIgnoreCase("B"))    return RobotCompass::B;
+    else if(str.equalsIgnoreCase("BC"))   return RobotCompass::BC;
+    else if(str.equalsIgnoreCase("C"))    return RobotCompass::C;
+    else if(str.equalsIgnoreCase("CA"))   return RobotCompass::CA;
+    else return RobotCompass::A; //Default
+}
+
+String compassToString(RobotCompass rc){
+    switch (rc){
+    case RobotCompass::A:
+        return "A";
+        break;
+    case RobotCompass::B:
+        return "B";
+        break;
+    case RobotCompass::C:
+        return "C";
+        break;
+    case RobotCompass::AB:
+        return "AB";
+        break;
+    case RobotCompass::BC:
+        return "BC";
+        break;
+    case RobotCompass::CA:
+        return "CA";
+        break;
+    default:
+        return "";
+        break;
+    }
+}
 
 float getOffsets(RobotCompass rc){
     switch (rc){

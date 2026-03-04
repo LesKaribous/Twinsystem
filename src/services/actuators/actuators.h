@@ -9,12 +9,12 @@ enum class ServoIDs : int{
     GRABBER_RIGHT = 0,
     ELEVATOR = 1,
     GRABBER_LEFT = 2,
-    HUGGER_LIFT = 0,
-    HUGGER_GRAB = 1,
+    HUGGER_ELEVATOR = 3,
+    HUGGER_GRAB = 4,
 };
 
 enum class ElevatorPose{
-    DROP = 0,
+    STORE = 0,
     UP = 1,
     DOWN = 2,
     //BORDER = 3,
@@ -49,13 +49,15 @@ public:
 
     void enableTraco();
     void disableTraco();
-private:
-    ActuatorGroup& getActuatorGroup(RobotCompass rc);
+
+     ActuatorGroup& getActuatorGroup(RobotCompass rc);
+
     
 //primary methods
 public:
     void drop   (RobotCompass rc, int speed = 100);
     void grab   (RobotCompass rc, int speed = 100);
+    void store   (RobotCompass rc, int speed = 100);
     
     void moveElevatorAngle(RobotCompass rc, int angle, int speed = 100);
     void moveElevator(RobotCompass rc, ElevatorPose poseIndex, int speed = 100);
@@ -64,7 +66,6 @@ public:
     void registerPoses(); //Register all servos poses
 
 private : 
-    bool moveManipulatorDual(SmartServo& a,SmartServo& b, ManipulatorPose pose, int speed = 100);
     bool moveManipulator(SmartServo& servo, ManipulatorPose pose, int speed = 100);
     bool moveElevator(SmartServo& servo, ElevatorPose pose, int speed = 100);
 

@@ -195,3 +195,60 @@ The following methods exist :
     void toggleDebug(ServiceID s);// activate debug of the service (Console will print mesage from this service)
 ```
 
+
+
+Sequence Hugger Grab and drop vertical
+
+servo(AB, 0, 90)
+wait(500)
+servo(AB, 1, 25)
+wait(500)
+servo(AB, 0, 155)
+wait(500)
+servo(AB, 1, 40)
+wait(500)
+goPolar(30,20)
+wait(200)
+goPolar(30,-80)
+
+
+
+
+
+
+
+
+
+initPump()
+
+servo(CA,1, 5)
+wait(1000)
+servo(CA,0,162)
+servo(CA,2,20)
+pump(RIGHT)
+pump(LEFT)
+
+wait(1000)
+
+servo(CA,1, 60)
+wait(1000)
+servo(CA,0,121)
+servo(CA,2,65)
+wait(1000)
+
+goPolar(-30,-100)
+
+wait(1000)
+
+servo(CA,1, 5)
+wait(1000)
+servo(CA,0,162)
+servo(CA,2,20)
+wait(1000)
+ev(RIGHT)
+ev(LEFT)
+
+wait(2000)
+servo(CA,0,121)
+servo(CA,2,65)
+go(0,0)

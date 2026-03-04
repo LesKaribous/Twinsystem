@@ -53,6 +53,9 @@ void command_initPump(const args_t& args);
 void command_elevator(const args_t& args);
 void command_move_elevator(const args_t& args);
 
+void command_servo(const args_t& args);
+void command_printServo(const args_t& args);
+
 //Routine
 void command_recalage(const args_t& args);
 

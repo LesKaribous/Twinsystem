@@ -4,6 +4,10 @@
 
 namespace POI{
 
+    const Vec2 home = Vec2(250,250);
+    const Vec2 testA = Vec2(500,500);
+    const Vec2 testB = Vec2(1000,500);
+
     // ------------------------------------------
     // Departure Areas - Center
     const Vec2 y1 = Vec2(375,225);

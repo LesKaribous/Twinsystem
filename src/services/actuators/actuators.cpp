@@ -28,22 +28,6 @@ void Actuators::attach(){
 
     enable();
     enable();//sinon il fait pas la pose par defaut. Who knowns ?
-
-    /*
-    drop(RobotCompass::AB);
-    drop(RobotCompass::CA);
-    grab(RobotCompass::AB);
-    grab(RobotCompass::CA);
-    moveElevator(RobotCompass::AB, ElevatorPose::UP,80);
-    moveElevator(RobotCompass::CA, ElevatorPose::UP,80);
-    moveElevator(RobotCompass::AB, ElevatorPose::DOWN,80);
-    moveElevator(RobotCompass::CA, ElevatorPose::DOWN,80);
-    grabPlank(RobotCompass::AB);
-    grabPlank(RobotCompass::CA);
-    storePlank(RobotCompass::AB);
-    storePlank(RobotCompass::CA);
-    /**/
-
     //sleep();
 }
 
@@ -60,7 +44,7 @@ void setServoPos(SmartServo& servo, ElevatorPose pose, int position){
 }
 
 void Actuators::moveElevatorOffset(RobotCompass rc, ElevatorPose pose, int offset, int speed){
-    SERVICE_METHOD_HEADER
+    //SERVICE_METHOD_HEADER
     if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR)){
         SmartServo& elevator = getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR);
         elevator.moveTo(elevator.getPose(CAST_POSE(pose)) + offset, speed);
@@ -71,10 +55,10 @@ void Actuators::registerPoses()
 {
     // --- AB ---
     //Lift
-    if(groupAB.hasServo((int)ServoIDs::HUGGER_LIFT)){
-        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_LIFT), ManipulatorPose::DROP, ActuatorPresets::AB.lift_down);
-        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_LIFT), ManipulatorPose::GRAB, ActuatorPresets::AB.lift_up);
-        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_LIFT), ManipulatorPose::STORE, ActuatorPresets::AB.lift_store);
+    if(groupAB.hasServo((int)ServoIDs::HUGGER_ELEVATOR)){
+        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_ELEVATOR), ElevatorPose::DOWN, ActuatorPresets::AB.lift_down);
+        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_ELEVATOR), ElevatorPose::UP, ActuatorPresets::AB.lift_up);
+        setServoPos(groupAB.getServo((int)ServoIDs::HUGGER_ELEVATOR), ElevatorPose::STORE, ActuatorPresets::AB.lift_store);
     }
 
     //Gripper
@@ -102,7 +86,7 @@ void Actuators::registerPoses()
     if(groupCA.hasServo((int)ServoIDs::ELEVATOR)){
         setServoPos(groupCA.getServo((int)ServoIDs::ELEVATOR), ElevatorPose::UP, ActuatorPresets::CA.elevator_Up);
         setServoPos(groupCA.getServo((int)ServoIDs::ELEVATOR), ElevatorPose::DOWN, ActuatorPresets::CA.elevator_Down);
-        setServoPos(groupCA.getServo((int)ServoIDs::ELEVATOR), ElevatorPose::DROP, ActuatorPresets::CA.elevator_Drop);
+        setServoPos(groupCA.getServo((int)ServoIDs::ELEVATOR), ElevatorPose::STORE, ActuatorPresets::CA.elevator_Store);
     }
 }
 
@@ -112,15 +96,15 @@ void Actuators::createManipulator(RobotCompass rc, ManipulatorProperties props){
     }else if(rc == RobotCompass::BC){
         Console::error("Actuators") << "No manipulator mounted on BC" << Console::endl;
     }else if(rc == RobotCompass::CA){
-        groupCA.createServo(CAST_POSE(ServoIDs::GRABBER_RIGHT) ,props.grabberRightPin, props.right_Drop);
+        groupCA.createServo(CAST_POSE(ServoIDs::GRABBER_RIGHT) ,props.grabberRightPin, props.right_Store);
         groupCA.createServo(CAST_POSE(ServoIDs::ELEVATOR) ,props.grabberElevatorPin, props.elevator_Down);
-        groupCA.createServo(CAST_POSE(ServoIDs::GRABBER_LEFT) ,props.grabberLeftPin, props.left_Drop);
+        groupCA.createServo(CAST_POSE(ServoIDs::GRABBER_LEFT) ,props.grabberLeftPin, props.left_Store);
     }
 }
 
 void Actuators::createHugger(RobotCompass rc, HuggerProperties props){
     if(rc == RobotCompass::AB){
-        groupAB.createServo(CAST_POSE(ServoIDs::HUGGER_LIFT), props.liftPin, props.lift_down);
+        groupAB.createServo(CAST_POSE(ServoIDs::HUGGER_ELEVATOR), props.liftPin, props.lift_up);
         groupAB.createServo(CAST_POSE(ServoIDs::HUGGER_GRAB), props.gripperPin, props.gripper_drop);
     }else if(rc == RobotCompass::BC){
         Console::error("Actuators") << "No Hugger mounted on BC" << Console::endl;
@@ -153,14 +137,13 @@ void Actuators::disable(){
 }
 
 void Actuators::drop(RobotCompass rc, int speed){
-    SERVICE_METHOD_HEADER
+    //SERVICE_METHOD_HEADER
 
     if(!ihm.isPrimary()) return;
     switch (rc)
     {
     case RobotCompass::AB :
         if(speed == 100){
-            groupAB.moveServoToPose((int)ServoIDs::HUGGER_LIFT, CAST_POSE(ManipulatorPose::DROP), speed);
             groupAB.moveServoToPose((int)ServoIDs::HUGGER_GRAB, CAST_POSE(ManipulatorPose::DROP), speed);
         }else{
             // if(groupAB.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupAB.hasServo((int)ServoIDs::MAGNET_LEFT))
@@ -191,7 +174,6 @@ void Actuators::drop(RobotCompass rc, int speed){
         if(speed == 100){
             groupCA.moveServoToPose((int)ServoIDs::GRABBER_LEFT, CAST_POSE(ManipulatorPose::DROP), speed);
             groupCA.moveServoToPose((int)ServoIDs::GRABBER_RIGHT, CAST_POSE(ManipulatorPose::DROP), speed);
-            groupCA.moveServoToPose((int)ServoIDs::ELEVATOR, CAST_POSE(ElevatorPose::DOWN), speed);
         }else{
             // if(groupCA.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupCA.hasServo((int)ServoIDs::MAGNET_LEFT))
             //     while(!moveMagnetDual(groupCA.getServo((int)ServoIDs::MAGNET_RIGHT), groupCA.getServo((int)ServoIDs::MAGNET_LEFT), ManipulatorPose::DROP, speed));
@@ -208,14 +190,13 @@ void Actuators::drop(RobotCompass rc, int speed){
 }
 
 void Actuators::grab(RobotCompass rc, int speed){
-    SERVICE_METHOD_HEADER
+    //SERVICE_METHOD_HEADER
     
     if(!ihm.isPrimary()) return;
-    switch (rc)
-    {
+
+    switch (rc)    {
     case RobotCompass::AB :
         if(speed == 100){
-            groupAB.moveServoToPose((int)ServoIDs::HUGGER_LIFT, CAST_POSE(ManipulatorPose::GRAB), speed);
             groupAB.moveServoToPose((int)ServoIDs::HUGGER_GRAB, CAST_POSE(ManipulatorPose::GRAB), speed);
         }else{
             // if(groupAB.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupAB.hasServo((int)ServoIDs::MAGNET_LEFT))
@@ -246,7 +227,6 @@ void Actuators::grab(RobotCompass rc, int speed){
         if(speed == 100){
             groupCA.moveServoToPose((int)ServoIDs::GRABBER_LEFT, CAST_POSE(ManipulatorPose::GRAB), speed);
             groupCA.moveServoToPose((int)ServoIDs::GRABBER_RIGHT, CAST_POSE(ManipulatorPose::GRAB), speed);
-            groupCA.moveServoToPose((int)ServoIDs::ELEVATOR, CAST_POSE(ElevatorPose::DOWN), speed);
         }else{
             // if(groupCA.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupCA.hasServo((int)ServoIDs::MAGNET_LEFT))
             //     while(!moveMagnetDual(groupCA.getServo((int)ServoIDs::MAGNET_RIGHT), groupCA.getServo((int)ServoIDs::MAGNET_LEFT), ManipulatorPose::GRAB, speed));
@@ -263,22 +243,90 @@ void Actuators::grab(RobotCompass rc, int speed){
 }
 
 
+
+void Actuators::store(RobotCompass rc, int speed){
+    //SERVICE_METHOD_HEADER
+    
+    if(!ihm.isPrimary()) return;
+
+    switch (rc)    {
+    case RobotCompass::AB :
+        if(speed == 100){
+            groupAB.moveServoToPose((int)ServoIDs::HUGGER_GRAB, CAST_POSE(ManipulatorPose::STORE), speed);
+        }else{
+            // if(groupAB.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupAB.hasServo((int)ServoIDs::MAGNET_LEFT))
+            //     while(!moveMagnetDual(groupAB.getServo((int)ServoIDs::MAGNET_RIGHT), groupAB.getServo((int)ServoIDs::MAGNET_LEFT), ManipulatorPose::GRAB, speed));
+            // else{
+            //     groupAB.getServo((int)ServoIDs::MAGNET_RIGHT); //just to display error
+            //     groupAB.getServo((int)ServoIDs::MAGNET_LEFT); //just to display error
+            // }
+        }
+        break;
+
+    // case RobotCompass::BC :
+    //     if(speed == 100){
+    //         groupBC.moveServoToPose((int)ServoIDs::MAGNET_RIGHT, CAST_POSE(ManipulatorPose::GRAB), speed);
+
+    //         groupBC.moveServoToPose((int)ServoIDs::MAGNET_LEFT, CAST_POSE(ManipulatorPose::GRAB), speed);
+    //     }else{
+    //         if(groupBC.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupBC.hasServo((int)ServoIDs::MAGNET_LEFT))
+    //             while(!moveMagnetDual(groupBC.getServo((int)ServoIDs::MAGNET_RIGHT), groupBC.getServo((int)ServoIDs::MAGNET_LEFT), ManipulatorPose::GRAB, speed));
+    //         else{
+    //             groupBC.getServo((int)ServoIDs::MAGNET_RIGHT); //just to display error
+    //             groupBC.getServo((int)ServoIDs::MAGNET_LEFT); //just to display error
+    //         }
+    //     }
+    //     break;
+
+    case RobotCompass::CA :
+        if(speed == 100){
+            groupCA.moveServoToPose((int)ServoIDs::GRABBER_LEFT, CAST_POSE(ManipulatorPose::STORE), speed);
+            groupCA.moveServoToPose((int)ServoIDs::GRABBER_RIGHT, CAST_POSE(ManipulatorPose::STORE), speed);
+        }else{
+            // if(groupCA.hasServo((int)ServoIDs::MAGNET_RIGHT) && groupCA.hasServo((int)ServoIDs::MAGNET_LEFT))
+            //     while(!moveMagnetDual(groupCA.getServo((int)ServoIDs::MAGNET_RIGHT), groupCA.getServo((int)ServoIDs::MAGNET_LEFT), ManipulatorPose::GRAB, speed));
+            // else{
+            //     groupCA.getServo((int)ServoIDs::MAGNET_RIGHT); //just to display error
+            //     groupCA.getServo((int)ServoIDs::MAGNET_LEFT); //just to display error
+            // }
+        }
+        break;
+    
+    default:
+        break;
+    }
+}
+
+
+
 void Actuators::moveElevator(RobotCompass rc, ElevatorPose pose, int speed){
-    if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
-        getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+
+    if (rc == RobotCompass::AB){
+        if(getActuatorGroup(rc).hasServo((int)ServoIDs::HUGGER_ELEVATOR))
+            getActuatorGroup(rc).getServo((int)ServoIDs::HUGGER_ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+    }
+    
+    if (rc == RobotCompass::CA){
+        if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
+            getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveToPose(CAST_POSE(pose), speed);
+    }
 }
 
 void Actuators::moveElevatorAngle(RobotCompass rc, int angle, int speed){
-    if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
-        getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveTo(angle, speed);
+
+    if (rc == RobotCompass::AB){
+        if(getActuatorGroup(rc).hasServo((int)ServoIDs::HUGGER_ELEVATOR))
+            getActuatorGroup(rc).getServo((int)ServoIDs::HUGGER_ELEVATOR).moveTo(angle, speed);
+    }
+    
+    if (rc == RobotCompass::CA){
+        if(getActuatorGroup(rc).hasServo((int)ServoIDs::ELEVATOR))
+            getActuatorGroup(rc).getServo((int)ServoIDs::ELEVATOR).moveTo(angle, speed);
+
+    }
 }
 
-bool Actuators::moveManipulatorDual(SmartServo &a, SmartServo &b, ManipulatorPose pose, int speed){
-    return a.moveToPose(CAST_POSE(pose), speed, true) || b.moveToPose(CAST_POSE(pose), speed, true);
-}
-
-bool Actuators::moveManipulator(SmartServo &servo, ManipulatorPose pose, int speed)
-{
+bool Actuators::moveManipulator(SmartServo &servo, ManipulatorPose pose, int speed){
     return servo.moveToPose(CAST_POSE(pose), speed, true);
 }
 

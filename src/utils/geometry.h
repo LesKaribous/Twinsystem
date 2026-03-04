@@ -33,4 +33,7 @@ float getCompassOrientation(TableCompass tc);
 float getCompassOrientation(RobotCompass rc);
 float getBorderDistance( Vec2 cartesianPos, float heading);
 float getOffsets(RobotCompass rc);
-//RobotCompass getNextCompass(RobotCompass rc);
+
+RobotCompass compassFromString(const String& str);
+String compassToString(RobotCompass rc);
+bool validCompassString(const String& str);

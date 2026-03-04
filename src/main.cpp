@@ -16,7 +16,6 @@ void setup(){
 	
 	cycle_manager.registerCycle(CycleFrequency::T_10US, step);
 	cycle_manager.registerCycle(CycleFrequency::T_1MS, control);
-
 	cycle_manager.start();
 }
 
