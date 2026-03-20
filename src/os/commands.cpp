@@ -51,6 +51,7 @@ void registerCommands() {
     CommandHandler::registerCommand("servo(side, servoID, pose)", "move servo to position", command_servo);
     //CommandHandler::registerCommand("servo_pos(side, servoID, pose)", "move servo to pose", command_servo_pos);
     CommandHandler::registerCommand("printServo(side)", "print servo mapping", command_printServo);
+    CommandHandler::registerCommand("collisionDetect(state)", "Toggle collision detection", command_collision_detect);
 
     //CommandHandler::registerCommand("open(side)", "Open actuator on a specific side", command_open);
     //CommandHandler::registerCommand("close(side)", "Close actuator on a specific side", command_close);
@@ -325,6 +326,13 @@ void command_setAbsPosition(const args_t& args){
 
 void command_resetCompass(const args_t& args){
     //Not implemented yet
+}
+
+
+void command_collision_detect(const args_t& args){
+    if(args.size() != 1) return;
+    bool state = args[0] == "1" || args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("on");
+    motion.cancelOnCollide(state);
 }
 
 

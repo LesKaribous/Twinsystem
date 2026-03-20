@@ -40,6 +40,7 @@ void command_setAbsolute(const args_t& args);
 void command_setRelative(const args_t& args);
 void command_setAbsPosition(const args_t& args);
 void command_resetCompass(const args_t& args);
+void command_collision_detect(const args_t& args);
 
 //Actuators
 void command_raise(const args_t& args);
