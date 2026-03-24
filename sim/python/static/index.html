@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TwinSystem Simulator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ── Top bar ─────────────────────────────────────────────────────────── -->
+  <header id="topbar">
+    <span class="brand">TwinSystem <span class="sub">Simulator</span></span>
+
+    <div class="team-toggle">
+      <button id="btn-yellow" class="team-btn active" onclick="setTeam('yellow')">
+        ⬛ YELLOW
+      </button>
+      <button id="btn-blue" class="team-btn" onclick="setTeam('blue')">
+        🔵 BLUE
+      </button>
+    </div>
+
+    <div class="topbar-controls">
+      <button class="btn green" onclick="runStrategy()">▶ Run</button>
+      <button class="btn red"   onclick="stopStrategy()">■ Stop</button>
+      <button class="btn"       onclick="resetSim()">↺ Reset</button>
+      <button class="btn"       onclick="reloadStrategy()">⟳ Reload</button>
+    </div>
+
+    <div class="feedrate-ctrl">
+      <label>Speed
+        <input type="range" id="feedrate" min="0.1" max="1.0" step="0.05" value="1.0"
+               oninput="setFeedrate(this.value)">
+        <span id="feedrate-val">1.00</span>
+      </label>
+    </div>
+  </header>
+
+  <!-- ── Main layout ────────────────────────────────────────────────────── -->
+  <main>
+    <!-- Field canvas -->
+    <section id="field-section">
+      <div id="mode-bar">
+        <span>Click mode:</span>
+        <label><input type="radio" name="mode" value="target"     checked onchange="setMode(this.value)"> Target</label>
+        <label><input type="radio" name="mode" value="obstacle"         onchange="setMode(this.value)"> Add obstacle</label>
+        <label><input type="radio" name="mode" value="remove_obs"       onchange="setMode(this.value)"> Remove obstacle</label>
+        <span class="hint">Right-click → toggle grid cell</span>
+      </div>
+      <canvas id="field-canvas"></canvas>
+      <div id="coord-display">x:— y:—</div>
+    </section>
+
+    <!-- Sidebar -->
+    <aside id="sidebar">
+
+      <!-- Robot state -->
+      <section class="panel">
+        <h3>Robot</h3>
+        <div class="stat-grid">
+          <span class="label">Pos</span>
+          <span id="s-pos" class="value">—</span>
+          <span class="label">θ</span>
+          <span id="s-theta" class="value">—</span>
+          <span class="label">Speed</span>
+          <span id="s-speed" class="value">—</span>
+          <span class="label">Motion</span>
+          <span id="s-mstate" class="value state-idle">IDLE</span>
+        </div>
+      </section>
+
+      <!-- Match -->
+      <section class="panel">
+        <h3>Match</h3>
+        <div class="stat-grid">
+          <span class="label">Time left</span>
+          <span id="s-time" class="value">100.0 s</span>
+          <span class="label">Score</span>
+          <span id="s-score" class="value">0 pts</span>
+        </div>
+        <div id="chrono-bar-wrap">
+          <div id="chrono-bar"></div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="panel">
+        <h3>Features</h3>
+        <div class="toggle-list">
+          <label class="toggle"><input type="checkbox" id="feat-collision" checked
+            onchange="setFeature('collision', this.checked)">
+            Collision detection</label>
+          <label class="toggle"><input type="checkbox" id="feat-safety" checked
+            onchange="setFeature('safety', this.checked)">
+            Safety (obstacle pause)</label>
+          <label class="toggle"><input type="checkbox" id="feat-pathfinding" checked
+            onchange="setFeature('pathfinding', this.checked)">
+            A* Pathfinding</label>
+          <label class="toggle"><input type="checkbox" id="feat-grid"
+            onchange="setFeature('show_grid', this.checked)">
+            Show grid</label>
+          <label class="toggle"><input type="checkbox" id="feat-trail" checked
+            onchange="setFeature('show_trail', this.checked)">
+            Show trail</label>
+          <label class="toggle"><input type="checkbox" id="feat-path" checked
+            onchange="setFeature('show_path', this.checked)">
+            Show path</label>
+        </div>
+      </section>
+
+      <!-- Game objects color editor -->
+      <section class="panel" id="color-panel">
+        <h3>Game Objects <button class="btn-tiny" onclick="toggleColorPanel()">▼</button></h3>
+        <div id="color-list"></div>
+      </section>
+
+      <!-- Log -->
+      <section class="panel log-panel">
+        <h3>Log <button class="btn-tiny" onclick="clearLog()">✕</button></h3>
+        <div id="log-output"></div>
+      </section>
+
+    </aside>
+  </main>
+
+  <!-- ── Color picker popup ────────────────────────────────────────────── -->
+  <div id="color-popup" class="hidden">
+    <div class="color-popup-inner">
+      <b id="color-popup-title">Set color</b>
+      <div id="color-choices"></div>
+    </div>
+  </div>
+
+  <!-- ── Reload notification ──────────────────────────────────────────── -->
+  <div id="reload-toast" class="hidden"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
