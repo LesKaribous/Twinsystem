@@ -1,473 +1,398 @@
-
 #include "positionController.h"
 #include "config/settings.h"
 #include "os/console.h"
 #include "services/lidar/occupancy.h"
 #include "services/localisation/localisation.h"
+#include <algorithm>
+
+#define NORMALIZE(x) ((x) > 0.0f ? 1.0f : ((x) < 0.0f ? -1.0f : 0.0f))
 
 
-#define NORMALIZE(x) (x > 0 ? 1.0 : (x < 0 ? -1.0 : 0.0))
+// ============================================================
+//  Lifecycle
+// ============================================================
 
+PositionController::PositionController()
+    : position(0.0f),
+      last_position(0.0f),
+      velocity(0.0f),
+      last_velocity(0.0f),
+      target_velocity(0.0f),
+      acceleration(0.0f),
+      target(0.0f),
+      newTarget(0.0f),
+      vx_controller  (4.0f,  0.0f, 100.0f),
+      vy_controller  (4.0f,  0.0f, 100.0f),
+      vrot_controller(10.0f, 0.0f,  70.0f)
+{}
 
-PositionController::PositionController() : 
-    position(0.0f, 0.0f),
-    last_position(0.0f, 0.0f),
-    velocity(0.0f, 0.0f),
-    acceleration(0.0f, 0.0f),
-    target(0.0f, 0.0f),
-    last_velocity(0.0f, 0.0f, 0.0f),
-    target_velocity(0.0f, 0.0f, 0.0f),
-    newTarget(0.0f, 0.0f),
-    collisionCounter(0),
-    vx_controller  (4.0, 0.0, 100.0),
-    vy_controller  (4.0, 0.0, 100.0),
-    vrot_controller(10, 0.0, 70.0)
-{
-    //controller.setPIDGains(Settings::Motion::kP, Settings::Motion::kI, Settings::Motion::kD);
-    //controller.enable();
-}
-
-void PositionController::setFeedrate(float feed){
-    m_feedrate = feed;
-}
-
-void PositionController::exec() {
-    //control();
-}
+void PositionController::setFeedrate(float feed) { m_feedrate = feed; }
+void PositionController::exec() {}  // unused — control() est appelé par le cycle ISR
 
 void PositionController::reset() {
     Job::reset();
-    position= Vec3(0.0f);
-    last_position= Vec3(0.0f);
-    velocity= Vec3(0.0f);
-    last_velocity= Vec3(0.0f);
-    acceleration = Vec3(0.0f);
-    target= Vec3(0.0f);
-    last_velocity= Vec3(0.0f);
-    target_velocity= Vec3(0.0f);
-    newTarget = Vec3(0.0f);
+    position        = Vec3(0.0f);
+    last_position   = Vec3(0.0f);
+    velocity        = Vec3(0.0f);
+    last_velocity   = Vec3(0.0f);
+    acceleration    = Vec3(0.0f);
+    target          = Vec3(0.0f);
+    target_velocity = Vec3(0.0f);
+    newTarget       = Vec3(0.0f);
+    m_collisionCounter = 0;
+    m_collisionEnabled = true;
+    m_satX = m_satY = m_satZ = false;
+    m_lastControlUs  = 0;
+    m_lastStallCheck = 0;
+    moveStart        = 0;
+    startPos         = Vec3(0.0f);
+    m_lastStallPos   = Vec3(0.0f);
     controller.reset();
+    controller.disable();
     vx_controller.reset();
     vy_controller.reset();
     vrot_controller.reset();
-    collisionCounter = 0;
-    controller.disable();
-    //Console::info("PositionController") << "reset" << Console::endl;
 }
 
-/*
-void PositionController::start() {
-    reset();
-    m_state = JobState::IDLE;
-    Job::start();
-
-    controller.enable();
-    // Update target if a new one has been set. 
-    if (!(newTarget == target)) {
-        target = newTarget;
-    }
-}
-/**/
-
-/**/
 void PositionController::start() {
     Job::start();
     controller.enable();
-    // Update target if a new one has been set. 
-    if (!(newTarget == target)) {
-        target = newTarget;
-    }
 
-    startPos = localisation.getPosition();
-    moveStart = millis();
+    if (!(newTarget == target)) target = newTarget;
 
-    //Console::info("PositionController") << "start" << Console::endl;
+    // Snapshot de départ pour la détection de blocage
+    startPos         = localisation.getPosition();
+    m_lastStallPos   = startPos;
+    moveStart        = millis();
+    m_lastStallCheck = 0;
+    m_lastControlUs  = 0;  // force dt = PID_INTERVAL au premier cycle
+
+    // Réinitialisation des flags de saturation
+    m_satX = m_satY = m_satZ = false;
+    m_collisionCounter = 0;
 }
-/**/
 
 void PositionController::complete() {
-    //Console::info("PositionController") << "next reset is from complete" << Console::endl;
     reset();
-    m_state = JobState::COMPLETED;
-    newTarget = target = position;  // Reset target to current position.
-    //Console::info("PositionController") << "complete" << Console::endl;
+    m_state   = JobState::COMPLETED;
+    newTarget = target = position;
 }
+
+
+// ============================================================
+//  Collision
+// ============================================================
 
 bool PositionController::collision() const {
-    return (collisionCounter >= COLLISION_COUNT_LIMIT && !isCanceling());
+    // Le counter peut être monté par :
+    //   - la bump detection (velocity, gated par m_collisionEnabled)
+    //   - la stall detection (temps, toujours active)
+    return (m_collisionCounter >= COLLISION_COUNT_LIMIT && !isCanceling());
 }
 
-float PositionController::shortestAngleDiff(float target, float current)
-{
-    float diff = fmodf(target - current + M_PI, 2.0f * M_PI);
-    if (diff < 0)
-        diff += 2.0f * M_PI;
+void PositionController::setCollisionEnabled(bool enabled) {
+    m_collisionEnabled = enabled;
+    if (!enabled) m_collisionCounter = 0;
+}
+
+float PositionController::shortestAngleDiff(float tgt, float cur) {
+    float diff = fmodf(tgt - cur + M_PI, 2.0f * M_PI);
+    if (diff < 0.0f) diff += 2.0f * M_PI;
     diff -= M_PI;
-
-    if (diff == -M_PI)
-        diff = M_PI;
-
+    if (diff == -M_PI) diff = M_PI;
     return diff;
 }
 
-void PositionController::onUpdate(){
-    static uint32_t lastMicros = micros();
-    uint32_t now = micros();
-    float dt = (now - lastMicros) * 1e-6f;
-    lastMicros = now;
 
+// ============================================================
+//  onUpdate — PID + collision (appelé depuis control() à ~200Hz)
+// ============================================================
+
+void PositionController::onUpdate() {
+    // ---- dt ----
+    uint32_t now = micros();
+    float dt = (m_lastControlUs == 0) ? (Settings::Motion::PID_INTERVAL * 1e-6f)
+                                      : ((now - m_lastControlUs) * 1e-6f);
+    m_lastControlUs = now;
     dt = std::clamp(dt, 1e-5f, Settings::Motion::PID_INTERVAL * 1e-6f * 2.0f);
 
+    // ---- Cinématique depuis OTOS ----
     float heading = localisation.getPosition().c;
-    velocity = localisation.getVelocity();
     position = localisation.getPosition();
-    //velocity = controller.getCurrentVelocity();
-    velocity.rotateZ(-heading);
-    //position = position + ( velocity * dt);
+    velocity = localisation.getVelocity();
+    velocity.rotateZ(-heading);  // monde → robot frame
 
-    float angle = PositionController::shortestAngleDiff(target.c, position.c);
-    Vec2 error = target - position;
-    
-    /*
-    if(isPending() && !isPaused()){
-        //acceleration.x = command(dt, error.x, velocity.x, Settings::Motion::MAX_ACCEL * m_feedrate, 0, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        //acceleration.y = command(dt, error.y, velocity.y, Settings::Motion::MAX_ACCEL * m_feedrate, 0, Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MIN_DISTANCE, 100, 50 );
-        //acceleration.c = command(dt, angle, velocity.c, Settings::Motion::MAX_ROT_ACCEL * m_feedrate, 0, Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MIN_ANGLE, 1.0, 0.6 );
-        static bool saturatedX = false;
-        acceleration.x = x_controller.compute(error.x,  dt, saturatedX);
-        acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL, Settings::Motion::MAX_ACCEL);
-        saturatedX = acceleration.x == -Settings::Motion::MAX_ACCEL || acceleration.x == Settings::Motion::MAX_ACCEL;
+    // ---- Erreurs ----
+    float angle = shortestAngleDiff(target.c, position.c);
+    Vec2  error = target - position;  // monde frame
 
-        static bool saturatedY = false;
-        acceleration.y = y_controller.compute(error.y, dt, saturatedY);
-        acceleration.y = std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL, Settings::Motion::MAX_ACCEL);
-        saturatedY = acceleration.y == -Settings::Motion::MAX_ACCEL || acceleration.x == Settings::Motion::MAX_ACCEL;
+    // ---- PID → vitesse désirée ----
+    Vec3 desired(0.0f);
 
-        static bool saturatedZ = false;
-        acceleration.c = rot_controller.compute(angle, dt, saturatedZ);
-        acceleration.c = std::clamp(acceleration.c, -Settings::Motion::MAX_ROT_ACCEL, Settings::Motion::MAX_ROT_ACCEL );
-        saturatedZ = acceleration.z == -Settings::Motion::MAX_ROT_ACCEL || acceleration.x == Settings::Motion::MAX_ROT_ACCEL;
+    if (!isCanceling() && !isPausing()) {
+        desired.x = vx_controller.compute(error.x, dt, m_satX);
+        desired.x = std::clamp(desired.x,
+            -Settings::Motion::MAX_SPEED * m_feedrate,
+             Settings::Motion::MAX_SPEED * m_feedrate);
+        m_satX = (fabsf(desired.x) >= Settings::Motion::MAX_SPEED * m_feedrate);
 
-    }
-    
-    // lidar repulsion
+        desired.y = vy_controller.compute(error.y, dt, m_satY);
+        desired.y = std::clamp(desired.y,
+            -Settings::Motion::MAX_SPEED * m_feedrate,
+             Settings::Motion::MAX_SPEED * m_feedrate);
+        m_satY = (fabsf(desired.y) >= Settings::Motion::MAX_SPEED * m_feedrate);
 
-    //Vec2 lidar_repulsion = occupancy.repulsiveGradient(position) * 200.0;
-    //acceleration.x -= lidar_repulsion.x;
-    //acceleration.y -= lidar_repulsion.y;
-
-    //Console::plotXY("attractor", position.x - lidar_repulsion.x, position.y - lidar_repulsion.y);
-    //Console::plotXY("robot", position.x, position.y);
-
-    //acceleration.x = std::clamp(acceleration.x, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
-    //acceleration.y = std::clamp(acceleration.y, -Settings::Motion::MAX_ACCEL * m_feedrate, Settings::Motion::MAX_ACCEL * m_feedrate);
-
-    
-    if(fabs(error.x) > Settings::Motion::MIN_DISTANCE){
-        target_velocity.x += acceleration.x * dt;
-    }else {
-        target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
+        float vz_raw = vrot_controller.compute(angle, dt, m_satZ);
+        desired.c = std::clamp(vz_raw,
+            -Settings::Motion::MAX_ROT_SPEED * m_feedrate,
+             Settings::Motion::MAX_ROT_SPEED * m_feedrate);
+        m_satZ = (fabsf(desired.c) >= Settings::Motion::MAX_ROT_SPEED * m_feedrate);
     }
 
-    if(fabs(error.y) > Settings::Motion::MIN_DISTANCE){
-        target_velocity.y += acceleration.y * dt;
-    }else {
-        target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
-    }
+    // ---- Rampe d'accélération ----
+    auto ramp = [](float des, float cur, float maxA, float dt_) -> float {
+        if (des > cur) return cur + maxA * dt_;
+        if (des < cur) return cur - maxA * dt_;
+        return cur;
+    };
+    target_velocity.x = ramp(desired.x, target_velocity.x, Settings::Motion::MAX_ACCEL,     dt);
+    target_velocity.y = ramp(desired.y, target_velocity.y, Settings::Motion::MAX_ACCEL,     dt);
+    target_velocity.c = ramp(desired.c, target_velocity.c, Settings::Motion::MAX_ROT_ACCEL, dt);
 
-    if(fabs(angle) > Settings::Motion::MIN_ANGLE){
-        target_velocity.c += acceleration.c * dt;
-    }else{
-        target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
-    }
-    */
+    // Atténuation légère à l'approche (évite les dépassements)
+    target_velocity += (velocity - target_velocity) * 0.01f;
 
-    Vec3 desired = Vec3(0);
+    // ---- Snap à zéro ----
+    Vec3 final_vel = target_velocity;
+    if (fabsf(error.x) < Settings::Motion::MIN_DISTANCE && fabsf(final_vel.x) < 20.0f) final_vel.x = 0.0f;
+    if (fabsf(error.y) < Settings::Motion::MIN_DISTANCE && fabsf(final_vel.y) < 20.0f) final_vel.y = 0.0f;
+    if (fabsf(angle)   < Settings::Motion::MIN_ANGLE    && fabsf(final_vel.c) < 0.1f)  final_vel.c = 0.0f;
 
-    if(!isCanceling() && !isPausing()){
-        static bool saturatedX = false;
-        desired.x = vx_controller.compute(error.x,  dt, saturatedX);
-        desired.x = std::clamp(desired.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-        saturatedX = desired.x == -Settings::Motion::MAX_SPEED || desired.x == Settings::Motion::MAX_SPEED;
+    // Clamp final
+    final_vel.x = std::clamp(final_vel.x, -Settings::Motion::MAX_SPEED     * m_feedrate, Settings::Motion::MAX_SPEED     * m_feedrate);
+    final_vel.y = std::clamp(final_vel.y, -Settings::Motion::MAX_SPEED     * m_feedrate, Settings::Motion::MAX_SPEED     * m_feedrate);
+    final_vel.c = std::clamp(final_vel.c, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
 
-        static bool saturatedY = false;
-        desired.y = vy_controller.compute(error.y, dt, saturatedY);
-        desired.y = std::clamp(desired.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-        saturatedY = desired.y == -Settings::Motion::MAX_SPEED || desired.x == Settings::Motion::MAX_SPEED;
-
-        static bool saturatedZ = false;
-        float vz_target = vrot_controller.compute(angle, dt, saturatedZ);
-        desired.c = std::clamp(vz_target, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
-        saturatedZ = desired.c == -Settings::Motion::MAX_ROT_SPEED * m_feedrate || desired.c == Settings::Motion::MAX_ROT_SPEED * m_feedrate;
-    }
-
-    if(desired.x > target_velocity.x) target_velocity.x += Settings::Motion::MAX_ACCEL * dt;
-    if(desired.x < target_velocity.x) target_velocity.x -= Settings::Motion::MAX_ACCEL * dt;
-    if(desired.y > target_velocity.y) target_velocity.y += Settings::Motion::MAX_ACCEL * dt;
-    if(desired.y < target_velocity.y) target_velocity.y -= Settings::Motion::MAX_ACCEL * dt;
-    if(desired.z > target_velocity.z) target_velocity.c += Settings::Motion::MAX_ROT_ACCEL * dt;
-    if(desired.z < target_velocity.z) target_velocity.c -= Settings::Motion::MAX_ROT_ACCEL * dt;
-
-    target_velocity += (velocity - target_velocity)*0.01;
-
-
-    Vec3 final_target_velocity = target_velocity;
-    if(fabs(error.x) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
-    if(fabs(error.y) < Settings::Motion::MIN_DISTANCE && fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
-    if(fabs(angle) < Settings::Motion::MIN_ANGLE && fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
-
-    std::clamp(final_target_velocity.x, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-    std::clamp(final_target_velocity.y, -Settings::Motion::MAX_SPEED * m_feedrate, Settings::Motion::MAX_SPEED * m_feedrate);
-    std::clamp(final_target_velocity.z, -Settings::Motion::MAX_ROT_SPEED * m_feedrate, Settings::Motion::MAX_ROT_SPEED * m_feedrate);
-
-    if(final_target_velocity.magSq() > 0){
-        final_target_velocity.rotateZ(position.c);
-        controller.setTargetVelocity(final_target_velocity);
-    }else{
-        if (fabs(error.x) < Settings::Motion::MIN_DISTANCE && 
-            fabs(error.y) < Settings::Motion::MIN_DISTANCE && 
-            fabs(angle) < Settings::Motion::MIN_ANGLE && isRunning()){
-                complete();
-            }
-            // else if(isPausing() || isCanceling()){
-            //     onCanceled();
-            // }
-        controller.setTargetVelocity(Vec3(0));
-
-    }
-
-    //Velocity based collisions
-    /**/
-    float velocityError = Vec2(final_target_velocity).mag() - Vec2(velocity).mag();
-    bool possibleCollision = fabs(velocityError) > COLLISION_VELOCITY_DIFF * Vec2(final_target_velocity).mag();
-
-    if (possibleCollision && final_target_velocity.mag() > COLLISION_THRESHOLD) {
-        collisionCounter++;
+    // ---- Envoi à la velocity controller ----
+    if (final_vel.magSq() > 0.0f) {
+        Vec3 cmd_robot = final_vel;
+        cmd_robot.rotateZ(position.c);  // monde → robot frame pour les steppers
+        controller.setTargetVelocity(cmd_robot);
     } else {
-        collisionCounter = 0;
+        if (fabsf(error.x) < Settings::Motion::MIN_DISTANCE &&
+            fabsf(error.y) < Settings::Motion::MIN_DISTANCE &&
+            fabsf(angle)   < Settings::Motion::MIN_ANGLE && isRunning()) {
+            complete();
+        }
+        controller.setTargetVelocity(Vec3(0.0f));
     }
-    
 
-    if(millis() - moveStart > 4000 && 
-        (fabs(startPos.x - position.x) < 80 && fabs(startPos.y - position.y) < 80 ) && fabs(startPos.z - position.z) < 5.0 * DEG_TO_RAD){
-        collisionCounter++;
-    }
+    // ============================================================
+    //  Détection de collision
+    //
+    //  Deux mécanismes indépendants :
+    //    1. Bump (velocity) — rapide, gated par m_collisionEnabled
+    //    2. Stall (temps)   — lent, toujours actif (rotation incluse)
+    //
+    //  Shared counter : +2 par hit, -1 par bon cycle (decay).
+    //  collision() retourne true quand counter >= COLLISION_COUNT_LIMIT.
+    // ============================================================
 
+    const uint32_t elapsed = (uint32_t)(millis() - moveStart);
 
+    // ================================================================
+    //  1. BUMP DETECTION — vitesse (rapide, ~300ms)
+    //     Projette la vitesse OTOS sur la direction commandée.
+    //     Gated par m_collisionEnabled (false pendant les rotations)
+    //     car l'OTOS rapporte une vélocité translationnelle apparente
+    //     proportionnelle à ω × offset_mécanique du capteur.
+    // ================================================================
 
-    /*
-    RUN_EVERY(
-        Console::info("velocityError") << velocityError << Console::endl;
-        Console::info("collision") << possibleCollision << Console::endl;
-        Console::info("collision") << final_target_velocity.mag() << ">" << COLLISION_THRESHOLD << Console::endl;
-        Console::info("collisionCounter") << collisionCounter << ">" << COLLISION_COUNT_LIMIT << Console::endl;
-    ,100)
-    /**/
+    if (m_collisionEnabled) {
+        Vec2  cmd_world(final_vel.x, final_vel.y);
+        float cmdMag    = cmd_world.mag();
+        float transNorm = cmdMag / (Settings::Motion::MAX_SPEED     * m_feedrate + 1e-6f);
+        float rotNorm   = fabsf(final_vel.c) / (Settings::Motion::MAX_ROT_SPEED * m_feedrate + 1e-6f);
+        bool  translationDominant = (transNorm > COLLISION_TRANS_MIN) && (rotNorm < COLLISION_ROT_MAX);
 
-    /*
-    static int  collisionCounter = 0;
+        if (translationDominant && cmdMag > COLLISION_MIN_SPEED && elapsed > COLLISION_DELAY_MS) {
+            Vec3 otos = localisation.getVelocity();
+            Vec2 act_world(otos.x, otos.y);
 
-    Vec2 vel2d = Vec2(final_target_velocity);
-    float expectedDisp = vel2d.mag() * dt;
+            float projected = Vec2::dot(act_world, cmd_world) / cmdMag;
+            float shortfall = cmdMag - projected;
 
-    Vec2 cur2d{position.x, position.y};
-    float actualDisp   = (cur2d - last_position).mag();
-    last_position = cur2d;
-
-    if (expectedDisp > MIN_EXPECTED_DISP) {
-        float ratioMiss = (expectedDisp - actualDisp) / expectedDisp;  
-
-        if (ratioMiss > DISP_RATIO_THRESH) {
-            collisionCounter++;
+            if (shortfall > COLLISION_RATIO * cmdMag) {
+                m_collisionCounter += 2;
+                if (m_collisionCounter > COLLISION_COUNT_LIMIT + 10)
+                    m_collisionCounter = COLLISION_COUNT_LIMIT + 10;
+            } else {
+                if (m_collisionCounter > 0) m_collisionCounter--;
+            }
         } else {
-            collisionCounter = 0;
+            if (m_collisionCounter > 0) m_collisionCounter--;
         }
     } else {
-        // tiny commanded move → ignore
-        collisionCounter = 0;
+        if (m_collisionCounter > 0) m_collisionCounter--;
     }
-    /**/
+
+    // ================================================================
+    //  2. STALL DETECTION — déplacement/temps (lente, STALL_DELAY_MS)
+    //     Toujours active — fonctionne pour translation ET rotation.
+    //     Vérifie périodiquement si le robot a progressé vers sa cible.
+    //     Fires même sur une rotation pure (turn/align bloqué).
+    // ================================================================
+
+    if (elapsed > STALL_DELAY_MS) {
+        uint32_t nowMs = millis();
+
+        if (m_lastStallCheck == 0 || (nowMs - m_lastStallCheck) >= STALL_CHECK_PERIOD_MS) {
+            m_lastStallCheck = nowMs;
+
+            // Fenêtre glissante : déplacement depuis le DERNIER check (pas depuis startPos)
+            // → détecte un blocage en fin de move (phase décélération) où le robot
+            //   n'a pas bougé récemment même s'il a déjà parcouru la majorité du trajet.
+            Vec2  recentTrans(position.x - m_lastStallPos.x, position.y - m_lastStallPos.y);
+            float recentAng = fabsf(shortestAngleDiff(position.c, m_lastStallPos.c));
+
+            float transTarget = Vec2(target.x - startPos.x, target.y - startPos.y).mag();
+            float angTarget   = fabsf(shortestAngleDiff(target.c, startPos.c));
+
+            // Stall translationnel : cible avec composante trans, mais robot immobile
+            bool transStall = (transTarget > STALL_TARGET_TRANS_MM)
+                           && (recentTrans.mag() < STALL_RECENT_DISP_MM);
+
+            // Stall rotationnel : cible avec composante rot, mais robot immobile
+            bool angStall = (angTarget > STALL_TARGET_ANGLE_RAD)
+                         && (recentAng  < STALL_RECENT_ANGLE_RAD);
+
+            if (transStall || angStall) {
+                m_collisionCounter = COLLISION_COUNT_LIMIT;
+                Console::warn("PositionController")
+                    << "Stall: recent_trans=" << (int)recentTrans.mag() << "mm"
+                    << " recent_ang=" << (int)(recentAng * RAD_TO_DEG) << "deg"
+                    << " t=" << (int)(elapsed / 1000) << "s"
+                    << Console::endl;
+            }
+
+            // Mise à jour du snapshot pour la prochaine fenêtre
+            m_lastStallPos = position;
+        }
+    }
+
     last_position = position;
     last_velocity = velocity;
 }
 
-void PositionController::onPausing(){
-    Console::error() << "Not implemented, cancelling instead" << Console::endl;
-    onCanceling(); 
+
+// ============================================================
+//  onPausing / onCanceling
+// ============================================================
+
+void PositionController::onPausing() {
+    onCanceling();
 }
 
-void PositionController::onCanceling(){
+void PositionController::onCanceling() {
+    float dt = Settings::Motion::PID_INTERVAL * 1e-6f;
 
-    float dt = Settings::Motion::PID_INTERVAL * 1e-6;
+    // Décélération exponentielle
+    target_velocity *= 0.9f;
 
-    target_velocity *= 0.9;
-    
     velocity = localisation.getVelocity();
-    //velocity = controller.getCurrentVelocity();
     velocity.rotateZ(-position.c);
-    position = position + ( velocity * dt);
+    position = position + (velocity * dt);
 
-    Vec3 final_target_velocity = target_velocity;
-    if(fabs(target_velocity.x) < 20) final_target_velocity.x = 0;
-    if(fabs(target_velocity.y) < 20) final_target_velocity.y = 0;
-    if(fabs(target_velocity.c) < 0.1) final_target_velocity.c = 0;
+    Vec3 final_vel = target_velocity;
+    if (fabsf(final_vel.x) < 20.0f) final_vel.x = 0.0f;
+    if (fabsf(final_vel.y) < 20.0f) final_vel.y = 0.0f;
+    if (fabsf(final_vel.c) < 0.1f)  final_vel.c = 0.0f;
 
-    if(final_target_velocity.magSq() > 0){
-        final_target_velocity.rotateZ(position.c);
-        controller.setTargetVelocity(final_target_velocity);
-    }else{
-        controller.setTargetVelocity(Vec3(0));
-        //Console::info("PositionController") << "cancel from start" << Console::endl;
+    if (final_vel.magSq() > 0.0f) {
+        final_vel.rotateZ(position.c);
+        controller.setTargetVelocity(final_vel);
+    } else {
+        controller.setTargetVelocity(Vec3(0.0f));
         reset();
         m_state = JobState::CANCELING;
         onCanceled();
     }
 }
 
+
+// ============================================================
+//  step / control
+// ============================================================
+
 void PositionController::step() {
-    if(!isBusy()) return;
+    if (!isBusy()) return;
     controller.step();
 }
 
 void PositionController::control() {
-    if(!isBusy()) return;
+    if (!isBusy()) return;
 
     static long lastTime = 0;
-    if(micros() - lastTime > Settings::Motion::PID_MIN_INTERVAL) {
-        //THROW(position);
-		lastTime = micros();
-        if(isPausing()) onCanceling();
-        else if(isCanceling()) onCanceling();
-        else if(isCanceled()) return;
-        else if(isCompleted()) return;
-        else onUpdate();
-    }
+    if (micros() - lastTime < (long)Settings::Motion::PID_MIN_INTERVAL) return;
+    lastTime = micros();
+
+    if      (isPausing())   onCanceling();
+    else if (isCanceling()) onCanceling();
+    else if (isCanceled())  return;
+    else if (isCompleted()) return;
+    else                    onUpdate();
 }
 
-void PositionController::deccelerate(){
-    float dt = Settings::Motion::PID_INTERVAL * 1e-6;
-    //Position
+
+// ============================================================
+//  Setters
+// ============================================================
+
+void PositionController::setPosition(const Vec3& t) { position = t; }
+void PositionController::setTarget(const Vec3& t)   { newTarget = t; }
+void PositionController::setSteppers(Stepper* a, Stepper* b, Stepper* c) {
+    controller.setSteppers(a, b, c);
+    controller.setTargetVelocity(Vec3(0.0f));
+}
+
+
+// ============================================================
+//  deccelerate (utilisée si besoin par le caller)
+// ============================================================
+
+void PositionController::deccelerate() {
+    float dt = Settings::Motion::PID_INTERVAL * 1e-6f;
+
     float currentSpeed = velocity.mag();
-    if (currentSpeed > 0) {
+    if (currentSpeed > 0.0f) {
         acceleration = Vec2::normalize(velocity) * (-Settings::Motion::MAX_ACCEL * m_feedrate);
-        //Serial.println(acceleration);
     } else {
-        acceleration = Vec2(0);
+        acceleration = Vec2(0.0f);
     }
 
-    //Rotation
-    if (velocity.c > 0) {
+    if (velocity.c > 0.0f)
         acceleration.c = NORMALIZE(velocity.c) * (-Settings::Motion::MAX_ROT_ACCEL * m_feedrate);
+    else
+        acceleration.c = 0.0f;
+
+    target_velocity.x = 0.98f  * (target_velocity.x + acceleration.x * dt);
+    target_velocity.y = 0.98f  * (target_velocity.y + acceleration.y * dt);
+    target_velocity.c = 0.998f * (target_velocity.c + acceleration.c * dt);
+
+    Vec3 final_vel = target_velocity;
+    if (fabsf(final_vel.x) < 5.0f) final_vel.x = 0.0f;
+    if (fabsf(final_vel.y) < 5.0f) final_vel.y = 0.0f;
+    if (fabsf(final_vel.c) < 0.5f) final_vel.c = 0.0f;
+
+    if (final_vel.magSq() > 100.0f) {
+        final_vel.rotateZ(position.c);
+        controller.setTargetVelocity(final_vel);
     } else {
-        acceleration.c = 0;
-    }    
-
-    target_velocity.x = 0.98 * (target_velocity.x + acceleration.x * dt);
-    target_velocity.y = 0.98 * (target_velocity.y + acceleration.y * dt);
-    target_velocity.c = 0.998 * (target_velocity.c +  acceleration.c * dt);
-
-    Vec3 final_target_velocity = target_velocity;
-    if(fabs(target_velocity.x) < 5) final_target_velocity.x = 0;
-    if(fabs(target_velocity.y) < 5) final_target_velocity.y = 0;
-    if(fabs(target_velocity.c) < 0.5) final_target_velocity.c = 0;
-
-    if(final_target_velocity.magSq() > 100){
-        final_target_velocity.rotateZ(position.c);
-        controller.setTargetVelocity(final_target_velocity);
-    }else{
-        controller.setTargetVelocity(Vec3(0));
+        controller.setTargetVelocity(Vec3(0.0f));
+        Console::success("PositionController") << "Move canceled successfully" << Console::endl;
+        newTarget = target = position;
         onCanceled();
         reset();
         m_state = JobState::CANCELED;
-        Console::success("PositionController") << "Successfully canceled move" << Console::endl;
-        //complete();
-        newTarget = target = position;  // Reset target to current position.
     }
 }
-
-void PositionController::setPosition(const Vec3 &t){
-    position = t;
-}
-
-void PositionController::setTarget(const Vec3 &t){
-    //Console::info() << "Setting target to " << t << Console::endl;
-    newTarget = t;
-}
-
-void PositionController::setSteppers(Stepper* a, Stepper* b, Stepper* c){
-    controller.setSteppers(a,b,c);
-    controller.setTargetVelocity(Vec3(0));
-}
-
-
-
-/*
-float command(float dt,
-              float error,
-              float velocity,
-              float maxAccel,
-              float minSpeed,
-              float maxSpeed,
-              float minDistance,
-              float proportionalThreshold,
-              float proportionalVelocityThreshold)
-{
-    constexpr float EPSILON = 1e-5f;
-
-    // If the target is within minDistance, no acceleration needed.
-    if (fabs(error) < minDistance)
-    {
-        return 0.0f;
-    }
-
-    float direction = NORMALIZE(error);
-
-    // Compute desired proportional speed based on position error.
-    float targetSpeed = maxSpeed;
-    if (fabs(error) < proportionalThreshold)
-    {
-        targetSpeed = std::min(minSpeed, maxSpeed * (fabs(error) / proportionalThreshold));
-    }
-    //targetSpeed = std::min(minSpeed, maxSpeed/10.0f * (fabs(error)));
-
-    float targetVel = direction * targetSpeed;
-
-    // Compute velocity error.
-    float velError = targetVel - velocity;
-
-    // Scale acceleration proportionally based on velocity error.
-    
-    float accel = maxAccel;
-    
-    if (fabs(velError) < proportionalVelocityThreshold)
-    {
-        accel = std::min(maxAccel, maxAccel * (fabs(velError) / proportionalVelocityThreshold));
-    }
-    //accel = std::min(maxAccel, maxAccel/10.0f * (fabs(velError)));
-
-    // Compute the required stopping distance from current velocity.
-    float stoppingDistance = (velocity * velocity) / (2.0f * (accel + EPSILON));
-
-    float acceleration = 0.0f;
-
-    // Determine motion phase clearly.
-    if (stoppingDistance*1.0 >= fabs(error))
-    {
-        // Deceleration phase.
-        acceleration = -NORMALIZE(velocity) * accel;
-    }
-    else if (fabs(velError) > EPSILON)
-    {
-        // Acceleration phase.
-        acceleration = NORMALIZE(velError) * accel;
-    }
-    else
-    {
-        // Constant velocity phase.
-        acceleration = 0.0f;
-    }
-
-    // Clamp the final acceleration.
-    return std::clamp(acceleration, -maxAccel, maxAccel);
-}
-/**/

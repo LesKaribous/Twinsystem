@@ -333,6 +333,8 @@ void command_collision_detect(const args_t& args){
     if(args.size() != 1) return;
     bool state = args[0] == "1" || args[0].equalsIgnoreCase("true") || args[0].equalsIgnoreCase("on");
     motion.cancelOnCollide(state);
+    if(state) Console::info("Interpreter") << "Collision detection enabled" << Console::endl;
+    else Console::info("Interpreter") << "Collision detection disabled" << Console::endl;
 }
 
 

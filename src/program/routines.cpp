@@ -218,7 +218,11 @@ void onRobotBoot(){
     ihm.drawBootProgress("Linking terminal...");
     os.attachService(&terminal); ihm.addBootProgress(10);
 
-    ihm.drawBootProgress("Registering Commands..."); 
+    ihm.drawBootProgress("Linking vision...");
+    os.attachService(&vision); ihm.addBootProgress(10);
+    // vision.disable();  // Décommenter si TwinVision non connecté
+
+    ihm.drawBootProgress("Registering Commands...");
     registerCommands(); ihm.addBootProgress(10);
 
     ihm.resetButton.resetDuration();

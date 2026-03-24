@@ -19,6 +19,7 @@ enum ServiceID{
     ID_TERMINAL,
     ID_ACTUATORS,
     ID_LOCALISATION,
+    ID_VISION,       // TwinVision — caméra centrale
     ID_NOT_A_SERVICE
     //Add new services here
 }; 

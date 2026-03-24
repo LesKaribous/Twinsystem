@@ -3,8 +3,13 @@
 #include "pin.h"
 #include "utils/geometry.h"
 
-#define INTERCOM_SERIAL Serial1
+#define INTERCOM_SERIAL   Serial1
 #define INTERCOM_BAUDRATE 31250
+
+// TwinVision — caméra centrale (XBee sur Serial2)
+// TX=8, RX=7 sur Teensy 4.1
+#define VISION_SERIAL   Serial2
+#define VISION_BAUDRATE 115200
 
 //#define XBEE
 #ifdef XBEE

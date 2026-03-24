@@ -3,19 +3,142 @@
 #include "config/score.h"
 #include "config/env.h"
 #include "routines.h"
+#include "mission.h"
+#include "services/lidar/occupancy.h"
 
+// TODO : déplacer dans Actuators
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-void match(){
-    //start match
-    motion.setFeedrate(1.0);
-    matchB();
-    /*
-    if(ihm.isColor(Settings::BLUE)) 
-        matchA();
-    else 
-        matchB();
-    */
+
+// ============================================================
+//  Helpers internes
+// ============================================================
+
+// Durée estimée des déplacements principaux (ms) — à affiner selon les mesures
+namespace Timing {
+    constexpr uint32_t COLLECT_STOCK_A = 8000;
+    constexpr uint32_t COLLECT_STOCK_B = 6000;
+}
+
+// Offset commun factored
+static void collectStock(Vec2 target, TableCompass tc, RobotCompass rc) {
+    constexpr float    APPROACH_OFFSET = 300.0f;
+    constexpr float    GRAB_OFFSET     = 155.0f;
+    constexpr uint32_t GRAB_DELAY_MS   = 1000;
+
+    Vec2 approach = target - PolarVec(getCompassOrientation(tc) * DEG_TO_RAD, APPROACH_OFFSET).toVec2();
+    Vec2 grab     = target - PolarVec(getCompassOrientation(tc) * DEG_TO_RAD, GRAB_OFFSET).toVec2();
+
+    async motion.goAlign(approach, rc, getCompassOrientation(tc));
+    async motion.goAlign(grab,     rc, getCompassOrientation(tc));
+
+    actuators.moveElevator(rc, ElevatorPose::DOWN);
+    waitMs(GRAB_DELAY_MS);
+    actuators.grab(rc);
+    waitMs(GRAB_DELAY_MS);
+    actuators.moveElevator(rc, ElevatorPose::STORE);
+
+    safety.enable();
+    motion.setFeedrate(1.0f);
+}
+
+
+// ============================================================
+//  Définition des blocs — une fonction par objectif
+//  Retourne SUCCESS ou FAILED selon le résultat
+// ============================================================
+
+// Retourne true si la couleur de l'objet justifie une collecte.
+// UNKNOWN = bénéfice du doute (on tente quand même).
+// NONE    = pas d'objet, inutile d'y aller.
+static bool isColorUseful(ObjectColor color) {
+    if (color == ObjectColor::NONE)    return false;
+    if (color == ObjectColor::UNKNOWN) return true; // lidar/vision non dispo → on tente
+    // Adapter selon les règles du match :
+    // ex: on ne collecte que les objets d'une certaine couleur
+    return true;
+}
+
+static BlockResult blockCollectA() {
+    // Interroger la couleur avant de se déplacer (sync, 400ms max)
+    ObjectColor color = vision.queryColorSync(POI::testA, 400);
+    Console::info("Strategy") << "Zone A: " << colorName(color) << Console::endl;
+    if (!isColorUseful(color)) return BlockResult::FAILED;
+
+    async motion.goAlign(POI::testA, RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
+    if (!motion.wasSuccessful()) return BlockResult::FAILED;
+
+    collectStock(POI::testA, TableCompass::SOUTH, RobotCompass::AB);
+    return motion.wasSuccessful() ? BlockResult::SUCCESS : BlockResult::FAILED;
+}
+
+static BlockResult blockCollectB() {
+    ObjectColor color = vision.queryColorSync(POI::testB, 400);
+    Console::info("Strategy") << "Zone B: " << colorName(color) << Console::endl;
+    if (!isColorUseful(color)) return BlockResult::FAILED;
+
+    async motion.goAlign(POI::testB, RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
+    if (!motion.wasSuccessful()) return BlockResult::FAILED;
+
+    collectStock(POI::testB, TableCompass::EAST, RobotCompass::CA);
+    return motion.wasSuccessful() ? BlockResult::SUCCESS : BlockResult::FAILED;
+}
+
+
+// ============================================================
+//  Conditions de faisabilité
+//  Appelées par Mission AVANT d'envoyer le robot vers un bloc.
+//  Retourne false → bloc skippé immédiatement, Mission tente le suivant.
+//
+//  ZONE_CHECK_RADIUS : rayon (mm) autour du POI vérifié dans l'occupancy map.
+//  ~450mm couvre le POI + la zone d'approche (offset 300mm).
+//  Si la carte est vide (lidar secondaire non connecté),
+//  isZoneOccupied retourne false → check passe et le robot tente quand même.
+// ============================================================
+
+namespace ZoneCheck {
+    constexpr float RADIUS = 450.0f; // mm (~3 cellules de 150mm)
+}
+
+static bool isZoneAFree() {
+    bool occupied = occupancy.isZoneOccupied(POI::testA, ZoneCheck::RADIUS);
+    if (occupied)
+        Console::warn("Strategy") << "Zone A occupee — bloc skipe" << Console::endl;
+    return !occupied;
+}
+
+static bool isZoneBFree() {
+    bool occupied = occupancy.isZoneOccupied(POI::testB, ZoneCheck::RADIUS);
+    if (occupied)
+        Console::warn("Strategy") << "Zone B occupee — bloc skipe" << Console::endl;
+    return !occupied;
+}
+
+
+// ============================================================
+//  match() — point d'entrée du match
+// ============================================================
+
+void match() {
+    motion.setFeedrate(1.0f);
+    motion.enableCruiseMode();
+
+    Mission mission;
+    mission
+        .setMode(Mission::SelectMode::PRIORITY)
+        .setTimeProvider([]() -> uint32_t {
+            long t = chrono.getTimeLeft();
+            return (t > 0) ? (uint32_t)t : 0u;
+        })
+        .setSafetyMargin(5000)  // Ne pas démarrer un bloc si < 5s restantes
+        // { nom,           priorité, points, durée estimée (ms), action,       faisabilité }
+        .add({ "collect_A", 10,       150,    Timing::COLLECT_STOCK_A, blockCollectA, isZoneAFree })
+        .add({ "collect_B",  8,        80,    Timing::COLLECT_STOCK_B, blockCollectB, isZoneBFree });
+
+    mission.run();
+
+    chrono.onMatchNearlyFinished();
+    chrono.onMatchFinished();
 }
 
 void waitMs(unsigned long time){
@@ -68,48 +191,6 @@ void recalage(){
     initPump(); //TODO : Integrate into Actuators 
 }
 
-//BLUE
-void matchA(){
-    //do Match
-    //async motion.turn(3600);
-    //motion.enableCruiseMode();
-    for(int i = 0; i < 10; i++){
-        async motion.go(POI::b2 + Vec2(0,-600));
-        async motion.go(POI::b2);
-    }
-
-    chrono.onMatchNearlyFinished();
-    chrono.onMatchFinished();
-}
-
-void matchB(){
-    motion.setFeedrate(1.0);
-    bool isYellow = ihm.isColor(Settings::YELLOW);
-    motion.enableCruiseMode();
-
-    async motion.goAlign(POI::testA, RobotCompass::AB, getCompassOrientation(TableCompass::SOUTH));
-    
-    //---- Take Stock ----
-    takeAllStock(
-        POI::testA,
-        TableCompass::SOUTH
-    );
-
-    async motion.goAlign(POI::testB, RobotCompass::CA, getCompassOrientation(TableCompass::EAST));
-    
-    //---- Take Stock ----
-    takeStock(
-        POI::testB,
-        TableCompass::EAST
-    );
-
-
-    waitMs(5000);
-
-    //Wait for the end to arrive (left space for PAMI)
-    chrono.onMatchNearlyFinished(); 
-    chrono.onMatchFinished();
-}
 
 void nearEnd(){
     //if(motion.isPending())motion.forceCancel();
@@ -141,74 +222,7 @@ void nearEnd(){
     chrono.onMatchFinished();
 }
 
-void takeAllStock(Vec2 target, TableCompass tc){
-    const float approachOffset = 300; //250 
-    float grabOffset = 155;//175 //150
-    if(ihm.isColor(Settings::BLUE)) grabOffset = 155;
-    RobotCompass rc = RobotCompass::AB;
-
-    const float itemOffsetA = 125;//100
-    const float itemOffsetB = 225;//100 * 2
-    const float itemGrab = 125;//120
-    const unsigned long delayTime = 1000;
-
-    Vec2 approach = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, approachOffset).toVec2();
-    Vec2 grab = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, grabOffset).toVec2();
-
-    // ---- Take first planks ----
-    //async motion.go(approach); 
-    //async motion.align(rc, getCompassOrientation(tc));
-    async motion.goAlign(approach, rc, getCompassOrientation(tc)); //opti
-    async motion.goAlign(grab, rc, getCompassOrientation(tc)); //opti
-    
-    actuators.moveElevator(rc, ElevatorPose::DOWN);
-    waitMs(delayTime);
-    actuators.grab(rc);
-    waitMs(delayTime);
-    actuators.moveElevator(rc, ElevatorPose::STORE);
-
-    // !!!! Engage safety !!!!
-    safety.enable();
-    //-------------------------
-
-    motion.setFeedrate(1.0);
-}
-
-
-void takeStock(Vec2 target, TableCompass tc){
-    const float approachOffset = 300; //250 
-    float grabOffset = 155;//175 //150
-    if(ihm.isColor(Settings::BLUE)) grabOffset = 155;
-    RobotCompass rc = RobotCompass::CA;
-
-    const float itemOffsetA = 125;//100
-    const float itemOffsetB = 225;//100 * 2
-    const float itemGrab = 125;//120
-    const unsigned long delayTime = 1000;
-
-    Vec2 approach = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, approachOffset).toVec2();
-    Vec2 grab = target - PolarVec(getCompassOrientation(tc)*DEG_TO_RAD, grabOffset).toVec2();
-
-    // ---- Take first planks ----
-    //async motion.go(approach); 
-    //async motion.align(rc, getCompassOrientation(tc));
-    async motion.goAlign(approach, rc, getCompassOrientation(tc)); //opti
-    async motion.goAlign(grab, rc, getCompassOrientation(tc)); //opti
-    
-    actuators.moveElevator(rc, ElevatorPose::DOWN);
-    waitMs(delayTime);
-    actuators.grab(rc);
-    waitMs(delayTime);
-    
-    actuators.moveElevator(rc, ElevatorPose::STORE);
-    waitMs(delayTime);
-    actuators.grab(rc);
-    // !!!! Engage safety !!!!
-    safety.enable();
-    //-------------------------
-
-    motion.setFeedrate(1.0);
-}
+// takeAllStock / takeStock ont été mergées en collectStock() — voir ci-dessus
 
 
 RobotCompass nextActuator(RobotCompass rc){

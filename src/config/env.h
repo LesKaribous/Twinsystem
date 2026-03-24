@@ -9,4 +9,5 @@
 #include "services/chrono/chrono.h"
 #include "services/safety/safety.h"
 #include "services/terminal/terminal.h"
+#include "services/vision/vision.h"
 #include "os/os.h"

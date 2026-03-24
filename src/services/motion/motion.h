@@ -7,124 +7,145 @@
 #include "services/motion/controller/stepperController.h"
 #include "services/motion/stepper.h"
 
-//BNO
 #include <Wire.h>
 #include <SPI.h>
 
-class Motion : public Service, public Job{
-public:
+// ============================================================
+//  Motion — service de déplacement holonomique
+//
+//  Deux contrôleurs disponibles :
+//    - CruiseMode (PositionController) : PID + OTOS, précis,
+//      utilisé quand localisation est active.
+//    - StepperMode (StepperController) : open-loop pas-à-pas,
+//      fallback ou déplacements courts.
+//
+//  Usage typique dans un bloc Mission :
+//    async motion.goAlign(POI::targetA, RobotCompass::A, 90);
+//    if (!motion.wasSuccessful()) return BlockResult::FAILED;
+// ============================================================
 
+class Motion : public Service, public Job {
+public:
     Motion();
 
-    void attach() override;
-    void run() override;
-    void exec() override;
+    void attach()  override;
+    void run()     override;
+    void exec()    override;
 
-    void enable() override;
+    void enable()  override;
     void disable() override;
 
-    void engage();// Engaging motors make them ready to move. Motors may be engaged but sleeping !
-    void disengage();// Disengaging motors turn them off. They cannot move at all.
+    // Engage = moteurs alimentés et prêts ; Disengage = moteurs hors tension
+    void engage();
+    void disengage();
 
-    Motion& go(Vec2);
+    // ---- Commandes de mouvement (chainables) ----
+    Motion& go(Vec2 target);
     Motion& go(float x, float y);
     Motion& goAlign(Vec2 target, RobotCompass rc, float orientation);
-    Motion& goPolar(float angle, float dist);
-    Motion& goPolarAlign(float angle, float dist, RobotCompass rc, float orientation);
-    Motion& turn(float w);
-    Motion& align(RobotCompass, float orientation);
+    Motion& goPolar(float heading, float dist);
+    Motion& goPolarAlign(float heading, float dist, RobotCompass rc, float orientation);
+    Motion& turn(float angle);
+    Motion& align(RobotCompass rc, float orientation);
     Motion& move(Vec3 target);
 
+    // ---- Cycle ISR (appelé depuis le CycleManager) ----
     void step();
     void control();
-    
-    void start() override;
-    void pause() override;
-    void resume() override;
-    void cancel() override;
+
+    // ---- Cycle de vie du Job ----
+    void start()       override;
+    void pause()       override;
+    void resume()      override;
+    void cancel()      override;
     void forceCancel() override;
-    void complete() override;
-    
-    void onRunning();
-    void onPausing() override;  //Called every run if in Pausing state
-    void onCanceling() override; //Called every run if in  exiting Pausing state
+    void complete()    override;
 
-    void onPaused() override;   //Called once when exiting Pausing state
-    void onCanceled() override; //Called once when exiting Canceling state
+    void onPausing()   override;
+    void onCanceling() override;
+    void onPaused()    override;
+    void onCanceled()  override;
 
-    Vec3 estimatedPosition(); //The closest value of our physical position
-    bool hasFinished();
+    // ---- Requêtes d'état ----
+    Vec3  estimatedPosition();
+    bool  hasFinished();
 
-    //Setters
-    //void setStepsVelocity(float velocity); //feed rate will be appied automatically (see setFeedrate)
-    void setAbsTarget(Vec3);    //mm, mm, rad
-    void setAbsPosition(Vec3);  //mm, mm, rad
+    // true si le dernier move s'est terminé normalement (pas CANCELED)
+    // Utiliser dans les blocs Mission après `async motion.go(...)`.
+    bool wasSuccessful() const;
+
+    bool isAbsolute()  const;
+    bool isRelative()  const;
+    bool isRotating()  const;
+    bool isSleeping()  const;
+    bool isMoving()    const;
+
+    // ---- Modes ----
     void setAbsolute();
     void setRelative();
-    void setAsync(); //Non blocking
-    void setSync(); //Blocking
-
-    void setFeedrate(float feed);
-    float getFeedrate() const;
-
-    Vec3 getAbsTarget() const;  //Absolute mm, mm, rad
-    Vec3 getAbsPosition() const;//Absolute mm, mm, rad
-
-    float getTargetDirection() const;
-    float getAbsoluteTargetDirection() const;
-    float getTargetDistance() const;
-
-    float getOrientation();
-    void setOrientation(float angle);
-    
-    bool isAbsolute() const;
-    bool isRelative() const;
-    bool isRotating() const;
-    bool isSleeping() const;
-    bool isMoving() const;
-
-    void enableOptimization(); // Use rotation optimization (see optmizeRelTarget)
-    void disableOptimization();// disable rotation optimization (see optmizeRelTarget)
-
+    void setAsync();
+    void setSync();
+    void enableOptimization();
+    void disableOptimization();
     void enableCruiseMode();
     void disableCruiseMode();
-
     void cancelOnCollide(bool state);
 
-private :
-    Stepper m_sA, m_sB, m_sC;
+    // ---- Position / target ----
+    void  setAbsPosition(Vec3);
+    Vec3  getAbsPosition() const;
+    void  setAbsTarget(Vec3);
+    Vec3  getAbsTarget()   const;
 
+    float getTargetDirection()         const;
+    float getAbsoluteTargetDirection() const;
+    float getTargetDistance()          const;
 
-    bool m_async = true; //non blocking by default
-    bool use_cruise_mode = true; //non blocking by default
-    bool current_move_cruised = false; //non blocking by default
+    float getOrientation();
+    void  setOrientation(float angle);
 
-    ///Vec3 unrecorded_steps; //Steps that need to be incorporated into position estimation.
-
-    Vec3 optmizeRelTarget(Vec3 relTarget);
-    Vec3 toRelativeTarget(Vec3 absTarget);
-    Vec3 toAbsoluteTarget(Vec3 absTarget);
-
-    Vec3 _startPosition  = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _position       = { 0, 0, 0}; //Absolute mm, mm, rad
-    Vec3 _target 	     = { 0, 0, 0}; //Absolute mm, mm, rad
-
-    bool use_cancel_on_collide = false;
-
-    Vec2 _controlPoint   = { 0, 0};
-
-    PositionController cruise_controller;
-    StepperController stepper_controller;
-
-    float m_feedrate = 1.0;
-
-    bool _engaged, _sleeping;
-    bool _absolute = true;
-    bool _isMoving = false;
-    bool _isRotating = false;
-    bool _optimizeRotation = true;
-    bool _debug = true;
+    // ---- Feedrate [0.05 – 1.0] ----
+    void  setFeedrate(float feed);
+    float getFeedrate() const;
 
     SINGLETON(Motion);
+
+private:
+    // ---- Steppers ----
+    Stepper m_sA, m_sB, m_sC;
+
+    // ---- Contrôleurs ----
+    PositionController cruise_controller;
+    StepperController  stepper_controller;
+
+    bool use_cruise_mode      = true;
+    bool current_move_cruised = false;
+
+    // ---- Options ----
+    bool m_async              = true;
+    bool use_cancel_on_collide = false;
+    bool _optimizeRotation    = true;
+    bool _absolute            = true;
+    bool _debug               = true;
+
+    // ---- État ----
+    bool _engaged    = false;
+    bool _sleeping   = false;
+    bool _isMoving   = false;
+    bool _isRotating = false;
+
+    float m_feedrate = 1.0f;
+
+    Vec3 _startPosition = {0, 0, 0};
+    Vec3 _position      = {0, 0, 0};
+    Vec3 _target        = {0, 0, 0};
+    Vec2 _controlPoint  = {0, 0};
+
+    // ---- Helpers ----
+    void onRunning();
+    Vec3 optimizeRelTarget(Vec3 relTarget);
+    Vec3 toRelativeTarget(Vec3 absTarget);
+    Vec3 toAbsoluteTarget(Vec3 relTarget);
 };
+
 SINGLETON_EXTERN(Motion, motion)
