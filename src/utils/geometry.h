@@ -15,12 +15,12 @@ enum class TableCompass{
 };
 
 enum class RobotCompass{
-    A,
-    AB,
-    B,
-    BC,
-    C, //Screen
-    CA
+    A, //BAU
+    AB, //hugger
+    B, //Screen
+    BC, //vide
+    C, //tirette
+    CA // manipulator
 };
 
 enum class Side{

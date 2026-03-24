@@ -255,9 +255,8 @@ void command_rawTurn(const args_t& args){
     /**/
     if(args.size() != 1)return;
     float x = args[0].toFloat();
-    motion.disableOptimization();
-    async motion.turn(x);
-    motion.enableOptimization();
+
+    async motion.withOptimization(false).turn(x);
     /**/
 }
 

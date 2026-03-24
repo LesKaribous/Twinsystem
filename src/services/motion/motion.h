@@ -20,12 +20,46 @@
 //      fallback ou déplacements courts.
 //
 //  Usage typique dans un bloc Mission :
-//    async motion.goAlign(POI::targetA, RobotCompass::A, 90);
+//
+//    // Move simple
+//    async motion.go(500, 200);
 //    if (!motion.wasSuccessful()) return BlockResult::FAILED;
+//
+//    // Move avec options (reset automatique après le move) :
+//    async motion.cancelOnCollide().feedrate(0.7f).go(500, 200);
+//    async motion.noCollide().turn(90);
+//
+//    // Chemin multi-waypoints (via = pass-through, go = stop final) :
+//    async motion.via(200, 0).via(200, 300).go(500, 300);
+//    async motion.via(200, 0).cancelOnCollide().go(500, 300);
 // ============================================================
 
 class Motion : public Service, public Job {
 public:
+
+    // ============================================================
+    //  Options par move — POD appliqué dans move(), reset ensuite
+    //
+    //  Utiliser les fluent setters avant la commande de mouvement.
+    //  Les options ne s'appliquent qu'au move suivant et sont
+    //  automatiquement réinitialisées aux valeurs par défaut.
+    // ============================================================
+    struct MoveOptions {
+        bool  collisionEnabled = true;   // active la bump + stall detection
+        bool  cancelOnCollide  = false;  // annule le move si collision détectée
+        bool  optimizeRotation = true;   // minimise la rotation (stepper mode)
+        float feedrate         = -1.0f;  // -1 → utilise le feedrate global
+    };
+
+    // ============================================================
+    //  Waypoint interne — entrée de la queue
+    // ============================================================
+    struct Waypoint {
+        Vec3 target;
+        bool passThrough;  // true = ne pas s'arrêter, accepter dans WAYPOINT_RADIUS
+        MoveOptions opts;  // options propres à CE segment
+    };
+
     Motion();
 
     void attach()  override;
@@ -39,6 +73,23 @@ public:
     void engage();
     void disengage();
 
+    // ---- Fluent — options pour le prochain move (reset après move()) ----
+    // Enchaîner avant la commande de déplacement :
+    //   async motion.cancelOnCollide().feedrate(0.8f).go(x, y);
+
+    Motion& noCollide();                      // désactive bump + stall
+    Motion& withCollision(bool on = true);    // contrôle fin de la détection
+    Motion& cancelOnCollide(bool on = true);  // annule si collision détectée
+    Motion& withOptimization(bool on = true); // rotation optimisation (stepper)
+    Motion& feedrate(float f);               // feedrate pour CE move uniquement
+
+    // ---- Waypoints — chaîner via() avant go() ----
+    // via() ajoute un point intermédiaire en mode pass-through.
+    // go() / goAlign() / etc. ajoutent le point final (stop complet).
+    //   async motion.via(A).via(B).go(C);
+    Motion& via(Vec2 wp);
+    Motion& via(float x, float y);
+
     // ---- Commandes de mouvement (chainables) ----
     Motion& go(Vec2 target);
     Motion& go(float x, float y);
@@ -47,7 +98,7 @@ public:
     Motion& goPolarAlign(float heading, float dist, RobotCompass rc, float orientation);
     Motion& turn(float angle);
     Motion& align(RobotCompass rc, float orientation);
-    Motion& move(Vec3 target);
+    Motion& move(Vec3 target);  // commande bas niveau — applique m_pendingOpts
 
     // ---- Cycle ISR (appelé depuis le CycleManager) ----
     void step();
@@ -71,7 +122,6 @@ public:
     bool  hasFinished();
 
     // true si le dernier move s'est terminé normalement (pas CANCELED)
-    // Utiliser dans les blocs Mission après `async motion.go(...)`.
     bool wasSuccessful() const;
 
     bool isAbsolute()  const;
@@ -80,16 +130,13 @@ public:
     bool isSleeping()  const;
     bool isMoving()    const;
 
-    // ---- Modes ----
+    // ---- Modes globaux (persistants entre les moves) ----
     void setAbsolute();
     void setRelative();
     void setAsync();
     void setSync();
-    void enableOptimization();
-    void disableOptimization();
     void enableCruiseMode();
     void disableCruiseMode();
-    void cancelOnCollide(bool state);
 
     // ---- Position / target ----
     void  setAbsPosition(Vec3);
@@ -104,7 +151,7 @@ public:
     float getOrientation();
     void  setOrientation(float angle);
 
-    // ---- Feedrate [0.05 – 1.0] ----
+    // ---- Feedrate global [0.05 – 1.0] (utilisé si feedrate per-move = -1) ----
     void  setFeedrate(float feed);
     float getFeedrate() const;
 
@@ -121,9 +168,24 @@ private:
     bool use_cruise_mode      = true;
     bool current_move_cruised = false;
 
-    // ---- Options ----
+    // ---- Options en attente (pour le prochain move) ----
+    MoveOptions m_pendingOpts;   // accumulées par les fluent setters
+    MoveOptions m_activeOpts;    // options du move en cours (pour onRunning)
+
+    // ---- Waypoint queue ----
+    static constexpr int WAYPOINT_CAPACITY = 8;
+    static constexpr float WAYPOINT_RADIUS = 80.0f;  // mm — acceptance radius pass-through
+
+    Waypoint m_waypoints[WAYPOINT_CAPACITY];
+    int  m_waypointCount = 0;   // nombre de waypoints en queue (inclut le final)
+    int  m_waypointIndex = 0;   // index du waypoint courant
+
+    void enqueueWaypoint(Vec3 target, bool passThrough);
+    bool advanceWaypoint();      // passe au waypoint suivant, retourne true si plus rien
+    void clearWaypoints();
+
+    // ---- Modes globaux ----
     bool m_async              = true;
-    bool use_cancel_on_collide = false;
     bool _optimizeRotation    = true;
     bool _absolute            = true;
     bool _debug               = true;
@@ -143,6 +205,7 @@ private:
 
     // ---- Helpers ----
     void onRunning();
+    void startWaypoint(const Waypoint& wp);  // lance le move pour un waypoint
     Vec3 optimizeRelTarget(Vec3 relTarget);
     Vec3 toRelativeTarget(Vec3 absTarget);
     Vec3 toAbsoluteTarget(Vec3 relTarget);

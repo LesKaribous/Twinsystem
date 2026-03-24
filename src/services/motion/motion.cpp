@@ -33,6 +33,7 @@ FLASHMEM void Motion::attach() {
     _position      = {0, 0, 0};
     _target        = {0, 0, 0};
     _controlPoint  = {0, 0};
+    clearWaypoints();
 
     pinMode(Pin::Stepper::enable, OUTPUT);
 }
@@ -49,7 +50,6 @@ void Motion::run() {
     else if (isRunning())   onRunning();
 }
 
-// exec() : appelé en contexte bloquant (AsyncExecutor) — même comportement
 void Motion::exec() { run(); }
 
 
@@ -60,31 +60,55 @@ void Motion::exec() { run(); }
 void Motion::onRunning() {
     if (!isBusy()) return;
 
-    // Fin normale du mouvement
-    if (hasFinished()) {
-        complete();
-        return;
-    }
-
     // Annulation venue du contrôleur (collision, obstacle…)
-    bool canceled = false;
-    if (current_move_cruised)  canceled = cruise_controller.isCanceled();
-    if (!current_move_cruised) canceled = stepper_controller.isCanceled();
+    bool controllerCanceled = false;
+    if ( current_move_cruised) controllerCanceled = cruise_controller.isCanceled();
+    if (!current_move_cruised) controllerCanceled = stepper_controller.isCanceled();
 
-    if (canceled) {
+    if (controllerCanceled) {
         Console::warn("Motion") << "Move canceled by controller" << Console::endl;
+        clearWaypoints();
         onCanceled();
         return;
     }
 
-    // Détection de collision → cancel le cruise controller
-    if (current_move_cruised && use_cancel_on_collide && cruise_controller.collision()) {
+    // Détection de collision → cancel si l'option est active
+    if (current_move_cruised && m_activeOpts.cancelOnCollide && cruise_controller.collision()) {
         Console::warn("Motion") << "Collision detected — canceling" << Console::endl;
+        clearWaypoints();
         cruise_controller.cancel();
         return;
     }
 
-    // Tick du contrôleur stepper (le cruise est piloté par son propre cycle)
+    // Pass-through : si waypoint intermédiaire et robot suffisamment proche, enchaîner
+    bool passThrough = (m_waypointIndex < m_waypointCount - 1)
+                    && (m_waypoints[m_waypointIndex].passThrough);
+
+    if (passThrough) {
+        float distToWp = Vec2(_target - _position).mag();
+        if (distToWp < WAYPOINT_RADIUS) {
+            if (!advanceWaypoint()) {
+                startWaypoint(m_waypoints[m_waypointIndex]);
+            } else {
+                complete();
+            }
+            return;
+        }
+    }
+
+    // Fin normale du move courant
+    if (hasFinished()) {
+        if (!advanceWaypoint()) {
+            // Il reste des waypoints → lancer le suivant
+            startWaypoint(m_waypoints[m_waypointIndex]);
+        } else {
+            // Tous les waypoints traités
+            complete();
+        }
+        return;
+    }
+
+    // Tick du contrôleur stepper (le cruise est piloté par son propre cycle ISR)
     if (!current_move_cruised) stepper_controller.exec();
 }
 
@@ -168,6 +192,74 @@ void Motion::control() {
 
 
 // ============================================================
+//  Fluent — options pour le prochain move
+// ============================================================
+
+Motion& Motion::noCollide() {
+    m_pendingOpts.collisionEnabled = false;
+    return *this;
+}
+
+Motion& Motion::withCollision(bool on) {
+    m_pendingOpts.collisionEnabled = on;
+    return *this;
+}
+
+Motion& Motion::cancelOnCollide(bool on) {
+    m_pendingOpts.cancelOnCollide = on;
+    return *this;
+}
+
+Motion& Motion::withOptimization(bool on) {
+    m_pendingOpts.optimizeRotation = on;
+    return *this;
+}
+
+Motion& Motion::feedrate(float f) {
+    m_pendingOpts.feedrate = std::max(std::min(f, 1.0f), 0.05f);
+    return *this;
+}
+
+
+// ============================================================
+//  Waypoints
+// ============================================================
+
+Motion& Motion::via(float x, float y) {
+    return via(Vec2(x, y));
+}
+
+Motion& Motion::via(Vec2 wp) {
+    // Un via() est toujours pass-through et hérite des options pending courantes
+    Vec3 target3(_absolute ? wp.a : wp.a,
+                 _absolute ? wp.b : wp.b,
+                 _absolute ? _position.c * RAD_TO_DEG : 0.0f);
+    enqueueWaypoint(target3, true);
+    return *this;
+}
+
+void Motion::enqueueWaypoint(Vec3 target, bool passThrough) {
+    if (m_waypointCount >= WAYPOINT_CAPACITY) {
+        Console::error("Motion") << "Waypoint queue full" << Console::endl;
+        return;
+    }
+    m_waypoints[m_waypointCount] = { target, passThrough, m_pendingOpts };
+    m_waypointCount++;
+}
+
+// Avance l'index. Retourne true si la queue est épuisée.
+bool Motion::advanceWaypoint() {
+    m_waypointIndex++;
+    return (m_waypointIndex >= m_waypointCount);
+}
+
+void Motion::clearWaypoints() {
+    m_waypointCount = 0;
+    m_waypointIndex = 0;
+}
+
+
+// ============================================================
 //  API publique — mouvements
 // ============================================================
 
@@ -178,21 +270,27 @@ Motion& Motion::go(float x, float y) {
 
 Motion& Motion::go(Vec2 target) {
     _isMoving = true;
-    if (_absolute) move(Vec3(target.a, target.b, _position.c * RAD_TO_DEG));
-    else           move(Vec3(target.a, target.b, 0.0f));
+    Vec3 t3 = _absolute ? Vec3(target.a, target.b, _position.c * RAD_TO_DEG)
+                        : Vec3(target.a, target.b, 0.0f);
+    enqueueWaypoint(t3, false);  // point final : pas pass-through
+    // Lancer le premier waypoint
+    startWaypoint(m_waypoints[0]);
     return *this;
 }
 
 Motion& Motion::goPolar(float heading, float dist) {
     _isMoving = true;
     PolarVec pv(heading * DEG_TO_RAD, dist);
+    Vec3 t3;
     if (_absolute) {
         Vec2 t = _position + pv.toVec2();
-        move(Vec3(t.a, t.b, _position.c * RAD_TO_DEG));
+        t3 = Vec3(t.a, t.b, _position.c * RAD_TO_DEG);
     } else {
         Vec2 t = pv.toVec2();
-        move(Vec3(t.a, t.b, 0.0f));
+        t3 = Vec3(t.a, t.b, 0.0f);
     }
+    enqueueWaypoint(t3, false);
+    startWaypoint(m_waypoints[0]);
     return *this;
 }
 
@@ -200,21 +298,26 @@ Motion& Motion::goPolarAlign(float heading, float dist, RobotCompass rc, float o
     _isMoving = true;
     PolarVec pv(heading * DEG_TO_RAD, dist);
     float angle = orientation - getCompassOrientation(rc);
+    Vec3 t3;
     if (_absolute) {
         Vec2 t = _position + pv.toVec2();
-        move(Vec3(t.a, t.b, angle));
+        t3 = Vec3(t.a, t.b, angle);
     } else {
         Vec2 t = pv.toVec2();
-        move(Vec3(t.a, t.b, angle));
+        t3 = Vec3(t.a, t.b, angle);
     }
+    enqueueWaypoint(t3, false);
+    startWaypoint(m_waypoints[0]);
     return *this;
 }
 
 Motion& Motion::turn(float angle) {
     _isMoving   = true;
     _isRotating = true;
-    if (_absolute) move(Vec3(_position.a, _position.b, angle));
-    else           move(Vec3(0.0f, 0.0f, angle));
+    Vec3 t3 = _absolute ? Vec3(_position.a, _position.b, angle)
+                        : Vec3(0.0f, 0.0f, angle);
+    enqueueWaypoint(t3, false);
+    startWaypoint(m_waypoints[0]);
     return *this;
 }
 
@@ -226,10 +329,13 @@ Motion& Motion::goAlign(Vec2 target, RobotCompass rc, float orientation) {
     _isMoving   = true;
     _isRotating = true;
     float angle = orientation - getCompassOrientation(rc);
-    move(Vec3(target.a, target.b, angle));
+    enqueueWaypoint(Vec3(target.a, target.b, angle), false);
+    startWaypoint(m_waypoints[0]);
     return *this;
 }
 
+// move() : commande bas niveau — ne passe plus par la queue, applique directement.
+// Utilisé en interne par startWaypoint().
 Motion& Motion::move(Vec3 target) {
     if (!enabled()) {
         Console::error("Motion") << "Motion not enabled" << Console::endl;
@@ -260,35 +366,49 @@ Motion& Motion::move(Vec3 target) {
     _target = target;
     Console::info("Motion") << "Target: " << _target << "  Pos: " << _position << Console::endl;
 
+    // Résoudre le feedrate effectif (per-move override ou global)
+    float effectiveFeedrate = (m_activeOpts.feedrate > 0.0f) ? m_activeOpts.feedrate : m_feedrate;
+
     Vec3 relTarget = toRelativeTarget(_target);
 
     cruise_controller.reset();
     stepper_controller.reset();
 
-    // Collision active uniquement si le move a une composante translationnelle.
-    // Pendant une rotation pure, l'OTOS rapporte une vélocité translationnelle
-    // apparente (décalage capteur/centre) qui déclencherait de faux positifs.
+    // Bump detection désactivée pour les rotations pures, et selon l'option du move
     bool pureRotation = _isRotating
         && fabsf(_target.x - _position.x) < Settings::Motion::MIN_DISTANCE
         && fabsf(_target.y - _position.y) < Settings::Motion::MIN_DISTANCE;
-    cruise_controller.setCollisionEnabled(!pureRotation);
+    cruise_controller.setCollisionEnabled(m_activeOpts.collisionEnabled && !pureRotation);
 
     if (use_cruise_mode && localisation.enabled()) {
-        cruise_controller.setFeedrate(isRotating() ? m_feedrate * 0.5f : m_feedrate);
+        float feed = isRotating() ? effectiveFeedrate * 0.5f : effectiveFeedrate;
+        cruise_controller.setFeedrate(feed);
         cruise_controller.setPosition(_position);
         cruise_controller.setTarget(_target);
         current_move_cruised = true;
     } else {
-        if (_optimizeRotation) relTarget = optimizeRelTarget(relTarget);
+        if (m_activeOpts.optimizeRotation) relTarget = optimizeRelTarget(relTarget);
         Vec3 steps = ik(relTarget);
         Console::info("Motion") << "Stepper move: steps=" << steps << Console::endl;
-        stepper_controller.setFeedrate(isRotating() ? m_feedrate * 0.5f : m_feedrate);
+        float feed = isRotating() ? effectiveFeedrate * 0.5f : effectiveFeedrate;
+        stepper_controller.setFeedrate(feed);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         current_move_cruised = false;
     }
 
     start();
     return *this;
+}
+
+// startWaypoint() : extrait les options du waypoint, les installe en m_activeOpts,
+//                   puis lance move().
+void Motion::startWaypoint(const Waypoint& wp) {
+    m_activeOpts = wp.opts;
+    // Pour les via() les options pending ont déjà été capturées à l'enqueue.
+    // Les options pending sont consommées ici et resetées pour le prochain move.
+    m_pendingOpts = MoveOptions{};  // reset aux defaults
+
+    move(wp.target);
 }
 
 
@@ -336,7 +456,8 @@ void Motion::resume() {
         cruise_controller.reset();
         stepper_controller.reset();
         cruise_controller.setPosition(pos);
-        cruise_controller.setFeedrate(m_feedrate);
+        float effectiveFeedrate = (m_activeOpts.feedrate > 0.0f) ? m_activeOpts.feedrate : m_feedrate;
+        cruise_controller.setFeedrate(effectiveFeedrate);
         cruise_controller.setTarget(_target);
         if (m_async) {
             cruise_controller.start();
@@ -350,9 +471,10 @@ void Motion::resume() {
         cruise_controller.reset();
         stepper_controller.reset();
         Vec3 rel = toRelativeTarget(_target);
-        if (_optimizeRotation) rel = optimizeRelTarget(rel);
+        if (m_activeOpts.optimizeRotation) rel = optimizeRelTarget(rel);
         Vec3 steps = ik(rel);
-        stepper_controller.setFeedrate(m_feedrate);
+        float effectiveFeedrate = (m_activeOpts.feedrate > 0.0f) ? m_activeOpts.feedrate : m_feedrate;
+        stepper_controller.setFeedrate(effectiveFeedrate);
         stepper_controller.setTarget(steps.a, steps.b, steps.c);
         if (m_async) {
             stepper_controller.start();
@@ -376,6 +498,8 @@ void Motion::cancel() {
 void Motion::complete() {
     _isMoving   = false;
     _isRotating = false;
+    clearWaypoints();
+    m_pendingOpts = MoveOptions{};  // reset des options pending
     _startPosition = _position = estimatedPosition();
     cruise_controller.reset();
     stepper_controller.reset();
@@ -386,6 +510,8 @@ void Motion::complete() {
 void Motion::forceCancel() {
     _isMoving   = false;
     _isRotating = false;
+    clearWaypoints();
+    m_pendingOpts = MoveOptions{};
     _startPosition = _position = estimatedPosition();
     cruise_controller.reset();
     stepper_controller.reset();
@@ -435,7 +561,7 @@ bool Motion::wasSuccessful() const { return isCompleted(); }
 
 
 // ============================================================
-//  Mode / options
+//  Modes globaux
 // ============================================================
 
 void Motion::enableCruiseMode() {
@@ -447,14 +573,6 @@ void Motion::disableCruiseMode() {
     if (isMoving()) Console::error("Motion") << "Cannot toggle cruise while moving" << Console::endl;
     else use_cruise_mode = false;
 }
-
-void Motion::cancelOnCollide(bool state) { use_cancel_on_collide = state; }
-
-void Motion::enableOptimization()  { _optimizeRotation = true; }
-void Motion::disableOptimization() { _optimizeRotation = false; }
-
-void Motion::setAsync() { m_async = true; }
-void Motion::setSync()  { m_async = false; }
 
 
 // ============================================================
@@ -510,3 +628,6 @@ void Motion::setRelative()        { _absolute = false; }
 
 void Motion::setFeedrate(float f) { m_feedrate = std::max(std::min(f, 1.0f), 0.05f); }
 float Motion::getFeedrate() const { return m_feedrate; }
+
+void Motion::setAsync() { m_async = true; }
+void Motion::setSync()  { m_async = false; }
